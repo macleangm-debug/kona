@@ -52,6 +52,17 @@
   line-height: 0.85;
 }
 
+/* Top 10 numbers for grid layout */
+.top-10-number-grid {
+  font-size: 6rem;
+  font-weight: 900;
+  color: #141414;
+  -webkit-text-stroke: 2px #5a5a5a;
+  text-stroke: 2px #5a5a5a;
+  z-index: 1;
+  line-height: 0.85;
+}
+
 /* Custom animations */
 @keyframes shimmer {
   0% {
