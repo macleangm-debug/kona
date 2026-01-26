@@ -750,36 +750,69 @@ const StorePage = () => {
   const [loading, setLoading] = useState(true);
   const [checkingPayment, setCheckingPayment] = useState(false);
   const location = useLocation();
+  
+  // Geo & Payment state
+  const [geoData, setGeoData] = useState(null);
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showPaymentSheet, setShowPaymentSheet] = useState(false);
 
   useEffect(() => {
-    const fetchPackages = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get(`${API}/store/packages`);
-        setPackages(res.data);
+        const [packagesRes, geoRes, countriesRes] = await Promise.all([
+          axios.get(`${API}/store/packages`),
+          axios.get(`${API}/geo/detect`),
+          axios.get(`${API}/geo/countries`)
+        ]);
+        setPackages(packagesRes.data);
+        setGeoData(geoRes.data);
+        setCountries(countriesRes.data);
+        
+        // Set detected country as default
+        const detectedCountry = countriesRes.data.find(c => c.code === geoRes.data.country_code);
+        if (detectedCountry) {
+          setSelectedCountry(detectedCountry);
+          setSelectedPaymentMethod(detectedCountry.payment_methods[0]);
+        } else {
+          // Default to international
+          const intl = countriesRes.data.find(c => c.code === "INTL");
+          setSelectedCountry(intl);
+          setSelectedPaymentMethod(intl?.payment_methods[0]);
+        }
       } catch (e) {
         console.error(e);
       }
       setLoading(false);
     };
-    fetchPackages();
+    fetchData();
   }, []);
 
   // Check for payment return
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const sessionId = params.get("session_id");
+    const txRef = params.get("tx_ref");
+    const provider = params.get("provider") || "stripe";
     
-    if (sessionId && token) {
+    const paymentRef = sessionId || txRef;
+    
+    if (paymentRef && token) {
       setCheckingPayment(true);
       const pollStatus = async (attempts = 0) => {
         if (attempts >= 5) {
           setCheckingPayment(false);
           toast.error("Payment verification timed out");
+          navigate("/store", { replace: true });
           return;
         }
         
         try {
-          const res = await axios.get(`${API}/store/checkout/status/${sessionId}`, {
+          const res = await axios.get(`${API}/store/checkout/status/${paymentRef}?provider=${provider}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -788,34 +821,70 @@ const StorePage = () => {
             toast.success("Payment successful! Coins added to your account.");
             setCheckingPayment(false);
             navigate("/store", { replace: true });
-          } else if (res.data.status === "expired") {
-            toast.error("Payment session expired");
+          } else if (res.data.status === "expired" || res.data.status === "failed") {
+            toast.error("Payment failed or expired");
             setCheckingPayment(false);
+            navigate("/store", { replace: true });
           } else {
             setTimeout(() => pollStatus(attempts + 1), 2000);
           }
         } catch (e) {
           console.error(e);
           setCheckingPayment(false);
+          navigate("/store", { replace: true });
         }
       };
       pollStatus();
     }
   }, [location, token, refreshUser, navigate]);
 
-  const handlePurchase = async (packageId) => {
+  const handlePackageSelect = (pkg) => {
+    setSelectedPackage(pkg);
+    setShowPaymentSheet(true);
+  };
+
+  const handlePurchase = async () => {
+    if (!selectedPackage || !selectedPaymentMethod || !selectedCountry) return;
+    
+    // Check if mobile money requires phone number
+    if (selectedPaymentMethod.type === "mobilemoney" && !phoneNumber) {
+      toast.error("Please enter your phone number for mobile money payment");
+      return;
+    }
+    
     try {
       const res = await axios.post(`${API}/store/checkout`, {
-        package_id: packageId,
-        origin_url: window.location.origin
+        package_id: selectedPackage.id,
+        origin_url: window.location.origin,
+        payment_method: selectedPaymentMethod.id,
+        country_code: selectedCountry.code,
+        phone_number: phoneNumber || null
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
+      setShowPaymentSheet(false);
       window.location.href = res.data.url;
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to create checkout");
     }
+  };
+
+  const handleCountryChange = (country) => {
+    setSelectedCountry(country);
+    setSelectedPaymentMethod(country.payment_methods[0]);
+    setShowCountryPicker(false);
+  };
+
+  // Calculate local price
+  const getLocalPrice = (usdPrice) => {
+    if (!geoData || !selectedCountry) return `$${usdPrice.toFixed(2)}`;
+    const rate = geoData.exchange_rate || 1;
+    const localPrice = usdPrice * rate;
+    const currency = selectedCountry.currency || "USD";
+    
+    if (currency === "USD") return `$${usdPrice.toFixed(2)}`;
+    return `${currency} ${localPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   };
 
   if (loading) {
@@ -856,13 +925,26 @@ const StorePage = () => {
         </div>
       </Card>
 
+      {/* Country/Region Selector */}
+      <div className="mb-6">
+        <p className="text-sm text-muted-foreground mb-2">Your region</p>
+        <button
+          onClick={() => setShowCountryPicker(true)}
+          className="w-full p-3 rounded-xl bg-secondary/50 border border-white/10 flex items-center justify-between hover:bg-secondary/80 transition-all"
+          data-testid="country-selector"
+        >
+          <span className="font-medium">{selectedCountry?.name || "Select country"}</span>
+          <span className="text-muted-foreground text-sm">{selectedCountry?.currency || ""}</span>
+        </button>
+      </div>
+
       {/* Packages */}
       <h2 className="font-heading text-lg font-semibold mb-4">Buy Coins</h2>
       <div className="grid grid-cols-2 gap-3">
         {packages.map((pkg) => (
           <div
             key={pkg.id}
-            onClick={() => handlePurchase(pkg.id)}
+            onClick={() => handlePackageSelect(pkg)}
             className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${pkg.popular ? "border-violet-500/50 shadow-[0_0_20px_rgba(124,58,237,0.3)]" : "border-white/10 hover:border-white/20"}`}
             data-testid={`package-${pkg.id}`}
           >
@@ -876,10 +958,106 @@ const StorePage = () => {
             {pkg.bonus > 0 && (
               <p className="text-xs text-green-400">+{pkg.bonus} bonus</p>
             )}
-            <p className="text-muted-foreground text-sm">${pkg.price.toFixed(2)}</p>
+            <p className="text-muted-foreground text-sm">{getLocalPrice(pkg.price)}</p>
           </div>
         ))}
       </div>
+
+      {/* Country Picker Dialog */}
+      <Dialog open={showCountryPicker} onOpenChange={setShowCountryPicker}>
+        <DialogContent className="max-w-[340px] bg-card border-white/10" data-testid="country-picker-modal">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">Select Your Region</DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Choose your country for local payment methods
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 max-h-[300px] overflow-y-auto mt-4">
+            {countries.map((country) => (
+              <button
+                key={country.code}
+                onClick={() => handleCountryChange(country)}
+                className={`w-full p-3 rounded-xl flex items-center justify-between transition-all ${selectedCountry?.code === country.code ? "bg-primary/20 border border-primary/50" : "bg-secondary/30 border border-transparent hover:bg-secondary/50"}`}
+                data-testid={`country-${country.code}`}
+              >
+                <span className="font-medium">{country.name}</span>
+                <span className="text-sm text-muted-foreground">{country.currency}</span>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Payment Method Sheet */}
+      <Sheet open={showPaymentSheet} onOpenChange={setShowPaymentSheet}>
+        <SheetContent side="bottom" className="bg-card border-t border-white/10 rounded-t-3xl" data-testid="payment-sheet">
+          <SheetHeader>
+            <SheetTitle className="font-heading text-xl">Complete Purchase</SheetTitle>
+          </SheetHeader>
+          
+          {selectedPackage && (
+            <div className="py-4">
+              {/* Package Summary */}
+              <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                    <Coins className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">{selectedPackage.coins} coins</p>
+                    {selectedPackage.bonus > 0 && (
+                      <p className="text-xs text-green-400">+{selectedPackage.bonus} bonus</p>
+                    )}
+                  </div>
+                </div>
+                <p className="font-heading font-bold text-lg">{getLocalPrice(selectedPackage.price)}</p>
+              </div>
+
+              {/* Payment Methods */}
+              <p className="text-sm text-muted-foreground mb-2">Payment Method</p>
+              <div className="space-y-2 mb-4">
+                {selectedCountry?.payment_methods.map((method) => (
+                  <button
+                    key={method.id}
+                    onClick={() => setSelectedPaymentMethod(method)}
+                    className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all ${selectedPaymentMethod?.id === method.id ? "bg-primary/20 border border-primary/50" : "bg-secondary/30 border border-transparent hover:bg-secondary/50"}`}
+                    data-testid={`payment-method-${method.id}`}
+                  >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${method.type === "mobilemoney" ? "bg-green-500/20 text-green-400" : "bg-blue-500/20 text-blue-400"}`}>
+                      {method.type === "mobilemoney" ? "📱" : "💳"}
+                    </div>
+                    <span className="font-medium">{method.name}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Phone Number for Mobile Money */}
+              {selectedPaymentMethod?.type === "mobilemoney" && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground mb-2">Phone Number</p>
+                  <Input
+                    type="tel"
+                    placeholder="+254 700 123 456"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="bg-secondary/50 border-white/10"
+                    data-testid="phone-input"
+                  />
+                </div>
+              )}
+
+              {/* Purchase Button */}
+              <Button
+                onClick={handlePurchase}
+                className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 rounded-full"
+                data-testid="confirm-purchase-btn"
+              >
+                Pay {getLocalPrice(selectedPackage.price)}
+              </Button>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
