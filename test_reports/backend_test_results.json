@@ -1,7 +1,7 @@
 {
-  "total_tests": 20,
-  "passed_tests": 20,
-  "success_rate": 100.0,
+  "total_tests": 40,
+  "passed_tests": 38,
+  "success_rate": 95.0,
   "test_results": [
     {
       "test": "User Registration",
@@ -100,6 +100,106 @@
     },
     {
       "test": "Get Unlocked Episodes",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Geo Location Detection",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Geo Detection Payment Methods Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Supported Countries",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Required Countries Present",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Country Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for KE",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Kenya Payment Methods (M-Pesa + Card)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Kenya Currency (KES)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for UG",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Uganda Payment Methods (MTN + Airtel + Card)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Uganda Currency (UGX)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for INTL",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "International Payment Methods (Card Only)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "International Currency (USD)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Checkout with KE mpesa",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (flutterwave)",
+      "success": false,
+      "details": "Expected flutterwave, got stripe"
+    },
+    {
+      "test": "Checkout with UG mtn",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (flutterwave)",
+      "success": false,
+      "details": "Expected flutterwave, got stripe"
+    },
+    {
+      "test": "Checkout with INTL card",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (stripe)",
       "success": true,
       "details": ""
     }
