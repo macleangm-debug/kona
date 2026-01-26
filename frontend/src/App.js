@@ -3572,6 +3572,17 @@ const CategoryPage = ({ onAuthClick }) => {
 function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [referralCode, setReferralCode] = useState("");
+  const [forceSignUp, setForceSignUp] = useState(false);
+
+  const openAuthForSignUp = () => {
+    setForceSignUp(true);
+    setShowAuth(true);
+  };
+
+  const openAuthForLogin = () => {
+    setForceSignUp(false);
+    setShowAuth(true);
+  };
 
   // Check for referral code in URL on mount
   useEffect(() => {
@@ -3591,21 +3602,22 @@ function App() {
         <div className="max-w-md mx-auto min-h-screen bg-background overflow-hidden shadow-2xl border-x border-border/10 relative">
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<HomePage onAuthClick={() => setShowAuth(true)} />} />
-              <Route path="/category/:category" element={<CategoryPage onAuthClick={() => setShowAuth(true)} />} />
-              <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={() => setShowAuth(true)} />} />
-              <Route path="/watch/:id" element={<VideoPlayerPage onAuthClick={() => setShowAuth(true)} />} />
+              <Route path="/" element={<HomePage onAuthClick={openAuthForLogin} />} />
+              <Route path="/category/:category" element={<CategoryPage onAuthClick={openAuthForLogin} />} />
+              <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={openAuthForLogin} />} />
+              <Route path="/watch/:id" element={<VideoPlayerPage onAuthClick={openAuthForSignUp} />} />
               <Route path="/store" element={<StorePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/subscriptions" element={<SubscriptionPage />} />
               <Route path="/admin" element={<AdminPage />} />
             </Routes>
-            <BottomNav onAuthClick={() => setShowAuth(true)} />
+            <BottomNav onAuthClick={openAuthForLogin} />
             <InstallAppBanner />
             <AuthModal 
               open={showAuth} 
-              onClose={() => { setShowAuth(false); setReferralCode(""); }}
+              onClose={() => { setShowAuth(false); setReferralCode(""); setForceSignUp(false); }}
               initialReferralCode={referralCode}
+              forceSignUp={forceSignUp}
             />
           </BrowserRouter>
         </div>
