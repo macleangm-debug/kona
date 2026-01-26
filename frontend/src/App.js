@@ -1460,43 +1460,6 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
-      {/* Top 10 in East Africa - Netflix style horizontal scroll */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between px-4 mb-3">
-          <h2 className="font-heading text-sm font-semibold">Top 10 in East Africa</h2>
-          <button 
-            onClick={() => navigate("/category/top-10")}
-            className="text-xs text-primary"
-            data-testid="see-all-top-10"
-          >See All</button>
-        </div>
-        <div className="flex gap-1 px-4 overflow-x-auto scrollbar-hide pb-2 pl-6">
-          {series.slice(0, 10).map((s, index) => (
-            <div 
-              key={s.id}
-              onClick={() => navigate(`/series/${s.id}`)}
-              className="flex-shrink-0 relative cursor-pointer group"
-              style={{ paddingLeft: index === 9 ? '2rem' : '1.5rem' }}
-              data-testid={`top-10-item-${index + 1}`}
-            >
-              {/* Large number positioned behind thumbnail */}
-              <span className="top-10-number absolute bottom-0 font-heading leading-none select-none"
-                    style={{ left: index === 9 ? '-1.5rem' : '-0.75rem' }}>
-                {index + 1}
-              </span>
-              {/* Thumbnail overlapping the number */}
-              <div className="relative w-24 aspect-[3/4] rounded-lg overflow-hidden z-10">
-                <img 
-                  src={s.thumbnail} 
-                  alt={s.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* My List Section - Only show if user has items */}
       {user && myList.length > 0 && (
         <div className="mb-6">
