@@ -1,41 +1,49 @@
 import React from 'react';
 
-// Kona Logo - Using the generated luxury image
+// Kona Logo - Just the play box (for icon use)
 export const KonaLogo2 = ({ size = 40, className = "" }) => (
-  <img 
-    src="/icons/icon-96x96.png" 
-    alt="Kona" 
+  <svg 
     width={size} 
-    height={size}
+    height={size} 
+    viewBox="0 0 100 100" 
     className={className}
     data-testid="kona-logo"
-    style={{ objectFit: 'contain' }}
-  />
+  >
+    <defs>
+      <linearGradient id="playBoxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#8B5CF6" />
+        <stop offset="100%" stopColor="#A855F7" />
+      </linearGradient>
+    </defs>
+    {/* Rounded box */}
+    <rect x="10" y="10" width="80" height="80" rx="16" fill="none" stroke="url(#playBoxGrad)" strokeWidth="6" />
+    {/* Play triangle */}
+    <path d="M38 30 L38 70 L72 50 Z" fill="url(#playBoxGrad)" />
+  </svg>
 );
 
-// Kona Logo Full with Text - Luxury Style
-export const KonaLogo2Full = ({ height = 40, className = "" }) => (
-  <div className={`flex items-center gap-2 ${className}`} data-testid="kona-logo-full">
-    <img 
-      src="/icons/icon-96x96.png" 
-      alt="Kona" 
-      height={height} 
-      width={height}
-      style={{ objectFit: 'contain' }}
-    />
-    <span 
-      style={{ 
-        fontFamily: 'Georgia, serif',
-        fontSize: height * 0.65,
-        fontWeight: 600,
-        color: 'white',
-        letterSpacing: '2px',
-        fontStyle: 'italic'
-      }}
-    >
-      KONA
-    </span>
-  </div>
+// Kona Logo Full - KONA text with O as play box
+export const KonaLogo2Full = ({ height = 32, className = "" }) => (
+  <svg 
+    height={height} 
+    viewBox="0 0 140 40" 
+    className={className}
+    data-testid="kona-logo-full"
+  >
+    <defs>
+      <linearGradient id="playBoxGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#8B5CF6" />
+        <stop offset="100%" stopColor="#A855F7" />
+      </linearGradient>
+    </defs>
+    {/* K */}
+    <text x="0" y="30" fontFamily="system-ui, -apple-system, sans-serif" fontSize="32" fontWeight="700" fill="white">K</text>
+    {/* O as play box */}
+    <rect x="28" y="6" width="28" height="28" rx="6" fill="none" stroke="url(#playBoxGradFull)" strokeWidth="3" />
+    <path d="M37 14 L37 26 L49 20 Z" fill="url(#playBoxGradFull)" />
+    {/* NA */}
+    <text x="60" y="30" fontFamily="system-ui, -apple-system, sans-serif" fontSize="32" fontWeight="700" fill="white">NA</text>
+  </svg>
 );
 
 // Default export
