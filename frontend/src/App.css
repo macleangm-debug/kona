@@ -41,6 +41,19 @@
   text-stroke: 3px hsl(var(--primary));
 }
 
+/* Netflix-style Top 10 numbers */
+.top-10-number {
+  font-size: 8rem;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-stroke: 4px #404040;
+  text-stroke: 4px #404040;
+  z-index: 1;
+  text-shadow: 
+    0 0 0 transparent,
+    4px 4px 0 rgba(0, 0, 0, 0.3);
+}
+
 /* Custom animations */
 @keyframes shimmer {
   0% {
