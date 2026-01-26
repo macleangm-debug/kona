@@ -1165,25 +1165,41 @@ const ProfilePage = ({ onLogout }) => {
     }
   };
 
-  const shareReferral = () => {
+  const shareReferral = async () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `Join MiniSeries and get 80 free coins! Use my code: ${user?.referral_code}`;
+    const shareText = `🎬 Join MiniSeries and get 80 FREE coins!\n\nWatch amazing short drama series for free!\n\nUse my code: ${user?.referral_code}`;
     
     if (navigator.share) {
-      navigator.share({
-        title: "Join MiniSeries",
-        text: shareText,
-        url: shareUrl
-      });
+      try {
+        await navigator.share({
+          title: "Join MiniSeries - Get 80 Free Coins!",
+          text: shareText,
+          url: shareUrl
+        });
+      } catch (err) {
+        // User cancelled or share failed - copy to clipboard as fallback
+        if (err.name !== 'AbortError') {
+          navigator.clipboard.writeText(`${shareText}\n\n👉 ${shareUrl}`);
+          toast.success("Share link copied to clipboard!");
+        }
+      }
     } else {
-      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
-      toast.success("Share link copied!");
+      navigator.clipboard.writeText(`${shareText}\n\n👉 ${shareUrl}`);
+      toast.success("Share link copied to clipboard!");
     }
   };
 
   const shareToWhatsApp = () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `🎬 Join MiniSeries and get 80 FREE coins to watch amazing short drama series!\n\nUse my code: ${user?.referral_code}\n\n👉 ${shareUrl}`;
+    const shareText = `🎬 *Join MiniSeries* and get *80 FREE coins* to watch amazing short drama series!
+
+✨ Trending shows updated daily
+🎁 Free coins every day
+📱 Watch anywhere, anytime
+
+Use my referral code: *${user?.referral_code}*
+
+👉 ${shareUrl}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
     window.open(whatsappUrl, '_blank');
   };
