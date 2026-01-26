@@ -1952,14 +1952,14 @@ const VideoPlayerPage = () => {
 
   if (loading || !episode) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black">
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black z-50" data-testid="video-player-page">
+    <div className="fixed inset-0 bg-black z-[100]" data-testid="video-player-page">
       {/* Full-screen vertical video */}
       <video
         id="main-video"
