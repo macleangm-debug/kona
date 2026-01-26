@@ -621,7 +621,11 @@ const HomePage = ({ onAuthClick }) => {
   const [series, setSeries] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
+  const [comingSoon, setComingSoon] = useState([]);
+  const [userReminders, setUserReminders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [reminderLoading, setReminderLoading] = useState(null);
+  const [showReminderSuccess, setShowReminderSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("explore");
   const [activeCategory, setActiveCategory] = useState("all");
   const navigate = useNavigate();
@@ -647,12 +651,14 @@ const HomePage = ({ onAuthClick }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [seriesRes, featuredRes] = await Promise.all([
+        const [seriesRes, featuredRes, comingSoonRes] = await Promise.all([
           axios.get(`${API}/series`),
-          axios.get(`${API}/series/featured`)
+          axios.get(`${API}/series/featured`),
+          axios.get(`${API}/series/coming-soon`)
         ]);
         setSeries(seriesRes.data);
         setFeatured(featuredRes.data);
+        setComingSoon(comingSoonRes.data);
         
         // Continue watching data
         if (token) {
@@ -662,6 +668,16 @@ const HomePage = ({ onAuthClick }) => {
             progress: Math.floor(Math.random() * 60) + 30
           }));
           setContinueWatching(mockContinue);
+          
+          // Fetch user reminders
+          try {
+            const remindersRes = await axios.get(`${API}/user/reminders`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setUserReminders(remindersRes.data.reminders || []);
+          } catch (e) {
+            console.error("Error fetching reminders:", e);
+          }
         }
       } catch (e) {
         console.error(e);
@@ -670,6 +686,32 @@ const HomePage = ({ onAuthClick }) => {
     };
     fetchData();
   }, [token]);
+
+  // Handle setting a reminder
+  const handleSetReminder = async (seriesId) => {
+    if (!token) {
+      onAuthClick();
+      return;
+    }
+    
+    setReminderLoading(seriesId);
+    try {
+      await axios.post(`${API}/series/remind`, 
+        { series_id: seriesId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUserReminders([...userReminders, seriesId]);
+      setShowReminderSuccess(true);
+      
+      // Update local coming soon count
+      setComingSoon(comingSoon.map(s => 
+        s.id === seriesId ? { ...s, reserved_count: s.reserved_count + 1 } : s
+      ));
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to set reminder");
+    }
+    setReminderLoading(null);
+  };
 
   useEffect(() => {
     const checkReward = async () => {
