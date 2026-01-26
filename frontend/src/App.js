@@ -1284,78 +1284,93 @@ const HomePage = ({ onAuthClick }) => {
         >
           {/* 3D Carousel Container */}
           <div 
-            className="carousel-container flex gap-3 px-[14%] overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-6 pt-4"
-            style={{ transformStyle: 'preserve-3d' }}
+            className="carousel-container flex gap-4 px-[15%] overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-6 pt-4"
           >
-            {heroSlides.map((heroSeries, index) => (
-              <div 
-                key={heroSeries.id} 
-                className="flex-shrink-0 w-[72%] snap-center cursor-pointer origin-center"
-                style={getCardStyle(index)}
-                onClick={() => navigate(`/series/${heroSeries.id}`)}
-              >
-                {/* Card */}
-                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
-                  {/* Background Image */}
-                  <img 
-                    src={heroSeries.thumbnail} 
-                    alt={heroSeries.title}
-                    className="w-full h-full object-cover"
-                  />
-                  
-                  {/* Gradient overlay for content readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-                  
-                  {/* Dark overlay for side cards - makes them appear darker/further back */}
-                  <div 
-                    className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-150"
-                    style={{ opacity: getDarkOverlay(index) }}
-                  />
-                  
-                  {/* Top Badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
-                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
-                      TOP {index + 1}
-                    </span>
-                    {heroSeries.featured && (
-                      <span className="px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded">
-                        HOT
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Episode Count Badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
-                    EP.{heroSeries.total_episodes}
-                  </div>
-                  
-                  {/* Play Button - Always visible on center card */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                      <Play className="w-7 h-7 text-black fill-black ml-1" />
-                    </div>
-                  </div>
-                  
-                  {/* Content at Bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    {/* Title */}
-                    <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2 leading-tight">
-                      {heroSeries.title}
-                    </h2>
+            {heroSlides.map((heroSeries, index) => {
+              const isActive = index === activeIndex;
+              const offset = index - activeIndex;
+              
+              return (
+                <div 
+                  key={heroSeries.id} 
+                  className={`hero-card flex-shrink-0 w-[70%] snap-center cursor-pointer transition-all duration-300 ease-out ${
+                    isActive ? 'scale-100 translate-y-0 z-10' : 'scale-[0.85] translate-y-6 z-0'
+                  }`}
+                  style={{
+                    transform: isActive 
+                      ? 'scale(1) translateY(0)' 
+                      : `scale(0.85) translateY(24px) rotateY(${offset * -15}deg)`,
+                    transformStyle: 'preserve-3d',
+                    perspective: '1000px'
+                  }}
+                  onClick={() => navigate(`/series/${heroSeries.id}`)}
+                >
+                  {/* Card */}
+                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
+                    {/* Background Image */}
+                    <img 
+                      src={heroSeries.thumbnail} 
+                      alt={heroSeries.title}
+                      className="w-full h-full object-cover"
+                    />
                     
-                    {/* Genre & Rating */}
-                    <div className="flex items-center gap-2 text-sm text-white/80">
-                      <span>{heroSeries.genre}</span>
-                      <span>•</span>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                        <span>{heroSeries.rating}</span>
+                    {/* Gradient overlay for content readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                    
+                    {/* Dark overlay for side cards */}
+                    <div 
+                      className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 ${
+                        isActive ? 'opacity-0' : 'opacity-50'
+                      }`}
+                    />
+                    
+                    {/* Top Badge */}
+                    <div className="absolute top-3 left-3 flex items-center gap-2">
+                      <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
+                        TOP {index + 1}
+                      </span>
+                      {heroSeries.featured && (
+                        <span className="px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded">
+                          HOT
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Episode Count Badge */}
+                    <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
+                      EP.{heroSeries.total_episodes}
+                    </div>
+                    
+                    {/* Play Button - Always visible on center card */}
+                    <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
+                      isActive ? 'opacity-100' : 'opacity-0'
+                    }`}>
+                      <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                        <Play className="w-7 h-7 text-black fill-black ml-1" />
+                      </div>
+                    </div>
+                    
+                    {/* Content at Bottom */}
+                    <div className="absolute bottom-0 left-0 right-0 p-4">
+                      {/* Title */}
+                      <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2 leading-tight">
+                        {heroSeries.title}
+                      </h2>
+                      
+                      {/* Genre & Rating */}
+                      <div className="flex items-center gap-2 text-sm text-white/80">
+                        <span>{heroSeries.genre}</span>
+                        <span>•</span>
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          <span>{heroSeries.rating}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Dot Indicators - Red style */}
