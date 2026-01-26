@@ -396,11 +396,20 @@ const CoinBalance = ({ coins, onClick }) => (
 );
 
 // Series Card - Industry Standard (Grid style with badges)
-const SeriesCard = ({ series, onClick, badge, showViews = true }) => {
+const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList = false, onAddToList, onRemoveFromList }) => {
   const formatViews = (views) => {
     if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
     if (views >= 1000) return `${(views / 1000).toFixed(0)}K`;
     return views;
+  };
+
+  const handleListToggle = (e) => {
+    e.stopPropagation();
+    if (inMyList) {
+      onRemoveFromList?.(series.id);
+    } else {
+      onAddToList?.(series.id);
+    }
   };
 
   return (
@@ -431,10 +440,30 @@ const SeriesCard = ({ series, onClick, badge, showViews = true }) => {
           </div>
         )}
         
-        {/* Episode count */}
-        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 text-[10px]">
-          EP.{series.total_episodes}
+        {/* First Episode Free badge */}
+        <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
+          <div className="px-1.5 py-0.5 rounded bg-black/60 text-[10px]">
+            EP.{series.total_episodes}
+          </div>
+          <div className="px-1.5 py-0.5 rounded bg-green-500 text-[9px] font-bold text-white">
+            EP1 FREE
+          </div>
         </div>
+        
+        {/* Add to List Button */}
+        {(onAddToList || onRemoveFromList) && (
+          <button
+            onClick={handleListToggle}
+            className="absolute bottom-8 right-2 p-1.5 rounded-full bg-black/60 hover:bg-black/80 transition-colors"
+            data-testid={`add-to-list-${series.id}`}
+          >
+            {inMyList ? (
+              <BookmarkCheck className="w-3.5 h-3.5 text-primary" />
+            ) : (
+              <Bookmark className="w-3.5 h-3.5" />
+            )}
+          </button>
+        )}
         
         {/* View count */}
         {showViews && (
