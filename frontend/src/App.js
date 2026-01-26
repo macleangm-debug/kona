@@ -1197,72 +1197,31 @@ const HomePage = ({ onAuthClick }) => {
   const [scrollProgress, setScrollProgress] = useState(0);
 
   // Track scroll position for 3D effect
+  const [activeIndex, setActiveIndex] = useState(0);
+  
   useEffect(() => {
     const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
     if (!container) return;
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.72;
-      const progress = scrollLeft / cardWidth;
-      
-      setScrollProgress(progress);
-      const newIndex = Math.round(progress);
-      if (newIndex !== currentSlide && newIndex >= 0 && newIndex < heroSlides.length) {
-        setCurrentSlide(newIndex);
-      }
+      const cardWidth = container.offsetWidth * 0.7;
+      const newIndex = Math.round(scrollLeft / cardWidth);
+      setActiveIndex(newIndex);
+      setCurrentSlide(newIndex);
     };
 
     container.addEventListener('scroll', handleScroll);
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [heroSlides.length, currentSlide]);
-
-  // Calculate 3D transform for each card - IMPROVED
-  const getCardStyle = (index) => {
-    const offset = index - scrollProgress;
-    const absOffset = Math.abs(offset);
-    
-    // Clamp offset for smooth transitions
-    const clampedOffset = Math.max(-1.5, Math.min(1.5, offset));
-    const clampedAbs = Math.abs(clampedOffset);
-    
-    // Scale: 1 at center, smaller on sides
-    const scale = 1 - clampedAbs * 0.18;
-    
-    // Y position: center is at 0, sides drop down
-    const translateY = clampedAbs * clampedAbs * 35;
-    
-    // Z position for depth (negative = further back)
-    const translateZ = -clampedAbs * 80;
-    
-    // Rotation: 0 at center, rotate away on sides
-    // Positive offset (right side) rotates left, negative offset (left side) rotates right
-    const rotateY = clampedOffset * -25;
-    
-    // Z-index: center on top
-    const zIndex = 100 - Math.round(absOffset * 10);
-    
-    return {
-      transform: `translateY(${translateY}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-      zIndex,
-      transition: 'transform 0.25s ease-out',
-    };
-  };
-
-  // Get dark overlay opacity for side cards
-  const getDarkOverlay = (index) => {
-    const offset = index - scrollProgress;
-    const absOffset = Math.abs(offset);
-    // Center: fully visible, sides: darken
-    return Math.min(0.65, absOffset * 0.55);
-  };
+  }, [heroSlides.length]);
 
   const scrollToSlide = (index) => {
     const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
     if (container) {
-      const cardWidth = container.offsetWidth * 0.72;
+      const cardWidth = container.offsetWidth * 0.7;
       container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
     }
+    setActiveIndex(index);
     setCurrentSlide(index);
   };
 
