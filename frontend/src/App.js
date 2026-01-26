@@ -903,9 +903,9 @@ const SearchModal = ({ open, onClose }) => {
                   <img src={series.thumbnail} alt="" className="w-12 h-16 object-cover rounded" />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm line-clamp-1">{series.title}</h4>
-                    <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} Episodes</p>
+                    <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} Eps <span className="text-green-400">• Free EP1</span></p>
                   </div>
-                  <Badge variant="secondary" className="text-[10px]">EP1 FREE</Badge>
+                  <ChevronLeft className="w-4 h-4 rotate-180 text-muted-foreground" />
                 </div>
               ))}
             </div>
