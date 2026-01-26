@@ -478,6 +478,142 @@ class MiniSeriesAPITester:
             return True, response
         return False, {}
 
+    def test_referral_code_validation(self, referral_code):
+        """Test referral code validation"""
+        success, response = self.run_test(
+            f"Validate Referral Code ({referral_code})",
+            "GET",
+            f"referral/validate/{referral_code}",
+            200
+        )
+        
+        if success and 'valid' in response:
+            if response['valid']:
+                # Check if bonus_coins is present for valid codes
+                if 'bonus_coins' in response and response['bonus_coins'] == 30:
+                    self.log_test("Referral Bonus Amount (30 coins)", True)
+                else:
+                    self.log_test("Referral Bonus Amount (30 coins)", False, f"Expected 30 bonus coins, got {response.get('bonus_coins', 'none')}")
+                
+                # Check if referrer_name is present
+                if 'referrer_name' in response:
+                    self.log_test("Referrer Name in Validation", True)
+                else:
+                    self.log_test("Referrer Name in Validation", False, "Missing referrer_name in response")
+            
+            return True, response
+        return False, {}
+
+    def test_referral_stats(self):
+        """Test user's referral statistics"""
+        success, response = self.run_test(
+            "Get Referral Stats",
+            "GET",
+            "referral/stats",
+            200
+        )
+        
+        if success and 'referral_code' in response:
+            # Check required fields
+            required_fields = ['referral_code', 'total_referrals', 'total_earnings', 'reward_per_referral', 'referee_bonus']
+            
+            for field in required_fields:
+                if field not in response:
+                    self.log_test("Referral Stats Structure", False, f"Missing field: {field}")
+                    return False, {}
+            
+            # Check reward amounts
+            if response['reward_per_referral'] == 20:
+                self.log_test("Referrer Reward Amount (20 coins)", True)
+            else:
+                self.log_test("Referrer Reward Amount (20 coins)", False, f"Expected 20, got {response['reward_per_referral']}")
+            
+            if response['referee_bonus'] == 30:
+                self.log_test("Referee Bonus Amount (30 coins)", True)
+            else:
+                self.log_test("Referee Bonus Amount (30 coins)", False, f"Expected 30, got {response['referee_bonus']}")
+            
+            self.log_test("Referral Stats Structure", True)
+            return True, response
+        return False, {}
+
+    def test_referral_leaderboard(self):
+        """Test referral leaderboard"""
+        success, response = self.run_test(
+            "Get Referral Leaderboard",
+            "GET",
+            "referral/leaderboard",
+            200
+        )
+        
+        if success and isinstance(response, list):
+            # Check if leaderboard has proper structure (even if empty)
+            if len(response) > 0:
+                # Check leaderboard entry structure
+                entry = response[0]
+                required_fields = ['name', 'referrals', 'earnings']
+                
+                for field in required_fields:
+                    if field not in entry:
+                        self.log_test("Leaderboard Entry Structure", False, f"Missing field: {field}")
+                        return False, []
+                
+                self.log_test("Leaderboard Entry Structure", True)
+            else:
+                self.log_test("Leaderboard Accessible (Empty)", True)
+            
+            return True, response
+        return False, []
+
+    def test_registration_with_referral(self, referral_code):
+        """Test user registration with referral code"""
+        timestamp = int(time.time())
+        test_user = {
+            "email": f"referred_user_{timestamp}@example.com",
+            "password": "TestPass123!",
+            "name": f"Referred User {timestamp}",
+            "referral_code": referral_code
+        }
+        
+        success, response = self.run_test(
+            "Registration with Referral Code",
+            "POST",
+            "auth/register",
+            200,
+            data=test_user
+        )
+        
+        if success and 'token' in response and 'user' in response:
+            # Check if user got 80 coins (50 welcome + 30 referral bonus)
+            if response['user']['coins'] == 80:
+                self.log_test("Referral Registration Bonus (80 coins)", True)
+            else:
+                self.log_test("Referral Registration Bonus (80 coins)", False, f"Got {response['user']['coins']} coins instead of 80")
+            
+            return True, response
+        return False, {}
+
+    def test_referrer_reward(self, referrer_token, initial_coins):
+        """Test if referrer received reward coins"""
+        # Get current user profile to check coins
+        success, response = self.run_test(
+            "Check Referrer Reward",
+            "GET",
+            "auth/me",
+            200,
+            headers={'Authorization': f'Bearer {referrer_token}'}
+        )
+        
+        if success and 'coins' in response:
+            expected_coins = initial_coins + 20  # Should get 20 coins for referral
+            if response['coins'] == expected_coins:
+                self.log_test("Referrer Reward (20 coins)", True)
+            else:
+                self.log_test("Referrer Reward (20 coins)", False, f"Expected {expected_coins} coins, got {response['coins']}")
+            
+            return True, response
+        return False, {}
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting MiniSeries API Tests...")
