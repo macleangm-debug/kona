@@ -2033,7 +2033,7 @@ const VideoPlayerPage = () => {
         autoPlay
         loop
         playsInline
-        onTimeUpdate={handleProgress}
+        onTimeUpdate={handleTimeUpdate}
         onClick={handleVideoTap}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
