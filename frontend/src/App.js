@@ -1205,11 +1205,11 @@ const HomePage = ({ onAuthClick }) => {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.75; // 75% card width
-      const newIndex = Math.round(scrollLeft / cardWidth);
+      const cardWidth = container.offsetWidth * 0.72; // Card width + gap
       const progress = scrollLeft / cardWidth;
       
       setScrollProgress(progress);
+      const newIndex = Math.round(progress);
       if (newIndex !== currentSlide && newIndex >= 0 && newIndex < heroSlides.length) {
         setCurrentSlide(newIndex);
       }
@@ -1223,23 +1223,40 @@ const HomePage = ({ onAuthClick }) => {
   const getCardStyle = (index) => {
     const offset = index - scrollProgress;
     const absOffset = Math.abs(offset);
+    const direction = offset > 0 ? 1 : -1;
     
-    // Scale: center card is 1, side cards are smaller
-    const scale = Math.max(0.8, 1 - absOffset * 0.12);
+    // When card is centered (offset ~0), it should be fully front-facing
+    // Scale: center card is 1, side cards scale down smoothly
+    const scale = 1 - Math.min(absOffset * 0.15, 0.25);
     
-    // Vertical offset: side cards drop down
-    const translateY = absOffset * 30;
+    // Vertical offset: side cards drop down with a curve
+    const translateY = Math.pow(absOffset, 1.5) * 20;
+    
+    // Horizontal shift to create arc effect
+    const translateX = offset * 15;
+    
+    // Z position for depth
+    const translateZ = -absOffset * 50;
+    
+    // Rotation: smoothly rotate cards as they move to sides
+    // Center card = 0 rotation, side cards rotate away
+    const rotateY = offset * 15;
     
     // Z-index for layering
-    const zIndex = 10 - Math.round(absOffset);
-    
-    // Rotation for curve effect
-    const rotateY = offset * -10;
+    const zIndex = 10 - Math.round(absOffset * 2);
     
     return {
-      transform: `scale(${scale}) translateY(${translateY}px) perspective(1000px) rotateY(${rotateY}deg)`,
+      transform: `
+        perspective(1200px)
+        translateX(${translateX}px)
+        translateY(${translateY}px)
+        translateZ(${translateZ}px)
+        rotateY(${rotateY}deg)
+        scale(${scale})
+      `,
       zIndex,
-      transition: 'transform 0.15s ease-out'
+      transition: 'transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
+      transformStyle: 'preserve-3d'
     };
   };
 
@@ -1247,14 +1264,14 @@ const HomePage = ({ onAuthClick }) => {
   const getDarkOverlay = (index) => {
     const offset = index - scrollProgress;
     const absOffset = Math.abs(offset);
-    // Center card: 0 darkness, side cards: up to 0.5 darkness
-    return Math.min(0.5, absOffset * 0.4);
+    // Center card: 0 darkness, side cards: darken smoothly
+    return Math.min(0.6, absOffset * 0.5);
   };
 
   const scrollToSlide = (index) => {
     const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
     if (container) {
-      const cardWidth = container.offsetWidth * 0.75;
+      const cardWidth = container.offsetWidth * 0.72;
       container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
     }
     setCurrentSlide(index);
