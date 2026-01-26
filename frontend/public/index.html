@@ -18,8 +18,32 @@
         work correctly both with client-side routing and a non-root public URL.
         Learn how to configure a non-root public URL by running `npm run build`.
         -->
-        <title>Emergent | Fullstack App</title>
+        <title>Kona | Mini-Series</title>
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
+        <script>
+            // Suppress PostHog PerformanceServerTiming errors (not app-related)
+            window.addEventListener('error', function(event) {
+                if (event.message && event.message.includes('PerformanceServerTiming')) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return true;
+                }
+            }, true);
+            
+            // Hide React error overlay for PostHog errors
+            window.addEventListener('unhandledrejection', function(event) {
+                if (event.reason && event.reason.message && event.reason.message.includes('PerformanceServerTiming')) {
+                    event.preventDefault();
+                    return true;
+                }
+            });
+        </script>
+        <style>
+            /* Hide React error overlay for PostHog errors */
+            iframe[style*="position: fixed"][style*="z-index: 2147483647"] {
+                display: none !important;
+            }
+        </style>
         <!--
         These two scripts have been added for the Visual Edits, please do not edit or remove them
         -->
