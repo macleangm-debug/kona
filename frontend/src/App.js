@@ -100,8 +100,8 @@ const AuthProvider = ({ children }) => {
 };
 
 // Auth Modal
-const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
-  const [isLogin, setIsLogin] = useState(initialReferralCode ? false : true);
+const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp = false }) => {
+  const [isLogin, setIsLogin] = useState(initialReferralCode || forceSignUp ? false : true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -118,6 +118,13 @@ const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
       setIsLogin(false); // Switch to signup mode
     }
   }, [initialReferralCode]);
+
+  // Force signup mode when prop changes
+  useEffect(() => {
+    if (forceSignUp && open) {
+      setIsLogin(false);
+    }
+  }, [forceSignUp, open]);
 
   // Validate referral code
   useEffect(() => {
