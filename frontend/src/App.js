@@ -1914,9 +1914,11 @@ const VideoPlayerPage = () => {
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const lastSavedProgress = React.useRef(0);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return '00:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -1924,10 +1926,13 @@ const VideoPlayerPage = () => {
 
   // Auto-hide controls after 3 seconds
   useEffect(() => {
+    let timer;
     if (showControls) {
-      const timer = setTimeout(() => setShowControls(false), 3000);
-      return () => clearTimeout(timer);
+      timer = setTimeout(() => setShowControls(false), 3000);
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [showControls]);
 
   useEffect(() => {
@@ -1952,32 +1957,25 @@ const VideoPlayerPage = () => {
     fetchData();
   }, [id, token]);
 
-  const handleProgress = (e) => {
+  const handleTimeUpdate = (e) => {
     const video = e.target;
-    // Only update every 500ms to prevent excessive re-renders
-    const newTime = Math.floor(video.currentTime * 2) / 2;
-    if (newTime !== currentTime) {
-      setCurrentTime(video.currentTime);
-    }
-    if (video.duration && video.duration !== duration) {
+    setCurrentTime(video.currentTime);
+    if (video.duration && !duration) {
       setDuration(video.duration);
     }
-  };
-
-  // Save progress to backend periodically
-  useEffect(() => {
-    const saveProgress = async () => {
-      if (!token || !id || duration === 0) return;
-      const progress = Math.round((currentTime / duration) * 100);
-      if (progress > 0 && progress % 10 === 0) {
-        try {
-          await axios.post(`${API}/episodes/progress`, { episode_id: id, progress }, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-        } catch (e) {
-          console.error(e);
-        }
+    
+    // Save progress every 10%
+    if (token && duration > 0) {
+      const progress = Math.round((video.currentTime / duration) * 100);
+      const progressBucket = Math.floor(progress / 10) * 10;
+      if (progressBucket > 0 && progressBucket !== lastSavedProgress.current) {
+        lastSavedProgress.current = progressBucket;
+        axios.post(`${API}/episodes/progress`, { episode_id: id, progress: progressBucket }, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).catch(() => {});
       }
+    }
+  };
     };
     saveProgress();
   }, [Math.floor(currentTime / 5)]); // Only run every 5 seconds
