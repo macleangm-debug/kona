@@ -1947,10 +1947,16 @@ const VideoPlayerPage = ({ onAuthClick }) => {
     }
   }, [currentTime, duration, user]);
 
-  // Show end prompt when video ends for guests
+  // Get next episode
+  const currentEpisodeIndex = allEpisodes.findIndex(ep => ep.id === episode?.id);
+  const nextEpisode = currentEpisodeIndex >= 0 && currentEpisodeIndex < allEpisodes.length - 1 
+    ? allEpisodes[currentEpisodeIndex + 1] 
+    : null;
+
+  // Show end prompt when video ends
   const handleVideoEnded = () => {
-    if (!user) {
-      setSignUpPromptType("end");
+    if (nextEpisode) {
+      setSignUpPromptType("next_episode_preview");
       setShowSignUpPrompt(true);
     }
   };
