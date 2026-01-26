@@ -1120,13 +1120,57 @@ const StorePage = () => {
 
 // Profile Page
 const ProfilePage = ({ onLogout }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const navigate = useNavigate();
+  const [referralStats, setReferralStats] = useState(null);
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const fetchReferralStats = async () => {
+      if (token) {
+        try {
+          const res = await axios.get(`${API}/referral/stats`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setReferralStats(res.data);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    fetchReferralStats();
+  }, [token]);
 
   const handleLogout = () => {
     logout();
     navigate("/");
     toast.success("Logged out successfully");
+  };
+
+  const copyReferralCode = () => {
+    if (user?.referral_code) {
+      navigator.clipboard.writeText(user.referral_code);
+      setCopied(true);
+      toast.success("Referral code copied!");
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const shareReferral = () => {
+    const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
+    const shareText = `Join MiniSeries and get 80 free coins! Use my code: ${user?.referral_code}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: "Join MiniSeries",
+        text: shareText,
+        url: shareUrl
+      });
+    } else {
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+      toast.success("Share link copied!");
+    }
   };
 
   if (!user) return null;
@@ -1150,6 +1194,74 @@ const ProfilePage = ({ onLogout }) => {
             <p className="text-muted-foreground text-sm">{user.email}</p>
           </div>
         </div>
+      </Card>
+
+      {/* Referral Card */}
+      <Card className="bg-gradient-to-br from-violet-600/20 to-pink-600/20 border-violet-500/30 p-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
+            <Users className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h3 className="font-heading font-semibold">Invite Friends</h3>
+            <p className="text-xs text-muted-foreground">Earn 20 coins per referral!</p>
+          </div>
+        </div>
+        
+        {/* Referral Code */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex-1 p-3 rounded-xl bg-black/30 border border-white/10 font-mono text-lg tracking-widest text-center">
+            {user.referral_code || "Loading..."}
+          </div>
+          <Button
+            variant="outline"
+            size="icon"
+            className="border-white/20 hover:bg-white/10"
+            onClick={copyReferralCode}
+            data-testid="copy-referral-btn"
+          >
+            {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+          </Button>
+        </div>
+
+        {/* Share Button */}
+        <Button
+          onClick={shareReferral}
+          className="w-full bg-gradient-to-r from-violet-600 to-pink-600 hover:from-violet-700 hover:to-pink-700 rounded-full"
+          data-testid="share-referral-btn"
+        >
+          <Share2 className="w-4 h-4 mr-2" />
+          Share & Earn 20 Coins
+        </Button>
+
+        {/* Referral Stats */}
+        {referralStats && (
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="text-center p-3 rounded-xl bg-black/20">
+              <p className="font-heading text-xl font-bold text-violet-400">{referralStats.total_referrals}</p>
+              <p className="text-xs text-muted-foreground">Friends Invited</p>
+            </div>
+            <div className="text-center p-3 rounded-xl bg-black/20">
+              <p className="font-heading text-xl font-bold text-yellow-400">{referralStats.total_earnings}</p>
+              <p className="text-xs text-muted-foreground">Coins Earned</p>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Referrals */}
+        {referralStats?.recent_referrals?.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs text-muted-foreground mb-2">Recent Referrals</p>
+            <div className="space-y-2">
+              {referralStats.recent_referrals.map((ref, i) => (
+                <div key={i} className="flex items-center justify-between text-sm p-2 rounded-lg bg-black/20">
+                  <span className="text-muted-foreground">{ref.email}</span>
+                  <span className="text-yellow-400">+{ref.reward}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Stats */}
