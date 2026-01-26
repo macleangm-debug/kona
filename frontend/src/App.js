@@ -1175,33 +1175,61 @@ const ProfilePage = ({ onLogout }) => {
     }
   };
 
-  const shareReferral = async () => {
+  const shareReferral = () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `🎬 Join MiniSeries and get 80 FREE coins!\n\nWatch amazing short drama series for free!\n\nUse my code: ${user?.referral_code}`;
+    const totalBonus = APP_CONFIG.welcomeBonus + APP_CONFIG.referralBonus;
+    const shareText = `🎬 Join ${APP_CONFIG.name} and get ${totalBonus} FREE coins!\n\n${APP_CONFIG.tagline} for free!\n\nUse my code: ${user?.referral_code}`;
     
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Join MiniSeries - Get 80 Free Coins!",
-          text: shareText,
-          url: shareUrl
-        });
-      } catch (err) {
+    // Check if Web Share API is available AND we're in a secure context
+    if (navigator.share && window.isSecureContext) {
+      navigator.share({
+        title: `Join ${APP_CONFIG.name} - Get ${totalBonus} Free Coins!`,
+        text: shareText,
+        url: shareUrl
+      }).catch((err) => {
         // User cancelled or share failed - copy to clipboard as fallback
         if (err.name !== 'AbortError') {
-          navigator.clipboard.writeText(`${shareText}\n\n👉 ${shareUrl}`);
-          toast.success("Share link copied to clipboard!");
+          copyToClipboard(`${shareText}\n\n👉 ${shareUrl}`);
         }
-      }
+      });
     } else {
-      navigator.clipboard.writeText(`${shareText}\n\n👉 ${shareUrl}`);
-      toast.success("Share link copied to clipboard!");
+      // Fallback: copy to clipboard
+      copyToClipboard(`${shareText}\n\n👉 ${shareUrl}`);
     }
+  };
+
+  const copyToClipboard = (text) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(() => {
+        toast.success("Share link copied to clipboard!");
+      }).catch(() => {
+        fallbackCopyToClipboard(text);
+      });
+    } else {
+      fallbackCopyToClipboard(text);
+    }
+  };
+
+  const fallbackCopyToClipboard = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      toast.success("Share link copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy. Please copy manually.");
+    }
+    document.body.removeChild(textArea);
   };
 
   const shareToWhatsApp = () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `🎬 *Join MiniSeries* and get *80 FREE coins* to watch amazing short drama series!
+    const totalBonus = APP_CONFIG.welcomeBonus + APP_CONFIG.referralBonus;
+    const shareText = `🎬 *Join ${APP_CONFIG.name}* and get *${totalBonus} FREE coins* to ${APP_CONFIG.tagline.toLowerCase()}!
 
 ✨ Trending shows updated daily
 🎁 Free coins every day
@@ -1216,16 +1244,17 @@ Use my referral code: *${user?.referral_code}*
 
   const shareViaSMS = () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `Join MiniSeries & get 80 FREE coins! Use code: ${user?.referral_code} ${shareUrl}`;
+    const totalBonus = APP_CONFIG.welcomeBonus + APP_CONFIG.referralBonus;
+    const shareText = `Join ${APP_CONFIG.name} & get ${totalBonus} FREE coins! Use code: ${user?.referral_code} ${shareUrl}`;
     const smsUrl = `sms:?body=${encodeURIComponent(shareText)}`;
     window.location.href = smsUrl;
   };
 
   const copyReferralLink = () => {
     const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
-    const shareText = `🎬 Join MiniSeries and get 80 FREE coins!\n\nUse my code: ${user?.referral_code}\n\n👉 ${shareUrl}`;
-    navigator.clipboard.writeText(shareText);
-    toast.success("Referral link copied!");
+    const totalBonus = APP_CONFIG.welcomeBonus + APP_CONFIG.referralBonus;
+    const shareText = `🎬 Join ${APP_CONFIG.name} and get ${totalBonus} FREE coins!\n\nUse my code: ${user?.referral_code}\n\n👉 ${shareUrl}`;
+    copyToClipboard(shareText);
   };
 
   if (!user) return null;
