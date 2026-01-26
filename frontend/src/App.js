@@ -626,40 +626,64 @@ const HomePage = ({ onAuthClick }) => {
   // Hero carousel - use featured series or top series
   const heroSlides = featured.length > 0 ? featured : series.slice(0, 5);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Track scroll position to update dots
+  // Track scroll position for 3D effect
   useEffect(() => {
-    const handleScroll = (e) => {
-      const container = e.target;
+    const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
+    if (!container) return;
+
+    const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.scrollWidth / heroSlides.length;
+      const cardWidth = container.offsetWidth * 0.75; // 75% card width
       const newIndex = Math.round(scrollLeft / cardWidth);
+      const progress = scrollLeft / cardWidth;
+      
+      setScrollProgress(progress);
       if (newIndex !== currentSlide && newIndex >= 0 && newIndex < heroSlides.length) {
         setCurrentSlide(newIndex);
       }
     };
 
-    const container = document.querySelector('[data-testid="hero-carousel"] > div');
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
+    container.addEventListener('scroll', handleScroll);
+    return () => container.removeEventListener('scroll', handleScroll);
   }, [heroSlides.length, currentSlide]);
 
-  // Handle swipe gestures (for non-snap browsers)
-  const handleTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
+  // Calculate 3D transform for each card based on scroll position
+  const getCardStyle = (index) => {
+    const offset = index - scrollProgress;
+    const absOffset = Math.abs(offset);
+    
+    // Scale: center card is 1, side cards are smaller
+    const scale = Math.max(0.75, 1 - absOffset * 0.15);
+    
+    // Vertical offset: side cards drop down
+    const translateY = absOffset * 25;
+    
+    // Z-index for layering
+    const zIndex = 10 - Math.round(absOffset);
+    
+    // Opacity: slightly dim side cards
+    const opacity = Math.max(0.6, 1 - absOffset * 0.3);
+    
+    // Rotation for curve effect
+    const rotateY = offset * -8;
+    
+    return {
+      transform: `scale(${scale}) translateY(${translateY}px) perspective(1000px) rotateY(${rotateY}deg)`,
+      zIndex,
+      opacity,
+      transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
+    };
   };
 
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    // Let native scroll handle it with snap
+  const scrollToSlide = (index) => {
+    const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
+    if (container) {
+      const cardWidth = container.offsetWidth * 0.75;
+      container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
+    }
+    setCurrentSlide(index);
   };
 
   if (loading) {
