@@ -1273,7 +1273,15 @@ const HomePage = ({ onAuthClick }) => {
       {/* Header - Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black via-black/90 to-transparent max-w-md mx-auto" data-testid="app-header">
         <KonaLogo2Full height={28} />
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          {/* Search Button */}
+          <button 
+            className="p-2 hover:bg-white/10 rounded-full transition-colors"
+            onClick={() => setShowSearch(true)}
+            data-testid="search-btn"
+          >
+            <Search className="w-5 h-5" />
+          </button>
           {user ? (
             <>
               <button 
