@@ -602,6 +602,10 @@ async def update_progress(data: WatchProgressUpdate, user: dict = Depends(get_cu
     
     return {"message": "Progress updated", "progress": data.progress}
 
+@api_router.get("/user/unlocked-episodes")
+async def get_unlocked_episodes(user: dict = Depends(get_current_user)):
+    return {"unlocked_episodes": user.get("unlocked_episodes", [])}
+
 @api_router.get("/user/reminders")
 async def get_user_reminders(user: dict = Depends(get_current_user)):
     """Get user's set reminders"""
