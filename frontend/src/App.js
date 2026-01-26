@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/sonner";
@@ -116,6 +116,9 @@ const AuthModal = ({ open, onClose }) => {
           <DialogTitle className="font-heading text-2xl">
             {isLogin ? "Welcome Back" : "Join Now"}
           </DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            {isLogin ? "Sign in to continue watching" : "Create an account to start watching"}
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           {!isLogin && (
