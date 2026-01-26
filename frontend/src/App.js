@@ -728,20 +728,19 @@ const HomePage = ({ onAuthClick }) => {
       {/* Spacer for fixed header */}
       <div className="h-14" />
 
-      {/* Hero Carousel - ReelShort Style Card Scroll */}
+      {/* Hero Carousel - 3D Curved Card Scroll */}
       {heroSlides.length > 0 && (
-        <div className="mb-4" data-testid="hero-carousel">
-          {/* Scrollable Cards Container */}
+        <div className="mb-4 overflow-hidden" data-testid="hero-carousel">
+          {/* 3D Carousel Container */}
           <div 
-            className="flex gap-3 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-3"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
+            className="carousel-container flex gap-4 px-[12.5%] overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-4 pt-2"
+            style={{ perspective: '1000px' }}
           >
             {heroSlides.map((heroSeries, index) => (
               <div 
                 key={heroSeries.id} 
-                className="flex-shrink-0 w-[85%] snap-center cursor-pointer group"
+                className="flex-shrink-0 w-[75%] snap-center cursor-pointer"
+                style={getCardStyle(index)}
                 onClick={() => navigate(`/series/${heroSeries.id}`)}
               >
                 {/* Card */}
@@ -750,11 +749,11 @@ const HomePage = ({ onAuthClick }) => {
                   <img 
                     src={heroSeries.thumbnail} 
                     alt={heroSeries.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover"
                   />
                   
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
                   
                   {/* Top Badge */}
                   <div className="absolute top-3 left-3 flex items-center gap-2">
@@ -773,22 +772,22 @@ const HomePage = ({ onAuthClick }) => {
                     EP.{heroSeries.total_episodes}
                   </div>
                   
-                  {/* Play Button Overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-                      <Play className="w-8 h-8 text-black fill-black ml-1" />
+                  {/* Play Button - Always visible on center card */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                      <Play className="w-7 h-7 text-black fill-black ml-1" />
                     </div>
                   </div>
                   
                   {/* Content at Bottom */}
                   <div className="absolute bottom-0 left-0 right-0 p-4">
                     {/* Title */}
-                    <h2 className="font-heading text-xl font-bold mb-1 line-clamp-2 leading-tight">
+                    <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2 leading-tight">
                       {heroSeries.title}
                     </h2>
                     
                     {/* Genre & Rating */}
-                    <div className="flex items-center gap-2 text-sm text-white/80 mb-2">
+                    <div className="flex items-center gap-2 text-sm text-white/80">
                       <span>{heroSeries.genre}</span>
                       <span>•</span>
                       <div className="flex items-center gap-1">
@@ -796,11 +795,6 @@ const HomePage = ({ onAuthClick }) => {
                         <span>{heroSeries.rating}</span>
                       </div>
                     </div>
-                    
-                    {/* Description */}
-                    <p className="text-xs text-white/60 line-clamp-2">
-                      {heroSeries.description}
-                    </p>
                   </div>
                 </div>
               </div>
@@ -808,19 +802,11 @@ const HomePage = ({ onAuthClick }) => {
           </div>
 
           {/* Dot Indicators - Red style */}
-          <div className="flex items-center justify-center gap-2 mt-3">
+          <div className="flex items-center justify-center gap-2 mt-2">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
-                onClick={() => {
-                  // Scroll to the card
-                  const container = document.querySelector('[data-testid="hero-carousel"] > div');
-                  if (container) {
-                    const cardWidth = container.scrollWidth / heroSlides.length;
-                    container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
-                  }
-                  setCurrentSlide(index);
-                }}
+                onClick={() => scrollToSlide(index)}
                 className={`transition-all duration-300 rounded-full ${
                   index === currentSlide 
                     ? "w-6 h-2 bg-red-500" 
