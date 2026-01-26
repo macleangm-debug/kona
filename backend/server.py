@@ -344,7 +344,10 @@ async def login(data: UserLogin):
         name=user["name"],
         coins=user["coins"],
         created_at=user["created_at"],
-        last_daily_reward=user.get("last_daily_reward")
+        last_daily_reward=user.get("last_daily_reward"),
+        referral_code=user.get("referral_code"),
+        referral_count=user.get("referral_count", 0),
+        referral_earnings=user.get("referral_earnings", 0)
     )
     return TokenResponse(token=token, user=user_response)
 
@@ -356,7 +359,10 @@ async def get_me(user: dict = Depends(get_current_user)):
         name=user["name"],
         coins=user["coins"],
         created_at=user["created_at"],
-        last_daily_reward=user.get("last_daily_reward")
+        last_daily_reward=user.get("last_daily_reward"),
+        referral_code=user.get("referral_code"),
+        referral_count=user.get("referral_count", 0),
+        referral_earnings=user.get("referral_earnings", 0)
     )
 
 # ============ DAILY REWARDS ============
