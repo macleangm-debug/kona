@@ -2908,6 +2908,8 @@ function App() {
               <Route path="/watch/:id" element={<VideoPlayerPage />} />
               <Route path="/store" element={<StorePage />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/subscriptions" element={<SubscriptionPage />} />
+              <Route path="/admin" element={<AdminPage />} />
             </Routes>
             <BottomNav onAuthClick={() => setShowAuth(true)} />
             <InstallAppBanner />
