@@ -686,7 +686,20 @@ async def unlock_episode(data: UnlockEpisodeRequest, user: dict = Depends(get_cu
     return {"message": "Episode unlocked!", "coins_spent": episode["coins_required"], "remaining_coins": new_coins}
 
 @api_router.post("/episodes/progress")
-async def update_progress(data: WatchProgressUpdate, user: dict = Depends(get_current_user)):
+async def update_progress(data: WatchProgressUpdate, authorization: Optional[str] = Header(None)):
+    # Progress tracking is optional for guests watching free episodes
+    if not authorization:
+        return {"message": "Progress not saved (guest mode)", "progress": data.progress}
+    
+    try:
+        token = authorization.replace("Bearer ", "")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+        if not user:
+            return {"message": "Progress not saved", "progress": data.progress}
+    except:
+        return {"message": "Progress not saved", "progress": data.progress}
+    
     watch_progress = user.get("watch_progress", {})
     watch_progress[data.episode_id] = data.progress
     
