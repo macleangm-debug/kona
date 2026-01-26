@@ -1193,33 +1193,38 @@ const HomePage = ({ onAuthClick }) => {
 
   // Hero carousel - use featured series or top series
   const heroSlides = featured.length > 0 ? featured : series.slice(0, 5);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  
-  useEffect(() => {
-    const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
-    if (!container) return;
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-    const handleScroll = () => {
-      const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.7;
-      const newIndex = Math.round(scrollLeft / cardWidth);
-      setActiveIndex(newIndex);
-      setCurrentSlide(newIndex);
-    };
+  // Swipe handlers
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsDragging(true);
+  };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, [heroSlides.length]);
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
 
-  const scrollToSlide = (index) => {
-    const container = document.querySelector('[data-testid="hero-carousel"] .carousel-container');
-    if (container) {
-      const cardWidth = container.offsetWidth * 0.7;
-      container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+    
+    if (distance > minSwipeDistance && activeIndex < heroSlides.length - 1) {
+      setActiveIndex(activeIndex + 1);
+    } else if (distance < -minSwipeDistance && activeIndex > 0) {
+      setActiveIndex(activeIndex - 1);
     }
-    setActiveIndex(index);
-    setCurrentSlide(index);
+  };
+
+  const goToSlide = (index) => {
+    setActiveIndex(Math.max(0, Math.min(heroSlides.length - 1, index)));
   };
 
   if (loading) {
