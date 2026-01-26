@@ -18,8 +18,8 @@ const API = `${BACKEND_URL}/api`;
 
 // App Configuration - Easy to change product name
 const APP_CONFIG = {
-  name: "MiniSeries",
-  tagline: "Watch amazing short drama series",
+  name: "Kona",
+  tagline: "Your corner for the best mini-series",
   welcomeBonus: 50,
   referralBonus: 30,
   referrerReward: 20,
