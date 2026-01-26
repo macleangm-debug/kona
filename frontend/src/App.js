@@ -2375,6 +2375,13 @@ const VideoPlayerPage = ({ onAuthClick }) => {
               <button
                 key={ep.id}
                 onClick={() => {
+                  // If guest and not Episode 1, show sign-up prompt
+                  if (!user && ep.episode_number !== 1 && !ep.is_free) {
+                    setShowEpisodes(false);
+                    setSignUpPromptType("next_episode");
+                    setShowSignUpPrompt(true);
+                    return;
+                  }
                   navigate(`/watch/${ep.id}`);
                   setShowEpisodes(false);
                 }}
