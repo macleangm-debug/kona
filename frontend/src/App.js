@@ -556,7 +556,7 @@ const HomePage = ({ onAuthClick }) => {
     <div className="pb-20" data-testid="home-page">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <KonaLogo2Full height={36} />
+        <KonaLogo2Full height={32} />
         {user ? (
           <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
         ) : (
@@ -572,43 +572,116 @@ const HomePage = ({ onAuthClick }) => {
         )}
       </div>
 
-      {/* Daily Reward Button */}
+      {/* Daily Reward Banner */}
       {user && canClaimReward && (
         <button
           onClick={() => setShowReward(true)}
-          className="mx-4 mb-4 w-[calc(100%-2rem)] p-3 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center gap-3 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
+          className="mx-4 mb-4 w-[calc(100%-2rem)] p-2.5 rounded-lg bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center gap-2 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
           data-testid="daily-reward-banner"
         >
-          <Gift className="w-6 h-6 text-yellow-400" />
-          <span className="font-semibold">Claim your daily reward!</span>
+          <Gift className="w-5 h-5 text-yellow-400" />
+          <span className="text-sm font-medium">Claim your daily reward!</span>
         </button>
       )}
 
-      {/* Featured Carousel */}
-      {featured.length > 0 && (
-        <div className="px-4 mb-8">
-          <h2 className="font-heading text-lg font-semibold mb-3">🔥 Trending Now</h2>
-          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-            {featured.map((s) => (
-              <div key={s.id} className="flex-shrink-0 w-40">
-                <SeriesCard series={s} onClick={() => navigate(`/series/${s.id}`)} />
-              </div>
+      {/* Continue Watching - Netflix style */}
+      {user && continueWatching.length > 0 && (
+        <div className="mb-6">
+          <SectionHeader title="Continue Watching" />
+          <ScrollRow>
+            {continueWatching.map((item, i) => (
+              <ContinueWatchingCard
+                key={i}
+                series={item.series}
+                episode={item.episode}
+                progress={item.progress}
+                onClick={() => navigate(`/series/${item.series.id}`)}
+              />
             ))}
-          </div>
+          </ScrollRow>
         </div>
       )}
 
-      {/* By Genre */}
-      {genres.map((genre) => (
-        <div key={genre} className="px-4 mb-6">
-          <h2 className="font-heading text-lg font-semibold mb-3">{genre}</h2>
-          <div className="grid grid-cols-2 gap-4">
-            {series.filter(s => s.genre === genre).slice(0, 4).map((s) => (
-              <SeriesCard key={s.id} series={s} onClick={() => navigate(`/series/${s.id}`)} />
+      {/* Trending Now - Horizontal scroll */}
+      {featured.length > 0 && (
+        <div className="mb-6">
+          <SectionHeader title="🔥 Trending Now" />
+          <ScrollRow>
+            {featured.map((s) => (
+              <SeriesCard 
+                key={s.id} 
+                series={s} 
+                onClick={() => navigate(`/series/${s.id}`)} 
+              />
             ))}
-          </div>
+          </ScrollRow>
+        </div>
+      )}
+
+      {/* Top 10 in Your Region */}
+      <div className="mb-6">
+        <SectionHeader title="Top 10 in East Africa" />
+        <ScrollRow>
+          {series.slice(0, 10).map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 flex items-end gap-1">
+              <span className="font-heading text-5xl font-black text-stroke">{index + 1}</span>
+              <SeriesCard 
+                series={s} 
+                size="small"
+                onClick={() => navigate(`/series/${s.id}`)} 
+              />
+            </div>
+          ))}
+        </ScrollRow>
+      </div>
+
+      {/* My List - for logged in users */}
+      {user && (
+        <div className="mb-6">
+          <SectionHeader title="My List" onSeeAll={() => {}} />
+          <ScrollRow>
+            {series.slice(0, 5).map((s) => (
+              <SeriesCard 
+                key={s.id} 
+                series={s}
+                size="small"
+                onClick={() => navigate(`/series/${s.id}`)} 
+              />
+            ))}
+          </ScrollRow>
+        </div>
+      )}
+
+      {/* Genre Rows - Netflix style */}
+      {genres.map((genre) => (
+        <div key={genre} className="mb-6">
+          <SectionHeader title={genre} />
+          <ScrollRow>
+            {series.filter(s => s.genre === genre).map((s) => (
+              <SeriesCard 
+                key={s.id} 
+                series={s}
+                size="small"
+                onClick={() => navigate(`/series/${s.id}`)} 
+              />
+            ))}
+          </ScrollRow>
         </div>
       ))}
+
+      {/* New Releases */}
+      <div className="mb-6">
+        <SectionHeader title="New Releases" />
+        <ScrollRow>
+          {[...series].reverse().slice(0, 6).map((s) => (
+            <SeriesCard 
+              key={s.id} 
+              series={s}
+              onClick={() => navigate(`/series/${s.id}`)} 
+            />
+          ))}
+        </ScrollRow>
+      </div>
 
       <DailyRewardModal 
         open={showReward} 
