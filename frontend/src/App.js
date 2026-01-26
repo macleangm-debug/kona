@@ -860,23 +860,24 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
-      {/* Main Grid - Trending Now (First section users see) */}
-      <div className="px-4 mb-6">
-        <div className="flex items-center justify-between mb-3">
+      {/* Trending Now - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">
             {activeCategory === "all" ? "Trending Now 🔥" : categories.find(c => c.id === activeCategory)?.label}
           </h2>
-          <span className="text-xs text-muted-foreground">{filteredSeries.length} shows</span>
+          <button className="text-xs text-primary">See All</button>
         </div>
-        
-        <div className="grid grid-cols-3 gap-3">
-          {filteredSeries.slice(0, 6).map((s, index) => (
-            <SeriesCard 
-              key={s.id} 
-              series={s}
-              badge={getBadge(s, index)}
-              onClick={() => navigate(`/series/${s.id}`)}
-            />
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {filteredSeries.map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge={getBadge(s, index)}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
           ))}
         </div>
       </div>
@@ -909,6 +910,26 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
+      {/* Romance Section - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
+          <h2 className="font-heading text-sm font-semibold">Romance 💕</h2>
+          <button className="text-xs text-primary">See All</button>
+        </div>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.filter(s => s.genre === "Romance").map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge={index === 0 ? "hot" : null}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Continue Watching - Lower on the page like Netflix */}
       {user && continueWatching.length > 0 && (
         <div className="mb-6">
@@ -916,34 +937,97 @@ const HomePage = ({ onAuthClick }) => {
             <h2 className="font-heading text-sm font-semibold">Continue Watching</h2>
             <button className="text-xs text-primary">See All</button>
           </div>
-          <div className="grid grid-cols-2 gap-3 px-4">
-            {continueWatching.slice(0, 2).map((item, i) => (
-              <ContinueWatchingCard
-                key={i}
-                series={item.series}
-                episode={item.episode}
-                progress={item.progress}
-                onClick={() => navigate(`/series/${item.series.id}`)}
-              />
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+            {continueWatching.map((item, i) => (
+              <div key={i} className="flex-shrink-0 w-44">
+                <ContinueWatchingCard
+                  series={item.series}
+                  episode={item.episode}
+                  progress={item.progress}
+                  onClick={() => navigate(`/series/${item.series.id}`)}
+                />
+              </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* New Releases Section */}
-      <div className="px-4 mb-6">
-        <div className="flex items-center justify-between mb-3">
+      {/* Thriller Section - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
+          <h2 className="font-heading text-sm font-semibold">Thriller 🔪</h2>
+          <button className="text-xs text-primary">See All</button>
+        </div>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.filter(s => s.genre === "Thriller").map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge={index === 0 ? "top" : null}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Drama Section - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
+          <h2 className="font-heading text-sm font-semibold">Drama 🎭</h2>
+          <button className="text-xs text-primary">See All</button>
+        </div>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.filter(s => s.genre === "Drama").map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge={index === 0 ? "vip" : null}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Action Section - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
+          <h2 className="font-heading text-sm font-semibold">Action 💥</h2>
+          <button className="text-xs text-primary">See All</button>
+        </div>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.filter(s => s.genre === "Action").map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge={index === 0 ? "new" : null}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* New Releases Section - Horizontal Scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">New Releases ✨</h2>
           <button className="text-xs text-primary">See All</button>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {series.slice(2, 5).map((s, index) => (
-            <SeriesCard 
-              key={s.id} 
-              series={s}
-              badge="new"
-              onClick={() => navigate(`/series/${s.id}`)}
-            />
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.slice(-8).map((s, index) => (
+            <div key={s.id} className="flex-shrink-0 w-28">
+              <SeriesCard 
+                series={s}
+                badge="new"
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+              />
+            </div>
           ))}
         </div>
       </div>
