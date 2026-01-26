@@ -1880,7 +1880,13 @@ const VideoPlayerPage = () => {
   const { token, user } = useAuth();
   const [episode, setEpisode] = useState(null);
   const [series, setSeries] = useState(null);
+  const [allEpisodes, setAllEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showEpisodes, setShowEpisodes] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+  const [videoQuality, setVideoQuality] = useState("540p");
+  const videoRef = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -1892,6 +1898,10 @@ const VideoPlayerPage = () => {
 
         const seriesRes = await axios.get(`${API}/series/${epRes.data.series_id}`);
         setSeries(seriesRes.data);
+
+        // Fetch all episodes for the series
+        const allEpsRes = await axios.get(`${API}/series/${epRes.data.series_id}/episodes`);
+        setAllEpisodes(allEpsRes.data);
       } catch (e) {
         console.error(e);
         navigate(-1);
@@ -1915,6 +1925,28 @@ const VideoPlayerPage = () => {
     }
   };
 
+  const togglePlayPause = () => {
+    const video = document.getElementById('main-video');
+    if (video) {
+      if (video.paused) {
+        video.play();
+        setIsPlaying(true);
+      } else {
+        video.pause();
+        setIsPlaying(false);
+      }
+    }
+  };
+
+  const changeSpeed = () => {
+    const speeds = [0.5, 1.0, 1.5, 2.0];
+    const currentIndex = speeds.indexOf(playbackSpeed);
+    const nextSpeed = speeds[(currentIndex + 1) % speeds.length];
+    setPlaybackSpeed(nextSpeed);
+    const video = document.getElementById('main-video');
+    if (video) video.playbackRate = nextSpeed;
+  };
+
   if (loading || !episode) {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
@@ -1924,36 +1956,193 @@ const VideoPlayerPage = () => {
   }
 
   return (
-    <div className="h-screen bg-black flex flex-col" data-testid="video-player-page">
+    <div className="fixed inset-0 bg-black z-50" data-testid="video-player-page">
+      {/* Full-screen vertical video */}
+      <video
+        id="main-video"
+        src={episode.video_url}
+        autoPlay
+        loop
+        playsInline
+        onTimeUpdate={handleProgress}
+        onClick={togglePlayPause}
+        className="absolute inset-0 w-full h-full object-cover"
+        data-testid="video-element"
+      />
+
+      {/* Top gradient overlay */}
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+      
+      {/* Bottom gradient overlay */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent absolute top-0 left-0 right-0 z-10">
+      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-20">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          className="p-2"
           data-testid="player-back-btn"
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-6 h-6 text-white" />
         </button>
-        {user && <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />}
+        <div className="flex-1 text-center">
+          <p className="text-white text-sm font-medium truncate px-4">
+            {series?.title} <span className="text-white/70">EP.{episode.episode_number}</span>
+          </p>
+        </div>
+        <button className="p-2">
+          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <circle cx="12" cy="5" r="2"/>
+            <circle cx="12" cy="12" r="2"/>
+            <circle cx="12" cy="19" r="2"/>
+          </svg>
+        </button>
       </div>
 
-      {/* Video */}
-      <div className="flex-1 flex items-center justify-center">
-        <video
-          src={episode.video_url}
-          controls
-          autoPlay
-          onTimeUpdate={handleProgress}
-          className="w-full max-h-full"
-          data-testid="video-element"
-        />
+      {/* Center play/pause button */}
+      <div 
+        className="absolute inset-0 flex items-center justify-center z-10"
+        onClick={togglePlayPause}
+      >
+        {!isPlaying && (
+          <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+            <Play className="w-8 h-8 text-white ml-1" fill="white" />
+          </div>
+        )}
+        {isPlaying && (
+          <div className="w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+            <svg className="w-8 h-8 text-white" fill="white" viewBox="0 0 24 24">
+              <rect x="6" y="4" width="4" height="16" rx="1"/>
+              <rect x="14" y="4" width="4" height="16" rx="1"/>
+            </svg>
+          </div>
+        )}
       </div>
 
-      {/* Info */}
-      <div className="p-4 bg-gradient-to-t from-black/80 to-transparent">
-        <p className="text-muted-foreground text-sm">{series?.title}</p>
-        <h2 className="font-heading text-lg font-semibold">{episode.title}</h2>
+      {/* Right side action buttons */}
+      <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20">
+        {/* Comments */}
+        <button className="flex flex-col items-center gap-1">
+          <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="white" viewBox="0 0 24 24">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <span className="text-white text-xs">81.2K</span>
+        </button>
+
+        {/* Likes */}
+        <button className="flex flex-col items-center gap-1">
+          <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <Heart className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-white text-xs">5.5K</span>
+        </button>
+
+        {/* Episodes */}
+        <button 
+          onClick={() => setShowEpisodes(true)}
+          className="flex flex-col items-center gap-1"
+        >
+          <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </div>
+          <span className="text-white text-xs">Episodes</span>
+        </button>
+
+        {/* Download/VIP */}
+        <button 
+          onClick={() => navigate("/subscriptions")}
+          className="flex flex-col items-center gap-1 relative"
+        >
+          <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
+            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+          </div>
+          <span className="absolute -top-1 -right-1 bg-yellow-500 text-black text-[8px] font-bold px-1 rounded">VIP</span>
+          <span className="text-white text-xs">Download</span>
+        </button>
       </div>
+
+      {/* Subtitle/Caption area */}
+      <div className="absolute bottom-28 left-4 right-20 z-20">
+        <p className="text-white text-lg font-medium drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
+          {episode.title || "Watch the drama unfold..."}
+        </p>
+      </div>
+
+      {/* Bottom control bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20">
+        <div className="flex items-center justify-between px-4 py-3 bg-black/60 backdrop-blur-sm">
+          {/* Upgrade to VIP */}
+          <button 
+            onClick={() => navigate("/subscriptions")}
+            className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2 rounded-full text-sm font-bold"
+          >
+            <Crown className="w-4 h-4" />
+            Upgrade to VIP &gt;
+          </button>
+
+          {/* Playback controls */}
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={changeSpeed}
+              className="text-white text-sm font-medium bg-white/20 px-3 py-1 rounded"
+            >
+              {playbackSpeed}X
+            </button>
+            <button className="text-white text-sm font-medium bg-white/20 px-3 py-1 rounded">
+              {videoQuality}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Episodes Sheet */}
+      <Sheet open={showEpisodes} onOpenChange={setShowEpisodes}>
+        <SheetContent side="bottom" className="h-[60vh] bg-background/95 backdrop-blur-lg rounded-t-3xl">
+          <SheetHeader className="pb-4">
+            <SheetTitle>Episodes</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-2 overflow-y-auto max-h-[calc(60vh-80px)]">
+            {allEpisodes.map((ep) => (
+              <button
+                key={ep.id}
+                onClick={() => {
+                  navigate(`/watch/${ep.id}`);
+                  setShowEpisodes(false);
+                }}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                  ep.id === episode.id ? 'bg-primary/20 border border-primary' : 'bg-white/5 hover:bg-white/10'
+                }`}
+              >
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold">
+                  {ep.episode_number}
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-medium text-sm">{ep.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {ep.coins_required === 0 ? (
+                      <span className="text-green-400">FREE</span>
+                    ) : (
+                      <span className="flex items-center gap-1">
+                        <Coins className="w-3 h-3 text-yellow-400" />
+                        {ep.coins_required}
+                      </span>
+                    )}
+                  </p>
+                </div>
+                {ep.id === episode.id && (
+                  <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                )}
+              </button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
