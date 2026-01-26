@@ -2099,37 +2099,10 @@ const VideoPlayerPage = () => {
       </div>
 
       {/* Subtitle/Caption area - only visible when showControls is true */}
-      <div className={`absolute bottom-28 left-4 right-20 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`absolute bottom-8 left-4 right-20 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
         <p className="text-white text-lg font-medium drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
           {episode.title || "Watch the drama unfold..."}
         </p>
-      </div>
-
-      {/* Bottom control bar - only visible when showControls is true */}
-      <div className={`absolute bottom-0 left-0 right-0 z-20 pb-safe transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className="flex items-center justify-between px-4 py-4 bg-black/70 backdrop-blur-sm">
-          {/* Upgrade to VIP */}
-          <button 
-            onClick={() => navigate("/subscriptions")}
-            className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2.5 rounded-full text-sm font-bold shadow-lg"
-          >
-            <Crown className="w-4 h-4" />
-            Upgrade to VIP &gt;
-          </button>
-
-          {/* Playback controls */}
-          <div className="flex items-center gap-2">
-            <button 
-              onClick={changeSpeed}
-              className="text-white text-sm font-medium bg-white/20 px-3 py-1.5 rounded"
-            >
-              {playbackSpeed}X
-            </button>
-            <button className="text-white text-sm font-medium bg-white/20 px-3 py-1.5 rounded">
-              {videoQuality}
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Episodes Sheet */}
