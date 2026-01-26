@@ -1203,7 +1203,7 @@ const HomePage = ({ onAuthClick }) => {
 
     const handleScroll = () => {
       const scrollLeft = container.scrollLeft;
-      const cardWidth = container.offsetWidth * 0.72; // Card width + gap
+      const cardWidth = container.offsetWidth * 0.72;
       const progress = scrollLeft / cardWidth;
       
       setScrollProgress(progress);
@@ -1217,44 +1217,35 @@ const HomePage = ({ onAuthClick }) => {
     return () => container.removeEventListener('scroll', handleScroll);
   }, [heroSlides.length, currentSlide]);
 
-  // Calculate 3D transform for each card based on scroll position
+  // Calculate 3D transform for each card - IMPROVED
   const getCardStyle = (index) => {
     const offset = index - scrollProgress;
     const absOffset = Math.abs(offset);
-    const direction = offset > 0 ? 1 : -1;
     
-    // When card is centered (offset ~0), it should be fully front-facing
-    // Scale: center card is 1, side cards scale down smoothly
-    const scale = 1 - Math.min(absOffset * 0.15, 0.25);
+    // Clamp offset for smooth transitions
+    const clampedOffset = Math.max(-1.5, Math.min(1.5, offset));
+    const clampedAbs = Math.abs(clampedOffset);
     
-    // Vertical offset: side cards drop down with a curve
-    const translateY = Math.pow(absOffset, 1.5) * 20;
+    // Scale: 1 at center, smaller on sides
+    const scale = 1 - clampedAbs * 0.18;
     
-    // Horizontal shift to create arc effect
-    const translateX = offset * 15;
+    // Y position: center is at 0, sides drop down
+    const translateY = clampedAbs * clampedAbs * 35;
     
-    // Z position for depth
-    const translateZ = -absOffset * 50;
+    // Z position for depth (negative = further back)
+    const translateZ = -clampedAbs * 80;
     
-    // Rotation: smoothly rotate cards as they move to sides
-    // Center card = 0 rotation, side cards rotate away
-    const rotateY = offset * 15;
+    // Rotation: 0 at center, rotate away on sides
+    // Positive offset (right side) rotates left, negative offset (left side) rotates right
+    const rotateY = clampedOffset * -25;
     
-    // Z-index for layering
-    const zIndex = 10 - Math.round(absOffset * 2);
+    // Z-index: center on top
+    const zIndex = 100 - Math.round(absOffset * 10);
     
     return {
-      transform: `
-        perspective(1200px)
-        translateX(${translateX}px)
-        translateY(${translateY}px)
-        translateZ(${translateZ}px)
-        rotateY(${rotateY}deg)
-        scale(${scale})
-      `,
+      transform: `translateY(${translateY}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
       zIndex,
-      transition: 'transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
-      transformStyle: 'preserve-3d'
+      transition: 'transform 0.25s ease-out',
     };
   };
 
@@ -1262,8 +1253,8 @@ const HomePage = ({ onAuthClick }) => {
   const getDarkOverlay = (index) => {
     const offset = index - scrollProgress;
     const absOffset = Math.abs(offset);
-    // Center card: 0 darkness, side cards: darken smoothly
-    return Math.min(0.6, absOffset * 0.5);
+    // Center: fully visible, sides: darken
+    return Math.min(0.65, absOffset * 0.55);
   };
 
   const scrollToSlide = (index) => {
