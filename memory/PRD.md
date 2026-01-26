@@ -1,10 +1,10 @@
 # MiniSeries App - Product Requirements Document
 
 ## Original Problem Statement
-Build a mini series app like ReelShort/Pocket FM where users purchase coins as credits to watch episodic video series.
+Build a mini series app like ReelShort/Pocket FM where users purchase coins as credits to watch episodic video series. Support geo-based payment routing for East/Central Africa with local payment methods.
 
 ## Target Audience
-Young adults 18-35 who enjoy binge-watching short-form drama series on mobile
+Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form drama series on mobile
 
 ## Core Requirements (Static)
 - User authentication (JWT)
@@ -12,11 +12,11 @@ Young adults 18-35 who enjoy binge-watching short-form drama series on mobile
 - Watch video episodes
 - Coin-based monetization
 - Daily rewards system
-- Stripe payment integration
+- Multi-region payment support (Africa + International)
 
-## What's Been Implemented (Jan 26, 2026)
+## What's Been Implemented
 
-### Backend (FastAPI + MongoDB)
+### Phase 1 - MVP (Jan 26, 2026)
 - [x] User registration with 50 coin welcome bonus
 - [x] JWT authentication (72hr expiry)
 - [x] Series & Episodes CRUD
@@ -25,29 +25,51 @@ Young adults 18-35 who enjoy binge-watching short-form drama series on mobile
 - [x] Daily reward system (10 coins/day)
 - [x] Episode unlocking with coins
 - [x] Watch progress tracking
-- [x] Payment transaction logging
-
-### Frontend (React + Tailwind)
 - [x] Mobile-first dark theme (Neon Noir)
-- [x] Bottom navigation
-- [x] Home page with trending & genre sections
-- [x] Series detail with episode list
-- [x] Video player with progress tracking
-- [x] Coin store with Stripe checkout
-- [x] Profile page with stats
-- [x] Auth modal (login/register)
-- [x] Daily reward popup
-- [x] Episode unlock sheet
+
+### Phase 2 - Geo-Payment Routing (Jan 26, 2026)
+- [x] IP-based geolocation detection
+- [x] Manual country selection
+- [x] East/Central Africa support:
+  - Kenya (M-Pesa + Card) - KES
+  - Tanzania (M-Pesa + Card) - TZS
+  - Uganda (MTN MoMo + Airtel + Card) - UGX
+  - Rwanda (MTN MoMo + Card) - RWF
+  - DR Congo (Airtel + Card) - CDF
+  - Burundi (Card) - BIF
+  - South Sudan (Card) - SSP
+- [x] International card payments (Stripe) - USD
+- [x] Flutterwave integration for African mobile money
+- [x] Local currency display with exchange rates
+- [x] Phone number input for mobile money
+- [x] Payment method routing (Flutterwave Africa, Stripe Intl)
 
 ### Database Collections
 - users, series, episodes, payment_transactions
 
+## API Endpoints
+
+### Geo/Payment APIs
+- GET /api/geo/detect - Auto-detect country from IP
+- GET /api/geo/countries - List supported countries
+- GET /api/geo/payment-methods/{country_code} - Get payment methods
+
+### Store APIs
+- GET /api/store/packages - List coin packages
+- POST /api/store/checkout - Create payment (routes to Stripe or Flutterwave)
+- GET /api/store/checkout/status/{id} - Check payment status
+
+## Environment Variables Required
+- STRIPE_API_KEY (pre-configured)
+- FLUTTERWAVE_SECRET_KEY (needed for Africa payments)
+- FLUTTERWAVE_PUBLIC_KEY (needed for Africa payments)
+
 ## Prioritized Backlog
 
-### P0 (Critical)
-- None remaining
+### P0 (Critical) - None remaining
 
 ### P1 (High Priority)
+- Add Flutterwave API keys for live Africa payments
 - Search functionality
 - Continue watching section
 - Push notifications
@@ -60,6 +82,6 @@ Young adults 18-35 who enjoy binge-watching short-form drama series on mobile
 - Admin panel
 
 ## Next Tasks
-1. Add search bar for series
-2. "Continue Watching" rail on home page
-3. Episode recommendations
+1. Obtain Flutterwave API keys for production
+2. Add search bar for series
+3. "Continue Watching" rail on home page
