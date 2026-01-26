@@ -79,12 +79,64 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
   - [x] Denied state with settings instructions
   - [x] Test notification on grant
 
+### Phase 6 - Core Features (Jan 26, 2026)
+- [x] Search functionality
+  - [x] Real-time search as you type
+  - [x] Search results with thumbnails and EP1 FREE badge
+  - [x] Recent searches saved in localStorage
+  - [x] Browse by genre options
+- [x] Add to My List functionality
+  - [x] Add/remove from list API endpoints
+  - [x] Bookmark icon on series cards
+  - [x] My List section on homepage (for logged-in users)
+- [x] Continue Watching
+  - [x] Backend API to track watch progress
+  - [x] Real continue watching data from user's watch history
+- [x] First Episode Free
+  - [x] EP1 FREE badge on all series cards
+  - [x] First episode always has coins_required: 0 in database
+
+### Phase 7 - Monetization (Jan 26, 2026)
+- [x] Subscription Plans
+  - [x] Basic: $4.99/month - 100 coins
+  - [x] Premium: $9.99/month - 300 coins (Popular)
+  - [x] VIP: $14.99/month - 500 coins
+  - [x] Stripe checkout integration
+  - [x] Subscription page UI
+- [x] Admin Panel
+  - [x] Dashboard with stats (users, revenue, series, subscribers)
+  - [x] User management (view all users, see coins/subscription)
+  - [x] Series management (view all series)
+  - [x] Transaction history
+
 ### Database Collections
-- users, series, episodes, payment_transactions, referrals
+- users, series, episodes, coming_soon, payment_transactions, referrals
 
 ## API Endpoints
 
-### Referral APIs (New)
+### Search & My List APIs (New)
+- GET /api/search?q={query} - Search series by title/description
+- POST /api/user/my-list/add - Add series to My List
+- POST /api/user/my-list/remove - Remove from My List
+- GET /api/user/my-list - Get user's My List with series data
+- GET /api/user/continue-watching - Get real watch progress
+
+### Subscription APIs (New)
+- GET /api/subscriptions/plans - Get all subscription plans
+- POST /api/subscriptions/subscribe - Create Stripe subscription checkout
+- GET /api/user/subscription - Get user's current subscription
+
+### Admin APIs (New)
+- GET /api/admin/stats - Dashboard statistics
+- GET /api/admin/users - List all users
+- PUT /api/admin/users/{id} - Update user (coins, subscription)
+- GET /api/admin/series - List all series
+- POST /api/admin/series - Create new series
+- DELETE /api/admin/series/{id} - Delete series
+- GET /api/admin/transactions - List all transactions
+- POST /api/admin/make-admin?email={email}&secret={secret} - Make user admin
+
+### Referral APIs
 - GET /api/referral/validate/{code} - Validate referral code
 - GET /api/referral/stats - Get user's referral statistics
 - GET /api/referral/leaderboard - Get top referrers
@@ -98,6 +150,13 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 - Referrer reward: 20 coins
 - Referee bonus: 30 coins
 
+## Subscription Plans
+| Plan | Price | Coins/Month | Features |
+|------|-------|-------------|----------|
+| Basic | $4.99 | 100 | 1 device, Standard quality |
+| Premium | $9.99 | 300 | 2 devices, HD, Early access |
+| VIP | $14.99 | 500 | 4 devices, 4K, Ad-free, Exclusive |
+
 ## Environment Variables Required
 - STRIPE_API_KEY (pre-configured)
 - FLUTTERWAVE_SECRET_KEY (needed for Africa payments)
@@ -108,15 +167,13 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 ### P0 (Critical) - None remaining
 
 ### P1 (High Priority)
-- Add to My List functionality (backend + frontend)
-- Connect Continue Watching to actual user watch history
-- Search functionality
 - Add Flutterwave API keys for live Africa payments
+- Video player with actual video content
+- Episode unlock flow testing
 
 ### P2 (Nice to Have)
 - Update favicon to Kona logo
 - Referral milestone rewards
-- Push notifications
 - Social sharing to specific platforms
 - User reviews/ratings
 - Subscription plans
