@@ -1954,6 +1954,9 @@ const VideoPlayerPage = () => {
 
   const handleProgress = async (e) => {
     const video = e.target;
+    setCurrentTime(video.currentTime);
+    setDuration(video.duration || 0);
+    
     const progress = Math.round((video.currentTime / video.duration) * 100);
     if (progress > 0 && progress % 10 === 0) {
       try {
@@ -1963,6 +1966,17 @@ const VideoPlayerPage = () => {
       } catch (e) {
         console.error(e);
       }
+    }
+  };
+
+  const handleSeek = (e) => {
+    const video = document.getElementById('main-video');
+    if (video && duration > 0) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const percentage = x / rect.width;
+      video.currentTime = percentage * duration;
+      setCurrentTime(percentage * duration);
     }
   };
 
