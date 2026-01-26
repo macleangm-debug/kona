@@ -1952,15 +1952,16 @@ const VideoPlayerPage = () => {
   };
 
   if (loading || !episode) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
+    return createPortal(
+      <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
+      </div>,
+      document.body
     );
   }
 
-  return (
-    <div className="fixed inset-0 bg-black z-[100]" data-testid="video-player-page">
+  const playerContent = (
+    <div className="fixed inset-0 bg-black z-[9999]" data-testid="video-player-page">
       {/* Full-screen vertical video */}
       <video
         id="main-video"
