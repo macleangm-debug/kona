@@ -1194,9 +1194,6 @@ const HomePage = ({ onAuthClick }) => {
   // Hero carousel - use featured series or top series
   const heroSlides = featured.length > 0 ? featured : series.slice(0, 5);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  // Track scroll position for 3D effect
   const [activeIndex, setActiveIndex] = useState(0);
   
   useEffect(() => {
