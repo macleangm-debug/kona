@@ -90,11 +90,14 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 ### P0 (Critical) - None remaining
 
 ### P1 (High Priority)
-- Add Flutterwave API keys for live Africa payments
+- Add to My List functionality (backend + frontend)
+- Connect Continue Watching to actual user watch history
 - Search functionality
-- Continue watching section
+- Add Flutterwave API keys for live Africa payments
 
 ### P2 (Nice to Have)
+- Update favicon to Kona logo
+- Referral milestone rewards
 - Push notifications
 - Social sharing to specific platforms
 - User reviews/ratings
@@ -102,6 +105,6 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 - Admin panel
 
 ## Next Tasks
-1. Obtain Flutterwave API keys for production
-2. Add search bar for series
-3. "Continue Watching" rail on home page
+1. Implement "Add to My List" functionality
+2. Connect Continue Watching section to real user data
+3. Add search bar for series
