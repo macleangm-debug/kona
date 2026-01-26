@@ -681,14 +681,18 @@ const HomePage = ({ onAuthClick }) => {
 
   return (
     <div className="pb-20" data-testid="home-page">
-      {/* Header - Floating over hero */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/80 to-transparent">
+      {/* Header - Fixed at top */}
+      <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black via-black/90 to-transparent max-w-md mx-auto" data-testid="app-header">
         <KonaLogo2Full height={28} />
         <div className="flex items-center gap-3">
           {user ? (
             <>
-              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <Gift className="w-5 h-5 text-yellow-400" onClick={() => setShowReward(true)} />
+              <button 
+                className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                onClick={() => setShowReward(true)}
+                data-testid="gift-btn"
+              >
+                <Gift className="w-5 h-5 text-yellow-400" />
               </button>
               <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
             </>
@@ -705,6 +709,9 @@ const HomePage = ({ onAuthClick }) => {
           )}
         </div>
       </div>
+      
+      {/* Spacer for fixed header */}
+      <div className="h-14" />
 
       {/* Hero Carousel - Swipeable with Auto-rotation */}
       {currentHero && (
