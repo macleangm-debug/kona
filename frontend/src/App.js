@@ -1,8 +1,8 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
-import { Home, Play, ShoppingCart, User, Gift, Lock, Coins, Star, Eye, Clock, ChevronLeft, X, Check, Loader2 } from "lucide-react";
+import { Home, Play, ShoppingCart, User, Gift, Lock, Coins, Star, Eye, Clock, ChevronLeft, X, Check, Loader2, Share2, Users, Copy, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
