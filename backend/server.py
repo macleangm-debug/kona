@@ -983,12 +983,17 @@ async def flutterwave_webhook(request: Request):
 
 # ============ SEED DATA ============
 async def seed_data():
-    # Check if already seeded
-    existing = await db.series.find_one({})
-    if existing:
+    # Check if already seeded with enough data
+    count = await db.series.count_documents({})
+    if count >= 20:
         return
     
+    # Clear existing data for fresh seed
+    await db.series.delete_many({})
+    await db.episodes.delete_many({})
+    
     sample_series = [
+        # Featured Series (Hero Carousel)
         {
             "id": "series-1",
             "title": "Love in the City",
@@ -1035,7 +1040,7 @@ async def seed_data():
             "coins_per_episode": 15,
             "rating": 4.5,
             "views": 75000,
-            "featured": False
+            "featured": True
         },
         {
             "id": "series-5",
@@ -1047,8 +1052,9 @@ async def seed_data():
             "coins_per_episode": 20,
             "rating": 4.7,
             "views": 110000,
-            "featured": False
+            "featured": True
         },
+        # Romance Series
         {
             "id": "series-6",
             "title": "Campus Rivals",
@@ -1059,6 +1065,240 @@ async def seed_data():
             "coins_per_episode": 12,
             "rating": 4.4,
             "views": 65000,
+            "featured": False
+        },
+        {
+            "id": "series-7",
+            "title": "Married to the Mafia Boss",
+            "description": "Forced into marriage with a ruthless mafia boss, she never expected to fall for him.",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 16,
+            "coins_per_episode": 18,
+            "rating": 4.7,
+            "views": 180000,
+            "featured": False
+        },
+        {
+            "id": "series-8",
+            "title": "Second Chance at Love",
+            "description": "High school sweethearts reunite 10 years later, but everything has changed.",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/1139793/pexels-photo-1139793.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 12,
+            "coins_per_episode": 15,
+            "rating": 4.5,
+            "views": 89000,
+            "featured": False
+        },
+        {
+            "id": "series-9",
+            "title": "The Fake Girlfriend",
+            "description": "He needed a fake girlfriend for his family reunion. She needed the money. Simple, right?",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/1024981/pexels-photo-1024981.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 10,
+            "coins_per_episode": 14,
+            "rating": 4.6,
+            "views": 95000,
+            "featured": False
+        },
+        # Drama Series
+        {
+            "id": "series-10",
+            "title": "Empire of Lies",
+            "description": "A powerful family's dark secrets threaten to destroy everything they've built.",
+            "genre": "Drama",
+            "thumbnail": "https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 20,
+            "coins_per_episode": 22,
+            "rating": 4.8,
+            "views": 220000,
+            "featured": False
+        },
+        {
+            "id": "series-11",
+            "title": "The Heir's Burden",
+            "description": "Inheriting a fortune sounds like a dream, until you learn the conditions attached.",
+            "genre": "Drama",
+            "thumbnail": "https://images.pexels.com/photos/3771836/pexels-photo-3771836.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 14,
+            "coins_per_episode": 18,
+            "rating": 4.5,
+            "views": 78000,
+            "featured": False
+        },
+        {
+            "id": "series-12",
+            "title": "Broken Vows",
+            "description": "A marriage falling apart reveals secrets that could destroy both families.",
+            "genre": "Drama",
+            "thumbnail": "https://images.pexels.com/photos/3807755/pexels-photo-3807755.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 12,
+            "coins_per_episode": 16,
+            "rating": 4.4,
+            "views": 67000,
+            "featured": False
+        },
+        # Thriller Series
+        {
+            "id": "series-13",
+            "title": "The Perfect Crime",
+            "description": "She committed the perfect murder. Or so she thought.",
+            "genre": "Thriller",
+            "thumbnail": "https://images.pexels.com/photos/3831849/pexels-photo-3831849.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 10,
+            "coins_per_episode": 20,
+            "rating": 4.9,
+            "views": 250000,
+            "featured": False
+        },
+        {
+            "id": "series-14",
+            "title": "Witness Protection",
+            "description": "After witnessing a mob murder, her new identity comes with unexpected dangers.",
+            "genre": "Thriller",
+            "thumbnail": "https://images.pexels.com/photos/3831645/pexels-photo-3831645.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 15,
+            "coins_per_episode": 18,
+            "rating": 4.7,
+            "views": 145000,
+            "featured": False
+        },
+        {
+            "id": "series-15",
+            "title": "The Stalker",
+            "description": "Someone is watching her every move. But who? And why?",
+            "genre": "Thriller",
+            "thumbnail": "https://images.pexels.com/photos/3831847/pexels-photo-3831847.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 8,
+            "coins_per_episode": 16,
+            "rating": 4.6,
+            "views": 112000,
+            "featured": False
+        },
+        # Action Series
+        {
+            "id": "series-16",
+            "title": "Street Fighter Queen",
+            "description": "In the underground fighting world, she's the undefeated champion with a deadly secret.",
+            "genre": "Action",
+            "thumbnail": "https://images.pexels.com/photos/3771120/pexels-photo-3771120.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 12,
+            "coins_per_episode": 20,
+            "rating": 4.8,
+            "views": 190000,
+            "featured": False
+        },
+        {
+            "id": "series-17",
+            "title": "Bodyguard's Heart",
+            "description": "Hired to protect her, falling for her wasn't part of the job description.",
+            "genre": "Action",
+            "thumbnail": "https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 10,
+            "coins_per_episode": 18,
+            "rating": 4.6,
+            "views": 88000,
+            "featured": False
+        },
+        {
+            "id": "series-18",
+            "title": "Escape from Paradise",
+            "description": "Trapped on a luxury island resort that's actually a prison for the elite.",
+            "genre": "Action",
+            "thumbnail": "https://images.pexels.com/photos/3155666/pexels-photo-3155666.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 14,
+            "coins_per_episode": 20,
+            "rating": 4.7,
+            "views": 135000,
+            "featured": False
+        },
+        # More Romance
+        {
+            "id": "series-19",
+            "title": "The Wrong Twin",
+            "description": "She fell for him thinking he was someone else. Now the truth threatens everything.",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/3791664/pexels-photo-3791664.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 11,
+            "coins_per_episode": 15,
+            "rating": 4.5,
+            "views": 72000,
+            "featured": False
+        },
+        {
+            "id": "series-20",
+            "title": "Divorced but Not Done",
+            "description": "They signed the papers, but fate keeps bringing them back together.",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 10,
+            "coins_per_episode": 14,
+            "rating": 4.4,
+            "views": 68000,
+            "featured": False
+        },
+        {
+            "id": "series-21",
+            "title": "Office Romance",
+            "description": "Dating your boss is against company policy. Too bad she didn't know he owned the company.",
+            "genre": "Romance",
+            "thumbnail": "https://images.pexels.com/photos/3184405/pexels-photo-3184405.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 12,
+            "coins_per_episode": 15,
+            "rating": 4.6,
+            "views": 105000,
+            "featured": False
+        },
+        # More Thriller
+        {
+            "id": "series-22",
+            "title": "Missing",
+            "description": "Her daughter vanished without a trace. The police gave up. She won't.",
+            "genre": "Thriller",
+            "thumbnail": "https://images.pexels.com/photos/3831862/pexels-photo-3831862.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 10,
+            "coins_per_episode": 18,
+            "rating": 4.8,
+            "views": 175000,
+            "featured": False
+        },
+        {
+            "id": "series-23",
+            "title": "The Bunker",
+            "description": "Five strangers wake up in an underground bunker with no memory of how they got there.",
+            "genre": "Thriller",
+            "thumbnail": "https://images.pexels.com/photos/3831851/pexels-photo-3831851.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 8,
+            "coins_per_episode": 20,
+            "rating": 4.7,
+            "views": 140000,
+            "featured": False
+        },
+        # More Drama
+        {
+            "id": "series-24",
+            "title": "The Surrogate",
+            "description": "She agreed to carry their baby. She never expected to fall for the husband.",
+            "genre": "Drama",
+            "thumbnail": "https://images.pexels.com/photos/3807524/pexels-photo-3807524.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 14,
+            "coins_per_episode": 16,
+            "rating": 4.5,
+            "views": 92000,
+            "featured": False
+        },
+        {
+            "id": "series-25",
+            "title": "Glass Houses",
+            "description": "In this wealthy neighborhood, everyone has secrets. Some are deadly.",
+            "genre": "Drama",
+            "thumbnail": "https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&w=600",
+            "total_episodes": 16,
+            "coins_per_episode": 18,
+            "rating": 4.6,
+            "views": 115000,
             "featured": False
         }
     ]
