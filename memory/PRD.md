@@ -51,6 +51,16 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 - [x] URL parameter support (?ref=CODE)
 - [x] Recent referrals display in profile
 
+### Phase 4 - UI/UX Enhancements (Jan 26, 2026)
+- [x] Netflix-style UI overhaul with grid layout
+- [x] App rebranded to "Kona" with custom logo
+- [x] Hero Carousel - rotating/swipeable featured series banner
+  - [x] Auto-rotation every 5 seconds
+  - [x] Touch swipe gesture support
+  - [x] Dot indicators for navigation
+  - [x] Desktop navigation arrows
+  - [x] Smooth CSS transitions
+
 ### Database Collections
 - users, series, episodes, payment_transactions, referrals
 
