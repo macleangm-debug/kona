@@ -2916,6 +2916,209 @@ const SubscriptionPage = () => {
   );
 };
 
+// Category Page - Shows all series in a category
+const CategoryPage = ({ onAuthClick }) => {
+  const navigate = useNavigate();
+  const { category } = useParams();
+  const { user, token } = useAuth();
+  const [series, setSeries] = useState([]);
+  const [comingSoon, setComingSoon] = useState([]);
+  const [myList, setMyList] = useState([]);
+  const [continueWatching, setContinueWatching] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Category configuration
+  const categoryConfig = {
+    trending: { title: "Trending Now", emoji: "🔥", filter: (s) => s },
+    "top-10": { title: "Top 10 in East Africa", emoji: "🏆", filter: (s) => s.slice(0, 10) },
+    "my-list": { title: "My List", emoji: "📚", filter: (s) => s.filter(item => myList.includes(item.id)) },
+    romance: { title: "Romance", emoji: "💕", filter: (s) => s.filter(item => item.genre === "Romance") },
+    "continue-watching": { title: "Continue Watching", emoji: "▶️", filter: () => continueWatching },
+    thriller: { title: "Thriller", emoji: "🔪", filter: (s) => s.filter(item => item.genre === "Thriller") },
+    drama: { title: "Drama", emoji: "🎭", filter: (s) => s.filter(item => item.genre === "Drama") },
+    action: { title: "Action", emoji: "💥", filter: (s) => s.filter(item => item.genre === "Action") },
+    "coming-soon": { title: "Coming Soon", emoji: "🔜", filter: () => comingSoon },
+    "new-releases": { title: "New Releases", emoji: "✨", filter: (s) => s.slice(-20) }
+  };
+
+  const currentCategory = categoryConfig[category] || { title: "All Series", emoji: "🎬", filter: (s) => s };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [seriesRes, comingSoonRes] = await Promise.all([
+          axios.get(`${API}/series`),
+          axios.get(`${API}/series/coming-soon`)
+        ]);
+        setSeries(seriesRes.data);
+        setComingSoon(comingSoonRes.data);
+
+        if (token) {
+          const [myListRes, progressRes] = await Promise.all([
+            axios.get(`${API}/users/me/my-list`, { headers: { Authorization: `Bearer ${token}` } }),
+            axios.get(`${API}/users/me/watch-progress`, { headers: { Authorization: `Bearer ${token}` } })
+          ]);
+          setMyList(myListRes.data.map(s => s.id));
+          
+          // Map continue watching data
+          const watchProgress = progressRes.data;
+          const continueData = watchProgress.map(wp => {
+            const s = seriesRes.data.find(ser => ser.id === wp.series_id);
+            if (s && wp.episodes?.length > 0) {
+              const lastWatched = wp.episodes.sort((a, b) => 
+                new Date(b.last_watched) - new Date(a.last_watched)
+              )[0];
+              return {
+                series: s,
+                episode: { episode_number: lastWatched.episode_number },
+                progress: lastWatched.progress
+              };
+            }
+            return null;
+          }).filter(Boolean);
+          setContinueWatching(continueData);
+        }
+      } catch (e) {
+        console.error("Error fetching category data:", e);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [token, category]);
+
+  const filteredSeries = currentCategory.filter(series);
+
+  const handleAddToList = async (seriesId) => {
+    if (!token) return onAuthClick();
+    try {
+      await axios.post(`${API}/users/me/my-list`, { series_id: seriesId }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyList(prev => [...prev, seriesId]);
+      toast.success("Added to My List");
+    } catch (e) {
+      toast.error("Failed to add");
+    }
+  };
+
+  const handleRemoveFromList = async (seriesId) => {
+    if (!token) return;
+    try {
+      await axios.delete(`${API}/users/me/my-list/${seriesId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyList(prev => prev.filter(id => id !== seriesId));
+      toast.success("Removed from My List");
+    } catch (e) {
+      toast.error("Failed to remove");
+    }
+  };
+
+  return (
+    <div className="pb-20 pt-4" data-testid="category-page">
+      {/* Header */}
+      <div className="flex items-center gap-3 px-4 mb-6">
+        <button 
+          onClick={() => navigate(-1)}
+          className="p-2 rounded-full bg-background/80 hover:bg-background"
+          data-testid="category-back-btn"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <h1 className="font-heading text-xl font-bold">
+          {currentCategory.title} {currentCategory.emoji}
+        </h1>
+      </div>
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex justify-center py-12">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : filteredSeries.length === 0 ? (
+        <div className="text-center py-12 px-4">
+          <p className="text-muted-foreground">No series found in this category</p>
+          {category === "my-list" && !user && (
+            <Button onClick={onAuthClick} className="mt-4 rounded-full">
+              Sign in to see your list
+            </Button>
+          )}
+        </div>
+      ) : category === "continue-watching" ? (
+        /* Continue Watching Grid */
+        <div className="grid grid-cols-3 gap-3 px-4">
+          {filteredSeries.map((item, i) => (
+            <div key={i}>
+              <ContinueWatchingCard
+                series={item.series}
+                episode={item.episode}
+                progress={item.progress}
+                onClick={() => navigate(`/series/${item.series.id}`)}
+              />
+            </div>
+          ))}
+        </div>
+      ) : category === "coming-soon" ? (
+        /* Coming Soon Grid */
+        <div className="grid grid-cols-3 gap-3 px-4">
+          {filteredSeries.map((s) => (
+            <div key={s.id}>
+              <ComingSoonCard
+                series={s}
+                isReminded={false}
+                onRemind={() => {}}
+              />
+            </div>
+          ))}
+        </div>
+      ) : category === "top-10" ? (
+        /* Top 10 Grid with numbers */
+        <div className="grid grid-cols-2 gap-4 px-4">
+          {filteredSeries.map((s, index) => (
+            <div 
+              key={s.id}
+              onClick={() => navigate(`/series/${s.id}`)}
+              className="relative cursor-pointer group"
+              data-testid={`category-top-10-item-${index + 1}`}
+            >
+              <span className="top-10-number-grid absolute -left-2 bottom-0 font-heading leading-none select-none">
+                {index + 1}
+              </span>
+              <div className="relative ml-8 aspect-[3/4] rounded-lg overflow-hidden z-10">
+                <img 
+                  src={s.thumbnail} 
+                  alt={s.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+                  <p className="text-xs font-medium line-clamp-1">{s.title}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Standard Grid */
+        <div className="grid grid-cols-3 gap-3 px-4">
+          {filteredSeries.map((s) => (
+            <div key={s.id}>
+              <SeriesCard 
+                series={s}
+                onClick={() => navigate(`/series/${s.id}`)}
+                showViews={false}
+                inMyList={myList.includes(s.id)}
+                onAddToList={handleAddToList}
+                onRemoveFromList={handleRemoveFromList}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Main App
 function App() {
   const [showAuth, setShowAuth] = useState(false);
