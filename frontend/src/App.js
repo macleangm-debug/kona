@@ -1952,22 +1952,35 @@ const VideoPlayerPage = () => {
     fetchData();
   }, [id, token]);
 
-  const handleProgress = async (e) => {
+  const handleProgress = (e) => {
     const video = e.target;
-    setCurrentTime(video.currentTime);
-    setDuration(video.duration || 0);
-    
-    const progress = Math.round((video.currentTime / video.duration) * 100);
-    if (progress > 0 && progress % 10 === 0) {
-      try {
-        await axios.post(`${API}/episodes/progress`, { episode_id: id, progress }, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-      } catch (e) {
-        console.error(e);
-      }
+    // Only update every 500ms to prevent excessive re-renders
+    const newTime = Math.floor(video.currentTime * 2) / 2;
+    if (newTime !== currentTime) {
+      setCurrentTime(video.currentTime);
+    }
+    if (video.duration && video.duration !== duration) {
+      setDuration(video.duration);
     }
   };
+
+  // Save progress to backend periodically
+  useEffect(() => {
+    const saveProgress = async () => {
+      if (!token || !id || duration === 0) return;
+      const progress = Math.round((currentTime / duration) * 100);
+      if (progress > 0 && progress % 10 === 0) {
+        try {
+          await axios.post(`${API}/episodes/progress`, { episode_id: id, progress }, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    saveProgress();
+  }, [Math.floor(currentTime / 5)]); // Only run every 5 seconds
 
   const handleSeek = (e) => {
     const video = document.getElementById('main-video');
