@@ -56,6 +56,9 @@ class UserResponse(BaseModel):
     coins: int
     created_at: str
     last_daily_reward: Optional[str] = None
+    referral_code: Optional[str] = None
+    referral_count: int = 0
+    referral_earnings: int = 0
 
 class TokenResponse(BaseModel):
     token: str
