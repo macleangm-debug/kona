@@ -16,6 +16,16 @@ import { toast } from "sonner";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// App Configuration - Easy to change product name
+const APP_CONFIG = {
+  name: "MiniSeries",
+  tagline: "Watch amazing short drama series",
+  welcomeBonus: 50,
+  referralBonus: 30,
+  referrerReward: 20,
+  dailyReward: 10
+};
+
 // Auth Context
 const AuthContext = createContext(null);
 
