@@ -89,7 +89,7 @@ const AuthProvider = ({ children }) => {
 
 // Auth Modal
 const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin, setIsLogin] = useState(initialReferralCode ? false : true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -98,6 +98,14 @@ const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
   const [referralBonus, setReferralBonus] = useState(0);
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
+
+  // Update referral code when initialReferralCode changes (from URL)
+  useEffect(() => {
+    if (initialReferralCode) {
+      setReferralCode(initialReferralCode);
+      setIsLogin(false); // Switch to signup mode
+    }
+  }, [initialReferralCode]);
 
   // Validate referral code
   useEffect(() => {
