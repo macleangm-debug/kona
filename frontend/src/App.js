@@ -504,9 +504,6 @@ const HomePage = ({ onAuthClick }) => {
     };
     fetchData();
   }, [token]);
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const checkReward = async () => {
