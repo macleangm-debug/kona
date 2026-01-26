@@ -1912,6 +1912,15 @@ const VideoPlayerPage = () => {
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [videoQuality, setVideoQuality] = useState("540p");
   const [showControls, setShowControls] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Format time as MM:SS
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Auto-hide controls after 3 seconds
   useEffect(() => {
