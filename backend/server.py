@@ -1437,59 +1437,6 @@ async def seed_data():
             episodes.append(episode)
     
     await db.episodes.insert_many(episodes)
-    
-    # Seed Coming Soon series
-    coming_soon_series = [
-        {
-            "id": "coming-1",
-            "title": "The Last Heiress",
-            "description": "When the only heir to a billion-dollar empire goes missing, everyone becomes a suspect.",
-            "genre": "Thriller",
-            "thumbnail": "https://images.pexels.com/photos/3800517/pexels-photo-3800517.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "release_date": "Jan 28",
-            "reserved_count": 8500
-        },
-        {
-            "id": "coming-2",
-            "title": "Forbidden Kingdom",
-            "description": "A princess falls for a commoner in a kingdom where love across classes means death.",
-            "genre": "Romance",
-            "thumbnail": "https://images.pexels.com/photos/3760529/pexels-photo-3760529.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "release_date": "Feb 1",
-            "reserved_count": 12300
-        },
-        {
-            "id": "coming-3",
-            "title": "Blood Ties",
-            "description": "Twin sisters separated at birth reunite, but one has a deadly secret.",
-            "genre": "Drama",
-            "thumbnail": "https://images.pexels.com/photos/3807541/pexels-photo-3807541.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "release_date": "Feb 5",
-            "reserved_count": 6200
-        },
-        {
-            "id": "coming-4",
-            "title": "Undercover Love",
-            "description": "An undercover agent falls for the crime boss's daughter. Will love or duty win?",
-            "genre": "Action",
-            "thumbnail": "https://images.pexels.com/photos/3771089/pexels-photo-3771089.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "release_date": "Feb 10",
-            "reserved_count": 9800
-        },
-        {
-            "id": "coming-5",
-            "title": "The Alpha's Revenge",
-            "description": "She rejected him years ago. Now he's back as the most powerful alpha in the region.",
-            "genre": "Romance",
-            "thumbnail": "https://images.pexels.com/photos/2747449/pexels-photo-2747449.jpeg?auto=compress&cs=tinysrgb&w=600",
-            "release_date": "Feb 14",
-            "reserved_count": 15600
-        }
-    ]
-    
-    # Clear and insert coming soon
-    await db.coming_soon.delete_many({})
-    await db.coming_soon.insert_many(coming_soon_series)
 
 @api_router.get("/")
 async def root():
