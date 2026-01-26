@@ -2156,9 +2156,14 @@ const VideoPlayerPage = ({ onAuthClick }) => {
               <Button 
                 onClick={() => {
                   setShowSignUpPrompt(false);
-                  onAuthClick();
+                  // Navigate back and trigger auth modal
+                  navigate("/");
+                  setTimeout(() => {
+                    if (onAuthClick) onAuthClick();
+                  }, 100);
                 }}
                 className="w-full bg-primary hover:bg-primary/90 rounded-full py-3 font-semibold"
+                data-testid="signup-prompt-btn"
               >
                 Sign Up FREE
               </Button>
