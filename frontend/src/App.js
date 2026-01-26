@@ -655,26 +655,30 @@ const HomePage = ({ onAuthClick }) => {
     const absOffset = Math.abs(offset);
     
     // Scale: center card is 1, side cards are smaller
-    const scale = Math.max(0.75, 1 - absOffset * 0.15);
+    const scale = Math.max(0.8, 1 - absOffset * 0.12);
     
     // Vertical offset: side cards drop down
-    const translateY = absOffset * 25;
+    const translateY = absOffset * 30;
     
     // Z-index for layering
     const zIndex = 10 - Math.round(absOffset);
     
-    // Opacity: slightly dim side cards
-    const opacity = Math.max(0.6, 1 - absOffset * 0.3);
-    
     // Rotation for curve effect
-    const rotateY = offset * -8;
+    const rotateY = offset * -10;
     
     return {
       transform: `scale(${scale}) translateY(${translateY}px) perspective(1000px) rotateY(${rotateY}deg)`,
       zIndex,
-      opacity,
-      transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
+      transition: 'transform 0.15s ease-out'
     };
+  };
+
+  // Get dark overlay opacity for side cards
+  const getDarkOverlay = (index) => {
+    const offset = index - scrollProgress;
+    const absOffset = Math.abs(offset);
+    // Center card: 0 darkness, side cards: up to 0.5 darkness
+    return Math.min(0.5, absOffset * 0.4);
   };
 
   const scrollToSlide = (index) => {
