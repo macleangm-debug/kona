@@ -337,6 +337,19 @@ async def login(data: UserLogin):
     if not user or not verify_password(data.password, user["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
+    # Auto-generate referral code for users who don't have one
+    referral_code = user.get("referral_code")
+    if not referral_code:
+        referral_code = generate_referral_code(user["id"])
+        await db.users.update_one(
+            {"id": user["id"]},
+            {"$set": {
+                "referral_code": referral_code,
+                "referral_count": 0,
+                "referral_earnings": 0
+            }}
+        )
+    
     token = create_token(user["id"])
     user_response = UserResponse(
         id=user["id"],
@@ -345,7 +358,7 @@ async def login(data: UserLogin):
         coins=user["coins"],
         created_at=user["created_at"],
         last_daily_reward=user.get("last_daily_reward"),
-        referral_code=user.get("referral_code"),
+        referral_code=referral_code,
         referral_count=user.get("referral_count", 0),
         referral_earnings=user.get("referral_earnings", 0)
     )
