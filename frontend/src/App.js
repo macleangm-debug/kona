@@ -1173,6 +1173,13 @@ const ProfilePage = ({ onLogout }) => {
     }
   };
 
+  const shareToWhatsApp = () => {
+    const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
+    const shareText = `🎬 Join MiniSeries and get 80 FREE coins to watch amazing short drama series!\n\nUse my code: ${user?.referral_code}\n\n👉 ${shareUrl}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
   if (!user) return null;
 
   return (
