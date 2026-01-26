@@ -1203,6 +1203,11 @@ const HomePage = ({ onAuthClick }) => {
         onClose={() => setShowReward(false)}
         onClaim={handleClaimReward}
       />
+      
+      <ReminderSuccessModal
+        open={showReminderSuccess}
+        onClose={() => setShowReminderSuccess(false)}
+      />
     </div>
   );
 };
