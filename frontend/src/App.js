@@ -2320,6 +2320,7 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
             </Routes>
             <BottomNav onAuthClick={() => setShowAuth(true)} />
+            <InstallAppBanner />
             <AuthModal 
               open={showAuth} 
               onClose={() => { setShowAuth(false); setReferralCode(""); }}
