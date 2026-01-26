@@ -1976,9 +1976,6 @@ const VideoPlayerPage = () => {
       }
     }
   };
-    };
-    saveProgress();
-  }, [Math.floor(currentTime / 5)]); // Only run every 5 seconds
 
   const handleSeek = (e) => {
     const video = document.getElementById('main-video');
