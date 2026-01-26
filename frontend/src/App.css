@@ -43,15 +43,13 @@
 
 /* Netflix-style Top 10 numbers */
 .top-10-number {
-  font-size: 8rem;
+  font-size: 9rem;
   font-weight: 900;
-  color: transparent;
-  -webkit-text-stroke: 4px #404040;
-  text-stroke: 4px #404040;
+  color: #141414;
+  -webkit-text-stroke: 3px #5a5a5a;
+  text-stroke: 3px #5a5a5a;
   z-index: 1;
-  text-shadow: 
-    0 0 0 transparent,
-    4px 4px 0 rgba(0, 0, 0, 0.3);
+  line-height: 0.85;
 }
 
 /* Custom animations */
