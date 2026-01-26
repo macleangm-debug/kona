@@ -631,12 +631,31 @@ async def get_episodes(series_id: str):
 
 # ============ EPISODE ROUTES ============
 @api_router.get("/episodes/{episode_id}")
-async def get_episode(episode_id: str, user: dict = Depends(get_current_user)):
+async def get_episode(episode_id: str, authorization: Optional[str] = Header(None)):
     episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0})
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
     
-    is_unlocked = episode["is_free"] or episode_id in user.get("unlocked_episodes", [])
+    # Allow Episode 1 (free episodes) without authentication
+    if episode.get("is_free") or episode.get("episode_number") == 1:
+        return {**episode, "is_unlocked": True, "progress": 0}
+    
+    # For non-free episodes, require authentication
+    if not authorization:
+        raise HTTPException(status_code=401, detail="Sign up to watch more episodes")
+    
+    try:
+        token = authorization.replace("Bearer ", "")
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+        user = await db.users.find_one({"id": payload["user_id"]}, {"_id": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    is_unlocked = episode_id in user.get("unlocked_episodes", [])
     progress = user.get("watch_progress", {}).get(episode_id, 0)
     
     return {**episode, "is_unlocked": is_unlocked, "progress": progress}
