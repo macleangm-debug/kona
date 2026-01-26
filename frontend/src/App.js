@@ -187,6 +187,10 @@ const DailyRewardModal = ({ open, onClose, onClaim }) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-[340px] bg-card border-white/10" data-testid="daily-reward-modal">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Daily Reward</DialogTitle>
+          <DialogDescription className="sr-only">Claim your free coins</DialogDescription>
+        </DialogHeader>
         <div className="text-center py-4">
           <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.5)]">
             <Gift className="w-10 h-10 text-white" />
