@@ -2129,10 +2129,10 @@ const VideoPlayerPage = ({ onAuthClick }) => {
 
       {/* Sign Up Prompt Modal for Guests */}
       {showSignUpPrompt && (
-        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-          <div className="bg-gradient-to-b from-gray-900 to-black rounded-2xl p-6 max-w-sm w-full text-center border border-white/10">
+        <div className="absolute inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-black rounded-2xl p-5 max-w-sm w-full border border-white/10">
             {signUpPromptType === "midway" && (
-              <>
+              <div className="text-center">
                 <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Play className="w-8 h-8 text-primary" fill="currentColor" />
                 </div>
@@ -2140,10 +2140,10 @@ const VideoPlayerPage = ({ onAuthClick }) => {
                 <p className="text-gray-400 text-sm mb-6">
                   Sign up for FREE to continue watching and unlock exclusive features!
                 </p>
-              </>
+              </div>
             )}
             {signUpPromptType === "end" && (
-              <>
+              <div className="text-center">
                 <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Crown className="w-8 h-8 text-yellow-500" />
                 </div>
@@ -2151,10 +2151,10 @@ const VideoPlayerPage = ({ onAuthClick }) => {
                 <p className="text-gray-400 text-sm mb-6">
                   Create a FREE account to unlock Episode 2 and get 50 bonus coins!
                 </p>
-              </>
+              </div>
             )}
             {signUpPromptType === "next_episode" && (
-              <>
+              <div className="text-center">
                 <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Lock className="w-8 h-8 text-primary" />
                 </div>
@@ -2162,41 +2162,124 @@ const VideoPlayerPage = ({ onAuthClick }) => {
                 <p className="text-gray-400 text-sm mb-6">
                   Sign up to continue watching. You'll get 50 FREE coins to unlock episodes!
                 </p>
+              </div>
+            )}
+            {signUpPromptType === "next_episode_preview" && nextEpisode && (
+              <>
+                <p className="text-gray-400 text-xs uppercase tracking-wider mb-3">Up Next</p>
+                
+                {/* Next Episode Preview Card */}
+                <div className="flex gap-3 bg-white/5 rounded-xl p-3 mb-4">
+                  <div className="relative w-24 aspect-video rounded-lg overflow-hidden flex-shrink-0">
+                    <img 
+                      src={series?.thumbnail} 
+                      alt={nextEpisode.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center">
+                        <Lock className="w-4 h-4 text-black" />
+                      </div>
+                    </div>
+                    <div className="absolute bottom-1 right-1 bg-black/80 px-1.5 py-0.5 rounded text-[10px] text-white">
+                      EP {nextEpisode.episode_number}
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-white text-sm line-clamp-1">{nextEpisode.title}</h4>
+                    <p className="text-gray-400 text-xs mt-1 line-clamp-2">
+                      {series?.title}
+                    </p>
+                    <div className="flex items-center gap-1 mt-2">
+                      <Lock className="w-3 h-3 text-yellow-500" />
+                      <span className="text-yellow-500 text-xs font-medium">
+                        {user ? `${nextEpisode.coins_required} coins` : "Sign up to unlock"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-bold text-white mb-1">
+                    {user ? "Unlock Next Episode" : "Sign up to continue"}
+                  </h3>
+                  <p className="text-gray-400 text-sm">
+                    {user 
+                      ? `Use ${nextEpisode.coins_required} coins to watch Episode ${nextEpisode.episode_number}`
+                      : "Create a FREE account and get 50 bonus coins!"
+                    }
+                  </p>
+                </div>
               </>
             )}
             
             <div className="space-y-3">
-              <Button 
-                onClick={() => {
-                  setShowSignUpPrompt(false);
-                  // Navigate back and trigger auth modal
-                  navigate("/");
-                  setTimeout(() => {
-                    if (onAuthClick) onAuthClick();
-                  }, 100);
-                }}
-                className="w-full bg-primary hover:bg-primary/90 rounded-full py-3 font-semibold"
-                data-testid="signup-prompt-btn"
-              >
-                Sign Up FREE
-              </Button>
-              <button 
-                onClick={() => {
-                  setShowSignUpPrompt(false);
-                  if (signUpPromptType === "midway") {
-                    // Resume video
-                    const video = document.getElementById('main-video');
-                    if (video) video.play();
-                    setIsPlaying(true);
-                  } else {
-                    // Go back to series detail
-                    navigate(-1);
-                  }
-                }}
-                className="w-full text-gray-400 text-sm py-2 hover:text-white transition-colors"
-              >
-                {signUpPromptType === "midway" ? "Continue Watching" : "Maybe Later"}
-              </button>
+              {signUpPromptType === "next_episode_preview" && user ? (
+                <>
+                  <Button 
+                    onClick={async () => {
+                      // Try to unlock the episode
+                      try {
+                        await axios.post(`${API}/episodes/unlock`, 
+                          { episode_id: nextEpisode.id },
+                          { headers: { Authorization: `Bearer ${token}` }}
+                        );
+                        setShowSignUpPrompt(false);
+                        navigate(`/watch/${nextEpisode.id}`);
+                      } catch (e) {
+                        toast.error(e.response?.data?.detail || "Failed to unlock");
+                        if (e.response?.data?.detail?.includes("Insufficient")) {
+                          navigate("/store");
+                        }
+                      }
+                    }}
+                    className="w-full bg-primary hover:bg-primary/90 rounded-full py-3 font-semibold"
+                  >
+                    <Coins className="w-4 h-4 mr-2" />
+                    Unlock for {nextEpisode?.coins_required} Coins
+                  </Button>
+                  <button 
+                    onClick={() => {
+                      setShowSignUpPrompt(false);
+                      navigate(`/series/${series?.id}`);
+                    }}
+                    className="w-full text-gray-400 text-sm py-2 hover:text-white transition-colors"
+                  >
+                    Back to Series
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    onClick={() => {
+                      setShowSignUpPrompt(false);
+                      navigate("/");
+                      setTimeout(() => {
+                        if (onAuthClick) onAuthClick();
+                      }, 100);
+                    }}
+                    className="w-full bg-primary hover:bg-primary/90 rounded-full py-3 font-semibold"
+                    data-testid="signup-prompt-btn"
+                  >
+                    Sign Up FREE
+                  </Button>
+                  <button 
+                    onClick={() => {
+                      setShowSignUpPrompt(false);
+                      if (signUpPromptType === "midway") {
+                        const video = document.getElementById('main-video');
+                        if (video) video.play();
+                        setIsPlaying(true);
+                      } else {
+                        navigate(-1);
+                      }
+                    }}
+                    className="w-full text-gray-400 text-sm py-2 hover:text-white transition-colors"
+                  >
+                    {signUpPromptType === "midway" ? "Continue Watching" : "Maybe Later"}
+                  </button>
+                </>
+              )}
             </div>
             
             <p className="text-gray-500 text-xs mt-4">
