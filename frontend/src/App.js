@@ -1204,6 +1204,20 @@ Use my referral code: *${user?.referral_code}*
     window.open(whatsappUrl, '_blank');
   };
 
+  const shareViaSMS = () => {
+    const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
+    const shareText = `Join MiniSeries & get 80 FREE coins! Use code: ${user?.referral_code} ${shareUrl}`;
+    const smsUrl = `sms:?body=${encodeURIComponent(shareText)}`;
+    window.location.href = smsUrl;
+  };
+
+  const copyReferralLink = () => {
+    const shareUrl = `${window.location.origin}?ref=${user?.referral_code}`;
+    const shareText = `🎬 Join MiniSeries and get 80 FREE coins!\n\nUse my code: ${user?.referral_code}\n\n👉 ${shareUrl}`;
+    navigator.clipboard.writeText(shareText);
+    toast.success("Referral link copied!");
+  };
+
   if (!user) return null;
 
   return (
