@@ -193,6 +193,27 @@ COIN_PACKAGES = {
 
 DAILY_REWARD_COINS = 10
 
+# ============ GEOLOCATION HELPER ============
+async def detect_country_from_ip(ip_address: str) -> dict:
+    """Detect country from IP using free ipapi.co service"""
+    try:
+        async with httpx.AsyncClient() as client:
+            # Skip geolocation for local IPs
+            if ip_address in ["127.0.0.1", "localhost", "::1"] or ip_address.startswith("192.168.") or ip_address.startswith("10."):
+                return {"country_code": "KE", "country_name": "Kenya"}  # Default to Kenya for dev
+            
+            response = await client.get(f"https://ipapi.co/{ip_address}/json/", timeout=5.0)
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "country_code": data.get("country_code", "US"),
+                    "country_name": data.get("country_name", "Unknown")
+                }
+    except Exception as e:
+        logging.error(f"Geolocation error: {e}")
+    
+    return {"country_code": "US", "country_name": "Unknown"}
+
 # ============ AUTH HELPERS ============
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
