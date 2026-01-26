@@ -1277,35 +1277,53 @@ const HomePage = ({ onAuthClick }) => {
       {/* Spacer for fixed header */}
       <div className="h-14" />
 
-      {/* Hero Carousel - 3D Curved Card Scroll */}
+      {/* Hero Carousel - True 3D Transform Based */}
       {heroSlides.length > 0 && (
         <div 
-          className="mb-4 overflow-visible relative" 
+          className="mb-6 relative h-[420px]" 
           data-testid="hero-carousel"
-          style={{ perspective: '1000px', perspectiveOrigin: '50% 50%' }}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
         >
-          {/* 3D Carousel Container */}
+          {/* Cards Container with 3D perspective */}
           <div 
-            className="carousel-container flex gap-4 px-[15%] overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-6 pt-4"
+            className="relative h-full w-full flex items-center justify-center"
+            style={{ perspective: '1000px' }}
           >
             {heroSlides.map((heroSeries, index) => {
-              const isActive = index === activeIndex;
               const offset = index - activeIndex;
+              const absOffset = Math.abs(offset);
+              const isActive = offset === 0;
+              
+              // Calculate transforms
+              const translateX = offset * 75; // Horizontal spacing
+              const translateZ = -absOffset * 150; // Depth
+              const rotateY = offset * 25; // Rotation
+              const scale = isActive ? 1 : 0.8;
+              const translateY = absOffset * 30; // Vertical drop
+              const opacity = absOffset > 1 ? 0 : 1;
+              const zIndex = 10 - absOffset;
               
               return (
                 <div 
-                  key={heroSeries.id} 
-                  className={`hero-card flex-shrink-0 w-[70%] snap-center cursor-pointer transition-all duration-300 ease-out ${
-                    isActive ? 'scale-100 translate-y-0 z-10' : 'scale-[0.85] translate-y-6 z-0'
-                  }`}
+                  key={heroSeries.id}
+                  className="absolute transition-all duration-500 ease-out cursor-pointer"
                   style={{
-                    transform: isActive 
-                      ? 'scale(1) translateY(0)' 
-                      : `scale(0.85) translateY(24px) rotateY(${offset * -15}deg)`,
+                    width: '70%',
+                    maxWidth: '280px',
+                    transform: `
+                      translateX(${translateX}%)
+                      translateY(${translateY}px)
+                      translateZ(${translateZ}px)
+                      rotateY(${rotateY}deg)
+                      scale(${scale})
+                    `,
+                    zIndex,
+                    opacity,
                     transformStyle: 'preserve-3d',
-                    perspective: '1000px'
                   }}
-                  onClick={() => navigate(`/series/${heroSeries.id}`)}
+                  onClick={() => isActive ? navigate(`/series/${heroSeries.id}`) : goToSlide(index)}
                 >
                   {/* Card */}
                   <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
@@ -1316,14 +1334,13 @@ const HomePage = ({ onAuthClick }) => {
                       className="w-full h-full object-cover"
                     />
                     
-                    {/* Gradient overlay for content readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                     
                     {/* Dark overlay for side cards */}
                     <div 
-                      className={`absolute inset-0 bg-black pointer-events-none transition-opacity duration-300 ${
-                        isActive ? 'opacity-0' : 'opacity-50'
-                      }`}
+                      className="absolute inset-0 bg-black transition-opacity duration-500"
+                      style={{ opacity: isActive ? 0 : 0.5 }}
                     />
                     
                     {/* Top Badge */}
@@ -1338,35 +1355,30 @@ const HomePage = ({ onAuthClick }) => {
                       )}
                     </div>
                     
-                    {/* Episode Count Badge */}
+                    {/* Episode Count */}
                     <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
-                      EP.{heroSeries.total_episodes}
+                      {heroSeries.total_episodes} EP
                     </div>
                     
-                    {/* Play Button - Always visible on center card */}
-                    <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
-                      isActive ? 'opacity-100' : 'opacity-0'
-                    }`}>
-                      <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-                        <Play className="w-7 h-7 text-black fill-black ml-1" />
+                    {/* Play Button - Only on active card */}
+                    {isActive && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
+                          <Play className="w-8 h-8 text-black fill-black ml-1" />
+                        </div>
                       </div>
-                    </div>
+                    )}
                     
                     {/* Content at Bottom */}
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      {/* Title */}
-                      <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2 leading-tight">
+                      <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2">
                         {heroSeries.title}
                       </h2>
-                      
-                      {/* Genre & Rating */}
                       <div className="flex items-center gap-2 text-sm text-white/80">
                         <span>{heroSeries.genre}</span>
                         <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                          <span>{heroSeries.rating}</span>
-                        </div>
+                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                        <span>{heroSeries.rating}</span>
                       </div>
                     </div>
                   </div>
@@ -1375,16 +1387,16 @@ const HomePage = ({ onAuthClick }) => {
             })}
           </div>
 
-          {/* Dot Indicators - Red style */}
-          <div className="flex items-center justify-center gap-2 mt-2">
+          {/* Dot Indicators */}
+          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
-                onClick={() => scrollToSlide(index)}
+                onClick={() => goToSlide(index)}
                 className={`transition-all duration-300 rounded-full ${
-                  index === currentSlide 
+                  index === activeIndex 
                     ? "w-6 h-2 bg-red-500" 
-                    : "w-2 h-2 bg-white/30 hover:bg-white/50"
+                    : "w-2 h-2 bg-white/40 hover:bg-white/60"
                 }`}
                 data-testid={`slide-dot-${index}`}
               />
