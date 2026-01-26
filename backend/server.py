@@ -197,6 +197,16 @@ COIN_PACKAGES = {
 
 DAILY_REWARD_COINS = 10
 
+# Referral rewards
+REFERRAL_REWARD_REFERRER = 20  # Coins for the person who referred
+REFERRAL_REWARD_REFEREE = 30   # Bonus coins for new user who used a referral code
+
+def generate_referral_code(user_id: str) -> str:
+    """Generate a unique referral code based on user_id"""
+    import hashlib
+    hash_input = f"{user_id}_{datetime.now(timezone.utc).timestamp()}"
+    return hashlib.sha256(hash_input.encode()).hexdigest()[:8].upper()
+
 # ============ GEOLOCATION HELPER ============
 async def detect_country_from_ip(ip_address: str) -> dict:
     """Detect country from IP using free ipapi.co service"""
