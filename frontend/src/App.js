@@ -2098,8 +2098,8 @@ const VideoPlayerPage = () => {
         </button>
       </div>
 
-      {/* Subtitle/Caption area - always visible */}
-      <div className="absolute bottom-28 left-4 right-20 z-20">
+      {/* Subtitle/Caption area - only visible when showControls is true */}
+      <div className={`absolute bottom-28 left-4 right-20 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
         <p className="text-white text-lg font-medium drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
           {episode.title || "Watch the drama unfold..."}
         </p>
