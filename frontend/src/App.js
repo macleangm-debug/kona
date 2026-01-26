@@ -2566,6 +2566,320 @@ Use my referral code: *${user?.referral_code}*
   );
 };
 
+// Admin Panel Page
+const AdminPage = () => {
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const [stats, setStats] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [seriesList, setSeriesList] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user?.is_admin) {
+      navigate("/");
+      return;
+    }
+    fetchAdminData();
+  }, [user, navigate]);
+
+  const fetchAdminData = async () => {
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      const [statsRes, usersRes, seriesRes, transRes] = await Promise.all([
+        axios.get(`${API}/admin/stats`, { headers }),
+        axios.get(`${API}/admin/users`, { headers }),
+        axios.get(`${API}/admin/series`, { headers }),
+        axios.get(`${API}/admin/transactions`, { headers })
+      ]);
+      setStats(statsRes.data);
+      setUsers(usersRes.data.users);
+      setSeriesList(seriesRes.data);
+      setTransactions(transRes.data.transactions);
+    } catch (e) {
+      toast.error("Failed to load admin data");
+      navigate("/");
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+    { id: "users", label: "Users", icon: Users },
+    { id: "series", label: "Series", icon: Film },
+    { id: "transactions", label: "Revenue", icon: CreditCard },
+  ];
+
+  return (
+    <div className="p-4 pb-24">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-secondary rounded-full">
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h1 className="font-heading text-xl font-bold">Admin Panel</h1>
+          <p className="text-xs text-muted-foreground">Manage your platform</p>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
+              activeTab === tab.id 
+                ? "bg-primary text-white" 
+                : "bg-secondary text-muted-foreground"
+            }`}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Dashboard Tab */}
+      {activeTab === "dashboard" && stats && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10">
+              <p className="text-xs text-muted-foreground">Total Users</p>
+              <p className="text-2xl font-bold">{stats.total_users}</p>
+              <p className="text-xs text-green-400">+{stats.recent_signups} this week</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10">
+              <p className="text-xs text-muted-foreground">Revenue</p>
+              <p className="text-2xl font-bold">${stats.total_revenue.toFixed(2)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10">
+              <p className="text-xs text-muted-foreground">Total Series</p>
+              <p className="text-2xl font-bold">{stats.total_series}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10">
+              <p className="text-xs text-muted-foreground">Subscribers</p>
+              <p className="text-2xl font-bold">{stats.active_subscriptions}</p>
+            </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Users Tab */}
+      {activeTab === "users" && (
+        <div className="space-y-3">
+          {users.map(u => (
+            <Card key={u.id} className="p-3 flex items-center justify-between">
+              <div>
+                <p className="font-medium text-sm">{u.name || u.email}</p>
+                <p className="text-xs text-muted-foreground">{u.email}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-bold text-yellow-400">{u.coins} coins</p>
+                <p className="text-xs text-muted-foreground">{u.subscription || "Free"}</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Series Tab */}
+      {activeTab === "series" && (
+        <div className="space-y-3">
+          {seriesList.map(s => (
+            <Card key={s.id} className="p-3 flex items-center gap-3">
+              <img src={s.thumbnail} alt="" className="w-12 h-16 object-cover rounded" />
+              <div className="flex-1">
+                <p className="font-medium text-sm">{s.title}</p>
+                <p className="text-xs text-muted-foreground">{s.genre} • {s.total_episodes} eps</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs">{s.views.toLocaleString()} views</p>
+                <p className="text-xs text-yellow-400">{s.coins_per_episode} coins/ep</p>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Transactions Tab */}
+      {activeTab === "transactions" && (
+        <div className="space-y-3">
+          {transactions.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <CreditCard className="w-12 h-12 mx-auto mb-2 opacity-50" />
+              <p>No transactions yet</p>
+            </div>
+          ) : (
+            transactions.map(t => (
+              <Card key={t.id} className="p-3 flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm">{t.type}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleDateString()}</p>
+                </div>
+                <p className="text-sm font-bold text-green-400">${t.amount}</p>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Subscription Page
+const SubscriptionPage = () => {
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+  const [plans, setPlans] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [subscribing, setSubscribing] = useState(null);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await axios.get(`${API}/subscriptions/plans`);
+        setPlans(res.data);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    fetchPlans();
+  }, []);
+
+  const handleSubscribe = async (planId) => {
+    if (!token) {
+      toast.error("Please sign in first");
+      return;
+    }
+    setSubscribing(planId);
+    try {
+      const res = await axios.post(`${API}/subscriptions/subscribe`, 
+        { plan_id: planId, origin_url: window.location.origin },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      window.location.href = res.data.checkout_url;
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to subscribe");
+    }
+    setSubscribing(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 pb-24">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-secondary rounded-full">
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <div>
+          <h1 className="font-heading text-xl font-bold">Subscriptions</h1>
+          <p className="text-xs text-muted-foreground">Get more coins monthly</p>
+        </div>
+      </div>
+
+      {/* Current Subscription */}
+      {user?.subscription && (
+        <Card className="p-4 mb-6 bg-gradient-to-r from-primary/20 to-purple-600/20 border-primary/30">
+          <div className="flex items-center gap-2 mb-2">
+            <Crown className="w-5 h-5 text-yellow-400" />
+            <span className="font-bold">Active Subscription</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            You're on the {user.subscription} plan. Enjoy your monthly coins!
+          </p>
+        </Card>
+      )}
+
+      {/* Plans */}
+      <div className="space-y-4">
+        {plans.map(plan => (
+          <Card 
+            key={plan.id} 
+            className={`p-4 relative overflow-hidden ${
+              plan.popular ? "border-primary bg-gradient-to-br from-primary/10 to-purple-600/10" : ""
+            }`}
+          >
+            {plan.popular && (
+              <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-bl">
+                POPULAR
+              </div>
+            )}
+            
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <h3 className="font-heading text-lg font-bold">{plan.name}</h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold">${plan.price}</span>
+                  <span className="text-sm text-muted-foreground">/month</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="flex items-center gap-1 text-yellow-400">
+                  <Coins className="w-4 h-4" />
+                  <span className="font-bold">{plan.monthly_coins}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">coins/month</p>
+              </div>
+            </div>
+
+            <ul className="space-y-1.5 mb-4">
+              {plan.features.map((feature, i) => (
+                <li key={i} className="flex items-center gap-2 text-sm">
+                  <Check className="w-4 h-4 text-green-400" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+
+            <Button 
+              onClick={() => handleSubscribe(plan.id)}
+              disabled={subscribing === plan.id || user?.subscription === plan.id}
+              className={`w-full rounded-full ${
+                plan.popular ? "bg-primary hover:bg-primary/90" : ""
+              }`}
+              variant={plan.popular ? "default" : "outline"}
+            >
+              {subscribing === plan.id ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : user?.subscription === plan.id ? (
+                "Current Plan"
+              ) : (
+                "Subscribe"
+              )}
+            </Button>
+          </Card>
+        ))}
+      </div>
+
+      {/* Info */}
+      <p className="text-xs text-center text-muted-foreground mt-6">
+        Cancel anytime. Coins are credited on your billing date.
+      </p>
+    </div>
+  );
+};
+
 // Main App
 function App() {
   const [showAuth, setShowAuth] = useState(false);
