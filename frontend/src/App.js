@@ -1300,6 +1300,19 @@ const ProfilePage = ({ onLogout }) => {
 // Main App
 function App() {
   const [showAuth, setShowAuth] = useState(false);
+  const [referralCode, setReferralCode] = useState("");
+
+  // Check for referral code in URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get("ref");
+    if (refCode) {
+      setReferralCode(refCode.toUpperCase());
+      setShowAuth(true);
+      // Clean URL
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
 
   return (
     <AuthProvider>
@@ -1314,7 +1327,11 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
             </Routes>
             <BottomNav onAuthClick={() => setShowAuth(true)} />
-            <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+            <AuthModal 
+              open={showAuth} 
+              onClose={() => { setShowAuth(false); setReferralCode(""); }}
+              initialReferralCode={referralCode}
+            />
           </BrowserRouter>
         </div>
         <Toaster position="top-center" />
