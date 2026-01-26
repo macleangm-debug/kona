@@ -1,0 +1,136 @@
+<analysis>**original_problem_statement:** The user wants to build a mini-series app where users purchase coins to watch series, similar to apps like ReelShort. The user has progressively requested features to match industry standards, including:
+- A coin-based economy for unlocking episodes.
+- Geo-targeted payment gateways, specifically for East and Central Africa (M-Pesa via Flutterwave) alongside international card payments (Stripe).
+- A viral referral system with rewards for both referrer and referee.
+- A complete UI/UX overhaul to match the look and feel of Netflix and other top-tier streaming apps, including a grid layout, hero banners, and content categories like Continue Watching and Top 10.
+- A custom brand name (Kona) and logo.
+- A rotating/swipeable hero banner at the top of the homepage.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack, mobile-first mini-series web application named Kona.
+-   **Backend (FastAPI):** Features JWT authentication, user management, a coin system, daily login rewards, a referral system, and dynamic payment gateway routing (Stripe for international, Flutterwave for Africa). It serves mock data for series and episodes.
+-   **Frontend (React):** A single-page application with a sophisticated, Netflix-style UI. It includes a dynamic hero banner, browsable categories (Trending, Continue Watching, Top 10), a user profile page with referral stats, and a store with geo-aware payment options. The app is branded with the Kona name and logo.
+-   **Database (MongoDB):** Schemas are defined for users, series, episodes, transactions, and rewards.
+
+**Last working item**:
+-   **Last item agent was working:** Implementing a rotating/swipeable hero carousel for the homepage. The user wants the featured series at the top to rotate automatically or be swipeable, similar to the provided reference image. The agent was in the process of replacing the static hero banner component with a new dynamic carousel component.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** Frontend testing agent
+-   **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+There are no outstanding bugs or issues. The current focus is on completing the in-progress feature.
+
+**In progress Task List**:
+-   **Task 1:** Complete the Hero Carousel Implementation (Priority: P0)
+    -   **Where to resume:** The agent has created the basic structure for a  component within . The next step is to implement the core logic for this component, including:
+        1.  State management for the current active slide ().
+        2.  An auto-rotation timer ( with ).
+        3.  User-swipe functionality.
+        4.  Dot indicators to show the current slide and allow navigation.
+    -   **What will be achieved with this?** The static hero banner will be replaced with a dynamic, engaging carousel that cycles through multiple featured series, fulfilling the user's explicit request.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Frontend
+
+**Upcoming and Future Tasks**
+-   **Upcoming Tasks:**
+    -   **P0:** Implement the Add to My List functionality. This will require both backend (API endpoint to save/remove from list) and frontend (UI button logic) changes. Reference file:  and .
+    -   **P1:** Connect the Continue Watching section to actual user watch history. This involves creating backend endpoints to track user progress and updating the frontend to fetch and display this data. Reference file:  and .
+-   **Future Tasks:**
+    -   **P1:** Implement a search feature to allow users to find series.
+    -   **P2:** Update the application's favicon to use the new Kona logo icon.
+    -   **P2:** Implement referral milestone rewards to further gamify the referral process.
+
+**Completed work in this session**
+-   **Mini-Series App MVP:** Built the core application with JWT auth, a coin system, and Stripe integration.
+-   **Geo-Based Payments:** Implemented dynamic payment gateway routing, integrating Flutterwave for African markets (M-Pesa, etc.) and keeping Stripe for international card payments.
+-   **Viral Referral System:** Created a complete referral feature with unique codes, rewards for both parties, and multi-channel sharing options (WhatsApp, SMS, Copy).
+-   **App Rebranding:** Brainstormed and implemented the new app name Kona and designed several logo options, integrating the user's choice.
+-   **Major UI/UX Overhaul:** Transformed the UI into a modern, industry-standard interface mimicking Netflix, including a grid layout, hero banner, category rows, and a rankings page.
+-   **Backend Data Persistence for Old Users:** Migrated existing users to have referral codes generated automatically upon login.
+
+**Earlier issues found/mentioned but not fixed**
+None. All user-reported issues have been addressed and fixed in this session.
+
+**Known issue recurrence from previous fork**
+None.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Backend:** FastAPI, Python, MongoDB
+-   **Frontend:** React.js, TailwindCSS
+-   **Authentication:** JWT (JSON Web Tokens)
+-   **Payments:** Stripe API, Flutterwave API, IP-based Geolocation for gateway routing.
+
+**key DB schema**
+-   **users:** 
+-   **series:** 
+-   **episodes:** 
+-   **transactions:** 
+
+**All files of reference**
+-   : Contains the entire backend logic for the application. It was heavily modified to add all features.
+-   : Contains the entire monolithic frontend application, including all components, state, and API logic. It was significantly overhauled multiple times.
+-   : A new file created to hold the SVG component for the Kona brand logo.
+-   : Contains the product requirements and a log of completed features.
+
+**Areas that need refactoring**:
+The frontend file  is extremely large and monolithic. It contains all components, state management, and business logic. For future scalability and maintainability, it should be broken down into a proper component structure (e.g., , , ) to separate concerns.
+
+**key api endpoints**
+-   
+-   
+-   
+-    & 
+-   
+-    (geo-aware)
+-   
+-   
+
+**Critical Info for New Agent**
+-   The frontend is a single, large monolithic file: . Nearly all frontend work will happen here.
+-   The application name is now Kona and is managed by a configuration object  at the top of . Use this for any text referencing the app name.
+-   The  tool sometimes loses session state on direct navigation, making logged-in pages appear blank. This is a tool limitation, not an application bug. A valid workaround is to perform actions sequentially in a single screenshot flow (e.g., login then click profile).
+
+**documents and test reports created in this job**
+-   /app/memory/PRD.md
+-   /app/test_reports/iteration_1.json
+-   /app/test_reports/iteration_2.json
+-   /app/test_reports/backend_test_results.json
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** Allow featured movies at the top to rotate. (Current task)
+2.  **User:** Implement the attached hero banner design. (Completed)
+3.  **User:** The interface is not good yet, make it better like the industry standard. (Completed, UI overhauled)
+4.  **User:** Implement smaller series icons like Netflix and Continue Watching. (Completed)
+5.  **User:** Switch the logo to option 2. (Completed)
+6.  **User:** Design a logo for Kona. (Completed)
+7.  **User:** The name has to be Kona. (Completed)
+8.  **User:** Give me more short name options. (Completed)
+9.  **User:** These names are too long. (Completed)
+10. **User:** Can you give me app name ideas? (Completed)
+
+**Project Health Check:**
+-   **Broken:** None.
+-   **Mocked:** All series, episode, and user progress data is currently mocked in the backend and frontend. The Flutterwave integration is mocked to fall back to Stripe as API keys are not provided.
+
+**3rd Party Integrations**
+-   **Stripe:** For international card payments. Uses test keys from the environment.
+-   **Flutterwave:** For African local payments (M-Pesa, etc.). Requires user-provided API keys to be functional; currently falls back to Stripe.
+
+**Testing status**
+-   **Testing agent used after significant changes:** YES. The agent was used after the MVP, geo-payment, and referral system implementations.
+-   **Troubleshoot agent used after agent stuck in loop:** NO.
+-   **Test files created:** None.
+-   **Known regressions:** None.
+
+**Credentials to test flow:**
+-   Create a new user through the Sign In -> Sign up flow in the UI. New users automatically receive 50 welcome coins. Email and password can be anything (e.g.,  / ).
+
+**What agent forgot to execute**
+The agent was in the middle of implementing the hero carousel feature when the session ended. The implementation is incomplete.</analysis>
