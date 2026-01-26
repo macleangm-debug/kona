@@ -1669,6 +1669,11 @@ const HomePage = ({ onAuthClick }) => {
         open={showReminderSuccess}
         onClose={() => setShowReminderSuccess(false)}
       />
+      
+      <SearchModal
+        open={showSearch}
+        onClose={() => setShowSearch(false)}
+      />
     </div>
   );
 };
