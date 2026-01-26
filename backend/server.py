@@ -98,10 +98,90 @@ class CoinPackage(BaseModel):
 class CheckoutRequest(BaseModel):
     package_id: str
     origin_url: str
+    payment_method: str = "card"  # card, mpesa, mtn, airtel
+    country_code: str = "US"
+    phone_number: Optional[str] = None
 
 class WatchProgressUpdate(BaseModel):
     episode_id: str
     progress: int  # percentage 0-100
+
+# ============ COUNTRY/PAYMENT CONFIG ============
+# East & Central Africa payment configuration
+COUNTRY_CONFIG = {
+    "KE": {
+        "name": "Kenya",
+        "currency": "KES",
+        "payment_methods": [
+            {"id": "mpesa", "name": "M-Pesa", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 130.0  # Approx KES per USD
+    },
+    "TZ": {
+        "name": "Tanzania",
+        "currency": "TZS",
+        "payment_methods": [
+            {"id": "mpesa", "name": "M-Pesa", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 2500.0
+    },
+    "UG": {
+        "name": "Uganda",
+        "currency": "UGX",
+        "payment_methods": [
+            {"id": "mtn", "name": "MTN Mobile Money", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "airtel", "name": "Airtel Money", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 3700.0
+    },
+    "RW": {
+        "name": "Rwanda",
+        "currency": "RWF",
+        "payment_methods": [
+            {"id": "mtn", "name": "MTN Mobile Money", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 1300.0
+    },
+    "CD": {
+        "name": "DR Congo",
+        "currency": "CDF",
+        "payment_methods": [
+            {"id": "airtel", "name": "Airtel Money", "type": "mobilemoney", "provider": "flutterwave"},
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 2800.0
+    },
+    "BI": {
+        "name": "Burundi",
+        "currency": "BIF",
+        "payment_methods": [
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 2900.0
+    },
+    "SS": {
+        "name": "South Sudan",
+        "currency": "SSP",
+        "payment_methods": [
+            {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "flutterwave"}
+        ],
+        "exchange_rate": 130.0
+    }
+}
+
+# Default for international users
+DEFAULT_CONFIG = {
+    "name": "International",
+    "currency": "USD",
+    "payment_methods": [
+        {"id": "card", "name": "Card (Visa/Mastercard)", "type": "card", "provider": "stripe"}
+    ],
+    "exchange_rate": 1.0
+}
 
 # ============ COIN PACKAGES ============
 COIN_PACKAGES = {
