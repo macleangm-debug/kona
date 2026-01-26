@@ -608,6 +608,19 @@ const HomePage = ({ onAuthClick }) => {
     }
   };
 
+  // Filter series based on active category
+  const filteredSeries = activeCategory === "all" 
+    ? series 
+    : series.filter(s => s.genre.toLowerCase() === activeCategory);
+
+  // Assign badges to series
+  const getBadge = (s, index) => {
+    if (s.featured) return "hot";
+    if (index < 2) return "new";
+    if (s.rating >= 4.8) return "top";
+    return null;
+  };
+
   const genres = [...new Set(series.map(s => s.genre))];
 
   if (loading) {
@@ -621,41 +634,65 @@ const HomePage = ({ onAuthClick }) => {
   return (
     <div className="pb-20" data-testid="home-page">
       {/* Header */}
-      <div className="flex items-center justify-between p-4">
-        <KonaLogo2Full height={32} />
-        {user ? (
-          <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
-        ) : (
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="rounded-full border-white/20"
-            onClick={onAuthClick}
-            data-testid="login-btn"
-          >
-            Sign In
-          </Button>
-        )}
+      <div className="flex items-center justify-between px-4 py-3">
+        <KonaLogo2Full height={28} />
+        <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              <button className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                <Gift className="w-5 h-5 text-yellow-400" onClick={() => setShowReward(true)} />
+              </button>
+              <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
+            </>
+          ) : (
+            <Button 
+              variant="default" 
+              size="sm" 
+              className="rounded-full bg-primary hover:bg-primary/90 h-8 px-4"
+              onClick={onAuthClick}
+              data-testid="login-btn"
+            >
+              Sign In
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Daily Reward Banner */}
-      {user && canClaimReward && (
-        <button
-          onClick={() => setShowReward(true)}
-          className="mx-4 mb-4 w-[calc(100%-2rem)] p-2.5 rounded-lg bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center gap-2 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
-          data-testid="daily-reward-banner"
-        >
-          <Gift className="w-5 h-5 text-yellow-400" />
-          <span className="text-sm font-medium">Claim your daily reward!</span>
-        </button>
-      )}
+      {/* Top Tabs */}
+      <div className="flex items-center gap-1 px-2 border-b border-white/10 overflow-x-auto scrollbar-hide">
+        {tabs.map(tab => (
+          <TabButton 
+            key={tab.id}
+            active={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </TabButton>
+        ))}
+      </div>
 
-      {/* Continue Watching - Netflix style */}
+      {/* Category Pills */}
+      <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
+        {categories.map(cat => (
+          <CategoryPill 
+            key={cat.id}
+            active={activeCategory === cat.id}
+            onClick={() => setActiveCategory(cat.id)}
+          >
+            {cat.label}
+          </CategoryPill>
+        ))}
+      </div>
+
+      {/* Continue Watching - Only show if user has progress */}
       {user && continueWatching.length > 0 && (
         <div className="mb-6">
-          <SectionHeader title="Continue Watching" />
-          <ScrollRow>
-            {continueWatching.map((item, i) => (
+          <div className="flex items-center justify-between px-4 mb-3">
+            <h2 className="font-heading text-sm font-semibold">Continue Watching</h2>
+            <button className="text-xs text-primary">See All</button>
+          </div>
+          <div className="grid grid-cols-2 gap-3 px-4">
+            {continueWatching.slice(0, 2).map((item, i) => (
               <ContinueWatchingCard
                 key={i}
                 series={item.series}
@@ -664,90 +701,59 @@ const HomePage = ({ onAuthClick }) => {
                 onClick={() => navigate(`/series/${item.series.id}`)}
               />
             ))}
-          </ScrollRow>
+          </div>
         </div>
       )}
 
-      {/* Trending Now - Horizontal scroll */}
-      {featured.length > 0 && (
-        <div className="mb-6">
-          <SectionHeader title="🔥 Trending Now" />
-          <ScrollRow>
-            {featured.map((s) => (
-              <SeriesCard 
-                key={s.id} 
-                series={s} 
-                onClick={() => navigate(`/series/${s.id}`)} 
-              />
-            ))}
-          </ScrollRow>
+      {/* Main Grid - Industry Standard 3 columns */}
+      <div className="px-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-heading text-sm font-semibold">
+            {activeCategory === "all" ? "Trending Now 🔥" : categories.find(c => c.id === activeCategory)?.label}
+          </h2>
+          <span className="text-xs text-muted-foreground">{filteredSeries.length} shows</span>
         </div>
-      )}
-
-      {/* Top 10 in Your Region */}
-      <div className="mb-6">
-        <SectionHeader title="Top 10 in East Africa" />
-        <ScrollRow>
-          {series.slice(0, 10).map((s, index) => (
-            <div key={s.id} className="flex-shrink-0 flex items-end gap-1">
-              <span className="font-heading text-5xl font-black text-stroke">{index + 1}</span>
-              <SeriesCard 
-                series={s} 
-                size="small"
-                onClick={() => navigate(`/series/${s.id}`)} 
-              />
-            </div>
-          ))}
-        </ScrollRow>
-      </div>
-
-      {/* My List - for logged in users */}
-      {user && (
-        <div className="mb-6">
-          <SectionHeader title="My List" onSeeAll={() => {}} />
-          <ScrollRow>
-            {series.slice(0, 5).map((s) => (
-              <SeriesCard 
-                key={s.id} 
-                series={s}
-                size="small"
-                onClick={() => navigate(`/series/${s.id}`)} 
-              />
-            ))}
-          </ScrollRow>
-        </div>
-      )}
-
-      {/* Genre Rows - Netflix style */}
-      {genres.map((genre) => (
-        <div key={genre} className="mb-6">
-          <SectionHeader title={genre} />
-          <ScrollRow>
-            {series.filter(s => s.genre === genre).map((s) => (
-              <SeriesCard 
-                key={s.id} 
-                series={s}
-                size="small"
-                onClick={() => navigate(`/series/${s.id}`)} 
-              />
-            ))}
-          </ScrollRow>
-        </div>
-      ))}
-
-      {/* New Releases */}
-      <div className="mb-6">
-        <SectionHeader title="New Releases" />
-        <ScrollRow>
-          {[...series].reverse().slice(0, 6).map((s) => (
+        
+        <div className="grid grid-cols-3 gap-3">
+          {filteredSeries.map((s, index) => (
             <SeriesCard 
               key={s.id} 
               series={s}
-              onClick={() => navigate(`/series/${s.id}`)} 
+              badge={getBadge(s, index)}
+              onClick={() => navigate(`/series/${s.id}`)}
             />
           ))}
-        </ScrollRow>
+        </div>
       </div>
+
+      {/* Rankings Section */}
+      {activeTab === "rankings" && (
+        <div className="px-4 mt-6">
+          <h2 className="font-heading text-sm font-semibold mb-3">Top 10 This Week</h2>
+          <div className="space-y-3">
+            {series.slice(0, 10).map((s, index) => (
+              <div 
+                key={s.id}
+                onClick={() => navigate(`/series/${s.id}`)}
+                className="flex items-center gap-3 p-2 rounded-xl bg-card/50 hover:bg-card transition-colors cursor-pointer"
+              >
+                <span className="font-heading text-2xl font-black text-primary w-8">{index + 1}</span>
+                <img src={s.thumbnail} alt={s.title} className="w-16 h-20 object-cover rounded-lg" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-medium text-sm line-clamp-1">{s.title}</h3>
+                  <p className="text-xs text-muted-foreground">{s.genre} • {s.total_episodes} eps</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    <span className="text-xs">{s.rating}</span>
+                    <Eye className="w-3 h-3 text-muted-foreground ml-2" />
+                    <span className="text-xs text-muted-foreground">{(s.views/1000).toFixed(0)}K</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <DailyRewardModal 
         open={showReward} 
