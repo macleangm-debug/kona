@@ -1911,6 +1911,15 @@ const VideoPlayerPage = () => {
   const [showEpisodes, setShowEpisodes] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [videoQuality, setVideoQuality] = useState("540p");
+  const [showControls, setShowControls] = useState(false);
+
+  // Auto-hide controls after 3 seconds
+  useEffect(() => {
+    if (showControls) {
+      const timer = setTimeout(() => setShowControls(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showControls]);
 
   useEffect(() => {
     const fetchData = async () => {
