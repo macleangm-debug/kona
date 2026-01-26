@@ -325,6 +325,159 @@ class MiniSeriesAPITester:
             return True, response
         return False, {}
 
+    def test_geo_detect(self):
+        """Test geo location detection"""
+        success, response = self.run_test(
+            "Geo Location Detection",
+            "GET",
+            "geo/detect",
+            200
+        )
+        
+        if success and 'country_code' in response and 'currency' in response and 'payment_methods' in response:
+            # Verify payment methods structure
+            if isinstance(response['payment_methods'], list) and len(response['payment_methods']) > 0:
+                payment_method = response['payment_methods'][0]
+                required_fields = ['id', 'name', 'type', 'provider']
+                
+                for field in required_fields:
+                    if field not in payment_method:
+                        self.log_test("Geo Detection Payment Methods Structure", False, f"Missing field: {field}")
+                        return False, {}
+                
+                self.log_test("Geo Detection Payment Methods Structure", True)
+            return True, response
+        return False, {}
+
+    def test_geo_countries(self):
+        """Test supported countries listing"""
+        success, response = self.run_test(
+            "Get Supported Countries",
+            "GET",
+            "geo/countries",
+            200
+        )
+        
+        if success and isinstance(response, list) and len(response) > 0:
+            # Check if required countries are present
+            country_codes = [country['code'] for country in response]
+            required_countries = ['KE', 'TZ', 'UG', 'RW', 'CD', 'INTL']
+            
+            missing_countries = []
+            for country_code in required_countries:
+                if country_code not in country_codes:
+                    missing_countries.append(country_code)
+            
+            if missing_countries:
+                self.log_test("Required Countries Present", False, f"Missing countries: {missing_countries}")
+            else:
+                self.log_test("Required Countries Present", True)
+            
+            # Check country structure
+            country = response[0]
+            required_fields = ['code', 'name', 'currency', 'payment_methods']
+            
+            for field in required_fields:
+                if field not in country:
+                    self.log_test("Country Data Structure", False, f"Missing field: {field}")
+                    return False, []
+            
+            self.log_test("Country Data Structure", True)
+            return True, response
+        
+        return False, []
+
+    def test_geo_payment_methods(self, country_code):
+        """Test payment methods for specific country"""
+        success, response = self.run_test(
+            f"Payment Methods for {country_code}",
+            "GET",
+            f"geo/payment-methods/{country_code}",
+            200
+        )
+        
+        if success and 'payment_methods' in response and 'currency' in response:
+            # Verify specific country payment methods
+            if country_code == 'KE':
+                # Kenya should have M-Pesa and Card
+                method_ids = [pm['id'] for pm in response['payment_methods']]
+                if 'mpesa' in method_ids and 'card' in method_ids:
+                    self.log_test("Kenya Payment Methods (M-Pesa + Card)", True)
+                else:
+                    self.log_test("Kenya Payment Methods (M-Pesa + Card)", False, f"Missing expected methods. Found: {method_ids}")
+                
+                # Check currency
+                if response['currency'] == 'KES':
+                    self.log_test("Kenya Currency (KES)", True)
+                else:
+                    self.log_test("Kenya Currency (KES)", False, f"Expected KES, got {response['currency']}")
+            
+            elif country_code == 'UG':
+                # Uganda should have MTN, Airtel, and Card
+                method_ids = [pm['id'] for pm in response['payment_methods']]
+                expected_methods = ['mtn', 'airtel', 'card']
+                missing_methods = [m for m in expected_methods if m not in method_ids]
+                
+                if not missing_methods:
+                    self.log_test("Uganda Payment Methods (MTN + Airtel + Card)", True)
+                else:
+                    self.log_test("Uganda Payment Methods (MTN + Airtel + Card)", False, f"Missing methods: {missing_methods}")
+                
+                # Check currency
+                if response['currency'] == 'UGX':
+                    self.log_test("Uganda Currency (UGX)", True)
+                else:
+                    self.log_test("Uganda Currency (UGX)", False, f"Expected UGX, got {response['currency']}")
+            
+            elif country_code == 'INTL':
+                # International should have only card
+                method_ids = [pm['id'] for pm in response['payment_methods']]
+                if len(method_ids) == 1 and 'card' in method_ids:
+                    self.log_test("International Payment Methods (Card Only)", True)
+                else:
+                    self.log_test("International Payment Methods (Card Only)", False, f"Expected only card, got: {method_ids}")
+                
+                # Check currency
+                if response['currency'] == 'USD':
+                    self.log_test("International Currency (USD)", True)
+                else:
+                    self.log_test("International Currency (USD)", False, f"Expected USD, got {response['currency']}")
+            
+            return True, response
+        return False, {}
+
+    def test_checkout_with_geo_data(self, package_id, country_code, payment_method):
+        """Test checkout with geo-based payment data"""
+        checkout_data = {
+            "package_id": package_id,
+            "origin_url": "https://test.example.com",
+            "payment_method": payment_method,
+            "country_code": country_code
+        }
+        
+        # Add phone number for mobile money
+        if payment_method in ['mpesa', 'mtn', 'airtel']:
+            checkout_data["phone_number"] = "+254700123456"
+        
+        success, response = self.run_test(
+            f"Checkout with {country_code} {payment_method}",
+            "POST",
+            "store/checkout",
+            200,
+            data=checkout_data
+        )
+        
+        if success and 'url' in response and 'provider' in response:
+            # Verify provider selection
+            expected_provider = "flutterwave" if country_code != "INTL" else "stripe"
+            if response['provider'] == expected_provider:
+                self.log_test(f"Correct Provider Selection ({expected_provider})", True)
+            else:
+                self.log_test(f"Correct Provider Selection ({expected_provider})", False, f"Expected {expected_provider}, got {response['provider']}")
+            
+            return True, response
+        return False, {}
+
     def run_all_tests(self):
         """Run comprehensive API tests"""
         print("🚀 Starting MiniSeries API Tests...")
