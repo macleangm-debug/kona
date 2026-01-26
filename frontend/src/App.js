@@ -2121,11 +2121,53 @@ const VideoPlayerPage = () => {
         </button>
       </div>
 
-      {/* Subtitle/Caption area - only visible when showControls is true */}
-      <div className={`absolute bottom-8 left-4 right-20 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-        <p className="text-white text-lg font-medium drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
-          {episode.title || "Watch the drama unfold..."}
-        </p>
+      {/* Bottom control bar - only visible when showControls is true */}
+      <div className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        {/* Progress bar */}
+        <div className="px-4 mb-2">
+          <div 
+            className="relative h-1 bg-white/30 rounded-full cursor-pointer"
+            onClick={handleSeek}
+          >
+            <div 
+              className="absolute left-0 top-0 h-full bg-white rounded-full"
+              style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+            />
+            <div 
+              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg"
+              style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, marginLeft: '-6px' }}
+            />
+          </div>
+          <div className="flex justify-between mt-1">
+            <span className="text-white text-xs">{formatTime(currentTime)}</span>
+            <span className="text-white text-xs">{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Control buttons */}
+        <div className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur-sm">
+          {/* Upgrade to VIP */}
+          <button 
+            onClick={() => navigate("/subscriptions")}
+            className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-3 py-1.5 rounded-full text-xs font-bold shadow-lg"
+          >
+            <Crown className="w-3.5 h-3.5" />
+            Upgrade to VIP &gt;
+          </button>
+
+          {/* Playback controls */}
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={changeSpeed}
+              className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded"
+            >
+              {playbackSpeed}X
+            </button>
+            <button className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded">
+              {videoQuality}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Episodes Sheet */}
