@@ -9,6 +9,17 @@
   display: none;
 }
 
+/* Snap scroll for hero carousel */
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+.snap-mandatory {
+  scroll-snap-type: x mandatory;
+}
+.snap-center {
+  scroll-snap-align: center;
+}
+
 /* Line clamp utilities */
 .line-clamp-2 {
   display: -webkit-box;
