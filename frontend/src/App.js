@@ -148,8 +148,8 @@ const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
         toast.success("Welcome back!");
       } else {
         await register(email, password, name, referralValid ? referralCode : null);
-        const bonusMsg = referralValid ? ` Plus ${referralBonus} bonus coins from referral!` : "";
-        toast.success(`Account created! You got 50 welcome coins!${bonusMsg}`);
+        const bonusMsg = referralValid ? ` Plus ${APP_CONFIG.referralBonus} bonus coins from referral!` : "";
+        toast.success(`Account created! You got ${APP_CONFIG.welcomeBonus} welcome coins!${bonusMsg}`);
       }
       onClose();
     } catch (err) {
