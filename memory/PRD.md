@@ -54,12 +54,30 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 ### Phase 4 - UI/UX Enhancements (Jan 26, 2026)
 - [x] Netflix-style UI overhaul with grid layout
 - [x] App rebranded to "Kona" with custom logo
-- [x] Hero Carousel - rotating/swipeable featured series banner
-  - [x] Auto-rotation every 5 seconds
-  - [x] Touch swipe gesture support
-  - [x] Dot indicators for navigation
-  - [x] Desktop navigation arrows
-  - [x] Smooth CSS transitions
+- [x] Hero Carousel - 3D curved card scroll with depth effect
+  - [x] Side cards appear smaller, lower, and darker
+  - [x] Touch swipe gesture support with snap scrolling
+  - [x] Red dot indicators for navigation
+  - [x] Smooth CSS transitions with 3D transforms
+- [x] Horizontal scroll carousels for all genre sections
+- [x] 25+ series with thumbnails for testing
+- [x] Coming Soon section with "Remind Me" feature
+  - [x] Release date badges
+  - [x] Reserved count display (e.g., "8.5K Reserved")
+  - [x] Reminder success modal with notification prompt
+
+### Phase 5 - PWA & Push Notifications (Jan 26, 2026)
+- [x] Progressive Web App (PWA) setup
+  - [x] Web App Manifest with app icons
+  - [x] Service Worker for caching and push
+  - [x] Apple touch icons for iOS
+- [x] Install App banner for mobile
+  - [x] Android: "Install Now" with beforeinstallprompt
+  - [x] iOS: Instructions to "Add to Home Screen"
+- [x] Push notification permission flow
+  - [x] Browser permission request
+  - [x] Denied state with settings instructions
+  - [x] Test notification on grant
 
 ### Database Collections
 - users, series, episodes, payment_transactions, referrals
