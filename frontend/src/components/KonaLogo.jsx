@@ -22,11 +22,11 @@ export const KonaLogo2 = ({ size = 40, className = "" }) => (
   </svg>
 );
 
-// Kona Logo Full - KONA text with O as play box
+// Kona Logo Full - KONA text with O as play box (aligned)
 export const KonaLogo2Full = ({ height = 32, className = "" }) => (
   <svg 
     height={height} 
-    viewBox="0 0 140 40" 
+    viewBox="0 0 120 36" 
     className={className}
     data-testid="kona-logo-full"
   >
@@ -37,12 +37,14 @@ export const KonaLogo2Full = ({ height = 32, className = "" }) => (
       </linearGradient>
     </defs>
     {/* K */}
-    <text x="0" y="30" fontFamily="system-ui, -apple-system, sans-serif" fontSize="32" fontWeight="700" fill="white">K</text>
-    {/* O as play box */}
-    <rect x="28" y="6" width="28" height="28" rx="6" fill="none" stroke="url(#playBoxGradFull)" strokeWidth="3" />
-    <path d="M37 14 L37 26 L49 20 Z" fill="url(#playBoxGradFull)" />
+    <text x="0" y="28" fontFamily="system-ui, -apple-system, sans-serif" fontSize="30" fontWeight="800" fill="white">K</text>
+    {/* O as play box - vertically centered */}
+    <g transform="translate(22, 4)">
+      <rect x="0" y="0" width="24" height="24" rx="5" fill="none" stroke="url(#playBoxGradFull)" strokeWidth="2.5" />
+      <path d="M8 6 L8 18 L18 12 Z" fill="url(#playBoxGradFull)" />
+    </g>
     {/* NA */}
-    <text x="60" y="30" fontFamily="system-ui, -apple-system, sans-serif" fontSize="32" fontWeight="700" fill="white">NA</text>
+    <text x="50" y="28" fontFamily="system-ui, -apple-system, sans-serif" fontSize="30" fontWeight="800" fill="white">NA</text>
   </svg>
 );
 
