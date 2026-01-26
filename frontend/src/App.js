@@ -440,14 +440,9 @@ const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList = false
           </div>
         )}
         
-        {/* First Episode Free badge */}
-        <div className="absolute top-2 right-2 flex flex-col items-end gap-1">
-          <div className="px-1.5 py-0.5 rounded bg-black/60 text-[10px]">
-            EP.{series.total_episodes}
-          </div>
-          <div className="px-1.5 py-0.5 rounded bg-green-500 text-[9px] font-bold text-white">
-            EP1 FREE
-          </div>
+        {/* Episode count - top right */}
+        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-sm text-[10px]">
+          {series.total_episodes} EP
         </div>
         
         {/* Add to List Button */}
@@ -480,9 +475,12 @@ const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList = false
         </div>
       </div>
       
-      {/* Title & Genre */}
+      {/* Title & Info */}
       <h3 className="font-medium text-sm line-clamp-1 mb-0.5">{series.title}</h3>
-      <p className="text-[11px] text-muted-foreground">{series.genre}</p>
+      <div className="flex items-center gap-1.5 text-[11px]">
+        <span className="text-muted-foreground">{series.genre}</span>
+        <span className="text-green-400 font-medium">• Free EP1</span>
+      </div>
     </div>
   );
 };
