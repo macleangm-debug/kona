@@ -1,0 +1,107 @@
+{
+  "total_tests": 20,
+  "passed_tests": 20,
+  "success_rate": 100.0,
+  "test_results": [
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Welcome Bonus (50 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get User Profile",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Series List",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Series Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Series Detail",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Episodes List",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "First Episode Free",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Episode Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Episode Detail",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Update Watch Progress",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Unlock Episode",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Featured Series",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Daily Reward Status",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Claim Daily Reward",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Daily Reward Amount (10 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Coin Packages",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Package Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Unlocked Episodes",
+      "success": true,
+      "details": ""
+    }
+  ]
+}
