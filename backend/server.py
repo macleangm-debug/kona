@@ -263,16 +263,57 @@ async def register(data: UserCreate):
         raise HTTPException(status_code=400, detail="Email already registered")
     
     user_id = str(uuid.uuid4())
+    referral_code = generate_referral_code(user_id)
+    
+    # Calculate initial coins (welcome bonus + referral bonus if applicable)
+    initial_coins = 50  # Welcome bonus
+    referred_by = None
+    
+    # Check if valid referral code was provided
+    if data.referral_code:
+        referrer = await db.users.find_one({"referral_code": data.referral_code.upper()}, {"_id": 0})
+        if referrer:
+            referred_by = referrer["id"]
+            initial_coins += REFERRAL_REWARD_REFEREE  # Bonus for using referral
+            
+            # Reward the referrer
+            await db.users.update_one(
+                {"id": referrer["id"]},
+                {
+                    "$inc": {
+                        "coins": REFERRAL_REWARD_REFERRER,
+                        "referral_count": 1,
+                        "referral_earnings": REFERRAL_REWARD_REFERRER
+                    }
+                }
+            )
+            
+            # Log the referral
+            referral_record = {
+                "id": str(uuid.uuid4()),
+                "referrer_id": referrer["id"],
+                "referee_id": user_id,
+                "referee_email": data.email,
+                "referrer_reward": REFERRAL_REWARD_REFERRER,
+                "referee_reward": REFERRAL_REWARD_REFEREE,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.referrals.insert_one(referral_record)
+    
     user = {
         "id": user_id,
         "email": data.email,
         "name": data.name,
         "password": hash_password(data.password),
-        "coins": 50,  # Welcome bonus
+        "coins": initial_coins,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "last_daily_reward": None,
         "unlocked_episodes": [],
-        "watch_progress": {}
+        "watch_progress": {},
+        "referral_code": referral_code,
+        "referred_by": referred_by,
+        "referral_count": 0,
+        "referral_earnings": 0
     }
     await db.users.insert_one(user)
     
@@ -283,7 +324,10 @@ async def register(data: UserCreate):
         name=user["name"],
         coins=user["coins"],
         created_at=user["created_at"],
-        last_daily_reward=user["last_daily_reward"]
+        last_daily_reward=user["last_daily_reward"],
+        referral_code=user["referral_code"],
+        referral_count=user["referral_count"],
+        referral_earnings=user["referral_earnings"]
     )
     return TokenResponse(token=token, user=user_response)
 
