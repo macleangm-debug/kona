@@ -623,8 +623,53 @@ const HomePage = ({ onAuthClick }) => {
 
   const genres = [...new Set(series.map(s => s.genre))];
 
-  // Get featured series for hero banner
-  const heroSeries = featured.length > 0 ? featured[0] : series[0];
+  // Hero carousel - use featured series or top series
+  const heroSlides = featured.length > 0 ? featured : series.slice(0, 5);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Auto-rotate carousel
+  useEffect(() => {
+    if (heroSlides.length <= 1) return;
+    
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 5000); // Change slide every 5 seconds
+    
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
+  // Handle swipe gestures
+  const handleTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const minSwipeDistance = 50;
+    
+    if (distance > minSwipeDistance) {
+      // Swiped left - next slide
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    } else if (distance < -minSwipeDistance) {
+      // Swiped right - previous slide
+      setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
+    }
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
+
+  const currentHero = heroSlides[currentSlide];
 
   if (loading) {
     return (
@@ -661,63 +706,123 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
-      {/* Hero Banner - Netflix Style */}
-      {heroSeries && (
-        <div className="relative h-[420px] mb-4">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <img 
-              src={heroSeries.thumbnail} 
-              alt={heroSeries.title}
-              className="w-full h-full object-cover"
-            />
-            {/* Gradient overlays */}
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
-          </div>
-          
-          {/* Content */}
-          <div className="absolute bottom-0 left-0 right-0 p-4 pb-6">
-            {/* Badge */}
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
-                TOP 10
-              </span>
-              <span className="text-xs text-muted-foreground">#{1} in East Africa Today</span>
-            </div>
-            
-            {/* Title */}
-            <h1 className="font-heading text-3xl font-bold mb-2 leading-tight">
-              {heroSeries.title}
-            </h1>
-            
-            {/* Genre Tags */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <span>{heroSeries.genre}</span>
-              <span>•</span>
-              <span>{heroSeries.total_episodes} Episodes</span>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                <span>{heroSeries.rating}</span>
+      {/* Hero Carousel - Swipeable with Auto-rotation */}
+      {currentHero && (
+        <div 
+          className="relative h-[420px] mb-4 overflow-hidden"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          data-testid="hero-carousel"
+        >
+          {/* Slides Container */}
+          <div 
+            className="flex transition-transform duration-500 ease-out h-full"
+            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+          >
+            {heroSlides.map((heroSeries, index) => (
+              <div key={heroSeries.id} className="w-full h-full flex-shrink-0 relative">
+                {/* Background Image */}
+                <div className="absolute inset-0">
+                  <img 
+                    src={heroSeries.thumbnail} 
+                    alt={heroSeries.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Gradient overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
+                </div>
+                
+                {/* Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 pb-12">
+                  {/* Badge */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                      TOP {index + 1}
+                    </span>
+                    <span className="text-xs text-muted-foreground">#{index + 1} in East Africa Today</span>
+                  </div>
+                  
+                  {/* Title */}
+                  <h1 className="font-heading text-3xl font-bold mb-2 leading-tight">
+                    {heroSeries.title}
+                  </h1>
+                  
+                  {/* Genre Tags */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+                    <span>{heroSeries.genre}</span>
+                    <span>•</span>
+                    <span>{heroSeries.total_episodes} Episodes</span>
+                    <span>•</span>
+                    <div className="flex items-center gap-1">
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <span>{heroSeries.rating}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Description */}
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
+                    {heroSeries.description}
+                  </p>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex items-center gap-3">
+                    <Button 
+                      onClick={() => navigate(`/series/${heroSeries.id}`)}
+                      className="bg-white hover:bg-white/90 text-black rounded-md h-10 px-6 font-semibold"
+                      data-testid="hero-play-btn"
+                    >
+                      <Play className="w-5 h-5 mr-2 fill-black" />
+                      Play
+                    </Button>
+                    <Button 
+                      variant="outline"
+                      className="border-white/40 hover:bg-white/10 rounded-md h-10 px-4"
+                      data-testid="hero-mylist-btn"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      My List
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            {/* Description */}
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {heroSeries.description}
-            </p>
-            
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3">
-              <Button 
-                onClick={() => navigate(`/series/${heroSeries.id}`)}
-                className="bg-white hover:bg-white/90 text-black rounded-md h-10 px-6 font-semibold"
-                data-testid="hero-play-btn"
-              >
-                <Play className="w-5 h-5 mr-2 fill-black" />
-                Play
-              </Button>
+            ))}
+          </div>
+
+          {/* Dot Indicators */}
+          <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 z-10">
+            {heroSlides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`transition-all duration-300 rounded-full ${
+                  index === currentSlide 
+                    ? "w-6 h-2 bg-primary" 
+                    : "w-2 h-2 bg-white/40 hover:bg-white/60"
+                }`}
+                data-testid={`slide-dot-${index}`}
+              />
+            ))}
+          </div>
+
+          {/* Navigation Arrows (for desktop) */}
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 hidden md:flex"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button 
+            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 hidden md:flex"
+          >
+            <ChevronLeft className="w-6 h-6 rotate-180" />
+          </button>
+        </div>
+      )}
               <Button 
                 variant="outline"
                 className="border-white/40 hover:bg-white/10 rounded-md h-10 px-4"
