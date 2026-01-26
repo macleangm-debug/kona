@@ -1882,7 +1882,7 @@ const SeriesDetailPage = ({ onAuthClick }) => {
 const VideoPlayerPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token, user } = useAuth();
+  const { token } = useAuth();
   const [episode, setEpisode] = useState(null);
   const [series, setSeries] = useState(null);
   const [allEpisodes, setAllEpisodes] = useState([]);
@@ -1891,14 +1891,13 @@ const VideoPlayerPage = () => {
   const [showEpisodes, setShowEpisodes] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
   const [videoQuality, setVideoQuality] = useState("540p");
-  const videoRef = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       try {
-        const epRes = await axios.get(`${API}/episodes/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const epRes = await axios.get(`${API}/episodes/${id}`, { headers });
         setEpisode(epRes.data);
 
         const seriesRes = await axios.get(`${API}/series/${epRes.data.series_id}`);
@@ -1908,13 +1907,12 @@ const VideoPlayerPage = () => {
         const allEpsRes = await axios.get(`${API}/series/${epRes.data.series_id}/episodes`);
         setAllEpisodes(allEpsRes.data);
       } catch (e) {
-        console.error(e);
-        navigate(-1);
+        console.error("Error loading episode:", e);
       }
       setLoading(false);
     };
     fetchData();
-  }, [id, token, navigate]);
+  }, [id, token]);
 
   const handleProgress = async (e) => {
     const video = e.target;
