@@ -536,6 +536,39 @@ class MiniSeriesAPITester:
         # Test unlocked episodes
         self.test_unlocked_episodes()
         
+        # Test geo-based payment routing
+        print("\n🌍 Testing Geo-based Payment Routing...")
+        
+        # Test geo detection
+        geo_success, geo_data = self.test_geo_detect()
+        
+        # Test countries listing
+        countries_success, countries_list = self.test_geo_countries()
+        
+        # Test specific country payment methods
+        if countries_success:
+            # Test Kenya (M-Pesa + Card)
+            self.test_geo_payment_methods('KE')
+            
+            # Test Uganda (MTN + Airtel + Card)
+            self.test_geo_payment_methods('UG')
+            
+            # Test International (Card only)
+            self.test_geo_payment_methods('INTL')
+        
+        # Test checkout with geo data (if we have packages)
+        if hasattr(self, '_test_packages') and self._test_packages:
+            package_id = self._test_packages[0]['id']
+            
+            # Test Kenya M-Pesa checkout
+            self.test_checkout_with_geo_data(package_id, 'KE', 'mpesa')
+            
+            # Test Uganda MTN checkout
+            self.test_checkout_with_geo_data(package_id, 'UG', 'mtn')
+            
+            # Test International card checkout
+            self.test_checkout_with_geo_data(package_id, 'INTL', 'card')
+        
         return self.get_summary()
 
     def get_summary(self):
