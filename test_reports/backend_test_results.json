@@ -1,7 +1,7 @@
 {
-  "total_tests": 40,
-  "passed_tests": 38,
-  "success_rate": 95.0,
+  "total_tests": 61,
+  "passed_tests": 59,
+  "success_rate": 96.72131147540983,
   "test_results": [
     {
       "test": "User Registration",
@@ -20,6 +20,111 @@
     },
     {
       "test": "Get User Profile",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Stats",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward Amount (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referee Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Validate Referral Code (1CFCCF55)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Name in Validation",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Validate Referral Code (INVALID123)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Invalid Referral Code Rejection",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Leaderboard",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Leaderboard Accessible (Empty)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Registration with Referral Code",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Registration Bonus (80 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Check Referrer Reward",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Stats",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward Amount (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referee Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Count Update",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Earnings Update",
       "success": true,
       "details": ""
     },
