@@ -2106,13 +2106,87 @@ const VideoPlayerPage = ({ onAuthClick }) => {
         id="main-video"
         src={episode.video_url}
         autoPlay
-        loop
         playsInline
         onTimeUpdate={handleTimeUpdate}
+        onEnded={handleVideoEnded}
         onClick={handleVideoTap}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
       />
+
+      {/* Sign Up Prompt Modal for Guests */}
+      {showSignUpPrompt && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-gradient-to-b from-gray-900 to-black rounded-2xl p-6 max-w-sm w-full text-center border border-white/10">
+            {signUpPromptType === "midway" && (
+              <>
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Play className="w-8 h-8 text-primary" fill="currentColor" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Enjoying the show?</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Sign up for FREE to continue watching and unlock exclusive features!
+                </p>
+              </>
+            )}
+            {signUpPromptType === "end" && (
+              <>
+                <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Crown className="w-8 h-8 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Want to watch more?</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Create a FREE account to unlock Episode 2 and get 50 bonus coins!
+                </p>
+              </>
+            )}
+            {signUpPromptType === "next_episode" && (
+              <>
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Lock className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Episode Locked</h3>
+                <p className="text-gray-400 text-sm mb-6">
+                  Sign up to continue watching. You'll get 50 FREE coins to unlock episodes!
+                </p>
+              </>
+            )}
+            
+            <div className="space-y-3">
+              <Button 
+                onClick={() => {
+                  setShowSignUpPrompt(false);
+                  onAuthClick();
+                }}
+                className="w-full bg-primary hover:bg-primary/90 rounded-full py-3 font-semibold"
+              >
+                Sign Up FREE
+              </Button>
+              <button 
+                onClick={() => {
+                  setShowSignUpPrompt(false);
+                  if (signUpPromptType === "midway") {
+                    // Resume video
+                    const video = document.getElementById('main-video');
+                    if (video) video.play();
+                    setIsPlaying(true);
+                  } else {
+                    // Go back to series detail
+                    navigate(-1);
+                  }
+                }}
+                className="w-full text-gray-400 text-sm py-2 hover:text-white transition-colors"
+              >
+                {signUpPromptType === "midway" ? "Continue Watching" : "Maybe Later"}
+              </button>
+            </div>
+            
+            <p className="text-gray-500 text-xs mt-4">
+              No credit card required • Cancel anytime
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Top gradient overlay - only visible when controls shown */}
       <div className={`absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
