@@ -2933,7 +2933,6 @@ const CategoryPage = ({ onAuthClick }) => {
   // Category configuration
   const categoryConfig = {
     trending: { title: "Trending Now", emoji: "🔥", filter: (s) => s },
-    "top-10": { title: "Top 10 in East Africa", emoji: "🏆", filter: (s) => s.slice(0, 10) },
     "my-list": { title: "My List", emoji: "📚", filter: (s) => s.filter(item => myList.includes(item.id)) },
     romance: { title: "Romance", emoji: "💕", filter: (s) => s.filter(item => item.genre === "Romance") },
     "continue-watching": { title: "Continue Watching", emoji: "▶️", filter: () => continueWatching },
@@ -3072,32 +3071,6 @@ const CategoryPage = ({ onAuthClick }) => {
                 isReminded={false}
                 onRemind={() => {}}
               />
-            </div>
-          ))}
-        </div>
-      ) : category === "top-10" ? (
-        /* Top 10 Grid with numbers */
-        <div className="grid grid-cols-2 gap-4 px-4">
-          {filteredSeries.map((s, index) => (
-            <div 
-              key={s.id}
-              onClick={() => navigate(`/series/${s.id}`)}
-              className="relative cursor-pointer group"
-              data-testid={`category-top-10-item-${index + 1}`}
-            >
-              <span className="top-10-number-grid absolute -left-2 bottom-0 font-heading leading-none select-none">
-                {index + 1}
-              </span>
-              <div className="relative ml-8 aspect-[3/4] rounded-lg overflow-hidden z-10">
-                <img 
-                  src={s.thumbnail} 
-                  alt={s.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-xs font-medium line-clamp-1">{s.title}</p>
-                </div>
-              </div>
             </div>
           ))}
         </div>
