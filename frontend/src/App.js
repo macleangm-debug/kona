@@ -1958,6 +1958,7 @@ const VideoPlayerPage = () => {
   };
 
   const togglePlayPause = () => {
+    setShowControls(true);
     const video = document.getElementById('main-video');
     if (video) {
       if (video.paused) {
@@ -1968,6 +1969,10 @@ const VideoPlayerPage = () => {
         setIsPlaying(false);
       }
     }
+  };
+
+  const handleVideoTap = () => {
+    setShowControls(!showControls);
   };
 
   const changeSpeed = () => {
