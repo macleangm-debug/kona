@@ -458,14 +458,14 @@ const SeriesCard = ({ series, onClick, badge, showViews = true }) => {
   );
 };
 
-// Continue Watching Card
+// Continue Watching Card - Same size as other thumbnails
 const ContinueWatchingCard = ({ series, episode, progress, onClick }) => (
   <div
     onClick={onClick}
     className="cursor-pointer group"
     data-testid={`continue-${series.id}`}
   >
-    <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-2">
+    <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-2">
       <img 
         src={series.thumbnail} 
         alt={series.title}
@@ -473,8 +473,8 @@ const ContinueWatchingCard = ({ series, episode, progress, onClick }) => (
       />
       {/* Play button */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-          <Play className="w-6 h-6 text-black fill-black ml-0.5" />
+        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <Play className="w-5 h-5 text-black fill-black ml-0.5" />
         </div>
       </div>
       {/* Episode badge */}
