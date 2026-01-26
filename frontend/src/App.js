@@ -2553,6 +2553,39 @@ Use my referral code: *${user?.referral_code}*
         </div>
       </Card>
 
+      {/* Quick Links */}
+      <div className="space-y-2 mb-6">
+        <button 
+          onClick={() => navigate("/subscriptions")}
+          className="w-full flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-primary/20 to-purple-600/20 hover:from-primary/30 hover:to-purple-600/30 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Crown className="w-5 h-5 text-yellow-400" />
+            <div className="text-left">
+              <p className="font-medium text-sm">Subscription Plans</p>
+              <p className="text-xs text-muted-foreground">Get monthly coins</p>
+            </div>
+          </div>
+          <ChevronLeft className="w-5 h-5 rotate-180" />
+        </button>
+        
+        {user.is_admin && (
+          <button 
+            onClick={() => navigate("/admin")}
+            className="w-full flex items-center justify-between p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Settings className="w-5 h-5" />
+              <div className="text-left">
+                <p className="font-medium text-sm">Admin Panel</p>
+                <p className="text-xs text-muted-foreground">Manage platform</p>
+              </div>
+            </div>
+            <ChevronLeft className="w-5 h-5 rotate-180" />
+          </button>
+        )}
+      </div>
+
       {/* Actions */}
       <Button 
         variant="outline" 
