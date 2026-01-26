@@ -1379,11 +1379,19 @@ const HomePage = ({ onAuthClick }) => {
                     
                     {/* Play Button - Only on active card */}
                     {isActive && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl">
+                      <button 
+                        className="absolute inset-0 flex items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Navigate to first episode of this series
+                          navigate(`/watch/${heroSeries.id}-ep1`);
+                        }}
+                        data-testid={`hero-play-btn-${index}`}
+                      >
+                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
                           <Play className="w-8 h-8 text-black fill-black ml-1" />
                         </div>
-                      </div>
+                      </button>
                     )}
                     
                     {/* Content at Bottom */}
