@@ -1914,7 +1914,7 @@ const VideoPlayerPage = () => {
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const lastSavedProgress = React.useRef(0);
+  const lastSavedProgress = useRef(0);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
