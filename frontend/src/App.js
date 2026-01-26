@@ -999,11 +999,13 @@ const HomePage = ({ onAuthClick }) => {
   const [series, setSeries] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
+  const [myList, setMyList] = useState([]);
   const [comingSoon, setComingSoon] = useState([]);
   const [userReminders, setUserReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [reminderLoading, setReminderLoading] = useState(null);
   const [showReminderSuccess, setShowReminderSuccess] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [activeTab, setActiveTab] = useState("explore");
   const [activeCategory, setActiveCategory] = useState("all");
   const navigate = useNavigate();
@@ -1038,14 +1040,33 @@ const HomePage = ({ onAuthClick }) => {
         setFeatured(featuredRes.data);
         setComingSoon(comingSoonRes.data);
         
-        // Continue watching data
+        // Fetch user-specific data
         if (token) {
-          const mockContinue = seriesRes.data.slice(0, 3).map((s, i) => ({
-            series: s,
-            episode: i + 2,
-            progress: Math.floor(Math.random() * 60) + 30
-          }));
-          setContinueWatching(mockContinue);
+          // Real Continue Watching data
+          try {
+            const continueRes = await axios.get(`${API}/user/continue-watching`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setContinueWatching(continueRes.data);
+          } catch (e) {
+            // Fallback to mock data if no progress yet
+            const mockContinue = seriesRes.data.slice(0, 3).map((s, i) => ({
+              series: s,
+              episode: i + 2,
+              progress: Math.floor(Math.random() * 60) + 30
+            }));
+            setContinueWatching(mockContinue);
+          }
+          
+          // Fetch My List
+          try {
+            const myListRes = await axios.get(`${API}/user/my-list`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setMyList(myListRes.data.map(s => s.id));
+          } catch (e) {
+            console.error("Error fetching my list:", e);
+          }
           
           // Fetch user reminders
           try {
@@ -1064,6 +1085,38 @@ const HomePage = ({ onAuthClick }) => {
     };
     fetchData();
   }, [token]);
+
+  // Add to My List
+  const handleAddToList = async (seriesId) => {
+    if (!token) {
+      onAuthClick();
+      return;
+    }
+    try {
+      await axios.post(`${API}/user/my-list/add`, 
+        { series_id: seriesId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMyList([...myList, seriesId]);
+      toast.success("Added to My List");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to add");
+    }
+  };
+
+  // Remove from My List
+  const handleRemoveFromList = async (seriesId) => {
+    try {
+      await axios.post(`${API}/user/my-list/remove`, 
+        { series_id: seriesId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMyList(myList.filter(id => id !== seriesId));
+      toast.success("Removed from My List");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to remove");
+    }
+  };
 
   // Handle setting a reminder
   const handleSetReminder = async (seriesId) => {
