@@ -1440,7 +1440,11 @@ const HomePage = ({ onAuthClick }) => {
           <h2 className="font-heading text-sm font-semibold">
             {activeCategory === "all" ? "Trending Now 🔥" : categories.find(c => c.id === activeCategory)?.label}
           </h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/trending")}
+            className="text-xs text-primary"
+            data-testid="see-all-trending"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {filteredSeries.map((s, index) => (
@@ -1460,7 +1464,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">Top 10 in East Africa</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/top-10")}
+            className="text-xs text-primary"
+            data-testid="see-all-top-10"
+          >See All</button>
         </div>
         <div className="flex gap-1 px-4 overflow-x-auto scrollbar-hide pb-2 pl-6">
           {series.slice(0, 10).map((s, index) => (
@@ -1494,7 +1502,11 @@ const HomePage = ({ onAuthClick }) => {
         <div className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="font-heading text-sm font-semibold">My List 📚</h2>
-            <button className="text-xs text-primary">See All</button>
+            <button 
+              onClick={() => navigate("/category/my-list")}
+              className="text-xs text-primary"
+              data-testid="see-all-my-list"
+            >See All</button>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {series.filter(s => myList.includes(s.id)).map((s) => (
@@ -1516,7 +1528,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">Romance 💕</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/romance")}
+            className="text-xs text-primary"
+            data-testid="see-all-romance"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {series.filter(s => s.genre === "Romance").map((s, index) => (
@@ -1540,7 +1556,11 @@ const HomePage = ({ onAuthClick }) => {
         <div className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="font-heading text-sm font-semibold">Continue Watching</h2>
-            <button className="text-xs text-primary">See All</button>
+            <button 
+              onClick={() => navigate("/category/continue-watching")}
+              className="text-xs text-primary"
+              data-testid="see-all-continue-watching"
+            >See All</button>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {continueWatching.map((item, i) => (
@@ -1561,7 +1581,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">Thriller 🔪</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/thriller")}
+            className="text-xs text-primary"
+            data-testid="see-all-thriller"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {series.filter(s => s.genre === "Thriller").map((s, index) => (
@@ -1581,7 +1605,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">Drama 🎭</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/drama")}
+            className="text-xs text-primary"
+            data-testid="see-all-drama"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {series.filter(s => s.genre === "Drama").map((s, index) => (
@@ -1601,7 +1629,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">Action 💥</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/action")}
+            className="text-xs text-primary"
+            data-testid="see-all-action"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {series.filter(s => s.genre === "Action").map((s, index) => (
@@ -1622,7 +1654,11 @@ const HomePage = ({ onAuthClick }) => {
         <div className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="font-heading text-sm font-semibold">Coming Soon 🔜</h2>
-            <button className="text-xs text-primary">See All</button>
+            <button 
+              onClick={() => navigate("/category/coming-soon")}
+              className="text-xs text-primary"
+              data-testid="see-all-coming-soon"
+            >See All</button>
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {comingSoon.map((s) => (
@@ -1643,7 +1679,11 @@ const HomePage = ({ onAuthClick }) => {
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
           <h2 className="font-heading text-sm font-semibold">New Releases ✨</h2>
-          <button className="text-xs text-primary">See All</button>
+          <button 
+            onClick={() => navigate("/category/new-releases")}
+            className="text-xs text-primary"
+            data-testid="see-all-new-releases"
+          >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
           {series.slice(-8).map((s, index) => (
