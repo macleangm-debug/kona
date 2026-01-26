@@ -3143,6 +3143,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<HomePage onAuthClick={() => setShowAuth(true)} />} />
+              <Route path="/category/:category" element={<CategoryPage onAuthClick={() => setShowAuth(true)} />} />
               <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={() => setShowAuth(true)} />} />
               <Route path="/watch/:id" element={<VideoPlayerPage />} />
               <Route path="/store" element={<StorePage />} />
