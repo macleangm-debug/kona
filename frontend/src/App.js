@@ -1347,7 +1347,7 @@ const HomePage = ({ onAuthClick }) => {
                     opacity,
                     transformStyle: 'preserve-3d',
                   }}
-                  onClick={() => isActive ? navigate(`/series/${heroSeries.id}`) : goToSlide(index)}
+                  onClick={() => isActive ? navigate(`/watch/${heroSeries.id}-ep1`) : goToSlide(index)}
                 >
                   {/* Card */}
                   <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
