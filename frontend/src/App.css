@@ -24,6 +24,12 @@
   text-stroke: 2px #666;
 }
 
+.text-stroke-primary {
+  color: transparent;
+  -webkit-text-stroke: 3px hsl(var(--primary));
+  text-stroke: 3px hsl(var(--primary));
+}
+
 /* Custom animations */
 @keyframes shimmer {
   0% {
