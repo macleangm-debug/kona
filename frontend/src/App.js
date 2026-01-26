@@ -1318,7 +1318,11 @@ const HomePage = ({ onAuthClick }) => {
 
       {/* Hero Carousel - 3D Curved Card Scroll */}
       {heroSlides.length > 0 && (
-        <div className="mb-4 overflow-visible" data-testid="hero-carousel" style={{ perspective: '1200px', perspectiveOrigin: 'center center' }}>
+        <div 
+          className="mb-4 overflow-visible relative" 
+          data-testid="hero-carousel"
+          style={{ perspective: '1000px', perspectiveOrigin: '50% 50%' }}
+        >
           {/* 3D Carousel Container */}
           <div 
             className="carousel-container flex gap-3 px-[14%] overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-6 pt-4"
@@ -1327,7 +1331,7 @@ const HomePage = ({ onAuthClick }) => {
             {heroSlides.map((heroSeries, index) => (
               <div 
                 key={heroSeries.id} 
-                className="flex-shrink-0 w-[72%] snap-center cursor-pointer"
+                className="flex-shrink-0 w-[72%] snap-center cursor-pointer origin-center"
                 style={getCardStyle(index)}
                 onClick={() => navigate(`/series/${heroSeries.id}`)}
               >
