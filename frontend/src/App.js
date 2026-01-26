@@ -831,30 +831,33 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       )}
 
-      {/* Top Tabs */}
-      <div className="flex items-center gap-1 px-2 border-b border-white/10 overflow-x-auto scrollbar-hide">
-        {tabs.map(tab => (
-          <TabButton 
-            key={tab.id}
-            active={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.label}
-          </TabButton>
-        ))}
-      </div>
+      {/* Sticky Navigation - Tabs & Categories */}
+      <div className="sticky top-14 z-40 bg-background">
+        {/* Top Tabs */}
+        <div className="flex items-center gap-1 px-2 border-b border-white/10 overflow-x-auto scrollbar-hide">
+          {tabs.map(tab => (
+            <TabButton 
+              key={tab.id}
+              active={activeTab === tab.id}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </TabButton>
+          ))}
+        </div>
 
-      {/* Category Pills */}
-      <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
-        {categories.map(cat => (
-          <CategoryPill 
-            key={cat.id}
-            active={activeCategory === cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-          >
-            {cat.label}
-          </CategoryPill>
-        ))}
+        {/* Category Pills */}
+        <div className="flex items-center gap-2 px-4 py-3 overflow-x-auto scrollbar-hide bg-background">
+          {categories.map(cat => (
+            <CategoryPill 
+              key={cat.id}
+              active={activeCategory === cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+            >
+              {cat.label}
+            </CategoryPill>
+          ))}
+        </div>
       </div>
 
       {/* Continue Watching - Only show if user has progress */}
