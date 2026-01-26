@@ -43,6 +43,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     name: str
+    referral_code: Optional[str] = None  # Code used during signup
 
 class UserLogin(BaseModel):
     email: EmailStr
