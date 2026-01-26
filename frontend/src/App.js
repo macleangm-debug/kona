@@ -88,13 +88,38 @@ const AuthProvider = ({ children }) => {
 };
 
 // Auth Modal
-const AuthModal = ({ open, onClose }) => {
+const AuthModal = ({ open, onClose, initialReferralCode = "" }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [referralCode, setReferralCode] = useState(initialReferralCode);
+  const [referralValid, setReferralValid] = useState(null);
+  const [referralBonus, setReferralBonus] = useState(0);
   const [loading, setLoading] = useState(false);
   const { login, register } = useAuth();
+
+  // Validate referral code
+  useEffect(() => {
+    const validateCode = async () => {
+      if (referralCode.length >= 6) {
+        try {
+          const res = await axios.get(`${API}/referral/validate/${referralCode}`);
+          setReferralValid(res.data.valid);
+          if (res.data.valid) {
+            setReferralBonus(res.data.bonus_coins);
+          }
+        } catch (e) {
+          setReferralValid(false);
+        }
+      } else {
+        setReferralValid(null);
+      }
+    };
+    if (!isLogin && referralCode) {
+      validateCode();
+    }
+  }, [referralCode, isLogin]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -104,8 +129,9 @@ const AuthModal = ({ open, onClose }) => {
         await login(email, password);
         toast.success("Welcome back!");
       } else {
-        await register(email, password, name);
-        toast.success("Account created! You got 50 welcome coins!");
+        await register(email, password, name, referralValid ? referralCode : null);
+        const bonusMsg = referralValid ? ` Plus ${referralBonus} bonus coins from referral!` : "";
+        toast.success(`Account created! You got 50 welcome coins!${bonusMsg}`);
       }
       onClose();
     } catch (err) {
@@ -151,6 +177,25 @@ const AuthModal = ({ open, onClose }) => {
             className="bg-secondary/50 border-white/10"
             data-testid="auth-password-input"
           />
+          {!isLogin && (
+            <div className="relative">
+              <Input
+                placeholder="Referral code (optional)"
+                value={referralCode}
+                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                className={`bg-secondary/50 border-white/10 pr-10 ${referralValid === true ? "border-green-500" : referralValid === false ? "border-red-500" : ""}`}
+                data-testid="auth-referral-input"
+              />
+              {referralValid === true && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <Check className="w-4 h-4 text-green-500" />
+                </div>
+              )}
+              {referralValid === true && (
+                <p className="text-xs text-green-400 mt-1">+{referralBonus} bonus coins!</p>
+              )}
+            </div>
+          )}
           <Button 
             type="submit" 
             className="w-full bg-primary hover:bg-primary/90 rounded-full"
