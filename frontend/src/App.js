@@ -713,121 +713,108 @@ const HomePage = ({ onAuthClick }) => {
       {/* Spacer for fixed header */}
       <div className="h-14" />
 
-      {/* Hero Carousel - Swipeable with Auto-rotation */}
-      {currentHero && (
-        <div 
-          className="relative h-[420px] mb-4 overflow-hidden"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          data-testid="hero-carousel"
-        >
-          {/* Slides Container */}
+      {/* Hero Carousel - ReelShort Style Card Scroll */}
+      {heroSlides.length > 0 && (
+        <div className="mb-4" data-testid="hero-carousel">
+          {/* Scrollable Cards Container */}
           <div 
-            className="flex transition-transform duration-500 ease-out h-full"
-            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+            className="flex gap-3 px-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-3"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             {heroSlides.map((heroSeries, index) => (
-              <div key={heroSeries.id} className="w-full h-full flex-shrink-0 relative">
-                {/* Background Image */}
-                <div className="absolute inset-0">
+              <div 
+                key={heroSeries.id} 
+                className="flex-shrink-0 w-[85%] snap-center cursor-pointer group"
+                onClick={() => navigate(`/series/${heroSeries.id}`)}
+              >
+                {/* Card */}
+                <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
+                  {/* Background Image */}
                   <img 
                     src={heroSeries.thumbnail} 
                     alt={heroSeries.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  {/* Gradient overlays */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent" />
-                </div>
-                
-                {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-4 pb-12">
-                  {/* Badge */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-red-500 text-white text-[10px] font-bold rounded">
+                  
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                  
+                  {/* Top Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
                       TOP {index + 1}
                     </span>
-                    <span className="text-xs text-muted-foreground">#{index + 1} in East Africa Today</span>
+                    {heroSeries.featured && (
+                      <span className="px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded">
+                        HOT
+                      </span>
+                    )}
                   </div>
                   
-                  {/* Title */}
-                  <h1 className="font-heading text-3xl font-bold mb-2 leading-tight">
-                    {heroSeries.title}
-                  </h1>
+                  {/* Episode Count Badge */}
+                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
+                    EP.{heroSeries.total_episodes}
+                  </div>
                   
-                  {/* Genre Tags */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                    <span>{heroSeries.genre}</span>
-                    <span>•</span>
-                    <span>{heroSeries.total_episodes} Episodes</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                      <span>{heroSeries.rating}</span>
+                  {/* Play Button Overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
+                      <Play className="w-8 h-8 text-black fill-black ml-1" />
                     </div>
                   </div>
                   
-                  {/* Description */}
-                  <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                    {heroSeries.description}
-                  </p>
-                  
-                  {/* Action Buttons */}
-                  <div className="flex items-center gap-3">
-                    <Button 
-                      onClick={() => navigate(`/series/${heroSeries.id}`)}
-                      className="bg-white hover:bg-white/90 text-black rounded-md h-10 px-6 font-semibold"
-                      data-testid="hero-play-btn"
-                    >
-                      <Play className="w-5 h-5 mr-2 fill-black" />
-                      Play
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      className="border-white/40 hover:bg-white/10 rounded-md h-10 px-4"
-                      data-testid="hero-mylist-btn"
-                    >
-                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      My List
-                    </Button>
+                  {/* Content at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    {/* Title */}
+                    <h2 className="font-heading text-xl font-bold mb-1 line-clamp-2 leading-tight">
+                      {heroSeries.title}
+                    </h2>
+                    
+                    {/* Genre & Rating */}
+                    <div className="flex items-center gap-2 text-sm text-white/80 mb-2">
+                      <span>{heroSeries.genre}</span>
+                      <span>•</span>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                        <span>{heroSeries.rating}</span>
+                      </div>
+                    </div>
+                    
+                    {/* Description */}
+                    <p className="text-xs text-white/60 line-clamp-2">
+                      {heroSeries.description}
+                    </p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Dot Indicators */}
-          <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center gap-2 z-10">
+          {/* Dot Indicators - Red style */}
+          <div className="flex items-center justify-center gap-2 mt-3">
             {heroSlides.map((_, index) => (
               <button
                 key={index}
-                onClick={() => goToSlide(index)}
+                onClick={() => {
+                  // Scroll to the card
+                  const container = document.querySelector('[data-testid="hero-carousel"] > div');
+                  if (container) {
+                    const cardWidth = container.scrollWidth / heroSlides.length;
+                    container.scrollTo({ left: cardWidth * index, behavior: 'smooth' });
+                  }
+                  setCurrentSlide(index);
+                }}
                 className={`transition-all duration-300 rounded-full ${
                   index === currentSlide 
-                    ? "w-6 h-2 bg-primary" 
-                    : "w-2 h-2 bg-white/40 hover:bg-white/60"
+                    ? "w-6 h-2 bg-red-500" 
+                    : "w-2 h-2 bg-white/30 hover:bg-white/50"
                 }`}
                 data-testid={`slide-dot-${index}`}
               />
             ))}
           </div>
-
-          {/* Navigation Arrows (for desktop) */}
-          <button 
-            onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 hidden md:flex"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button 
-            onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity z-10 hidden md:flex"
-          >
-            <ChevronLeft className="w-6 h-6 rotate-180" />
-          </button>
         </div>
       )}
 
