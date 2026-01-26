@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Kona Logo - Cinema/Film Reel Style K
+// Kona Logo - Luxury Elegant Cursive K
 export const KonaLogo2 = ({ size = 40, className = "" }) => (
   <svg 
     width={size} 
@@ -11,84 +11,71 @@ export const KonaLogo2 = ({ size = 40, className = "" }) => (
   >
     <defs>
       <linearGradient id="konaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#8B5CF6" />
-        <stop offset="50%" stopColor="#A855F7" />
-        <stop offset="100%" stopColor="#EC4899" />
+        <stop offset="0%" stopColor="#C084FC" />
+        <stop offset="50%" stopColor="#E879F9" />
+        <stop offset="100%" stopColor="#F472B6" />
       </linearGradient>
     </defs>
-    {/* Film reel circle */}
-    <circle cx="50" cy="50" r="42" fill="none" stroke="url(#konaGrad)" strokeWidth="4" />
-    {/* Inner circle */}
-    <circle cx="50" cy="50" r="28" fill="url(#konaGrad)" opacity="0.2" />
-    {/* K letter */}
+    {/* Elegant cursive K */}
     <path 
-      d="M35 25 L35 75 M35 50 L55 25 M35 50 L55 75" 
+      d="M25 20 
+         C25 20, 25 80, 25 80
+         M25 50 
+         Q40 50, 55 25
+         Q60 18, 70 20
+         M25 50
+         Q45 50, 55 65
+         Q65 80, 75 80" 
       fill="none" 
       stroke="url(#konaGrad)" 
-      strokeWidth="8" 
+      strokeWidth="6" 
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Play triangle */}
-    <path 
-      d="M58 42 L72 50 L58 58 Z" 
-      fill="url(#konaGrad)"
-    />
-    {/* Film sprocket holes */}
-    <circle cx="50" cy="12" r="4" fill="url(#konaGrad)" />
-    <circle cx="50" cy="88" r="4" fill="url(#konaGrad)" />
-    <circle cx="12" cy="50" r="4" fill="url(#konaGrad)" />
-    <circle cx="88" cy="50" r="4" fill="url(#konaGrad)" />
   </svg>
 );
 
-// Kona Logo Full with Text - Cinema Style
+// Kona Logo Full with Text - Luxury Style
 export const KonaLogo2Full = ({ height = 40, className = "" }) => (
   <svg 
     height={height} 
-    viewBox="0 0 170 50" 
+    viewBox="0 0 160 50" 
     className={className}
     data-testid="kona-logo-full"
   >
     <defs>
       <linearGradient id="konaGradFull" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#8B5CF6" />
-        <stop offset="50%" stopColor="#A855F7" />
-        <stop offset="100%" stopColor="#EC4899" />
+        <stop offset="0%" stopColor="#C084FC" />
+        <stop offset="50%" stopColor="#E879F9" />
+        <stop offset="100%" stopColor="#F472B6" />
       </linearGradient>
     </defs>
-    {/* Film reel circle */}
-    <circle cx="25" cy="25" r="21" fill="none" stroke="url(#konaGradFull)" strokeWidth="2.5" />
-    {/* Inner circle */}
-    <circle cx="25" cy="25" r="14" fill="url(#konaGradFull)" opacity="0.2" />
-    {/* K letter */}
+    {/* Elegant cursive K */}
     <path 
-      d="M17 12 L17 38 M17 25 L28 12 M17 25 L28 38" 
+      d="M12 8 
+         C12 8, 12 42, 12 42
+         M12 25 
+         Q22 25, 30 10
+         Q33 5, 38 8
+         M12 25
+         Q25 25, 32 35
+         Q38 44, 42 42" 
       fill="none" 
       stroke="url(#konaGradFull)" 
       strokeWidth="4" 
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-    {/* Play triangle */}
-    <path 
-      d="M29 21 L37 25 L29 29 Z" 
-      fill="url(#konaGradFull)"
-    />
-    {/* Film sprocket holes */}
-    <circle cx="25" cy="6" r="2" fill="url(#konaGradFull)" />
-    <circle cx="25" cy="44" r="2" fill="url(#konaGradFull)" />
-    <circle cx="6" cy="25" r="2" fill="url(#konaGradFull)" />
-    <circle cx="44" cy="25" r="2" fill="url(#konaGradFull)" />
-    {/* KONA text */}
+    {/* KONA text - elegant font style */}
     <text 
-      x="55" 
-      y="33" 
-      fontFamily="system-ui, -apple-system, sans-serif" 
+      x="52" 
+      y="34" 
+      fontFamily="Georgia, serif" 
       fontSize="26" 
-      fontWeight="800" 
+      fontWeight="600" 
       fill="white"
-      letterSpacing="2"
+      letterSpacing="3"
+      fontStyle="italic"
     >
       KONA
     </text>
