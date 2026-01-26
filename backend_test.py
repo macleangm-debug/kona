@@ -531,7 +531,9 @@ class MiniSeriesAPITester:
             self.test_daily_reward_claim()
         
         # Test coin store
-        self.test_coin_packages()
+        packages_success, packages_list = self.test_coin_packages()
+        if packages_success:
+            self._test_packages = packages_list
         
         # Test unlocked episodes
         self.test_unlocked_episodes()
