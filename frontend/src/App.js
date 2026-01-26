@@ -2080,26 +2080,26 @@ const VideoPlayerPage = () => {
       </div>
 
       {/* Bottom control bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20">
-        <div className="flex items-center justify-between px-4 py-3 bg-black/60 backdrop-blur-sm">
+      <div className="absolute bottom-0 left-0 right-0 z-20 pb-safe">
+        <div className="flex items-center justify-between px-4 py-4 bg-black/70 backdrop-blur-sm">
           {/* Upgrade to VIP */}
           <button 
             onClick={() => navigate("/subscriptions")}
-            className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2 rounded-full text-sm font-bold"
+            className="flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-4 py-2.5 rounded-full text-sm font-bold shadow-lg"
           >
             <Crown className="w-4 h-4" />
             Upgrade to VIP &gt;
           </button>
 
           {/* Playback controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button 
               onClick={changeSpeed}
-              className="text-white text-sm font-medium bg-white/20 px-3 py-1 rounded"
+              className="text-white text-sm font-medium bg-white/20 px-3 py-1.5 rounded"
             >
               {playbackSpeed}X
             </button>
-            <button className="text-white text-sm font-medium bg-white/20 px-3 py-1 rounded">
+            <button className="text-white text-sm font-medium bg-white/20 px-3 py-1.5 rounded">
               {videoQuality}
             </button>
           </div>
