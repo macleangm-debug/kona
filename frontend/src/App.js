@@ -500,7 +500,7 @@ const HomePage = ({ onAuthClick }) => {
     <div className="pb-20" data-testid="home-page">
       {/* Header */}
       <div className="flex items-center justify-between p-4">
-        <KonaLogoFull height={36} />
+        <KonaLogo2Full height={36} />
         {user ? (
           <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
         ) : (
