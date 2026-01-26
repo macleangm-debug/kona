@@ -2003,18 +2003,18 @@ const VideoPlayerPage = () => {
         loop
         playsInline
         onTimeUpdate={handleProgress}
-        onClick={togglePlayPause}
+        onClick={handleVideoTap}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
       />
 
-      {/* Top gradient overlay */}
+      {/* Top gradient overlay - always visible */}
       <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
       
-      {/* Bottom gradient overlay */}
+      {/* Bottom gradient overlay - always visible */}
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
 
-      {/* Header */}
+      {/* Header - always visible */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-20">
         <button
           onClick={() => navigate(-1)}
@@ -2037,38 +2037,31 @@ const VideoPlayerPage = () => {
         </button>
       </div>
 
-      {/* Center play/pause button */}
+      {/* Center play/pause button - shows when paused or controls visible */}
       <div 
         className="absolute inset-0 flex items-center justify-center z-10"
-        onClick={togglePlayPause}
+        onClick={handleVideoTap}
       >
         {!isPlaying && (
           <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
             <Play className="w-8 h-8 text-white ml-1" fill="white" />
           </div>
         )}
-        {isPlaying && (
-          <div className="w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+        {isPlaying && showControls && (
+          <button 
+            onClick={(e) => { e.stopPropagation(); togglePlayPause(); }}
+            className="w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+          >
             <svg className="w-8 h-8 text-white" fill="white" viewBox="0 0 24 24">
               <rect x="6" y="4" width="4" height="16" rx="1"/>
               <rect x="14" y="4" width="4" height="16" rx="1"/>
             </svg>
-          </div>
+          </button>
         )}
       </div>
 
-      {/* Right side action buttons */}
-      <div className="absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20">
-        {/* Comments */}
-        <button className="flex flex-col items-center gap-1">
-          <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
-            <svg className="w-5 h-5 text-white" fill="white" viewBox="0 0 24 24">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-          </div>
-          <span className="text-white text-xs">81.2K</span>
-        </button>
-
+      {/* Right side action buttons - only visible when showControls is true */}
+      <div className={`absolute right-3 bottom-32 flex flex-col items-center gap-5 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         {/* Likes */}
         <button className="flex flex-col items-center gap-1">
           <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
@@ -2105,15 +2098,15 @@ const VideoPlayerPage = () => {
         </button>
       </div>
 
-      {/* Subtitle/Caption area */}
+      {/* Subtitle/Caption area - always visible */}
       <div className="absolute bottom-28 left-4 right-20 z-20">
         <p className="text-white text-lg font-medium drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.8)' }}>
           {episode.title || "Watch the drama unfold..."}
         </p>
       </div>
 
-      {/* Bottom control bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 pb-safe">
+      {/* Bottom control bar - only visible when showControls is true */}
+      <div className={`absolute bottom-0 left-0 right-0 z-20 pb-safe transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="flex items-center justify-between px-4 py-4 bg-black/70 backdrop-blur-sm">
           {/* Upgrade to VIP */}
           <button 
