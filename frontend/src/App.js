@@ -1462,16 +1462,18 @@ const HomePage = ({ onAuthClick }) => {
           <h2 className="font-heading text-sm font-semibold">Top 10 in East Africa</h2>
           <button className="text-xs text-primary">See All</button>
         </div>
-        <div className="flex gap-2 px-4 overflow-x-auto scrollbar-hide pb-2">
+        <div className="flex gap-1 px-4 overflow-x-auto scrollbar-hide pb-2 pl-6">
           {series.slice(0, 10).map((s, index) => (
             <div 
               key={s.id}
               onClick={() => navigate(`/series/${s.id}`)}
-              className="flex-shrink-0 relative cursor-pointer group pl-8"
+              className="flex-shrink-0 relative cursor-pointer group"
+              style={{ paddingLeft: index === 9 ? '2rem' : '1.5rem' }}
               data-testid={`top-10-item-${index + 1}`}
             >
               {/* Large number positioned behind thumbnail */}
-              <span className="top-10-number absolute -left-1 bottom-0 font-heading leading-none select-none">
+              <span className="top-10-number absolute bottom-0 font-heading leading-none select-none"
+                    style={{ left: index === 9 ? '-1.5rem' : '-0.75rem' }}>
                 {index + 1}
               </span>
               {/* Thumbnail overlapping the number */}
