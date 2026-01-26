@@ -860,7 +860,56 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
-      {/* Continue Watching - Only show if user has progress */}
+      {/* Main Grid - Trending Now (First section users see) */}
+      <div className="px-4 mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-heading text-sm font-semibold">
+            {activeCategory === "all" ? "Trending Now 🔥" : categories.find(c => c.id === activeCategory)?.label}
+          </h2>
+          <span className="text-xs text-muted-foreground">{filteredSeries.length} shows</span>
+        </div>
+        
+        <div className="grid grid-cols-3 gap-3">
+          {filteredSeries.slice(0, 6).map((s, index) => (
+            <SeriesCard 
+              key={s.id} 
+              series={s}
+              badge={getBadge(s, index)}
+              onClick={() => navigate(`/series/${s.id}`)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Top 10 in East Africa - Netflix style horizontal scroll */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between px-4 mb-3">
+          <h2 className="font-heading text-sm font-semibold">Top 10 in East Africa</h2>
+          <button className="text-xs text-primary">See All</button>
+        </div>
+        <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+          {series.slice(0, 10).map((s, index) => (
+            <div 
+              key={s.id}
+              onClick={() => navigate(`/series/${s.id}`)}
+              className="flex-shrink-0 flex items-end cursor-pointer group"
+            >
+              <span className="font-heading text-6xl font-black text-stroke-primary opacity-80 -mr-2 z-10">
+                {index + 1}
+              </span>
+              <div className="relative w-24 aspect-[3/4] rounded-lg overflow-hidden">
+                <img 
+                  src={s.thumbnail} 
+                  alt={s.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Continue Watching - Lower on the page like Netflix */}
       {user && continueWatching.length > 0 && (
         <div className="mb-6">
           <div className="flex items-center justify-between px-4 mb-3">
@@ -881,21 +930,18 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       )}
 
-      {/* Main Grid - Industry Standard 3 columns */}
-      <div className="px-4">
+      {/* New Releases Section */}
+      <div className="px-4 mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-heading text-sm font-semibold">
-            {activeCategory === "all" ? "Trending Now 🔥" : categories.find(c => c.id === activeCategory)?.label}
-          </h2>
-          <span className="text-xs text-muted-foreground">{filteredSeries.length} shows</span>
+          <h2 className="font-heading text-sm font-semibold">New Releases ✨</h2>
+          <button className="text-xs text-primary">See All</button>
         </div>
-        
         <div className="grid grid-cols-3 gap-3">
-          {filteredSeries.map((s, index) => (
+          {series.slice(2, 5).map((s, index) => (
             <SeriesCard 
               key={s.id} 
               series={s}
-              badge={getBadge(s, index)}
+              badge="new"
               onClick={() => navigate(`/series/${s.id}`)}
             />
           ))}
