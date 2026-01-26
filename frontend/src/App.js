@@ -395,87 +395,157 @@ const CoinBalance = ({ coins, onClick }) => (
   </button>
 );
 
-// Series Card - Netflix style (smaller, horizontal scroll)
-const SeriesCard = ({ series, onClick, size = "normal" }) => {
-  const isSmall = size === "small";
+// Series Card - Industry Standard (Grid style with badges)
+const SeriesCard = ({ series, onClick, badge, showViews = true }) => {
+  const formatViews = (views) => {
+    if (views >= 1000000) return `${(views / 1000000).toFixed(1)}M`;
+    if (views >= 1000) return `${(views / 1000).toFixed(0)}K`;
+    return views;
+  };
+
   return (
     <div
       onClick={onClick}
-      className={`${isSmall ? "w-28 h-40" : "w-32 h-48"} flex-shrink-0 rounded-lg overflow-hidden relative group cursor-pointer hover:scale-105 hover:z-10 transition-all duration-200`}
+      className="cursor-pointer group"
       data-testid={`series-card-${series.id}`}
     >
-      <img 
-        src={series.thumbnail} 
-        alt={series.title}
-        className="w-full h-full object-cover"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="absolute bottom-0 left-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <h3 className="font-semibold text-xs line-clamp-2">{series.title}</h3>
+      <div className="relative aspect-[3/4] rounded-xl overflow-hidden mb-2">
+        <img 
+          src={series.thumbnail} 
+          alt={series.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        
+        {/* Badge - Hot/New/Top */}
+        {badge && (
+          <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+            badge === "hot" ? "bg-red-500" :
+            badge === "new" ? "bg-green-500" :
+            badge === "top" ? "bg-yellow-500 text-black" :
+            badge === "vip" ? "bg-purple-500" :
+            "bg-primary"
+          }`}>
+            {badge}
+          </div>
+        )}
+        
+        {/* Episode count */}
+        <div className="absolute top-2 right-2 px-1.5 py-0.5 rounded bg-black/60 text-[10px]">
+          EP.{series.total_episodes}
+        </div>
+        
+        {/* View count */}
+        {showViews && (
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 text-[10px] text-white/90">
+            <Eye className="w-3 h-3" />
+            <span>{formatViews(series.views)}</span>
+          </div>
+        )}
+        
+        {/* Rating */}
+        <div className="absolute bottom-2 right-2 flex items-center gap-0.5 text-[10px]">
+          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          <span>{series.rating}</span>
+        </div>
       </div>
+      
+      {/* Title & Genre */}
+      <h3 className="font-medium text-sm line-clamp-1 mb-0.5">{series.title}</h3>
+      <p className="text-[11px] text-muted-foreground">{series.genre}</p>
     </div>
   );
 };
 
-// Continue Watching Card - with progress bar
+// Continue Watching Card
 const ContinueWatchingCard = ({ series, episode, progress, onClick }) => (
   <div
     onClick={onClick}
-    className="w-36 flex-shrink-0 cursor-pointer group"
+    className="cursor-pointer group"
     data-testid={`continue-${series.id}`}
   >
-    <div className="relative rounded-lg overflow-hidden aspect-video mb-2">
+    <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-2">
       <img 
         src={series.thumbnail} 
         alt={series.title}
-        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
       />
-      {/* Play button overlay */}
-      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
-        <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
-          <Play className="w-5 h-5 text-black fill-black ml-0.5" />
+      {/* Play button */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full bg-white/90 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+          <Play className="w-6 h-6 text-black fill-black ml-0.5" />
         </div>
       </div>
+      {/* Episode badge */}
+      <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-primary text-[10px] font-medium">
+        EP.{episode}
+      </div>
       {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-600">
-        <div 
-          className="h-full bg-primary" 
-          style={{ width: `${progress}%` }}
-        />
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+        <div className="h-full bg-primary" style={{ width: `${progress}%` }} />
       </div>
     </div>
-    <p className="text-xs text-muted-foreground truncate">{series.title}</p>
-    <p className="text-xs text-muted-foreground/70">Ep {episode}</p>
+    <h3 className="font-medium text-sm line-clamp-1">{series.title}</h3>
+    <p className="text-[11px] text-muted-foreground">{progress}% watched</p>
   </div>
 );
 
-// Section Header
-const SectionHeader = ({ title, onSeeAll }) => (
-  <div className="flex items-center justify-between px-4 mb-3">
-    <h2 className="font-heading text-base font-semibold">{title}</h2>
-    {onSeeAll && (
-      <button className="text-xs text-primary hover:underline">See All</button>
-    )}
-  </div>
-);
-
-// Horizontal Scroll Row
-const ScrollRow = ({ children }) => (
-  <div className="flex gap-2 overflow-x-auto px-4 pb-2 scrollbar-hide">
+// Tab Button
+const TabButton = ({ active, children, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${
+      active 
+        ? "text-white border-b-2 border-primary" 
+        : "text-muted-foreground hover:text-white"
+    }`}
+  >
     {children}
-  </div>
+  </button>
 );
 
-// Home Page - Netflix Style
+// Category Pill
+const CategoryPill = ({ active, children, onClick }) => (
+  <button
+    onClick={onClick}
+    className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+      active 
+        ? "bg-primary text-white" 
+        : "bg-secondary/50 text-muted-foreground hover:bg-secondary"
+    }`}
+  >
+    {children}
+  </button>
+);
+
+// Home Page - Industry Standard
 const HomePage = ({ onAuthClick }) => {
   const [series, setSeries] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("explore");
+  const [activeCategory, setActiveCategory] = useState("all");
   const navigate = useNavigate();
   const { user, token, refreshUser } = useAuth();
   const [showReward, setShowReward] = useState(false);
   const [canClaimReward, setCanClaimReward] = useState(false);
+
+  const tabs = [
+    { id: "explore", label: "Explore" },
+    { id: "new", label: "New" },
+    { id: "originals", label: "Originals" },
+    { id: "rankings", label: "Rankings" },
+  ];
+
+  const categories = [
+    { id: "all", label: "Popular" },
+    { id: "romance", label: "Romance" },
+    { id: "drama", label: "Drama" },
+    { id: "action", label: "Action" },
+    { id: "thriller", label: "Thriller" },
+  ];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -487,13 +557,12 @@ const HomePage = ({ onAuthClick }) => {
         setSeries(seriesRes.data);
         setFeatured(featuredRes.data);
         
-        // Mock continue watching data (in real app, fetch from user's watch history)
+        // Continue watching data
         if (token) {
-          // Simulate continue watching based on series
-          const mockContinue = seriesRes.data.slice(0, 4).map((s, i) => ({
+          const mockContinue = seriesRes.data.slice(0, 3).map((s, i) => ({
             series: s,
-            episode: i + 1,
-            progress: Math.floor(Math.random() * 70) + 20
+            episode: i + 2,
+            progress: Math.floor(Math.random() * 60) + 30
           }));
           setContinueWatching(mockContinue);
         }
