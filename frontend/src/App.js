@@ -1899,10 +1899,10 @@ const SeriesDetailPage = ({ onAuthClick }) => {
 };
 
 // Video Player Page
-const VideoPlayerPage = () => {
+const VideoPlayerPage = ({ onAuthClick }) => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [episode, setEpisode] = useState(null);
   const [series, setSeries] = useState(null);
   const [allEpisodes, setAllEpisodes] = useState([]);
@@ -1914,7 +1914,10 @@ const VideoPlayerPage = () => {
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
+  const [signUpPromptType, setSignUpPromptType] = useState(""); // "midway", "end", "next_episode"
   const lastSavedProgress = useRef(0);
+  const hasShownMidwayPrompt = useRef(false);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
@@ -1922,6 +1925,27 @@ const VideoPlayerPage = () => {
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Show sign-up prompt at 50% of video for guests
+  useEffect(() => {
+    if (!user && duration > 0 && currentTime > duration * 0.5 && !hasShownMidwayPrompt.current) {
+      hasShownMidwayPrompt.current = true;
+      setSignUpPromptType("midway");
+      setShowSignUpPrompt(true);
+      // Pause video when showing prompt
+      const video = document.getElementById('main-video');
+      if (video) video.pause();
+      setIsPlaying(false);
+    }
+  }, [currentTime, duration, user]);
+
+  // Show end prompt when video ends for guests
+  const handleVideoEnded = () => {
+    if (!user) {
+      setSignUpPromptType("end");
+      setShowSignUpPrompt(true);
+    }
   };
 
   // Auto-hide controls after 3 seconds
