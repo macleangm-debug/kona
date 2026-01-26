@@ -1486,6 +1486,29 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
+      {/* My List Section - Only show if user has items */}
+      {user && myList.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between px-4 mb-3">
+            <h2 className="font-heading text-sm font-semibold">My List 📚</h2>
+            <button className="text-xs text-primary">See All</button>
+          </div>
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+            {series.filter(s => myList.includes(s.id)).map((s) => (
+              <div key={s.id} className="flex-shrink-0 w-28">
+                <SeriesCard 
+                  series={s}
+                  onClick={() => navigate(`/series/${s.id}`)}
+                  showViews={false}
+                  inMyList={true}
+                  onRemoveFromList={handleRemoveFromList}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Romance Section - Horizontal Scroll */}
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
@@ -1500,6 +1523,9 @@ const HomePage = ({ onAuthClick }) => {
                 badge={index === 0 ? "hot" : null}
                 onClick={() => navigate(`/series/${s.id}`)}
                 showViews={false}
+                inMyList={myList.includes(s.id)}
+                onAddToList={handleAddToList}
+                onRemoveFromList={handleRemoveFromList}
               />
             </div>
           ))}
