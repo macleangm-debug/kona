@@ -629,18 +629,26 @@ const HomePage = ({ onAuthClick }) => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
 
-  // Auto-rotate carousel
+  // Track scroll position to update dots
   useEffect(() => {
-    if (heroSlides.length <= 1) return;
-    
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    }, 5000); // Change slide every 5 seconds
-    
-    return () => clearInterval(timer);
-  }, [heroSlides.length]);
+    const handleScroll = (e) => {
+      const container = e.target;
+      const scrollLeft = container.scrollLeft;
+      const cardWidth = container.scrollWidth / heroSlides.length;
+      const newIndex = Math.round(scrollLeft / cardWidth);
+      if (newIndex !== currentSlide && newIndex >= 0 && newIndex < heroSlides.length) {
+        setCurrentSlide(newIndex);
+      }
+    };
 
-  // Handle swipe gestures
+    const container = document.querySelector('[data-testid="hero-carousel"] > div');
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [heroSlides.length, currentSlide]);
+
+  // Handle swipe gestures (for non-snap browsers)
   const handleTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart(e.targetTouches[0].clientX);
@@ -651,25 +659,8 @@ const HomePage = ({ onAuthClick }) => {
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
-    
-    if (distance > minSwipeDistance) {
-      // Swiped left - next slide
-      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
-    } else if (distance < -minSwipeDistance) {
-      // Swiped right - previous slide
-      setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length);
-    }
+    // Let native scroll handle it with snap
   };
-
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
-
-  const currentHero = heroSlides[currentSlide];
 
   if (loading) {
     return (
