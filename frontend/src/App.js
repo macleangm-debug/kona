@@ -1977,16 +1977,67 @@ const VideoPlayerPage = () => {
     }
   };
 
-  const handleSeek = (e) => {
-    const video = document.getElementById('main-video');
-    if (video && duration > 0) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const percentage = x / rect.width;
-      video.currentTime = percentage * duration;
-      setCurrentTime(percentage * duration);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const progressBarRef = useRef(null);
+
+  const calculateSeekPosition = (clientX) => {
+    if (!progressBarRef.current || duration <= 0) return null;
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
+    const percentage = x / rect.width;
+    return percentage * duration;
+  };
+
+  const handleSeekStart = (e) => {
+    e.preventDefault();
+    setIsSeeking(true);
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const newTime = calculateSeekPosition(clientX);
+    if (newTime !== null) {
+      setCurrentTime(newTime);
     }
   };
+
+  const handleSeekMove = (e) => {
+    if (!isSeeking) return;
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const newTime = calculateSeekPosition(clientX);
+    if (newTime !== null) {
+      setCurrentTime(newTime);
+    }
+  };
+
+  const handleSeekEnd = () => {
+    if (isSeeking) {
+      const video = document.getElementById('main-video');
+      if (video) {
+        video.currentTime = currentTime;
+      }
+      setIsSeeking(false);
+    }
+  };
+
+  // Add event listeners for dragging
+  useEffect(() => {
+    if (isSeeking) {
+      const handleMove = (e) => handleSeekMove(e);
+      const handleEnd = () => handleSeekEnd();
+      
+      document.addEventListener('mousemove', handleMove);
+      document.addEventListener('mouseup', handleEnd);
+      document.addEventListener('touchmove', handleMove, { passive: false });
+      document.addEventListener('touchend', handleEnd);
+      
+      return () => {
+        document.removeEventListener('mousemove', handleMove);
+        document.removeEventListener('mouseup', handleEnd);
+        document.removeEventListener('touchmove', handleMove);
+        document.removeEventListener('touchend', handleEnd);
+      };
+    }
+  }, [isSeeking, currentTime]);
 
   const togglePlayPause = () => {
     setShowControls(true);
