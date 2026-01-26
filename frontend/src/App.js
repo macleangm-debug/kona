@@ -1204,6 +1204,17 @@ const HomePage = ({ onAuthClick }) => {
   const [touchEnd, setTouchEnd] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Auto-play carousel
+  useEffect(() => {
+    if (heroSlides.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % heroSlides.length);
+    }, 4000); // Change slide every 4 seconds
+    
+    return () => clearInterval(interval);
+  }, [heroSlides.length]);
+
   // Swipe handlers
   const handleTouchStart = (e) => {
     setTouchEnd(null);
