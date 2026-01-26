@@ -1910,7 +1910,7 @@ const VideoPlayerPage = () => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showEpisodes, setShowEpisodes] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [videoQuality, setVideoQuality] = useState("540p");
+  const [videoQuality, setVideoQuality] = useState("480p");
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
