@@ -2008,14 +2008,14 @@ const VideoPlayerPage = () => {
         data-testid="video-element"
       />
 
-      {/* Top gradient overlay - always visible */}
-      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none" />
+      {/* Top gradient overlay - only visible when controls shown */}
+      <div className={`absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-black/60 to-transparent pointer-events-none transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
       
-      {/* Bottom gradient overlay - always visible */}
-      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none" />
+      {/* Bottom gradient overlay - only visible when controls shown */}
+      <div className={`absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/80 to-transparent pointer-events-none transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`} />
 
-      {/* Header - always visible */}
-      <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-20">
+      {/* Header - only visible when controls shown */}
+      <div className={`absolute top-0 left-0 right-0 flex items-center justify-between p-3 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <button
           onClick={() => navigate(-1)}
           className="p-2"
