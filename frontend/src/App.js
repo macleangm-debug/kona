@@ -937,7 +937,7 @@ const HomePage = ({ onAuthClick }) => {
           </div>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {continueWatching.map((item, i) => (
-              <div key={i} className="flex-shrink-0 w-44">
+              <div key={i} className="flex-shrink-0 w-28">
                 <ContinueWatchingCard
                   series={item.series}
                   episode={item.episode}
