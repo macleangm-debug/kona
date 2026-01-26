@@ -2182,19 +2182,21 @@ const VideoPlayerPage = () => {
 
       {/* Bottom control bar - only visible when showControls is true */}
       <div className={`absolute bottom-0 left-0 right-0 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        {/* Progress bar */}
+        {/* Progress bar - draggable */}
         <div className="px-4 mb-2">
           <div 
-            className="relative h-1 bg-white/30 rounded-full cursor-pointer"
-            onClick={handleSeek}
+            ref={progressBarRef}
+            className="relative h-2 bg-white/30 rounded-full cursor-pointer touch-none"
+            onMouseDown={handleSeekStart}
+            onTouchStart={handleSeekStart}
           >
             <div 
-              className="absolute left-0 top-0 h-full bg-white rounded-full"
+              className="absolute left-0 top-0 h-full bg-primary rounded-full pointer-events-none"
               style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
             />
             <div 
-              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg"
-              style={{ left: `${duration > 0 ? (currentTime / duration) * 100 : 0}%`, marginLeft: '-6px' }}
+              className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg pointer-events-none"
+              style={{ left: `calc(${duration > 0 ? (currentTime / duration) * 100 : 0}% - 8px)` }}
             />
           </div>
           <div className="flex justify-between mt-1">
@@ -2222,9 +2224,44 @@ const VideoPlayerPage = () => {
             >
               {playbackSpeed}X
             </button>
-            <button className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded">
-              {videoQuality}
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setShowQualityMenu(!showQualityMenu)}
+                className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded"
+              >
+                {videoQuality}
+              </button>
+              {/* Quality menu */}
+              {showQualityMenu && (
+                <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-lg overflow-hidden min-w-[100px]">
+                  {[
+                    { value: "480p", label: "480p", vip: false },
+                    { value: "720p", label: "720p", vip: false },
+                    { value: "1080p", label: "1080p", vip: true }
+                  ].map((quality) => (
+                    <button
+                      key={quality.value}
+                      onClick={() => {
+                        if (quality.vip) {
+                          navigate("/subscriptions");
+                        } else {
+                          setVideoQuality(quality.value);
+                        }
+                        setShowQualityMenu(false);
+                      }}
+                      className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 ${
+                        videoQuality === quality.value ? 'text-primary' : 'text-white'
+                      }`}
+                    >
+                      <span>{quality.label}</span>
+                      {quality.vip && (
+                        <span className="bg-yellow-500 text-black text-[8px] font-bold px-1 rounded">VIP</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
