@@ -878,12 +878,18 @@ const StorePage = () => {
 
   // Calculate local price
   const getLocalPrice = (usdPrice) => {
-    if (!geoData || !selectedCountry) return `$${usdPrice.toFixed(2)}`;
-    const rate = geoData.exchange_rate || 1;
-    const localPrice = usdPrice * rate;
+    if (!selectedCountry) return `$${usdPrice.toFixed(2)}`;
     const currency = selectedCountry.currency || "USD";
     
     if (currency === "USD") return `$${usdPrice.toFixed(2)}`;
+    
+    // Get exchange rate for selected country
+    const exchangeRates = {
+      "KE": 130, "TZ": 2500, "UG": 3700, "RW": 1300, "CD": 2800, "BI": 2900, "SS": 130
+    };
+    const rate = exchangeRates[selectedCountry.code] || 1;
+    const localPrice = usdPrice * rate;
+    
     return `${currency} ${localPrice.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
   };
 
