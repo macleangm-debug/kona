@@ -756,8 +756,14 @@ const HomePage = ({ onAuthClick }) => {
                     className="w-full h-full object-cover"
                   />
                   
-                  {/* Gradient overlay */}
+                  {/* Gradient overlay for content readability */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                  
+                  {/* Dark overlay for side cards - makes them appear darker/further back */}
+                  <div 
+                    className="absolute inset-0 bg-black pointer-events-none transition-opacity duration-150"
+                    style={{ opacity: getDarkOverlay(index) }}
+                  />
                   
                   {/* Top Badge */}
                   <div className="absolute top-3 left-3 flex items-center gap-2">
