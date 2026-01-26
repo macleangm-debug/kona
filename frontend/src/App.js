@@ -2150,6 +2150,8 @@ const VideoPlayerPage = () => {
       </Sheet>
     </div>
   );
+
+  return createPortal(playerContent, document.body);
 };
 
 // Coin Store Page
