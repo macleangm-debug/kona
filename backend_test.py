@@ -625,6 +625,10 @@ class MiniSeriesAPITester:
             print("❌ Registration failed, stopping tests")
             return self.get_summary()
         
+        # Store referrer info for referral testing
+        referrer_token = self.token
+        referrer_coins = 50  # Initial coins after registration
+        
         # Test user login
         if not self.test_user_login(user_creds):
             print("❌ Login failed, stopping tests")
@@ -632,6 +636,56 @@ class MiniSeriesAPITester:
         
         # Test user profile
         self.test_get_user_profile()
+        
+        # Test referral system
+        print("\n🤝 Testing Referral System...")
+        
+        # Test referral stats for new user (should have 0 referrals)
+        referral_stats_success, referral_stats = self.test_referral_stats()
+        referral_code = None
+        if referral_stats_success and referral_stats.get('referral_code'):
+            referral_code = referral_stats['referral_code']
+            print(f"   User's referral code: {referral_code}")
+        
+        # Test referral code validation
+        if referral_code:
+            self.test_referral_code_validation(referral_code)
+            
+            # Test invalid referral code
+            invalid_success, invalid_response = self.test_referral_code_validation("INVALID123")
+            if invalid_success and not invalid_response.get('valid', True):
+                self.log_test("Invalid Referral Code Rejection", True)
+            else:
+                self.log_test("Invalid Referral Code Rejection", False, "Invalid code was not properly rejected")
+        
+        # Test referral leaderboard
+        self.test_referral_leaderboard()
+        
+        # Test registration with referral code (create new user using first user's code)
+        if referral_code:
+            referred_success, referred_response = self.test_registration_with_referral(referral_code)
+            if referred_success:
+                # Check if referrer got reward
+                self.test_referrer_reward(referrer_token, referrer_coins)
+                
+                # Test referral stats again to see if count increased
+                # Switch back to referrer token to check stats
+                current_token = self.token
+                self.token = referrer_token
+                updated_stats_success, updated_stats = self.test_referral_stats()
+                if updated_stats_success:
+                    if updated_stats.get('total_referrals', 0) == 1:
+                        self.log_test("Referral Count Update", True)
+                    else:
+                        self.log_test("Referral Count Update", False, f"Expected 1 referral, got {updated_stats.get('total_referrals', 0)}")
+                    
+                    if updated_stats.get('total_earnings', 0) == 20:
+                        self.log_test("Referral Earnings Update", True)
+                    else:
+                        self.log_test("Referral Earnings Update", False, f"Expected 20 earnings, got {updated_stats.get('total_earnings', 0)}")
+                
+                # Switch back to referred user token
+                self.token = current_token
         
         # Test series functionality
         series_success, series_list = self.test_series_listing()
