@@ -347,6 +347,11 @@ const BottomNav = ({ onAuthClick }) => {
   const location = useLocation();
   const { user } = useAuth();
   
+  // Hide bottom nav on video player page
+  if (location.pathname.startsWith("/watch")) {
+    return null;
+  }
+  
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: ShoppingCart, label: "Store", path: "/store" },
