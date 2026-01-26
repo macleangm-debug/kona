@@ -1149,6 +1149,28 @@ const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
+      {/* Coming Soon Section - Horizontal Scroll */}
+      {comingSoon.length > 0 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between px-4 mb-3">
+            <h2 className="font-heading text-sm font-semibold">Coming Soon 🔜</h2>
+            <button className="text-xs text-primary">See All</button>
+          </div>
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+            {comingSoon.map((s) => (
+              <div key={s.id} className="flex-shrink-0 w-28">
+                <ComingSoonCard
+                  series={s}
+                  isReminded={userReminders.includes(s.id)}
+                  onRemind={handleSetReminder}
+                  loading={reminderLoading === s.id}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* New Releases Section - Horizontal Scroll */}
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
