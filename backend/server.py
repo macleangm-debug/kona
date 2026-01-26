@@ -110,6 +110,19 @@ class WatchProgressUpdate(BaseModel):
     episode_id: str
     progress: int  # percentage 0-100
 
+class ReminderRequest(BaseModel):
+    series_id: str
+
+class ComingSoonResponse(BaseModel):
+    id: str
+    title: str
+    description: str
+    genre: str
+    thumbnail: str
+    release_date: str
+    reserved_count: int
+    is_reminded: bool = False
+
 # ============ COUNTRY/PAYMENT CONFIG ============
 # East & Central Africa payment configuration
 COUNTRY_CONFIG = {
