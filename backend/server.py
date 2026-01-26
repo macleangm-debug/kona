@@ -420,12 +420,121 @@ async def get_unlocked_episodes(user: dict = Depends(get_current_user)):
 async def get_packages():
     return list(COIN_PACKAGES.values())
 
+# ============ GEOLOCATION & PAYMENT METHODS ============
+@api_router.get("/geo/detect")
+async def detect_location(request: Request):
+    """Auto-detect user's location from IP"""
+    # Get client IP
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        client_ip = forwarded.split(",")[0].strip()
+    else:
+        client_ip = request.client.host if request.client else "127.0.0.1"
+    
+    geo_data = await detect_country_from_ip(client_ip)
+    country_code = geo_data["country_code"]
+    
+    # Get config for this country or default
+    config = COUNTRY_CONFIG.get(country_code, DEFAULT_CONFIG)
+    
+    return {
+        "country_code": country_code,
+        "country_name": geo_data["country_name"],
+        "currency": config["currency"],
+        "payment_methods": config["payment_methods"],
+        "exchange_rate": config["exchange_rate"],
+        "detected_ip": client_ip
+    }
+
+@api_router.get("/geo/countries")
+async def get_supported_countries():
+    """Get list of supported countries for manual selection"""
+    countries = []
+    for code, config in COUNTRY_CONFIG.items():
+        countries.append({
+            "code": code,
+            "name": config["name"],
+            "currency": config["currency"],
+            "payment_methods": config["payment_methods"]
+        })
+    # Add international option
+    countries.append({
+        "code": "INTL",
+        "name": "International (Card Only)",
+        "currency": "USD",
+        "payment_methods": DEFAULT_CONFIG["payment_methods"]
+    })
+    return countries
+
+@api_router.get("/geo/payment-methods/{country_code}")
+async def get_payment_methods_for_country(country_code: str):
+    """Get payment methods available for a specific country"""
+    if country_code == "INTL":
+        config = DEFAULT_CONFIG
+    else:
+        config = COUNTRY_CONFIG.get(country_code, DEFAULT_CONFIG)
+    
+    return {
+        "country_code": country_code,
+        "currency": config["currency"],
+        "payment_methods": config["payment_methods"],
+        "exchange_rate": config.get("exchange_rate", 1.0)
+    }
+
 @api_router.post("/store/checkout")
 async def create_checkout(data: CheckoutRequest, request: Request, user: dict = Depends(get_current_user)):
+    """Create checkout - routes to Stripe (international) or Flutterwave (Africa)"""
     if data.package_id not in COIN_PACKAGES:
         raise HTTPException(status_code=400, detail="Invalid package")
     
     package = COIN_PACKAGES[data.package_id]
+    
+    # Determine which payment provider to use based on country
+    country_code = data.country_code
+    config = COUNTRY_CONFIG.get(country_code, DEFAULT_CONFIG)
+    
+    # Find the payment method config
+    payment_method_config = None
+    for pm in config["payment_methods"]:
+        if pm["id"] == data.payment_method:
+            payment_method_config = pm
+            break
+    
+    if not payment_method_config:
+        # Default to card if method not found
+        payment_method_config = {"id": "card", "type": "card", "provider": "stripe"}
+    
+    provider = payment_method_config.get("provider", "stripe")
+    
+    # Calculate local price
+    exchange_rate = config.get("exchange_rate", 1.0)
+    local_amount = round(package.price * exchange_rate, 2)
+    currency = config["currency"].lower()
+    
+    tx_ref = f"MINI_{int(datetime.now(timezone.utc).timestamp())}_{uuid.uuid4().hex[:8]}"
+    
+    if provider == "flutterwave" and FLUTTERWAVE_SECRET_KEY:
+        # Use Flutterwave for African payments
+        return await create_flutterwave_checkout(
+            user=user,
+            package=package,
+            data=data,
+            local_amount=local_amount,
+            currency=currency,
+            tx_ref=tx_ref,
+            payment_method=data.payment_method
+        )
+    else:
+        # Use Stripe for international card payments
+        return await create_stripe_checkout(
+            user=user,
+            package=package,
+            data=data,
+            request=request
+        )
+
+async def create_stripe_checkout(user: dict, package: CoinPackage, data: CheckoutRequest, request: Request):
+    """Create Stripe checkout session for international payments"""
     api_key = os.environ.get('STRIPE_API_KEY')
     
     host_url = str(request.base_url).rstrip('/')
@@ -433,7 +542,7 @@ async def create_checkout(data: CheckoutRequest, request: Request, user: dict = 
     
     stripe_checkout = StripeCheckout(api_key=api_key, webhook_url=webhook_url)
     
-    success_url = f"{data.origin_url}/store?session_id={{CHECKOUT_SESSION_ID}}"
+    success_url = f"{data.origin_url}/store?session_id={{CHECKOUT_SESSION_ID}}&provider=stripe"
     cancel_url = f"{data.origin_url}/store"
     
     checkout_request = CheckoutSessionRequest(
@@ -454,30 +563,131 @@ async def create_checkout(data: CheckoutRequest, request: Request, user: dict = 
     transaction = {
         "id": str(uuid.uuid4()),
         "session_id": session.session_id,
+        "tx_ref": session.session_id,
         "user_id": user["id"],
         "package_id": package.id,
         "amount": package.price,
         "currency": "usd",
         "coins": package.coins + package.bonus,
+        "provider": "stripe",
+        "payment_method": "card",
         "status": "pending",
         "payment_status": "initiated",
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     await db.payment_transactions.insert_one(transaction)
     
-    return {"url": session.url, "session_id": session.session_id}
+    return {"url": session.url, "session_id": session.session_id, "provider": "stripe"}
+
+async def create_flutterwave_checkout(user: dict, package: CoinPackage, data: CheckoutRequest, 
+                                       local_amount: float, currency: str, tx_ref: str, payment_method: str):
+    """Create Flutterwave payment for African mobile money & cards"""
+    
+    success_url = f"{data.origin_url}/store?tx_ref={tx_ref}&provider=flutterwave"
+    cancel_url = f"{data.origin_url}/store"
+    
+    # Map payment method to Flutterwave payment type
+    payment_options = "card"
+    if payment_method in ["mpesa", "mtn", "airtel"]:
+        payment_options = "mobilemoney"
+    
+    # Prepare Flutterwave payment link request
+    payload = {
+        "tx_ref": tx_ref,
+        "amount": local_amount,
+        "currency": currency.upper(),
+        "redirect_url": success_url,
+        "payment_options": payment_options,
+        "customer": {
+            "email": user["email"],
+            "name": user["name"],
+            "phonenumber": data.phone_number or ""
+        },
+        "customizations": {
+            "title": "MiniSeries Coins",
+            "description": f"{package.name} - {package.coins + package.bonus} coins",
+            "logo": "https://images.pexels.com/photos/12198531/pexels-photo-12198531.jpeg"
+        },
+        "meta": {
+            "user_id": user["id"],
+            "package_id": package.id,
+            "coins": str(package.coins + package.bonus)
+        }
+    }
+    
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://api.flutterwave.com/v3/payments",
+                json=payload,
+                headers={
+                    "Authorization": f"Bearer {FLUTTERWAVE_SECRET_KEY}",
+                    "Content-Type": "application/json"
+                },
+                timeout=30.0
+            )
+            
+            result = response.json()
+            
+            if result.get("status") == "success":
+                payment_link = result["data"]["link"]
+                
+                # Create transaction record
+                transaction = {
+                    "id": str(uuid.uuid4()),
+                    "tx_ref": tx_ref,
+                    "session_id": tx_ref,
+                    "user_id": user["id"],
+                    "package_id": package.id,
+                    "amount": local_amount,
+                    "amount_usd": package.price,
+                    "currency": currency.upper(),
+                    "coins": package.coins + package.bonus,
+                    "provider": "flutterwave",
+                    "payment_method": payment_method,
+                    "country_code": data.country_code,
+                    "status": "pending",
+                    "payment_status": "initiated",
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.payment_transactions.insert_one(transaction)
+                
+                return {"url": payment_link, "tx_ref": tx_ref, "provider": "flutterwave"}
+            else:
+                logging.error(f"Flutterwave error: {result}")
+                raise HTTPException(status_code=400, detail=result.get("message", "Payment initialization failed"))
+                
+    except httpx.RequestError as e:
+        logging.error(f"Flutterwave request error: {e}")
+        raise HTTPException(status_code=500, detail="Payment service temporarily unavailable")
 
 @api_router.get("/store/checkout/status/{session_id}")
-async def get_checkout_status(session_id: str, user: dict = Depends(get_current_user)):
+async def get_checkout_status(session_id: str, provider: str = "stripe", user: dict = Depends(get_current_user)):
+    """Check payment status - works for both Stripe and Flutterwave"""
+    
+    transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
+    if not transaction:
+        # Try finding by tx_ref for Flutterwave
+        transaction = await db.payment_transactions.find_one({"tx_ref": session_id}, {"_id": 0})
+    
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    actual_provider = transaction.get("provider", "stripe")
+    
+    if actual_provider == "flutterwave":
+        return await check_flutterwave_status(session_id, transaction, user)
+    else:
+        return await check_stripe_status(session_id, transaction, user)
+
+async def check_stripe_status(session_id: str, transaction: dict, user: dict):
+    """Check Stripe payment status"""
     api_key = os.environ.get('STRIPE_API_KEY')
     stripe_checkout = StripeCheckout(api_key=api_key, webhook_url="")
     
     status = await stripe_checkout.get_checkout_status(session_id)
     
-    # Update transaction
-    transaction = await db.payment_transactions.find_one({"session_id": session_id}, {"_id": 0})
-    
-    if transaction and transaction["payment_status"] != "paid" and status.payment_status == "paid":
+    if transaction["payment_status"] != "paid" and status.payment_status == "paid":
         # Credit coins only once
         coins_to_add = transaction["coins"]
         await db.users.update_one(
@@ -493,8 +703,69 @@ async def get_checkout_status(session_id: str, user: dict = Depends(get_current_
         "status": status.status,
         "payment_status": status.payment_status,
         "amount_total": status.amount_total,
-        "currency": status.currency
+        "currency": status.currency,
+        "provider": "stripe"
     }
+
+async def check_flutterwave_status(tx_ref: str, transaction: dict, user: dict):
+    """Check Flutterwave payment status"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://api.flutterwave.com/v3/transactions/verify_by_reference?tx_ref={tx_ref}",
+                headers={
+                    "Authorization": f"Bearer {FLUTTERWAVE_SECRET_KEY}",
+                    "Content-Type": "application/json"
+                },
+                timeout=30.0
+            )
+            
+            result = response.json()
+            
+            if result.get("status") == "success":
+                payment_data = result.get("data", {})
+                payment_status = payment_data.get("status", "").lower()
+                
+                if transaction["payment_status"] != "paid" and payment_status == "successful":
+                    # Credit coins only once
+                    coins_to_add = transaction["coins"]
+                    await db.users.update_one(
+                        {"id": user["id"]},
+                        {"$inc": {"coins": coins_to_add}}
+                    )
+                    await db.payment_transactions.update_one(
+                        {"tx_ref": tx_ref},
+                        {"$set": {
+                            "status": "completed",
+                            "payment_status": "paid",
+                            "flutterwave_response": payment_data
+                        }}
+                    )
+                    payment_status = "paid"
+                elif payment_status == "successful":
+                    payment_status = "paid"
+                
+                return {
+                    "status": payment_status,
+                    "payment_status": payment_status,
+                    "amount_total": payment_data.get("amount", 0),
+                    "currency": payment_data.get("currency", ""),
+                    "provider": "flutterwave"
+                }
+            else:
+                return {
+                    "status": "pending",
+                    "payment_status": "pending",
+                    "provider": "flutterwave"
+                }
+                
+    except Exception as e:
+        logging.error(f"Flutterwave status check error: {e}")
+        return {
+            "status": "pending",
+            "payment_status": "pending",
+            "provider": "flutterwave"
+        }
 
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
@@ -527,6 +798,43 @@ async def stripe_webhook(request: Request):
         return {"status": "success"}
     except Exception as e:
         logging.error(f"Webhook error: {e}")
+        return {"status": "error"}
+
+@api_router.post("/webhook/flutterwave")
+async def flutterwave_webhook(request: Request):
+    """Handle Flutterwave webhook notifications"""
+    try:
+        body = await request.json()
+        
+        # Verify webhook (in production, verify signature)
+        event_type = body.get("event")
+        data = body.get("data", {})
+        
+        if event_type == "charge.completed" and data.get("status") == "successful":
+            tx_ref = data.get("tx_ref")
+            
+            transaction = await db.payment_transactions.find_one({"tx_ref": tx_ref}, {"_id": 0})
+            
+            if transaction and transaction["payment_status"] != "paid":
+                user_id = transaction.get("user_id")
+                coins = transaction.get("coins", 0)
+                
+                await db.users.update_one(
+                    {"id": user_id},
+                    {"$inc": {"coins": coins}}
+                )
+                await db.payment_transactions.update_one(
+                    {"tx_ref": tx_ref},
+                    {"$set": {
+                        "status": "completed",
+                        "payment_status": "paid",
+                        "flutterwave_response": data
+                    }}
+                )
+        
+        return {"status": "success"}
+    except Exception as e:
+        logging.error(f"Flutterwave webhook error: {e}")
         return {"status": "error"}
 
 # ============ SEED DATA ============
