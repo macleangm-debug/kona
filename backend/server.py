@@ -123,6 +123,82 @@ class ComingSoonResponse(BaseModel):
     reserved_count: int
     is_reminded: bool = False
 
+# My List Models
+class MyListRequest(BaseModel):
+    series_id: str
+
+# Search Models
+class SearchQuery(BaseModel):
+    query: str
+    genre: Optional[str] = None
+
+# Subscription Models
+class SubscriptionPlan(BaseModel):
+    id: str
+    name: str
+    monthly_coins: int
+    price: float
+    features: List[str]
+    popular: bool = False
+
+class SubscribeRequest(BaseModel):
+    plan_id: str
+    origin_url: str
+
+# Admin Models
+class AdminSeriesCreate(BaseModel):
+    title: str
+    description: str
+    genre: str
+    thumbnail: str
+    total_episodes: int
+    coins_per_episode: int
+    rating: float = 4.5
+    featured: bool = False
+
+class AdminEpisodeCreate(BaseModel):
+    series_id: str
+    episode_number: int
+    title: str
+    description: str
+    duration: str
+    thumbnail: str
+    video_url: str
+    is_free: bool = False
+    coins_required: int = 15
+
+class AdminUserUpdate(BaseModel):
+    coins: Optional[int] = None
+    subscription: Optional[str] = None
+
+# ============ SUBSCRIPTION PLANS ============
+SUBSCRIPTION_PLANS = [
+    {
+        "id": "basic",
+        "name": "Basic",
+        "monthly_coins": 100,
+        "price": 4.99,
+        "features": ["100 coins/month", "Watch on 1 device", "Standard quality"],
+        "popular": False
+    },
+    {
+        "id": "premium",
+        "name": "Premium",
+        "monthly_coins": 300,
+        "price": 9.99,
+        "features": ["300 coins/month", "Watch on 2 devices", "HD quality", "Early access"],
+        "popular": True
+    },
+    {
+        "id": "vip",
+        "name": "VIP",
+        "monthly_coins": 500,
+        "price": 14.99,
+        "features": ["500 coins/month", "Watch on 4 devices", "4K quality", "Early access", "Ad-free", "Exclusive content"],
+        "popular": False
+    }
+]
+
 # ============ COUNTRY/PAYMENT CONFIG ============
 # East & Central Africa payment configuration
 COUNTRY_CONFIG = {
