@@ -400,6 +400,60 @@ async def get_reward_status(user: dict = Depends(get_current_user)):
     
     return {"can_claim": can_claim, "hours_until_next": hours_until_next, "reward_amount": DAILY_REWARD_COINS}
 
+# ============ REFERRAL ROUTES ============
+@api_router.get("/referral/stats")
+async def get_referral_stats(user: dict = Depends(get_current_user)):
+    """Get user's referral statistics"""
+    referrals = await db.referrals.find(
+        {"referrer_id": user["id"]}, 
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return {
+        "referral_code": user.get("referral_code"),
+        "total_referrals": user.get("referral_count", 0),
+        "total_earnings": user.get("referral_earnings", 0),
+        "reward_per_referral": REFERRAL_REWARD_REFERRER,
+        "referee_bonus": REFERRAL_REWARD_REFEREE,
+        "recent_referrals": [
+            {
+                "email": r["referee_email"][:3] + "***" + r["referee_email"][r["referee_email"].index("@"):],
+                "reward": r["referrer_reward"],
+                "date": r["created_at"]
+            }
+            for r in referrals[:5]
+        ]
+    }
+
+@api_router.get("/referral/validate/{code}")
+async def validate_referral_code(code: str):
+    """Validate if a referral code exists (for signup form)"""
+    user = await db.users.find_one({"referral_code": code.upper()}, {"_id": 0})
+    if user:
+        return {
+            "valid": True,
+            "referrer_name": user["name"].split()[0],  # First name only
+            "bonus_coins": REFERRAL_REWARD_REFEREE
+        }
+    return {"valid": False}
+
+@api_router.get("/referral/leaderboard")
+async def get_referral_leaderboard():
+    """Get top referrers (anonymized)"""
+    top_referrers = await db.users.find(
+        {"referral_count": {"$gt": 0}},
+        {"_id": 0, "name": 1, "referral_count": 1, "referral_earnings": 1}
+    ).sort("referral_count", -1).limit(10).to_list(10)
+    
+    return [
+        {
+            "name": u["name"].split()[0] + " " + u["name"].split()[-1][0] + "." if len(u["name"].split()) > 1 else u["name"],
+            "referrals": u["referral_count"],
+            "earnings": u["referral_earnings"]
+        }
+        for u in top_referrers
+    ]
+
 # ============ SERIES ROUTES ============
 @api_router.get("/series", response_model=List[SeriesResponse])
 async def get_series():
