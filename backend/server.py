@@ -687,6 +687,266 @@ async def get_user_reminders(user: dict = Depends(get_current_user)):
     """Get user's set reminders"""
     return {"reminders": user.get("reminders", [])}
 
+# ============ MY LIST ============
+@api_router.post("/user/my-list/add")
+async def add_to_my_list(data: MyListRequest, user: dict = Depends(get_current_user)):
+    """Add a series to user's My List"""
+    my_list = user.get("my_list", [])
+    if data.series_id in my_list:
+        raise HTTPException(status_code=400, detail="Already in your list")
+    
+    my_list.append(data.series_id)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"my_list": my_list}}
+    )
+    return {"message": "Added to My List", "my_list": my_list}
+
+@api_router.post("/user/my-list/remove")
+async def remove_from_my_list(data: MyListRequest, user: dict = Depends(get_current_user)):
+    """Remove a series from user's My List"""
+    my_list = user.get("my_list", [])
+    if data.series_id not in my_list:
+        raise HTTPException(status_code=400, detail="Not in your list")
+    
+    my_list.remove(data.series_id)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"my_list": my_list}}
+    )
+    return {"message": "Removed from My List", "my_list": my_list}
+
+@api_router.get("/user/my-list")
+async def get_my_list(user: dict = Depends(get_current_user)):
+    """Get user's My List with full series data"""
+    my_list_ids = user.get("my_list", [])
+    if not my_list_ids:
+        return []
+    
+    series_list = await db.series.find({"id": {"$in": my_list_ids}}, {"_id": 0}).to_list(50)
+    return series_list
+
+# ============ CONTINUE WATCHING ============
+@api_router.get("/user/continue-watching")
+async def get_continue_watching(user: dict = Depends(get_current_user)):
+    """Get user's continue watching list with progress"""
+    watch_progress = user.get("watch_progress", {})
+    if not watch_progress:
+        return []
+    
+    # Get episodes with progress < 100%
+    continue_watching = []
+    for episode_id, progress in watch_progress.items():
+        if progress < 100:
+            episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0})
+            if episode:
+                series = await db.series.find_one({"id": episode["series_id"]}, {"_id": 0})
+                if series:
+                    continue_watching.append({
+                        "series": series,
+                        "episode": episode["episode_number"],
+                        "episode_id": episode_id,
+                        "progress": progress
+                    })
+    
+    # Sort by most recent (we'd need timestamps for proper sorting)
+    return continue_watching[:10]
+
+# ============ SEARCH ============
+@api_router.get("/search")
+async def search_series(q: str, genre: Optional[str] = None):
+    """Search series by title or description"""
+    query = {"$or": [
+        {"title": {"$regex": q, "$options": "i"}},
+        {"description": {"$regex": q, "$options": "i"}}
+    ]}
+    
+    if genre and genre != "all":
+        query["genre"] = {"$regex": genre, "$options": "i"}
+    
+    results = await db.series.find(query, {"_id": 0}).to_list(50)
+    return results
+
+# ============ SUBSCRIPTIONS ============
+@api_router.get("/subscriptions/plans")
+async def get_subscription_plans():
+    """Get available subscription plans"""
+    return SUBSCRIPTION_PLANS
+
+@api_router.get("/user/subscription")
+async def get_user_subscription(user: dict = Depends(get_current_user)):
+    """Get user's current subscription"""
+    return {
+        "subscription": user.get("subscription"),
+        "subscription_end": user.get("subscription_end"),
+        "monthly_coins": user.get("monthly_coins", 0)
+    }
+
+@api_router.post("/subscriptions/subscribe")
+async def subscribe(data: SubscribeRequest, user: dict = Depends(get_current_user)):
+    """Subscribe to a plan"""
+    plan = next((p for p in SUBSCRIPTION_PLANS if p["id"] == data.plan_id), None)
+    if not plan:
+        raise HTTPException(status_code=404, detail="Plan not found")
+    
+    # Create Stripe checkout for subscription
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=["card"],
+            line_items=[{
+                "price_data": {
+                    "currency": "usd",
+                    "product_data": {
+                        "name": f"Kona {plan['name']} Subscription",
+                        "description": f"{plan['monthly_coins']} coins/month",
+                    },
+                    "unit_amount": int(plan["price"] * 100),
+                    "recurring": {"interval": "month"}
+                },
+                "quantity": 1,
+            }],
+            mode="subscription",
+            success_url=f"{data.origin_url}/profile?subscription=success",
+            cancel_url=f"{data.origin_url}/store?subscription=cancelled",
+            metadata={
+                "user_id": user["id"],
+                "plan_id": plan["id"]
+            }
+        )
+        return {"checkout_url": checkout_session.url, "session_id": checkout_session.id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# ============ ADMIN PANEL ============
+async def get_admin_user(user: dict = Depends(get_current_user)):
+    """Check if user is admin"""
+    if not user.get("is_admin", False):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(get_admin_user)):
+    """Get admin dashboard statistics"""
+    total_users = await db.users.count_documents({})
+    total_series = await db.series.count_documents({})
+    total_episodes = await db.episodes.count_documents({})
+    
+    # Revenue from transactions
+    transactions = await db.transactions.find({"status": "completed"}).to_list(1000)
+    total_revenue = sum(t.get("amount", 0) for t in transactions)
+    
+    # Recent signups (last 7 days)
+    from datetime import datetime, timedelta
+    week_ago = datetime.utcnow() - timedelta(days=7)
+    recent_signups = await db.users.count_documents({"created_at": {"$gte": week_ago}})
+    
+    return {
+        "total_users": total_users,
+        "total_series": total_series,
+        "total_episodes": total_episodes,
+        "total_revenue": total_revenue,
+        "recent_signups": recent_signups,
+        "active_subscriptions": await db.users.count_documents({"subscription": {"$ne": None}})
+    }
+
+@api_router.get("/admin/users")
+async def get_admin_users(admin: dict = Depends(get_admin_user), skip: int = 0, limit: int = 50):
+    """Get all users for admin"""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.users.count_documents({})
+    return {"users": users, "total": total}
+
+@api_router.put("/admin/users/{user_id}")
+async def update_user(user_id: str, data: AdminUserUpdate, admin: dict = Depends(get_admin_user)):
+    """Update a user's coins or subscription"""
+    update_data = {}
+    if data.coins is not None:
+        update_data["coins"] = data.coins
+    if data.subscription is not None:
+        update_data["subscription"] = data.subscription
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No update data provided")
+    
+    result = await db.users.update_one({"id": user_id}, {"$set": update_data})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": "User updated"}
+
+@api_router.get("/admin/series")
+async def get_admin_series(admin: dict = Depends(get_admin_user)):
+    """Get all series for admin"""
+    series = await db.series.find({}, {"_id": 0}).to_list(100)
+    return series
+
+@api_router.post("/admin/series")
+async def create_series(data: AdminSeriesCreate, admin: dict = Depends(get_admin_user)):
+    """Create a new series"""
+    series_id = f"series-{uuid.uuid4().hex[:8]}"
+    series_data = {
+        "id": series_id,
+        **data.dict(),
+        "views": 0,
+        "created_at": datetime.utcnow()
+    }
+    await db.series.insert_one(series_data)
+    return {"message": "Series created", "id": series_id}
+
+@api_router.put("/admin/series/{series_id}")
+async def update_series(series_id: str, data: AdminSeriesCreate, admin: dict = Depends(get_admin_user)):
+    """Update a series"""
+    result = await db.series.update_one({"id": series_id}, {"$set": data.dict()})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Series not found")
+    return {"message": "Series updated"}
+
+@api_router.delete("/admin/series/{series_id}")
+async def delete_series(series_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a series and its episodes"""
+    await db.series.delete_one({"id": series_id})
+    await db.episodes.delete_many({"series_id": series_id})
+    return {"message": "Series deleted"}
+
+@api_router.post("/admin/episodes")
+async def create_episode(data: AdminEpisodeCreate, admin: dict = Depends(get_admin_user)):
+    """Create a new episode"""
+    episode_id = f"ep-{uuid.uuid4().hex[:8]}"
+    episode_data = {
+        "id": episode_id,
+        **data.dict(),
+        "created_at": datetime.utcnow()
+    }
+    await db.episodes.insert_one(episode_data)
+    
+    # Update series episode count
+    await db.series.update_one(
+        {"id": data.series_id},
+        {"$inc": {"total_episodes": 1}}
+    )
+    
+    return {"message": "Episode created", "id": episode_id}
+
+@api_router.get("/admin/transactions")
+async def get_admin_transactions(admin: dict = Depends(get_admin_user), skip: int = 0, limit: int = 50):
+    """Get all transactions for admin"""
+    transactions = await db.transactions.find({}, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.transactions.count_documents({})
+    return {"transactions": transactions, "total": total}
+
+# Make first admin user
+@api_router.post("/admin/make-admin")
+async def make_admin(email: str, secret: str):
+    """Make a user an admin (requires secret key)"""
+    if secret != "kona-admin-secret-2026":
+        raise HTTPException(status_code=403, detail="Invalid secret")
+    
+    result = await db.users.update_one({"email": email}, {"$set": {"is_admin": True}})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"message": f"{email} is now an admin"}
+
 # ============ COIN STORE ============
 @api_router.get("/store/packages", response_model=List[CoinPackage])
 async def get_packages():
