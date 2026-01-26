@@ -1,53 +1,972 @@
-import { useEffect } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
+import { Home, Play, ShoppingCart, User, Gift, Lock, Coins, Star, Eye, Clock, ChevronLeft, X, Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
+// Auth Context
+const AuthContext = createContext(null);
+
+const useAuth = () => useContext(AuthContext);
+
+const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (token) {
+        try {
+          const res = await axios.get(`${API}/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(res.data);
+        } catch (e) {
+          localStorage.removeItem("token");
+          setToken(null);
+        }
+      }
+      setLoading(false);
+    };
+    fetchUser();
+  }, [token]);
+
+  const login = async (email, password) => {
+    const res = await axios.post(`${API}/auth/login`, { email, password });
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
+    return res.data;
+  };
+
+  const register = async (email, password, name) => {
+    const res = await axios.post(`${API}/auth/register`, { email, password, name });
+    localStorage.setItem("token", res.data.token);
+    setToken(res.data.token);
+    setUser(res.data.user);
+    return res.data;
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setUser(null);
+  };
+
+  const refreshUser = async () => {
+    if (token) {
+      const res = await axios.get(`${API}/auth/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUser(res.data);
     }
   };
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+  return (
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading, refreshUser }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Auth Modal
+const AuthModal = ({ open, onClose }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { login, register } = useAuth();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await login(email, password);
+        toast.success("Welcome back!");
+      } else {
+        await register(email, password, name);
+        toast.success("Account created! You got 50 welcome coins!");
+      }
+      onClose();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Something went wrong");
+    }
+    setLoading(false);
+  };
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-[340px] bg-card border-white/10" data-testid="auth-modal">
+        <DialogHeader>
+          <DialogTitle className="font-heading text-2xl">
+            {isLogin ? "Welcome Back" : "Join Now"}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
+          {!isLogin && (
+            <Input
+              placeholder="Your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="bg-secondary/50 border-white/10"
+              data-testid="auth-name-input"
+            />
+          )}
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="bg-secondary/50 border-white/10"
+            data-testid="auth-email-input"
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="bg-secondary/50 border-white/10"
+            data-testid="auth-password-input"
+          />
+          <Button 
+            type="submit" 
+            className="w-full bg-primary hover:bg-primary/90 rounded-full"
+            disabled={loading}
+            data-testid="auth-submit-btn"
+          >
+            {loading ? <Loader2 className="animate-spin" /> : isLogin ? "Sign In" : "Create Account"}
+          </Button>
+        </form>
+        <p className="text-center text-sm text-muted-foreground mt-4">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
+          <button
+            onClick={() => setIsLogin(!isLogin)}
+            className="text-primary hover:underline"
+            data-testid="auth-toggle-btn"
+          >
+            {isLogin ? "Sign up" : "Sign in"}
+          </button>
+        </p>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Daily Reward Modal
+const DailyRewardModal = ({ open, onClose, onClaim }) => {
+  const [loading, setLoading] = useState(false);
+  const [claimed, setClaimed] = useState(false);
+
+  const handleClaim = async () => {
+    setLoading(true);
+    const success = await onClaim();
+    if (success) {
+      setClaimed(true);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-[340px] bg-card border-white/10" data-testid="daily-reward-modal">
+        <div className="text-center py-4">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.5)]">
+            <Gift className="w-10 h-10 text-white" />
+          </div>
+          <h2 className="font-heading text-2xl mb-2">Daily Reward!</h2>
+          <p className="text-muted-foreground mb-6">Claim your free 10 coins today</p>
+          
+          {claimed ? (
+            <div className="flex items-center justify-center gap-2 text-green-400">
+              <Check className="w-5 h-5" />
+              <span>Claimed!</span>
+            </div>
+          ) : (
+            <Button 
+              onClick={handleClaim}
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full px-8"
+              disabled={loading}
+              data-testid="claim-reward-btn"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : "Claim Reward"}
+            </Button>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Unlock Sheet
+const UnlockSheet = ({ open, onClose, episode, onUnlock, userCoins }) => {
+  const [loading, setLoading] = useState(false);
+  const canAfford = userCoins >= (episode?.coins_required || 0);
+
+  const handleUnlock = async () => {
+    setLoading(true);
+    await onUnlock(episode.id);
+    setLoading(false);
+    onClose();
+  };
+
+  if (!episode) return null;
+
+  return (
+    <Sheet open={open} onOpenChange={onClose}>
+      <SheetContent side="bottom" className="bg-card border-t border-white/10 rounded-t-3xl" data-testid="unlock-sheet">
+        <SheetHeader>
+          <SheetTitle className="font-heading text-xl">Unlock Episode</SheetTitle>
+        </SheetHeader>
+        <div className="py-6 text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <Lock className="w-6 h-6 text-muted-foreground" />
+            <span className="text-lg">{episode.title}</span>
+          </div>
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="flex items-center gap-1 text-yellow-400">
+              <Coins className="w-5 h-5" />
+              <span className="font-semibold">{episode.coins_required}</span>
+            </div>
+            <span className="text-muted-foreground">coins required</span>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Your balance: <span className="text-yellow-400">{userCoins} coins</span>
+          </p>
+          {canAfford ? (
+            <Button 
+              onClick={handleUnlock}
+              className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 rounded-full px-8"
+              disabled={loading}
+              data-testid="unlock-confirm-btn"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : "Unlock Now"}
+            </Button>
+          ) : (
+            <p className="text-red-400 text-sm">Not enough coins. Visit the store to get more!</p>
+          )}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+};
+
+// Bottom Navigation
+const BottomNav = ({ onAuthClick }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
+  
+  const navItems = [
+    { icon: Home, label: "Home", path: "/" },
+    { icon: ShoppingCart, label: "Store", path: "/store" },
+    { icon: User, label: "Profile", path: "/profile" },
+  ];
+
+  const handleNav = (path) => {
+    if ((path === "/store" || path === "/profile") && !user) {
+      onAuthClick();
+    } else {
+      navigate(path);
+    }
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 h-16 bg-black/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-around z-50 max-w-md mx-auto" data-testid="bottom-nav">
+      {navItems.map((item) => {
+        const isActive = location.pathname === item.path;
+        return (
+          <button
+            key={item.path}
+            onClick={() => handleNav(item.path)}
+            className={`flex flex-col items-center gap-1 p-2 transition-all ${isActive ? "text-primary" : "text-muted-foreground hover:text-white"}`}
+            data-testid={`nav-${item.label.toLowerCase()}`}
+          >
+            <item.icon className="w-5 h-5" />
+            <span className="text-xs">{item.label}</span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+};
+
+// Coin Balance Display
+const CoinBalance = ({ coins, onClick }) => (
+  <button
+    onClick={onClick}
+    className="flex items-center gap-2 bg-secondary/50 backdrop-blur-md border border-white/10 rounded-full px-3 py-1.5 hover:bg-secondary/80 transition-all"
+    data-testid="coin-balance"
+  >
+    <div className="w-5 h-5 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+      <Coins className="w-3 h-3 text-white" />
+    </div>
+    <span className="font-semibold text-sm">{coins || 0}</span>
+  </button>
+);
+
+// Series Card
+const SeriesCard = ({ series, onClick }) => (
+  <div
+    onClick={onClick}
+    className="aspect-[2/3] rounded-xl overflow-hidden relative group cursor-pointer border border-white/5 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+    data-testid={`series-card-${series.id}`}
+  >
+    <img 
+      src={series.thumbnail} 
+      alt={series.title}
+      className="w-full h-full object-cover"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+    <div className="absolute bottom-0 left-0 right-0 p-3">
+      <h3 className="font-heading font-semibold text-sm line-clamp-2">{series.title}</h3>
+      <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          <span>{series.rating}</span>
+        </div>
+        <span>•</span>
+        <span>{series.total_episodes} eps</span>
+      </div>
+    </div>
+    {series.featured && (
+      <Badge className="absolute top-2 left-2 bg-primary/80 backdrop-blur-sm text-xs">Featured</Badge>
+    )}
+  </div>
+);
+
+// Home Page
+const HomePage = ({ onAuthClick }) => {
+  const [series, setSeries] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { user, token, refreshUser } = useAuth();
+  const [showReward, setShowReward] = useState(false);
+  const [canClaimReward, setCanClaimReward] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [seriesRes, featuredRes] = await Promise.all([
+          axios.get(`${API}/series`),
+          axios.get(`${API}/series/featured`)
+        ]);
+        setSeries(seriesRes.data);
+        setFeatured(featuredRes.data);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const checkReward = async () => {
+      if (token) {
+        try {
+          const res = await axios.get(`${API}/rewards/status`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (res.data.can_claim) {
+            setCanClaimReward(true);
+            setShowReward(true);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    };
+    checkReward();
+  }, [token]);
+
+  const handleClaimReward = async () => {
+    try {
+      await axios.post(`${API}/rewards/claim`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      await refreshUser();
+      toast.success("You got 10 coins!");
+      setCanClaimReward(false);
+      return true;
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to claim reward");
+      return false;
+    }
+  };
+
+  const genres = [...new Set(series.map(s => s.genre))];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-20" data-testid="home-page">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4">
+        <h1 className="font-heading text-2xl font-bold">MiniSeries</h1>
+        {user ? (
+          <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
+        ) : (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full border-white/20"
+            onClick={onAuthClick}
+            data-testid="login-btn"
+          >
+            Sign In
+          </Button>
+        )}
+      </div>
+
+      {/* Daily Reward Button */}
+      {user && canClaimReward && (
+        <button
+          onClick={() => setShowReward(true)}
+          className="mx-4 mb-4 w-[calc(100%-2rem)] p-3 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 flex items-center gap-3 hover:from-yellow-500/30 hover:to-orange-500/30 transition-all"
+          data-testid="daily-reward-banner"
         >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
+          <Gift className="w-6 h-6 text-yellow-400" />
+          <span className="font-semibold">Claim your daily reward!</span>
+        </button>
+      )}
+
+      {/* Featured Carousel */}
+      {featured.length > 0 && (
+        <div className="px-4 mb-8">
+          <h2 className="font-heading text-lg font-semibold mb-3">🔥 Trending Now</h2>
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            {featured.map((s) => (
+              <div key={s.id} className="flex-shrink-0 w-40">
+                <SeriesCard series={s} onClick={() => navigate(`/series/${s.id}`)} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* By Genre */}
+      {genres.map((genre) => (
+        <div key={genre} className="px-4 mb-6">
+          <h2 className="font-heading text-lg font-semibold mb-3">{genre}</h2>
+          <div className="grid grid-cols-2 gap-4">
+            {series.filter(s => s.genre === genre).slice(0, 4).map((s) => (
+              <SeriesCard key={s.id} series={s} onClick={() => navigate(`/series/${s.id}`)} />
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <DailyRewardModal 
+        open={showReward} 
+        onClose={() => setShowReward(false)}
+        onClaim={handleClaimReward}
+      />
     </div>
   );
 };
 
-function App() {
+// Series Detail Page
+const SeriesDetailPage = ({ onAuthClick }) => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { user, token, refreshUser } = useAuth();
+  const [series, setSeries] = useState(null);
+  const [episodes, setEpisodes] = useState([]);
+  const [unlockedEpisodes, setUnlockedEpisodes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [unlockSheet, setUnlockSheet] = useState({ open: false, episode: null });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [seriesRes, episodesRes] = await Promise.all([
+          axios.get(`${API}/series/${id}`),
+          axios.get(`${API}/series/${id}/episodes`)
+        ]);
+        setSeries(seriesRes.data);
+        setEpisodes(episodesRes.data);
+
+        if (token) {
+          const unlockedRes = await axios.get(`${API}/user/unlocked-episodes`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUnlockedEpisodes(unlockedRes.data.unlocked_episodes);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [id, token]);
+
+  const handleEpisodeClick = (episode) => {
+    if (!user) {
+      onAuthClick();
+      return;
+    }
+    
+    const isUnlocked = episode.is_free || unlockedEpisodes.includes(episode.id);
+    if (isUnlocked) {
+      navigate(`/watch/${episode.id}`);
+    } else {
+      setUnlockSheet({ open: true, episode });
+    }
+  };
+
+  const handleUnlock = async (episodeId) => {
+    try {
+      await axios.post(`${API}/episodes/unlock`, { episode_id: episodeId }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setUnlockedEpisodes([...unlockedEpisodes, episodeId]);
+      await refreshUser();
+      toast.success("Episode unlocked!");
+      navigate(`/watch/${episodeId}`);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to unlock");
+    }
+  };
+
+  if (loading || !series) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+    <div className="pb-20" data-testid="series-detail-page">
+      {/* Hero */}
+      <div className="relative h-64">
+        <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          data-testid="back-btn"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        {user && (
+          <div className="absolute top-4 right-4">
+            <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="px-4 -mt-16 relative z-10">
+        <Badge className="mb-2 bg-primary/80">{series.genre}</Badge>
+        <h1 className="font-heading text-2xl font-bold mb-2">{series.title}</h1>
+        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            <span>{series.rating}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Eye className="w-4 h-4" />
+            <span>{(series.views / 1000).toFixed(0)}K views</span>
+          </div>
+          <span>{series.total_episodes} episodes</span>
+        </div>
+        <p className="text-muted-foreground text-sm mb-6">{series.description}</p>
+
+        {/* Episodes */}
+        <h2 className="font-heading text-lg font-semibold mb-3">Episodes</h2>
+        <div className="space-y-2">
+          {episodes.map((ep) => {
+            const isUnlocked = ep.is_free || unlockedEpisodes.includes(ep.id);
+            return (
+              <div
+                key={ep.id}
+                onClick={() => handleEpisodeClick(ep)}
+                className="flex items-center gap-4 p-3 rounded-xl bg-card/50 border border-white/5 hover:bg-card/80 transition-all cursor-pointer"
+                data-testid={`episode-${ep.episode_number}`}
+              >
+                <div className="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0">
+                  <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
+                  {!isUnlocked && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                      <Lock className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{ep.title}</p>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Clock className="w-3 h-3" />
+                    <span>{ep.duration}</span>
+                    {!isUnlocked && (
+                      <span className="flex items-center gap-1 text-yellow-400">
+                        <Coins className="w-3 h-3" />
+                        {ep.coins_required}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {isUnlocked ? (
+                  <Play className="w-5 h-5 text-primary" />
+                ) : (
+                  <Lock className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <UnlockSheet
+        open={unlockSheet.open}
+        onClose={() => setUnlockSheet({ open: false, episode: null })}
+        episode={unlockSheet.episode}
+        onUnlock={handleUnlock}
+        userCoins={user?.coins || 0}
+      />
     </div>
+  );
+};
+
+// Video Player Page
+const VideoPlayerPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { token, user } = useAuth();
+  const [episode, setEpisode] = useState(null);
+  const [series, setSeries] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const epRes = await axios.get(`${API}/episodes/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEpisode(epRes.data);
+
+        const seriesRes = await axios.get(`${API}/series/${epRes.data.series_id}`);
+        setSeries(seriesRes.data);
+      } catch (e) {
+        console.error(e);
+        navigate(-1);
+      }
+      setLoading(false);
+    };
+    fetchData();
+  }, [id, token, navigate]);
+
+  const handleProgress = async (e) => {
+    const video = e.target;
+    const progress = Math.round((video.currentTime / video.duration) * 100);
+    if (progress > 0 && progress % 10 === 0) {
+      try {
+        await axios.post(`${API}/episodes/progress`, { episode_id: id, progress }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
+  if (loading || !episode) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen bg-black flex flex-col" data-testid="video-player-page">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent absolute top-0 left-0 right-0 z-10">
+        <button
+          onClick={() => navigate(-1)}
+          className="w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          data-testid="player-back-btn"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        {user && <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />}
+      </div>
+
+      {/* Video */}
+      <div className="flex-1 flex items-center justify-center">
+        <video
+          src={episode.video_url}
+          controls
+          autoPlay
+          onTimeUpdate={handleProgress}
+          className="w-full max-h-full"
+          data-testid="video-element"
+        />
+      </div>
+
+      {/* Info */}
+      <div className="p-4 bg-gradient-to-t from-black/80 to-transparent">
+        <p className="text-muted-foreground text-sm">{series?.title}</p>
+        <h2 className="font-heading text-lg font-semibold">{episode.title}</h2>
+      </div>
+    </div>
+  );
+};
+
+// Coin Store Page
+const StorePage = () => {
+  const navigate = useNavigate();
+  const { user, token, refreshUser } = useAuth();
+  const [packages, setPackages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [checkingPayment, setCheckingPayment] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await axios.get(`${API}/store/packages`);
+        setPackages(res.data);
+      } catch (e) {
+        console.error(e);
+      }
+      setLoading(false);
+    };
+    fetchPackages();
+  }, []);
+
+  // Check for payment return
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const sessionId = params.get("session_id");
+    
+    if (sessionId && token) {
+      setCheckingPayment(true);
+      const pollStatus = async (attempts = 0) => {
+        if (attempts >= 5) {
+          setCheckingPayment(false);
+          toast.error("Payment verification timed out");
+          return;
+        }
+        
+        try {
+          const res = await axios.get(`${API}/store/checkout/status/${sessionId}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.data.payment_status === "paid") {
+            await refreshUser();
+            toast.success("Payment successful! Coins added to your account.");
+            setCheckingPayment(false);
+            navigate("/store", { replace: true });
+          } else if (res.data.status === "expired") {
+            toast.error("Payment session expired");
+            setCheckingPayment(false);
+          } else {
+            setTimeout(() => pollStatus(attempts + 1), 2000);
+          }
+        } catch (e) {
+          console.error(e);
+          setCheckingPayment(false);
+        }
+      };
+      pollStatus();
+    }
+  }, [location, token, refreshUser, navigate]);
+
+  const handlePurchase = async (packageId) => {
+    try {
+      const res = await axios.post(`${API}/store/checkout`, {
+        package_id: packageId,
+        origin_url: window.location.origin
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      window.location.href = res.data.url;
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to create checkout");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (checkingPayment) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh] gap-4">
+        <Loader2 className="w-10 h-10 animate-spin text-primary" />
+        <p className="text-muted-foreground">Verifying payment...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="pb-20 px-4 pt-4" data-testid="store-page">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-heading text-2xl font-bold">Coin Store</h1>
+        {user && <CoinBalance coins={user.coins} />}
+      </div>
+
+      {/* Balance Card */}
+      <Card className="bg-gradient-to-br from-violet-600/20 to-indigo-600/20 border-violet-500/30 p-6 mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-[0_0_30px_rgba(251,191,36,0.3)]">
+            <Coins className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <p className="text-muted-foreground text-sm">Your Balance</p>
+            <p className="font-heading text-3xl font-bold">{user?.coins || 0} <span className="text-lg text-muted-foreground">coins</span></p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Packages */}
+      <h2 className="font-heading text-lg font-semibold mb-4">Buy Coins</h2>
+      <div className="grid grid-cols-2 gap-3">
+        {packages.map((pkg) => (
+          <div
+            key={pkg.id}
+            onClick={() => handlePurchase(pkg.id)}
+            className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border p-4 flex flex-col items-center justify-center gap-2 cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${pkg.popular ? "border-violet-500/50 shadow-[0_0_20px_rgba(124,58,237,0.3)]" : "border-white/10 hover:border-white/20"}`}
+            data-testid={`package-${pkg.id}`}
+          >
+            {pkg.popular && (
+              <Badge className="absolute top-2 right-2 bg-violet-500 text-xs">Popular</Badge>
+            )}
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+              <Coins className="w-6 h-6 text-white" />
+            </div>
+            <p className="font-heading font-bold text-lg">{pkg.coins}</p>
+            {pkg.bonus > 0 && (
+              <p className="text-xs text-green-400">+{pkg.bonus} bonus</p>
+            )}
+            <p className="text-muted-foreground text-sm">${pkg.price.toFixed(2)}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Profile Page
+const ProfilePage = ({ onLogout }) => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+    toast.success("Logged out successfully");
+  };
+
+  if (!user) return null;
+
+  return (
+    <div className="pb-20 px-4 pt-4" data-testid="profile-page">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-heading text-2xl font-bold">Profile</h1>
+        <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
+      </div>
+
+      {/* User Info */}
+      <Card className="bg-card/50 border-white/10 p-6 mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center text-2xl font-bold">
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <h2 className="font-heading text-xl font-semibold">{user.name}</h2>
+            <p className="text-muted-foreground text-sm">{user.email}</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Stats */}
+      <Card className="bg-card/50 border-white/10 p-6 mb-6">
+        <h3 className="font-heading font-semibold mb-4">Your Stats</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-center p-4 rounded-xl bg-secondary/50">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <Coins className="w-5 h-5 text-yellow-400" />
+              <span className="font-heading text-2xl font-bold">{user.coins}</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Coins</p>
+          </div>
+          <div className="text-center p-4 rounded-xl bg-secondary/50">
+            <p className="font-heading text-2xl font-bold">
+              {new Date(user.created_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}
+            </p>
+            <p className="text-xs text-muted-foreground">Member since</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Actions */}
+      <Button 
+        variant="outline" 
+        className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 rounded-full"
+        onClick={handleLogout}
+        data-testid="logout-btn"
+      >
+        Sign Out
+      </Button>
+    </div>
+  );
+};
+
+// Main App
+function App() {
+  const [showAuth, setShowAuth] = useState(false);
+
+  return (
+    <AuthProvider>
+      <div className="min-h-screen bg-[#09090b]">
+        <div className="max-w-md mx-auto min-h-screen bg-background overflow-hidden shadow-2xl border-x border-border/10 relative">
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage onAuthClick={() => setShowAuth(true)} />} />
+              <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={() => setShowAuth(true)} />} />
+              <Route path="/watch/:id" element={<VideoPlayerPage />} />
+              <Route path="/store" element={<StorePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
+            <BottomNav onAuthClick={() => setShowAuth(true)} />
+            <AuthModal open={showAuth} onClose={() => setShowAuth(false)} />
+          </BrowserRouter>
+        </div>
+        <Toaster position="top-center" />
+      </div>
+    </AuthProvider>
   );
 }
 
