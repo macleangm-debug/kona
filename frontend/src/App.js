@@ -2084,7 +2084,7 @@ const VideoPlayerPage = () => {
       </div>
 
       {/* Right side action buttons - only visible when showControls is true */}
-      <div className={`absolute right-3 bottom-20 flex flex-col items-center gap-5 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`absolute right-3 bottom-36 flex flex-col items-center gap-5 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         {/* Likes */}
         <button className="flex flex-col items-center gap-1">
           <div className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center">
