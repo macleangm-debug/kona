@@ -572,6 +572,45 @@ async def update_progress(data: WatchProgressUpdate, user: dict = Depends(get_cu
 async def get_unlocked_episodes(user: dict = Depends(get_current_user)):
     return {"unlocked_episodes": user.get("unlocked_episodes", [])}
 
+# ============ COMING SOON ============
+@api_router.get("/series/coming-soon")
+async def get_coming_soon():
+    """Get list of upcoming series"""
+    coming_soon = await db.coming_soon.find({}, {"_id": 0}).to_list(20)
+    return coming_soon
+
+@api_router.post("/series/remind")
+async def set_reminder(data: ReminderRequest, user: dict = Depends(get_current_user)):
+    """Set a reminder for an upcoming series"""
+    series = await db.coming_soon.find_one({"id": data.series_id}, {"_id": 0})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Check if already reminded
+    reminders = user.get("reminders", [])
+    if data.series_id in reminders:
+        raise HTTPException(status_code=400, detail="Reminder already set")
+    
+    # Add to user's reminders
+    reminders.append(data.series_id)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"reminders": reminders}}
+    )
+    
+    # Increment reserved count
+    await db.coming_soon.update_one(
+        {"id": data.series_id},
+        {"$inc": {"reserved_count": 1}}
+    )
+    
+    return {"message": "Reminder set successfully!", "series_id": data.series_id}
+
+@api_router.get("/user/reminders")
+async def get_user_reminders(user: dict = Depends(get_current_user)):
+    """Get user's set reminders"""
+    return {"reminders": user.get("reminders", [])}
+
 # ============ COIN STORE ============
 @api_router.get("/store/packages", response_model=List[CoinPackage])
 async def get_packages():
