@@ -1,5 +1,6 @@
 // Re-export all pages for easier imports
 export { HomePage } from './HomePage';
+export { HomePageResponsive } from './HomePageResponsive';
 export { SeriesDetailPage } from './SeriesDetailPage';
 export { VideoPlayerPage } from './VideoPlayerPage';
 export { StorePage } from './StorePage';
