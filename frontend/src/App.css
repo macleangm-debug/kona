@@ -1,5 +1,52 @@
 /* MiniSeries App - Neon Noir Theme */
 
+/* Hero Swiper Carousel Styles */
+.hero-swiper {
+  padding: 20px 0 50px 0;
+}
+
+.hero-swiper .swiper-wrapper {
+  align-items: center;
+}
+
+.hero-slide {
+  width: 280px !important;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hero-swiper .swiper-slide-active {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.hero-swiper .swiper-slide:not(.swiper-slide-active) {
+  opacity: 0.5;
+}
+
+/* Custom pagination bullets */
+.hero-bullet {
+  width: 8px !important;
+  height: 8px !important;
+  background: rgba(255, 255, 255, 0.4) !important;
+  opacity: 1 !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  margin: 0 4px !important;
+}
+
+.hero-bullet-active {
+  width: 24px !important;
+  background: #ef4444 !important;
+}
+
+/* Swiper pagination container positioning */
+.hero-swiper .swiper-pagination {
+  position: absolute;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+}
+
 /* Scrollbar hide utility */
 .scrollbar-hide {
   -ms-overflow-style: none;
