@@ -1009,6 +1009,73 @@ async def make_admin(email: str, secret: str):
     
     return {"message": f"{email} is now an admin"}
 
+# ============ FEATURED/PROMOTED SERIES ============
+@api_router.get("/promos/active")
+async def get_active_promos():
+    """Get active promotional content for popup display"""
+    now = datetime.now(timezone.utc).isoformat()
+    promos = await db.featured_promos.find(
+        {
+            "is_active": True,
+            "$or": [
+                {"expires_at": None},
+                {"expires_at": {"$gt": now}}
+            ]
+        },
+        {"_id": 0}
+    ).sort("priority", -1).to_list(10)
+    return promos
+
+@api_router.get("/admin/promos")
+async def get_all_promos(admin: dict = Depends(get_admin_user)):
+    """Get all promos for admin management"""
+    promos = await db.featured_promos.find({}, {"_id": 0}).sort("priority", -1).to_list(100)
+    return promos
+
+@api_router.post("/admin/promos")
+async def create_promo(promo: FeaturedPromoCreate, admin: dict = Depends(get_admin_user)):
+    """Create a new featured promo"""
+    promo_data = promo.dict()
+    promo_data["id"] = f"promo-{uuid.uuid4().hex[:8]}"
+    promo_data["is_active"] = True
+    promo_data["created_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.featured_promos.insert_one(promo_data)
+    return {"message": "Promo created", "id": promo_data["id"]}
+
+@api_router.put("/admin/promos/{promo_id}")
+async def update_promo(promo_id: str, promo: FeaturedPromoCreate, admin: dict = Depends(get_admin_user)):
+    """Update a featured promo"""
+    result = await db.featured_promos.update_one(
+        {"id": promo_id},
+        {"$set": promo.dict()}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Promo not found")
+    return {"message": "Promo updated"}
+
+@api_router.delete("/admin/promos/{promo_id}")
+async def delete_promo(promo_id: str, admin: dict = Depends(get_admin_user)):
+    """Delete a featured promo"""
+    result = await db.featured_promos.delete_one({"id": promo_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Promo not found")
+    return {"message": "Promo deleted"}
+
+@api_router.patch("/admin/promos/{promo_id}/toggle")
+async def toggle_promo(promo_id: str, admin: dict = Depends(get_admin_user)):
+    """Toggle promo active status"""
+    promo = await db.featured_promos.find_one({"id": promo_id})
+    if not promo:
+        raise HTTPException(status_code=404, detail="Promo not found")
+    
+    new_status = not promo.get("is_active", True)
+    await db.featured_promos.update_one(
+        {"id": promo_id},
+        {"$set": {"is_active": new_status}}
+    )
+    return {"message": f"Promo {'activated' if new_status else 'deactivated'}", "is_active": new_status}
+
 # ============ COIN STORE ============
 @api_router.get("/store/packages", response_model=List[CoinPackage])
 async def get_packages():
