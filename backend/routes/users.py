@@ -160,9 +160,73 @@ async def unlock_episode(data: UnlockEpisodeRequest, user: dict = Depends(get_cu
         {"$set": {"coins": new_coins, "unlocked_episodes": unlocked}}
     )
     
+    # Track revenue for creator if this is creator content
+    creator_id = episode.get("creator_id")
+    if creator_id:
+        await track_creator_revenue(
+            episode_id=data.episode_id,
+            series_id=episode.get("series_id"),
+            creator_id=creator_id,
+            user_id=user["id"],
+            coins_spent=coins_required
+        )
+    
     return {
         "message": "Episode unlocked!",
         "coins_spent": coins_required,
         "coins_remaining": new_coins,
         "unlocked": True
     }
+
+
+async def track_creator_revenue(episode_id: str, series_id: str, creator_id: str, user_id: str, coins_spent: int):
+    """Track revenue when user unlocks creator content"""
+    import uuid
+    from datetime import datetime, timezone
+    
+    # Get creator's revenue share
+    creator = await db.creators.find_one({"id": creator_id})
+    if not creator:
+        return
+    
+    revenue_share = creator.get("revenue_share", 0.60)
+    creator_share = int(coins_spent * revenue_share)
+    platform_share = coins_spent - creator_share
+    
+    # Record the view/purchase
+    view_record = {
+        "id": f"view-{uuid.uuid4().hex[:12]}",
+        "episode_id": episode_id,
+        "series_id": series_id,
+        "creator_id": creator_id,
+        "user_id": user_id,
+        "coins_spent": coins_spent,
+        "creator_share": creator_share,
+        "platform_share": platform_share,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.view_records.insert_one(view_record)
+    
+    # Update creator stats
+    await db.creators.update_one(
+        {"id": creator_id},
+        {"$inc": {
+            "total_views": 1,
+            "total_earnings": creator_share,
+            "pending_payout": creator_share
+        }}
+    )
+    
+    # Update episode stats
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$inc": {"views": 1, "earnings": creator_share}}
+    )
+    
+    # Update series stats
+    await db.creator_series.update_one(
+        {"id": series_id},
+        {"$inc": {"total_views": 1, "total_earnings": creator_share}}
+    )
+
