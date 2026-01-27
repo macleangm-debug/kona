@@ -320,6 +320,50 @@ DAILY_REWARD_COINS = 10
 REFERRAL_REWARD_REFERRER = 20  # Coins for the person who referred
 REFERRAL_REWARD_REFEREE = 30   # Bonus coins for new user who used a referral code
 
+# Referral Milestone Rewards (conservative tier structure)
+REFERRAL_MILESTONES = [
+    {
+        "id": "bronze",
+        "name": "Bronze",
+        "icon": "🥉",
+        "required_referrals": 10,
+        "reward_coins": 100,
+        "reward_description": "100 bonus coins"
+    },
+    {
+        "id": "silver",
+        "name": "Silver",
+        "icon": "🥈",
+        "required_referrals": 25,
+        "reward_coins": 300,
+        "reward_description": "300 bonus coins"
+    },
+    {
+        "id": "gold",
+        "name": "Gold",
+        "icon": "🥇",
+        "required_referrals": 50,
+        "reward_coins": 600,
+        "reward_description": "600 bonus coins"
+    },
+    {
+        "id": "platinum",
+        "name": "Platinum",
+        "icon": "💎",
+        "required_referrals": 100,
+        "reward_coins": 1500,
+        "reward_description": "1500 bonus coins"
+    },
+    {
+        "id": "diamond",
+        "name": "Diamond",
+        "icon": "👑",
+        "required_referrals": 200,
+        "reward_coins": 4000,
+        "reward_description": "4000 bonus coins + Legend badge"
+    }
+]
+
 def generate_referral_code(user_id: str) -> str:
     """Generate a unique referral code based on user_id"""
     import hashlib
