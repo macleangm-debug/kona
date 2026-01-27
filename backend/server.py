@@ -1902,6 +1902,45 @@ async def seed_data():
             episodes.append(episode)
     
     await db.episodes.insert_many(episodes)
+    
+    # Seed Featured Promos
+    promo_count = await db.featured_promos.count_documents({})
+    if promo_count == 0:
+        featured_promos = [
+            {
+                "id": "promo-christmas",
+                "series_id": "series-1",
+                "title": "CHRISTMAS",
+                "subtitle": "Love in the City",
+                "description": "A heartwarming holiday romance that will melt your heart",
+                "promo_image": "https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=800",
+                "tags": ["Romance", "Drama", "Holiday Special"],
+                "badge_text": "SHORT DRAMA",
+                "is_active": True,
+                "priority": 10,
+                "trigger_type": "both",
+                "delay_seconds": 10,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "expires_at": None
+            },
+            {
+                "id": "promo-thriller",
+                "series_id": "series-3",
+                "title": "REVENGE",
+                "subtitle": "Revenge of the Rejected",
+                "description": "She returns more powerful than ever",
+                "promo_image": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
+                "tags": ["Thriller", "Drama", "Exclusive"],
+                "badge_text": "NEW SERIES",
+                "is_active": True,
+                "priority": 5,
+                "trigger_type": "timed",
+                "delay_seconds": 15,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "expires_at": None
+            }
+        ]
+        await db.featured_promos.insert_many(featured_promos)
 
 @api_router.get("/")
 async def root():
