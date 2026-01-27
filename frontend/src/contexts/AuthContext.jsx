@@ -1,9 +1,6 @@
-/**
- * Authentication Context Provider
- */
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-import { API } from '../config';
+import React, { useState, useEffect, createContext, useContext } from "react";
+import axios from "axios";
+import { API } from "@/config";
 
 const AuthContext = createContext(null);
 
@@ -75,4 +72,4 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthProvider;
+export default AuthContext;
