@@ -12,165 +12,160 @@
 - Subscription plans for recurring coin purchases.
 - The first episode of each series should be free.
 - The application should be installable on mobile devices (PWA) with push notification capabilities.
+- A promotional popup to feature specific content.
 
 **User's preferred language**: English
 
 **what currently exists?**
 A full-stack, mobile-first mini-series web application named Kona (React/FastAPI/MongoDB).
--   **Backend:** Features JWT authentication, a coin system, daily rewards, a referral system, and dynamic payment gateways. It includes APIs for search, my list, continue watching, subscriptions, and a coming soon feature. All data is mocked and seeded on startup.
--   **Frontend:** A monolithic React application () with a sophisticated, Netflix-style UI. It includes a 3D hero carousel, sticky navigation, and multiple horizontally-scrolling content carousels (Trending, Top 10, New Releases, etc.). It has pages for User Profile, Subscriptions, and a basic Admin Panel. The app is a fully configured Progressive Web App (PWA) with a service worker and manifest for mobile installation.
--   **Database (MongoDB):** Schemas are defined for users (including , , ), series, episodes, and subscriptions.
+-   **Backend:** Features JWT authentication, a coin system, daily rewards, a referral system, and dynamic payment gateways. It includes APIs for search, my list, continue watching, subscriptions, and a coming soon feature. It was recently updated to allow guest access for free episodes and has the beginnings of a Featured Promo system. All data is mocked and seeded on startup.
+-   **Frontend:** A monolithic React application ( > 3500 lines) with a sophisticated, Netflix-style UI. It includes an auto-scrolling 3D hero carousel, sticky navigation, and multiple content carousels. Key features include a full-screen vertical video player (ReelShort-style), guest viewing with sign-up prompts, and pages for various user functions. The app is a fully configured PWA. The logo was recently updated to a K▶NA design.
+-   **Database (MongoDB):** Schemas are defined for users, series, episodes, and subscriptions. A new  collection is being added.
 
 **Last working item**:
--   **Last item agent was working:** The user reported a visual bug where the numbers in the Top 10 in East Africa section are not styled correctly. They should be large, semi-transparent, and positioned behind the thumbnails, similar to Netflix. The agent identified the issue but has not yet implemented a fix.
--   **Status:** NOT STARTED
+-   **Last item agent was working:** The user requested a promotional popup to feature specific content. It should have two triggers: one on app open (once per session) and another after 10 seconds of browsing. This required creating a new Featured/Promoted collection in the database that an admin can manage. The agent started the backend work for this feature.
+-   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** screenshot tool
+-   **Which testing method agent to use?** both
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** The numbers in the Top 10 section are not styled correctly. (Priority: P0)
--   **Issue 2:** The 3D Hero Banner implementation is a recurring problem and the user is not satisfied with its behavior. (Priority: P0)
--   **Issue 3:** The functionality for the See All buttons next to category titles is undefined. (Priority: P1)
+-   **Issue 1:** The 3D Hero Banner implementation is a recurring problem and the user is not satisfied with its behavior. (Priority: P0)
+-   **Issue 2:** The Top 10 section was implemented and then removed at user request. There might be leftover code or CSS that needs cleanup. (Priority: P2)
 
 **Issues Detail:**
--   **Issue 1: Fix Top 10 number styling**
-    -   **Attempted fixes:** None. The agent was about to start working on this.
+-   **Issue 1: 3D Hero Banner is not working correctly**
+    -   **Attempted fixes:** Multiple custom implementations (scroll-based, CSS transforms). The latest fix added auto-scroll and fixed the play button's navigation. However, the user has repeatedly expressed dissatisfaction with its feel and stability.
     -   **Next debug checklist:**
-        1.  Inspect  to locate the JSX for the Top 10 section.
-        2.  Inspect  to find or add the relevant CSS.
-        3.  Apply styles to the number element: , a large , a low  (to place it behind the thumbnail), and a text stroke effect ( or ) for the outline.
-    -   **Why fix this issue?** To resolve the visual bug reported by the user and match the desired Netflix-style UI.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend.
-
--   **Issue 2: 3D Hero Banner is not working correctly**
-    -   **Attempted fixes:** The agent has attempted three different custom implementations (scroll-based, simple CSS, complex transform-based). While the latest version appears correct in screenshots, the user has repeatedly stated it's not working, indicating the feel or animation may still be wrong.
-    -   **Next debug checklist:**
-        1.  Ask the user for specific feedback on *what* is wrong with the current carousel (e.g., animation speed, swipe feel, rotation angle).
-        2.  Consider replacing the brittle custom code with a well-supported third-party library like  which has a coverflow effect module. This would be more stable and save significant development time.
+        1.  Propose replacing the brittle custom code with a well-supported third-party library like  which has a coverflow effect module. This would provide a more stable, professional, and reliable user experience.
+        2.  If the user agrees, integrate the library to replace the custom hero carousel code in .
     -   **Why fix this issue?** It is a major UI component and a persistent source of user dissatisfaction.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Frontend.
-    -   **Blocked on other issue:** Awaiting specific user feedback.
+    -   **Blocked on other issue:** None
 
--   **Issue 3: Define See All button functionality**
-    -   **Attempted fixes:** None. The agent asked for clarification, but the user moved on to other tasks.
-    -   **Next debug checklist:** Prompt the user again for a decision: When a user clicks See All next to a category, should it navigate to a new page showing all items in that category?
-    -   **Why fix this issue?** The See All buttons are currently non-functional placeholders.
-    -   **Status:** BLOCKED
+-   **Issue 2: Cleanup removed Top 10 feature**
+    -   **Attempted fixes:** The agent removed the component from the homepage and the category page route.
+    -   **Next debug checklist:**
+        1.  Search for Top 10 related class names in  (e.g., , ) and remove them.
+        2.  Search for top-10 related logic or data structures in  and ensure they are fully removed.
+    -   **Why fix this issue?** To remove dead code and prevent potential styling conflicts.
+    -   **Status:** NOT STARTED
     -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Both (new page/route would need backend and frontend work).
+    -   **Should Test frontend/backend/both after fix?** Frontend.
+    -   **Blocked on other issue:** None
 
 **In progress Task List**:
-None. The current priority is to resolve the pending issues.
+-   **Task 1: Implement Promotional Popup (P0)**
+    -   **Where to resume:** The agent was in the process of adding seed data for the new  collection in . The backend models and some API endpoints are partially created.
+    -   **What will be achieved with this?** A dynamic, admin-manageable promotional popup that triggers on app open and after a time delay to improve user engagement and content discovery.
+    -   **Status:** IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1:** Implement See All functionality once the user provides direction. (File: )
+    -   **P0:** Refactor the monolithic  into a proper component-based architecture (e.g., , , ). This is a critical risk to project maintainability.
+    -   **P1:** Refactor the monolithic  into separate modules (e.g., , , ).
 -   **Future Tasks:**
-    -   **P2:** Update the application's favicon to use the Kona logo.
     -   **P2:** Implement referral milestone rewards.
-    -   **P3:** Explore a Watch Party feature to allow synchronized viewing.
+    -   **P3:** Explore a Watch Party feature for synchronized viewing.
 
 **Completed work in this session**
--   **PWA Implementation:** Made the app installable on mobile with a manifest, service worker, and app icons.
--   **Coming Soon Feature:** Implemented a full-stack feature with a Remind Me button, success modal, and a push notification permission flow.
--   **Major Features Batch:**
-    -   **Admin Panel & Subscriptions:** Created pages and backend APIs for an admin dashboard and user subscription plans.
-    -   **Search:** Implemented a full-stack search feature with a modal UI.
-    -   **My List & Continue Watching:** Connected these UI sections to backend APIs to reflect real user data.
-    -   **First Episode Free:** Added a • Free EP1 text indicator on series cards.
--   **UI/UX Overhaul:**
-    -   Implemented multiple iterations of a 3D curved hero carousel.
-    -   Made the header and navigation tabs sticky.
-    -   Re-ordered homepage carousels to prioritize content discovery (Trending, Top 10).
-    -   Implemented infinite horizontal scroll for all carousels.
-    -   Standardized thumbnail sizes across all sections.
--   **Error Handling:** Suppressed a persistent error overlay from an external analytics tool.
+-   **See All Pages:** Implemented navigation from See All buttons to new dedicated category pages.
+-   **Vertical Video Player Redesign:**
+    -   Created a full-screen, vertical, ReelShort-style player using React Portals.
+    -   Implemented tap-to-show/auto-hide controls (header, side actions, progress bar, quality selector).
+    -   Added a draggable/seekable progress bar with time display.
+    -   Added a quality selector (480p, 720p, 1080p-VIP).
+-   **Guest Viewing & Sign-up Prompts:**
+    -   Enabled guests to watch the first episode for free.
+    -   Implemented strategic sign-up prompts (mid-video, end-of-video, locked episode access).
+    -   Created a Next Episode Preview prompt to encourage sign-ups after a free episode.
+-   **Hero Carousel Fixes:**
+    -   Fixed the play button to navigate directly to the video player.
+    -   Implemented auto-scrolling.
+-   **App Stability:** Resolved multiple app reloading/flickering issues related to state management in the video player.
+-   **Logo Redesign:** Iterated through several logo concepts with the user and implemented the final K▶NA design, including updating PWA icons.
 
 **Earlier issues found/mentioned but not fixed**
 None.
 
 **Known issue recurrence from previous fork**
-None.
+-   **Issue recurrence in previous fork:** 3D Hero Banner is not working correctly
+-   **Recurrence count:** 3+
+-   **Status:** IN PROGRESS
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
 -   **Backend:** FastAPI, Python, MongoDB
--   **Frontend:** React.js, TailwindCSS, **PWA (Progressive Web App)**
+-   **Frontend:** React.js, TailwindCSS, **PWA**, **React Portals**
 -   **Authentication:** JWT (JSON Web Tokens)
--   **UI:** 3D Carousel (custom), Sticky Navigation, Infinite Scroll
+-   **UI:** 3D Carousel (custom), Vertical Video Player (ReelShort-style)
 
 **key DB schema**
 -   **users:** 
 -   **series:** 
--   **subscriptions:** 
+-   **episodes:** 
+-   **featured_promos:**  (**New, In Progress**)
 
 **All files of reference**
--   : Contains the entire backend logic.
--   : Contains the entire monolithic frontend application.
--   : Contains all custom styles for the application.
--   : **New file** for PWA configuration.
--   : **New file** for the service worker.
--   : The product requirements document.
+-   : Contains the entire backend logic. **Partially updated** for the featured promos feature.
+-   : Contains the entire monolithic frontend application. **Heavily modified** with the video player, guest prompts, and other UI fixes.
+-   : Contains all custom styles.
+-   : The SVG/Image component for the app logo. **Updated** with the final K▶NA design.
 
 **Areas that need refactoring**:
--   **CRITICAL:** The frontend file  is now over 3000 lines. It urgently needs to be broken down into a proper component architecture (e.g., , , ) to ensure maintainability.
+-   **CRITICAL:** The frontend file  is now over 3500 lines. It urgently needs to be broken down into a proper component architecture (e.g., , , ) to ensure maintainability.
 -   The backend file  is also becoming large and should be split into modules for routes, models, and business logic.
 
 **key api endpoints**
--   
--    (GET, POST, DELETE)
--    (GET)
--   
--   
--   
--   
+-   : **Updated** to allow guest access for free episodes.
+-   : **Updated** to allow optional authentication for progress saving.
+-    (GET): **New endpoint** (in progress).
+-    (POST, DELETE): **New admin endpoints** (in progress).
 
 **Critical Info for New Agent**
--   **Frontend Monolith is a High Risk:** The entire frontend is in . This is a major source of complexity and the primary area for technical debt. Propose refactoring this file as a high-priority task.
--   **3D Carousel is Unstable:** The user has repeatedly expressed dissatisfaction with the 3D hero carousel. The current custom implementation is fragile. Prioritize fixing it, possibly by replacing it with a stable third-party library to avoid further rework.
--   **User Clarification Needed:** The functionality for the See All button is still undefined and is blocking further development on that feature.
+-   **Frontend Monolith is a HIGH RISK:** The  file is extremely large and difficult to maintain. Propose and prioritize refactoring this file immediately after completing the current task.
+-   **Hero Carousel is UNSTABLE:** This is a recurring pain point. The current custom CSS solution is brittle. Strongly recommend replacing it with a stable third-party library like  to finally resolve the issue.
+-   **Last Task is Incomplete:** The promotional popup feature is only partially implemented on the backend. The agent must complete the backend work (seeding, APIs) and then implement the entire frontend component and logic.
 
 **documents and test reports created in this job**
--   /app/memory/PRD.md
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Pointed out a styling issue with the Top 10 numbers. (Current task)
-2.  **User:** The 3D Hero Banner is still not working. (Recurring issue)
-3.  **User:** Still not working - referring to the 3D carousel.
-4.  **User:** Please implement the 3D hero better... (Partially addressed).
-5.  **User:** Requested a batch of features including Admin Panel, Subscriptions, Search, My List, and Free First Episode. (Completed).
-6.  **User:** Agreed to implement the app as a PWA.
-7.  **User:** Asked about Netflix's approach to mobile apps.
-8.  **User:** Asked about installed mobile apps.
-9.  **User:** Specified how push notification permissions should work on a phone.
-10. **User:** Asked what happens when the Turn On notification button is clicked.
-
--   **Pending Human Message:** The agent previously asked, What should happen when user clicks see all?. This question is still awaiting a response.
+1.  **User:** Requested promotional popup with app open & timed triggers, and an admin-managed Featured collection. (IN PROGRESS)
+2.  **User:** Asked how guests would be prompted to watch the next episode. (COMPLETED)
+3.  **User:** Requested a logo change to be word-based with a play button in the 'O'. (COMPLETED)
+4.  **User:** Stated the logo hadn't changed on the preview. (RESOLVED - caching issue)
+5.  **User:** Stated the hero auto-rotation was not working. (RESOLVED)
+6.  **User:** Asked how to clear the cache in the preview screen. (ANSWERED)
+7.  **User:** Stated they couldn't see the logo on the preview. (RESOLVED - caching issue)
+8.  **User:** Requested logo alignment adjustments. (COMPLETED)
+9.  **User:** Stated the new logo hadn't changed. (RESOLVED - caching issue)
+10. **User:** Requested a specific luxury logo style (Option 4). (COMPLETED, but later superseded)
 
 **Project Health Check:**
--   **Broken:** The styling of the Top 10 numbers. The 3D Hero Banner is considered broken by the user.
+-   **Broken:** The 3D Hero banner's feel is still not meeting user expectations. The promotional popup feature is incomplete.
 -   **Mocked:** All application data (series, users, progress) is mocked and seeded on backend startup.
 
 **3rd Party Integrations**
 -   **Stripe:** For international card payments.
--   **Flutterwave:** For African local payments (requires user-provided API keys).
+-   **Flutterwave:** For African local payments.
 
 **Testing status**
--   **Testing agent used after significant changes:** NO
+-   **Testing agent used after significant changes:** YES, once for a previous feature.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None.
--   **Known regressions:** The styling of the Top 10 section numbers.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
--   Create a new user through the Sign In -> Sign up flow in the UI. New users automatically receive 50 welcome coins. Email and password can be anything (e.g.,  / ).
+-   **Guest:** No credentials needed. Can navigate the site and watch the first episode of any series.
+-   **New User:** Use the Sign In -> Sign up flow in the UI. New users automatically receive 50 welcome coins. Email and password can be anything (e.g.,  / ).
 
 **What agent forgot to execute**
--   The agent has not implemented the fix for the Top 10 number styling, which was the user's last direct request.
--   The agent has not followed up on the pending question regarding the See All button functionality.</analysis>
+-   The agent was in the middle of implementing the backend for the promotional popup feature and did not get to the frontend implementation. This task must be completed.
+-   The agent did not propose or prioritize the critical refactoring of , despite its growing complexity being a major risk. This should be the next major task after the popup is finished.</analysis>
