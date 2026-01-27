@@ -748,6 +748,101 @@ async def claim_milestone(milestone_id: str, user: dict = Depends(get_current_us
         "milestone": milestone
     }
 
+@api_router.get("/referral/milestone-proximity")
+async def get_milestone_proximity(user: dict = Depends(get_current_user)):
+    """Check if user is close to next milestone (for notification triggers)"""
+    referral_count = user.get("referral_count", 0)
+    claimed_milestones = user.get("claimed_milestones", [])
+    
+    # Find next unclaimed milestone
+    next_milestone = None
+    for m in REFERRAL_MILESTONES:
+        if m["id"] not in claimed_milestones:
+            next_milestone = m
+            break
+    
+    if not next_milestone:
+        return {"has_notification": False, "all_claimed": True}
+    
+    remaining = next_milestone["required_referrals"] - referral_count
+    
+    # Trigger notification when within 3 referrals
+    PROXIMITY_THRESHOLD = 3
+    
+    if remaining <= PROXIMITY_THRESHOLD and remaining > 0:
+        return {
+            "has_notification": True,
+            "notification_type": "milestone_proximity",
+            "milestone": next_milestone,
+            "referrals_remaining": remaining,
+            "current_referrals": referral_count,
+            "message": f"Only {remaining} more referral{'s' if remaining > 1 else ''} to unlock {next_milestone['icon']} {next_milestone['name']}!",
+            "reward_coins": next_milestone["reward_coins"]
+        }
+    
+    # Check if milestone is claimable but not claimed
+    if remaining <= 0:
+        return {
+            "has_notification": True,
+            "notification_type": "milestone_claimable",
+            "milestone": next_milestone,
+            "message": f"🎉 You can claim your {next_milestone['icon']} {next_milestone['name']} milestone reward!",
+            "reward_coins": next_milestone["reward_coins"]
+        }
+    
+    return {
+        "has_notification": False,
+        "next_milestone": next_milestone,
+        "referrals_remaining": remaining,
+        "current_referrals": referral_count
+    }
+
+class PushSubscription(BaseModel):
+    endpoint: str
+    keys: dict
+
+@api_router.post("/notifications/subscribe")
+async def save_push_subscription(subscription: PushSubscription, user: dict = Depends(get_current_user)):
+    """Save push subscription for user"""
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"push_subscription": subscription.dict()}}
+    )
+    return {"message": "Push subscription saved"}
+
+@api_router.delete("/notifications/unsubscribe")
+async def remove_push_subscription(user: dict = Depends(get_current_user)):
+    """Remove push subscription for user"""
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$unset": {"push_subscription": ""}}
+    )
+    return {"message": "Push subscription removed"}
+
+@api_router.get("/notifications/settings")
+async def get_notification_settings(user: dict = Depends(get_current_user)):
+    """Get user's notification preferences"""
+    return {
+        "push_enabled": "push_subscription" in user,
+        "milestone_alerts": user.get("notification_settings", {}).get("milestone_alerts", True),
+        "new_episodes": user.get("notification_settings", {}).get("new_episodes", True),
+        "daily_rewards": user.get("notification_settings", {}).get("daily_rewards", True)
+    }
+
+class NotificationSettings(BaseModel):
+    milestone_alerts: bool = True
+    new_episodes: bool = True
+    daily_rewards: bool = True
+
+@api_router.put("/notifications/settings")
+async def update_notification_settings(settings: NotificationSettings, user: dict = Depends(get_current_user)):
+    """Update user's notification preferences"""
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"notification_settings": settings.dict()}}
+    )
+    return {"message": "Notification settings updated", "settings": settings.dict()}
+
 # ============ SERIES ROUTES ============
 @api_router.get("/series", response_model=List[SeriesResponse])
 async def get_series():
