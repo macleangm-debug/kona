@@ -103,8 +103,8 @@ async def login(data: UserLogin):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Check password - handle both old and new user schemas
-    password_hash = user.get("password_hash") or user.get("password")
+    # Check password - the field is named 'password' in DB
+    password_hash = user.get("password")
     if not password_hash or not verify_password(data.password, password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
