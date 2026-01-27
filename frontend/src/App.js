@@ -991,6 +991,121 @@ const usePromoManager = () => {
   return { activePromo, showPromo, closePromo };
 };
 
+// Milestone Notification Hook
+const useMilestoneNotifications = () => {
+  const { token, user } = useAuth();
+  const [notification, setNotification] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    if (!token || dismissed) return;
+
+    const checkMilestoneProximity = async () => {
+      try {
+        const res = await axios.get(`${API}/referral/milestone-proximity`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.data.has_notification) {
+          // Check if we've shown this notification recently
+          const lastShown = sessionStorage.getItem('kona-milestone-alert-shown');
+          const lastMilestone = sessionStorage.getItem('kona-milestone-alert-id');
+          
+          if (lastShown && lastMilestone === res.data.milestone?.id) {
+            return; // Already shown this session for this milestone
+          }
+          
+          setNotification(res.data);
+          // Delay showing to not overlap with other popups
+          setTimeout(() => setShowAlert(true), 5000);
+        }
+      } catch (e) {
+        console.error('Failed to check milestone proximity:', e);
+      }
+    };
+
+    // Check after a delay to not interfere with initial load
+    const timer = setTimeout(checkMilestoneProximity, 8000);
+    return () => clearTimeout(timer);
+  }, [token, dismissed]);
+
+  const dismissAlert = () => {
+    setShowAlert(false);
+    setDismissed(true);
+    if (notification?.milestone?.id) {
+      sessionStorage.setItem('kona-milestone-alert-shown', 'true');
+      sessionStorage.setItem('kona-milestone-alert-id', notification.milestone.id);
+    }
+  };
+
+  return { notification, showAlert, dismissAlert };
+};
+
+// Milestone Alert Component (In-App Banner)
+const MilestoneAlert = ({ notification, open, onDismiss, onAction }) => {
+  const navigate = useNavigate();
+
+  if (!notification || !open) return null;
+
+  const handleAction = () => {
+    onDismiss();
+    navigate('/profile');
+  };
+
+  const isClaimable = notification.notification_type === 'milestone_claimable';
+  const bgClass = isClaimable 
+    ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border-yellow-500/50' 
+    : 'bg-gradient-to-r from-primary/20 to-purple-600/20 border-primary/50';
+
+  return (
+    <div className="fixed top-16 left-0 right-0 z-50 px-4 animate-slide-down" data-testid="milestone-alert">
+      <div className={`max-w-md mx-auto rounded-xl border p-4 shadow-lg backdrop-blur-sm ${bgClass}`}>
+        <div className="flex items-start gap-3">
+          <span className="text-3xl">{notification.milestone?.icon}</span>
+          <div className="flex-1">
+            <p className="font-semibold text-sm">
+              {isClaimable ? '🎉 Reward Ready!' : '🔥 Almost There!'}
+            </p>
+            <p className="text-sm text-white/80 mt-0.5">{notification.message}</p>
+            {!isClaimable && (
+              <p className="text-xs text-primary mt-1">
+                +{notification.reward_coins} coins waiting for you!
+              </p>
+            )}
+          </div>
+          <button 
+            onClick={onDismiss}
+            className="p-1 hover:bg-white/10 rounded-full"
+            data-testid="milestone-alert-close"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        
+        <div className="flex gap-2 mt-3">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onDismiss}
+            className="flex-1 rounded-full text-xs"
+          >
+            Later
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleAction}
+            className={`flex-1 rounded-full text-xs ${isClaimable ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : ''}`}
+            data-testid="milestone-alert-action"
+          >
+            {isClaimable ? 'Claim Now!' : 'Invite Friends'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Search Modal Component
 const SearchModal = ({ open, onClose }) => {
   const [query, setQuery] = useState("");
