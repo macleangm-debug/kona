@@ -14,6 +14,12 @@ import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
+// Swiper imports
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { EffectCoverflow, Autoplay, Pagination } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-coverflow';
+import 'swiper/css/pagination';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
