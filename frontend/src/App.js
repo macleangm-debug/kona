@@ -4427,6 +4427,7 @@ function App() {
               <Route path="/store" element={<StorePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/subscriptions" element={<SubscriptionPage />} />
+              <Route path="/creator" element={<CreatorPortal />} />
               <Route path="/admin" element={<AdminPage />} />
             </Routes>
             <BottomNav onAuthClick={openAuthForLogin} />
