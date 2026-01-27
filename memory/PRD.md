@@ -181,19 +181,51 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 
 ### P1 (High Priority)
 - Add Flutterwave API keys for live Africa payments
-- Video player with actual video content
-- Episode unlock flow testing
+- Video player with Bunny.net HLS streaming (signed URLs ready)
 
 ### P2 (Nice to Have)
 - Update favicon to Kona logo
 - Social sharing to specific platforms
 - User reviews/ratings
-- Frontend refactoring (App.js still 4000+ lines - contexts extracted, pages pending)
+- Frontend refactoring (App.js now 4500+ lines)
+- Creator series detail page (/creator/series/:id)
 
 ### P3 (Future)
 - Watch Party feature (synchronized viewing)
+- Creator analytics deep-dive
 
 ## Completed This Session (Jan 27, 2026)
+
+### Creator Partnership System (Complete ✅)
+Full automated content creator partnership with Bunny.net integration:
+
+**Backend APIs:**
+- `POST /api/creator/apply` - Creator application
+- `GET /api/creator/status` - Check creator status
+- `GET /api/creator/dashboard` - Stats (earnings, views, payouts)
+- `POST /api/creator/series` - Create series
+- `POST /api/creator/episodes` - Create episode + Bunny.net video
+- `GET /api/creator/episodes/{id}/status` - Video encoding status
+- `POST /api/creator/series/{id}/submit` - Submit for review
+- `POST /api/creator/payout/request` - Request payout
+- Admin: `/api/admin/creators/*` - Approve, reject, upgrade tier
+
+**Revenue Model:**
+- 60% New → 65% Verified (10K+ views) → 70% Partner (100K+ views)
+- Milestone bonuses: 10K=500, 50K=2,500, 100K=10,000, 500K=50,000, 1M=150,000 coins
+
+**Bunny.net Integration:**
+- Video upload with auto-transcoding
+- Signed URLs for content protection
+- HLS streaming (multiple qualities)
+- Thumbnail generation
+
+**Frontend:**
+- Creator Portal page (`/creator`)
+- Application form with validation
+- Dashboard with stats and series list
+- Create series dialog
+- Link from Profile page
 
 ### Backend Refactoring (Complete ✅)
 Refactored monolithic `server.py` (2215 lines) into modular structure:
@@ -203,11 +235,13 @@ Refactored monolithic `server.py` (2215 lines) into modular structure:
 ├── config/
 │   └── settings.py    # Constants, packages, milestones config
 ├── models/
-│   └── schemas.py     # Pydantic models for all endpoints
+│   ├── schemas.py     # Pydantic models for all endpoints
+│   └── creator.py     # Creator-specific models
 ├── services/
 │   ├── auth.py        # JWT, password hashing, user auth
 │   ├── database.py    # MongoDB connection
-│   └── geo.py         # Geolocation, payment config
+│   ├── geo.py         # Geolocation, payment config
+│   └── bunny.py       # Bunny.net Stream service
 └── routes/
     ├── auth.py        # Login, register, /auth/*
     ├── referral.py    # Stats, milestones, /referral/*
@@ -215,8 +249,9 @@ Refactored monolithic `server.py` (2215 lines) into modular structure:
     ├── users.py       # Rewards, lists, progress, unlock
     ├── payments.py    # Store, checkout, subscriptions
     ├── notifications.py # Push subscription, settings
-    ├── admin.py       # Admin CRUD operations
-    └── promos.py      # Featured promos
+    ├── admin.py       # Admin CRUD + creator management
+    ├── promos.py      # Featured promos
+    └── creator.py     # Creator partnership APIs
 ```
 
 ### Frontend Refactoring (Started)
