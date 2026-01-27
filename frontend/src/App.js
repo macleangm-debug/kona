@@ -957,8 +957,12 @@ const usePromoManager = () => {
     }
   }, [promos, hasShownAppOpen]);
 
-  // Timed trigger (10 seconds after browsing)
+  // Timed trigger (10 seconds after browsing) - only once per session
   useEffect(() => {
+    // Skip if session already showed promos
+    const sessionShown = sessionStorage.getItem('kona-promo-shown');
+    if (sessionShown) return;
+    
     if (promos.length === 0 || hasShownTimed || showPromo) return;
 
     // Find a promo with timed trigger that hasn't been shown yet
