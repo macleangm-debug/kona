@@ -1,6 +1,10 @@
 """
 Kona Mini-Series Backend - Refactored Main Server
 """
+# Load environment variables FIRST
+from dotenv import load_dotenv
+load_dotenv()
+
 import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
