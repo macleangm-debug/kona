@@ -2938,27 +2938,52 @@ const StorePage = () => {
 
 // Profile Page
 const ProfilePage = ({ onLogout }) => {
-  const { user, logout, token } = useAuth();
+  const { user, logout, token, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [referralStats, setReferralStats] = useState(null);
+  const [milestones, setMilestones] = useState(null);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [claimingMilestone, setClaimingMilestone] = useState(null);
 
   useEffect(() => {
-    const fetchReferralStats = async () => {
+    const fetchData = async () => {
       if (token) {
         try {
-          const res = await axios.get(`${API}/referral/stats`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setReferralStats(res.data);
+          const [statsRes, milestonesRes] = await Promise.all([
+            axios.get(`${API}/referral/stats`, { headers: { Authorization: `Bearer ${token}` } }),
+            axios.get(`${API}/referral/milestones`, { headers: { Authorization: `Bearer ${token}` } })
+          ]);
+          setReferralStats(statsRes.data);
+          setMilestones(milestonesRes.data);
         } catch (e) {
           console.error(e);
         }
       }
     };
-    fetchReferralStats();
+    fetchData();
   }, [token]);
+
+  const claimMilestone = async (milestoneId) => {
+    setClaimingMilestone(milestoneId);
+    try {
+      const res = await axios.post(
+        `${API}/referral/milestones/${milestoneId}/claim`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(res.data.message);
+      await refreshUser();
+      // Refresh milestones
+      const milestonesRes = await axios.get(`${API}/referral/milestones`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMilestones(milestonesRes.data);
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to claim milestone");
+    }
+    setClaimingMilestone(null);
+  };
 
   const handleLogout = () => {
     logout();
