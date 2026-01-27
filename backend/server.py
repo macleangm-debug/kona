@@ -598,12 +598,28 @@ async def get_referral_stats(user: dict = Depends(get_current_user)):
         {"_id": 0}
     ).sort("created_at", -1).to_list(100)
     
+    referral_count = user.get("referral_count", 0)
+    claimed_milestones = user.get("claimed_milestones", [])
+    
+    # Find next milestone
+    next_milestone = None
+    for m in REFERRAL_MILESTONES:
+        if referral_count < m["required_referrals"]:
+            next_milestone = {
+                **m,
+                "progress": referral_count,
+                "remaining": m["required_referrals"] - referral_count
+            }
+            break
+    
     return {
         "referral_code": user.get("referral_code"),
-        "total_referrals": user.get("referral_count", 0),
+        "total_referrals": referral_count,
         "total_earnings": user.get("referral_earnings", 0),
         "reward_per_referral": REFERRAL_REWARD_REFERRER,
         "referee_bonus": REFERRAL_REWARD_REFEREE,
+        "claimed_milestones": claimed_milestones,
+        "next_milestone": next_milestone,
         "recent_referrals": [
             {
                 "email": r["referee_email"][:3] + "***" + r["referee_email"][r["referee_email"].index("@"):],
