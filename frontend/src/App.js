@@ -1864,17 +1864,21 @@ const SeriesDetailPage = ({ onAuthClick }) => {
   }, [id, token]);
 
   const handleEpisodeClick = (episode) => {
+    // Allow free episodes (Episode 1) to be watched without login
+    const isUnlocked = episode.is_free || episode.episode_number === 1 || unlockedEpisodes.includes(episode.id);
+    
+    if (isUnlocked) {
+      navigate(`/watch/${episode.id}`);
+      return;
+    }
+    
+    // For non-free episodes, require login
     if (!user) {
       onAuthClick();
       return;
     }
     
-    const isUnlocked = episode.is_free || unlockedEpisodes.includes(episode.id);
-    if (isUnlocked) {
-      navigate(`/watch/${episode.id}`);
-    } else {
-      setUnlockSheet({ open: true, episode });
-    }
+    setUnlockSheet({ open: true, episode });
   };
 
   const handleUnlock = async (episodeId) => {
