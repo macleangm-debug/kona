@@ -643,6 +643,95 @@ async def get_referral_leaderboard():
         for u in top_referrers
     ]
 
+# ============ REFERRAL MILESTONES ============
+@api_router.get("/referral/milestones")
+async def get_milestones(user: dict = Depends(get_current_user)):
+    """Get user's milestone progress"""
+    referral_count = user.get("referral_count", 0)
+    claimed_milestones = user.get("claimed_milestones", [])
+    
+    milestones_with_status = []
+    for milestone in REFERRAL_MILESTONES:
+        is_reached = referral_count >= milestone["required_referrals"]
+        is_claimed = milestone["id"] in claimed_milestones
+        
+        milestones_with_status.append({
+            **milestone,
+            "is_reached": is_reached,
+            "is_claimed": is_claimed,
+            "can_claim": is_reached and not is_claimed,
+            "progress": min(referral_count, milestone["required_referrals"]),
+            "progress_percent": min(100, (referral_count / milestone["required_referrals"]) * 100)
+        })
+    
+    # Find next milestone
+    next_milestone = None
+    for m in milestones_with_status:
+        if not m["is_reached"]:
+            next_milestone = m
+            break
+    
+    return {
+        "referral_count": referral_count,
+        "milestones": milestones_with_status,
+        "next_milestone": next_milestone,
+        "total_milestone_earnings": sum(m["reward_coins"] for m in REFERRAL_MILESTONES if m["id"] in claimed_milestones)
+    }
+
+@api_router.post("/referral/milestones/{milestone_id}/claim")
+async def claim_milestone(milestone_id: str, user: dict = Depends(get_current_user)):
+    """Claim a milestone reward"""
+    # Find the milestone
+    milestone = next((m for m in REFERRAL_MILESTONES if m["id"] == milestone_id), None)
+    if not milestone:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    
+    referral_count = user.get("referral_count", 0)
+    claimed_milestones = user.get("claimed_milestones", [])
+    
+    # Check if already claimed
+    if milestone_id in claimed_milestones:
+        raise HTTPException(status_code=400, detail="Milestone already claimed")
+    
+    # Check if milestone is reached
+    if referral_count < milestone["required_referrals"]:
+        raise HTTPException(status_code=400, detail=f"Need {milestone['required_referrals']} referrals to claim this milestone")
+    
+    # Grant the reward
+    new_coins = user["coins"] + milestone["reward_coins"]
+    claimed_milestones.append(milestone_id)
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {
+            "$set": {
+                "coins": new_coins,
+                "claimed_milestones": claimed_milestones
+            },
+            "$inc": {
+                "referral_earnings": milestone["reward_coins"]
+            }
+        }
+    )
+    
+    # Log the milestone claim
+    milestone_record = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "milestone_id": milestone_id,
+        "milestone_name": milestone["name"],
+        "reward_coins": milestone["reward_coins"],
+        "claimed_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.milestone_claims.insert_one(milestone_record)
+    
+    return {
+        "message": f"Congratulations! You claimed the {milestone['name']} milestone!",
+        "coins_earned": milestone["reward_coins"],
+        "total_coins": new_coins,
+        "milestone": milestone
+    }
+
 # ============ SERIES ROUTES ============
 @api_router.get("/series", response_model=List[SeriesResponse])
 async def get_series():
