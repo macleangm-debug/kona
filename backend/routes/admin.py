@@ -162,3 +162,170 @@ async def delete_promo(promo_id: str, user: dict = Depends(require_admin)):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Promo not found")
     return {"message": "Promo deleted"}
+
+
+
+# ============ ADMIN CREATOR MANAGEMENT ============
+@router.get("/creators")
+async def list_creators(user: dict = Depends(require_admin), status: str = None):
+    """List all creator applications"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    creators = await db.creators.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return creators
+
+@router.get("/creators/{creator_id}")
+async def get_creator_detail(creator_id: str, user: dict = Depends(require_admin)):
+    """Get creator details"""
+    creator = await db.creators.find_one({"id": creator_id}, {"_id": 0})
+    if not creator:
+        raise HTTPException(status_code=404, detail="Creator not found")
+    
+    # Get series count
+    series = await db.creator_series.find({"creator_id": creator_id}, {"_id": 0}).to_list(100)
+    
+    return {
+        **creator,
+        "series": series
+    }
+
+@router.post("/creators/{creator_id}/approve")
+async def approve_creator(creator_id: str, user: dict = Depends(require_admin)):
+    """Approve a creator application"""
+    result = await db.creators.update_one(
+        {"id": creator_id, "status": "pending"},
+        {"$set": {
+            "status": "approved",
+            "approved_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Creator not found or already processed")
+    
+    return {"message": "Creator approved", "creator_id": creator_id}
+
+@router.post("/creators/{creator_id}/reject")
+async def reject_creator(creator_id: str, reason: str = "Does not meet requirements", user: dict = Depends(require_admin)):
+    """Reject a creator application"""
+    result = await db.creators.update_one(
+        {"id": creator_id, "status": "pending"},
+        {"$set": {
+            "status": "rejected",
+            "rejection_reason": reason
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Creator not found or already processed")
+    
+    return {"message": "Creator rejected", "creator_id": creator_id}
+
+@router.post("/creators/{creator_id}/upgrade-tier")
+async def upgrade_creator_tier(creator_id: str, new_tier: str, user: dict = Depends(require_admin)):
+    """Upgrade creator tier"""
+    TIER_CONFIG = {
+        "new": {"revenue_share": 0.60},
+        "verified": {"revenue_share": 0.65},
+        "partner": {"revenue_share": 0.70}
+    }
+    
+    if new_tier not in TIER_CONFIG:
+        raise HTTPException(status_code=400, detail="Invalid tier")
+    
+    result = await db.creators.update_one(
+        {"id": creator_id},
+        {"$set": {
+            "tier": new_tier,
+            "revenue_share": TIER_CONFIG[new_tier]["revenue_share"]
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Creator not found")
+    
+    return {"message": f"Creator upgraded to {new_tier}", "new_revenue_share": TIER_CONFIG[new_tier]["revenue_share"]}
+
+@router.get("/creator-series")
+async def list_pending_series(user: dict = Depends(require_admin), status: str = "pending_review"):
+    """List series pending review"""
+    series = await db.creator_series.find({"status": status}, {"_id": 0}).to_list(100)
+    
+    # Add creator info
+    for s in series:
+        creator = await db.creators.find_one({"id": s["creator_id"]}, {"_id": 0, "name": 1, "tier": 1})
+        s["creator"] = creator
+    
+    return series
+
+@router.post("/creator-series/{series_id}/approve")
+async def approve_series(series_id: str, user: dict = Depends(require_admin)):
+    """Approve and publish a series"""
+    from routes.creator import publish_series_to_main
+    
+    series = await db.creator_series.find_one({"id": series_id})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    await db.creator_series.update_one(
+        {"id": series_id},
+        {"$set": {
+            "status": "published",
+            "published_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    # Publish to main series
+    await publish_series_to_main(series_id, series["creator_id"])
+    
+    return {"message": "Series approved and published", "series_id": series_id}
+
+@router.post("/creator-series/{series_id}/reject")
+async def reject_series(series_id: str, reason: str = "Does not meet quality standards", user: dict = Depends(require_admin)):
+    """Reject a series"""
+    result = await db.creator_series.update_one(
+        {"id": series_id},
+        {"$set": {
+            "status": "rejected",
+            "rejection_reason": reason
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    return {"message": "Series rejected", "series_id": series_id}
+
+@router.get("/payouts")
+async def list_payouts(user: dict = Depends(require_admin), status: str = None):
+    """List payout requests"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    payouts = await db.payouts.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Add creator info
+    for p in payouts:
+        creator = await db.creators.find_one({"id": p["creator_id"]}, {"_id": 0, "name": 1, "email": 1})
+        p["creator"] = creator
+    
+    return payouts
+
+@router.post("/payouts/{payout_id}/process")
+async def process_payout(payout_id: str, user: dict = Depends(require_admin)):
+    """Mark payout as processed"""
+    result = await db.payouts.update_one(
+        {"id": payout_id, "status": "pending"},
+        {"$set": {
+            "status": "completed",
+            "processed_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Payout not found or already processed")
+    
+    return {"message": "Payout marked as processed"}
