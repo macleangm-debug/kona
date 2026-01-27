@@ -152,9 +152,23 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
   - Separate config and context files
 - ✅ Creator Login page (`/creator/login`)
 - ✅ Admin Login page (`/admin/login`)
+- ✅ **Local Payouts System (P1)**
+  - Flutterwave Payouts API integration for bank transfers
+  - **KwikPay Mock Integration** (ready to connect when developed)
+  - Mobile Money support: M-Pesa, MTN, Airtel Money, Vodafone Cash
+  - Bank Transfer support for NG, KE, GH, TZ, UG
+  - Payout webhooks for status updates
+- ✅ **Admin Dashboard (P1)** - Desktop-optimized portal with:
+  - Revenue charts (area/line charts with Recharts)
+  - User growth analytics (bar charts)
+  - Content by genre (pie charts)
+  - Top performing content table
+  - Creator application management
+  - Real-time stats overview
 
 ## Test Credentials
-- **Admin/Creator**: `milestone_test@test.com` / `test123`
+- **Admin**: `admin@kona.com` / `Admin123!`
+- **Creator**: `milestone_test@test.com` / `test123` (creator application needed)
 
 ## Deployment
 - Preview URL: https://stream-kona.preview.emergentagent.com
@@ -164,17 +178,13 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 
 ## Future Roadmap
 
-### P1 - High Priority
-- Enhanced Creator Portal with automated payouts (Stripe Connect)
+### P2 - Medium Priority
+- Watch Party feature (WebSocket-based sync with live chat & reactions)
 - AI-powered content moderation
 - Push notifications via PWA
 
-### P2 - Medium Priority
-- Watch Party feature for synchronized viewing
-- Referral leaderboard
-- Offline downloads for VIP users
-
 ### P3 - Low Priority
+- Multi-language support (English, Swahili, French)
+- Offline downloads for VIP users (Service Worker + IndexedDB)
 - Social features (comments, reactions)
-- Multi-language support
 - Creator verification badges
