@@ -13,6 +13,46 @@ router = APIRouter(tags=["Payments"])
 # Initialize Stripe
 stripe.api_key = STRIPE_API_KEY
 
+@router.get("/geo/detect")
+async def detect_geo(request: Request):
+    """Detect user location from IP"""
+    client_ip = request.client.host
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        client_ip = forwarded_for.split(",")[0].strip()
+    
+    geo_data = await detect_country_from_ip(client_ip)
+    return geo_data
+
+@router.get("/geo/countries")
+async def get_countries():
+    """Get list of supported countries with payment methods"""
+    countries = []
+    
+    # Add African countries
+    for code, config in AFRICAN_COUNTRIES.items():
+        countries.append({
+            "code": code,
+            "name": config["name"],
+            "currency": config["currency"],
+            "payment_methods": [
+                {"id": pm, "name": pm.replace("_", " ").title(), "type": "mobilemoney" if pm != "card" else "card"}
+                for pm in config["payment_methods"]
+            ]
+        })
+    
+    # Add International option
+    countries.append({
+        "code": "INTL",
+        "name": "International",
+        "currency": "USD",
+        "payment_methods": [
+            {"id": "card", "name": "Credit/Debit Card", "type": "card"}
+        ]
+    })
+    
+    return countries
+
 @router.get("/location/detect")
 async def detect_location(request: Request):
     """Detect user location from IP"""
