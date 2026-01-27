@@ -1,7 +1,7 @@
 """
 Authentication and security services
 """
-import hashlib
+import bcrypt
 import jwt
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -13,10 +13,13 @@ from config.settings import JWT_SECRET
 security = HTTPBearer(auto_error=False)
 
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(password: str, hashed: str) -> bool:
-    return hash_password(password) == hashed
+    try:
+        return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+    except:
+        return False
 
 def create_token(user_id: str) -> str:
     payload = {
