@@ -3216,6 +3216,90 @@ Use my referral code: *${user?.referral_code}*
         )}
       </Card>
 
+      {/* Referral Milestones */}
+      {milestones && (
+        <Card className="bg-card/50 border-white/10 p-6 mb-6" data-testid="milestones-card">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-5 h-5 text-yellow-400" />
+              <h3 className="font-heading font-semibold">Referral Milestones</h3>
+            </div>
+            <span className="text-xs text-muted-foreground">{milestones.referral_count} referrals</span>
+          </div>
+
+          {/* Next Milestone Progress */}
+          {milestones.next_milestone && (
+            <div className="mb-4 p-3 rounded-xl bg-gradient-to-r from-primary/10 to-purple-600/10 border border-primary/20">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm">Next: {milestones.next_milestone.icon} {milestones.next_milestone.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {milestones.referral_count}/{milestones.next_milestone.required_referrals}
+                </span>
+              </div>
+              <Progress 
+                value={milestones.next_milestone.progress_percent} 
+                className="h-2"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                {milestones.next_milestone.required_referrals - milestones.referral_count} more to unlock {milestones.next_milestone.reward_coins} coins!
+              </p>
+            </div>
+          )}
+
+          {/* Milestone List */}
+          <div className="space-y-3">
+            {milestones.milestones.map((milestone) => (
+              <div 
+                key={milestone.id}
+                className={`flex items-center justify-between p-3 rounded-xl transition-colors ${
+                  milestone.is_claimed 
+                    ? 'bg-green-500/10 border border-green-500/30' 
+                    : milestone.can_claim 
+                      ? 'bg-yellow-500/10 border border-yellow-500/30 animate-pulse' 
+                      : 'bg-secondary/30'
+                }`}
+                data-testid={`milestone-${milestone.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{milestone.icon}</span>
+                  <div>
+                    <p className="font-medium text-sm">{milestone.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {milestone.required_referrals} referrals • {milestone.reward_description}
+                    </p>
+                  </div>
+                </div>
+                
+                {milestone.is_claimed ? (
+                  <div className="flex items-center gap-1 text-green-400">
+                    <Check className="w-4 h-4" />
+                    <span className="text-xs">Claimed</span>
+                  </div>
+                ) : milestone.can_claim ? (
+                  <Button
+                    size="sm"
+                    onClick={() => claimMilestone(milestone.id)}
+                    disabled={claimingMilestone === milestone.id}
+                    className="bg-yellow-500 hover:bg-yellow-600 text-black rounded-full text-xs px-3"
+                    data-testid={`claim-${milestone.id}`}
+                  >
+                    {claimingMilestone === milestone.id ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : (
+                      'Claim!'
+                    )}
+                  </Button>
+                ) : (
+                  <div className="text-xs text-muted-foreground">
+                    <Lock className="w-4 h-4" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Stats */}
       <Card className="bg-card/50 border-white/10 p-6 mb-6">
         <h3 className="font-heading font-semibold mb-4">Your Stats</h3>
