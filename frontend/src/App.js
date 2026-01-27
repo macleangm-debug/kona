@@ -3442,6 +3442,21 @@ Use my referral code: *${user?.referral_code}*
       {/* Quick Links */}
       <div className="space-y-2 mb-6">
         <button 
+          onClick={() => navigate("/creator")}
+          className="w-full flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-600/20 hover:from-green-500/30 hover:to-emerald-600/30 transition-colors"
+          data-testid="creator-portal-btn"
+        >
+          <div className="flex items-center gap-3">
+            <Film className="w-5 h-5 text-green-400" />
+            <div className="text-left">
+              <p className="font-medium text-sm">Creator Portal</p>
+              <p className="text-xs text-muted-foreground">Upload & earn from your content</p>
+            </div>
+          </div>
+          <ChevronLeft className="w-5 h-5 rotate-180" />
+        </button>
+        
+        <button 
           onClick={() => navigate("/subscriptions")}
           className="w-full flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-primary/20 to-purple-600/20 hover:from-primary/30 hover:to-purple-600/30 transition-colors"
         >
