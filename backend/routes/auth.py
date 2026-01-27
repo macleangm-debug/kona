@@ -77,7 +77,8 @@ async def register(data: UserCreate):
     
     await db.users.insert_one(user)
     del user["password_hash"]
-    del user["_id"] if "_id" in user else None
+    if "_id" in user:
+        del user["_id"]
     
     token = create_token(user_id)
     
