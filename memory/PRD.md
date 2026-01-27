@@ -186,16 +186,31 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 
 ### P2 (Nice to Have)
 - Update favicon to Kona logo
-- Referral milestone rewards
 - Social sharing to specific platforms
 - User reviews/ratings
-- Frontend refactoring (App.js is 3700+ lines, needs component split)
+- Frontend refactoring (App.js is 3900+ lines, needs component split)
 
 ### P3 (Future)
 - Watch Party feature (synchronized viewing)
 - Backend refactoring (server.py into modules)
 
 ## Completed This Session (Jan 27, 2026)
+
+### Referral Milestone Rewards (P2 - Complete)
+- Implemented 5-tier milestone system for referral gamification:
+  - 🥉 Bronze: 10 referrals → 100 coins
+  - 🥈 Silver: 25 referrals → 300 coins  
+  - 🥇 Gold: 50 referrals → 600 coins
+  - 💎 Platinum: 100 referrals → 1500 coins
+  - 👑 Diamond: 200 referrals → 4000 coins
+- Backend APIs: GET /api/referral/milestones, POST /api/referral/milestones/{id}/claim
+- Profile page shows milestones card with:
+  - Progress bar to next milestone
+  - All tiers with lock/claimable/claimed status
+  - Yellow pulsing "Claim!" button for unlocked milestones
+  - Green checkmark for claimed milestones
+- Coins automatically added to user balance on claim
+- Prevents double-claiming and claiming unreached milestones
 
 ### Promotional Popup Feature (P0 - Complete)
 - Added promotional popup with admin-managed "featured_promos" collection
@@ -213,6 +228,7 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 
 ### Bug Fixes
 - Fixed guest viewing from series page - Episode 1 now plays without login
+- Fixed promo popup timed trigger to respect session storage
 
 ## Previous Session
 - Fixed Top 10 number styling (Netflix-style large outlined numbers behind thumbnails)
