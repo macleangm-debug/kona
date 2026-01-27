@@ -3816,6 +3816,12 @@ const CategoryPage = ({ onAuthClick }) => {
   );
 };
 
+// Promo Popup Wrapper (needs to be inside BrowserRouter for useNavigate)
+const PromoWrapper = () => {
+  const { activePromo, showPromo, closePromo } = usePromoManager();
+  return <PromoPopup promo={activePromo} open={showPromo} onClose={closePromo} />;
+};
+
 // Main App
 function App() {
   const [showAuth, setShowAuth] = useState(false);
@@ -3861,6 +3867,7 @@ function App() {
             </Routes>
             <BottomNav onAuthClick={openAuthForLogin} />
             <InstallAppBanner />
+            <PromoWrapper />
             <AuthModal 
               open={showAuth} 
               onClose={() => { setShowAuth(false); setReferralCode(""); setForceSignUp(false); }}
