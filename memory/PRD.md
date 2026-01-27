@@ -196,6 +196,18 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 
 ## Completed This Session (Jan 27, 2026)
 
+### Milestone Notifications (New - Complete)
+- In-app alert banner when user is within 3 referrals of next milestone
+- Two notification types:
+  - **Proximity**: "Only X more referrals to unlock 🥇 Gold!" (purple gradient)
+  - **Claimable**: "🎉 You can claim your milestone reward!" (yellow gradient)
+- Alert appears 8-13 seconds after login (staggered to avoid popup overlap)
+- "Later" button dismisses, "Invite Friends"/"Claim Now!" navigates to profile
+- Session storage prevents repeat alerts for same milestone
+- Backend APIs for push notification subscriptions:
+  - GET/PUT /api/notifications/settings
+  - POST/DELETE /api/notifications/subscribe
+
 ### Referral Milestone Rewards (P2 - Complete)
 - Implemented 5-tier milestone system for referral gamification:
   - 🥉 Bronze: 10 referrals → 100 coins
