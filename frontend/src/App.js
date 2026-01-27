@@ -3981,6 +3981,12 @@ const PromoWrapper = () => {
   return <PromoPopup promo={activePromo} open={showPromo} onClose={closePromo} />;
 };
 
+// Milestone Notification Wrapper
+const MilestoneAlertWrapper = () => {
+  const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
+  return <MilestoneAlert notification={notification} open={showAlert} onDismiss={dismissAlert} />;
+};
+
 // Main App
 function App() {
   const [showAuth, setShowAuth] = useState(false);
@@ -4027,6 +4033,7 @@ function App() {
             <BottomNav onAuthClick={openAuthForLogin} />
             <InstallAppBanner />
             <PromoWrapper />
+            <MilestoneAlertWrapper />
             <AuthModal 
               open={showAuth} 
               onClose={() => { setShowAuth(false); setReferralCode(""); setForceSignUp(false); }}
