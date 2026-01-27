@@ -4,6 +4,7 @@ Authentication and security services
 import bcrypt
 import jwt
 import uuid
+import hashlib
 from datetime import datetime, timezone, timedelta
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
