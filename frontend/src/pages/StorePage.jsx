@@ -39,7 +39,8 @@ export const StorePage = () => {
           axios.get(`${API}/geo/detect`),
           axios.get(`${API}/geo/countries`)
         ]);
-        setPackages(packagesRes.data);
+        // API returns {packages: [...]} so extract the packages array
+        setPackages(packagesRes.data.packages || packagesRes.data);
         setGeoData(geoRes.data);
         setCountries(countriesRes.data);
         
