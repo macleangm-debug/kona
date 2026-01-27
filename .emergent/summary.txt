@@ -3,7 +3,7 @@
 **PRODUCT REQUIREMENTS:**
 - A coin-based economy for unlocking episodes.
 - Geo-targeted payment gateways (M-Pesa via Flutterwave for Africa, Stripe for international).
-- A viral referral system with rewards.
+- A viral referral system with rewards, including milestone-based rewards.
 - A complete UI/UX overhaul to match Netflix, including a grid layout, hero banners, and content categories.
 - A rotating/swipeable 3D hero banner.
 - Add to My List and Continue Watching functionality connected to user data.
@@ -13,159 +13,158 @@
 - The first episode of each series should be free.
 - The application should be installable on mobile devices (PWA) with push notification capabilities.
 - A promotional popup to feature specific content.
+- An automated system for content creators to partner, upload content, and earn revenue.
 
 **User's preferred language**: English
 
 **what currently exists?**
 A full-stack, mobile-first mini-series web application named Kona (React/FastAPI/MongoDB).
--   **Backend:** Features JWT authentication, a coin system, daily rewards, a referral system, and dynamic payment gateways. It includes APIs for search, my list, continue watching, subscriptions, and a coming soon feature. It was recently updated to allow guest access for free episodes and has the beginnings of a Featured Promo system. All data is mocked and seeded on startup.
--   **Frontend:** A monolithic React application ( > 3500 lines) with a sophisticated, Netflix-style UI. It includes an auto-scrolling 3D hero carousel, sticky navigation, and multiple content carousels. Key features include a full-screen vertical video player (ReelShort-style), guest viewing with sign-up prompts, and pages for various user functions. The app is a fully configured PWA. The logo was recently updated to a K▶NA design.
--   **Database (MongoDB):** Schemas are defined for users, series, episodes, and subscriptions. A new  collection is being added.
+-   **Backend:** A modular FastAPI application. Features include JWT authentication, a coin system, daily rewards, a referral system with milestone rewards, and dynamic payment gateways. It supports creator partnerships with content upload via Bunny.net integration and revenue tracking. It also includes APIs for search, my list, continue watching, subscriptions, and a promotional popup system. The backend was successfully refactored from a monolithic  into a clean, modular structure (, , ).
+-   **Frontend:** A monolithic React application ( > 4500 lines) with a sophisticated, Netflix-style UI. The unstable custom hero carousel has been replaced with a more robust  implementation. Key features include a full-screen vertical video player, guest viewing with sign-up prompts, a promotional popup, and dedicated pages for user profiles (with referral milestones) and a new Creator Portal. The app is a fully configured PWA.
+-   **Database (MongoDB):** Schemas are defined for users, series, episodes, and subscriptions. New collections have been added for  and .
 
 **Last working item**:
--   **Last item agent was working:** The user requested a promotional popup to feature specific content. It should have two triggers: one on app open (once per session) and another after 10 seconds of browsing. This required creating a new Featured/Promoted collection in the database that an admin can manage. The agent started the backend work for this feature.
+-   **Last item agent was working:** The user last reported The top hero is not working. The agent performed a quick visual check, concluded it was working, and asked the user for more details before moving on to a new feature request. This issue remains unresolved from the user's perspective.
 -   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
--   **Which testing method agent to use?** both
+-   **Which testing method agent to use?** Frontend testing agent
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   **Issue 1:** The 3D Hero Banner implementation is a recurring problem and the user is not satisfied with its behavior. (Priority: P0)
--   **Issue 2:** The Top 10 section was implemented and then removed at user request. There might be leftover code or CSS that needs cleanup. (Priority: P2)
+-   **Issue 1:** The 3D Hero Banner is not working correctly. (Priority: P0)
 
 **Issues Detail:**
 -   **Issue 1: 3D Hero Banner is not working correctly**
-    -   **Attempted fixes:** Multiple custom implementations (scroll-based, CSS transforms). The latest fix added auto-scroll and fixed the play button's navigation. However, the user has repeatedly expressed dissatisfaction with its feel and stability.
+    -   **Attempted fixes:** The original custom CSS implementation was replaced with  to improve stability. While the agent's tests and screenshots showed it working, the user's last message on the topic was The top hero is not working.
     -   **Next debug checklist:**
-        1.  Propose replacing the brittle custom code with a well-supported third-party library like  which has a coverflow effect module. This would provide a more stable, professional, and reliable user experience.
-        2.  If the user agrees, integrate the library to replace the custom hero carousel code in .
-    -   **Why fix this issue?** It is a major UI component and a persistent source of user dissatisfaction.
+        1.  Re-engage the user to get specific details about the failure. Ask: Is it not auto-playing?, Is the swipe gesture broken?, or Are there visual glitches on your end?.
+        2.  Thoroughly inspect the browser console for any errors related to Swiper.js or React when the homepage loads.
+        3.  Review the Swiper implementation in  and its associated CSS in  to check for regressions.
+        4.  Use the screenshot tool to capture the state of the hero banner and compare it with the expected design.
+    -   **Why fix this issue?** This is a primary UI component and has been a recurring source of user dissatisfaction throughout the project.
     -   **Status:** IN PROGRESS
     -   **Is recurring issue?** Y
     -   **Should Test frontend/backend/both after fix?** Frontend.
-    -   **Blocked on other issue:** None
-
--   **Issue 2: Cleanup removed Top 10 feature**
-    -   **Attempted fixes:** The agent removed the component from the homepage and the category page route.
-    -   **Next debug checklist:**
-        1.  Search for Top 10 related class names in  (e.g., , ) and remove them.
-        2.  Search for top-10 related logic or data structures in  and ensure they are fully removed.
-    -   **Why fix this issue?** To remove dead code and prevent potential styling conflicts.
-    -   **Status:** NOT STARTED
-    -   **Is recurring issue?** N
-    -   **Should Test frontend/backend/both after fix?** Frontend.
-    -   **Blocked on other issue:** None
+    -   **Blocked on other issue:** Blocked on user feedback for specific details.
 
 **In progress Task List**:
--   **Task 1: Implement Promotional Popup (P0)**
-    -   **Where to resume:** The agent was in the process of adding seed data for the new  collection in . The backend models and some API endpoints are partially created.
-    -   **What will be achieved with this?** A dynamic, admin-manageable promotional popup that triggers on app open and after a time delay to improve user engagement and content discovery.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on something:** None
+None.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P0:** Refactor the monolithic  into a proper component-based architecture (e.g., , , ). This is a critical risk to project maintainability.
-    -   **P1:** Refactor the monolithic  into separate modules (e.g., , , ).
+    -   **P0:** Refactor the monolithic frontend file  (currently >4500 lines) into a proper component-based architecture (, , ). This is a critical technical debt that hinders development and was only partially started in the last session.
 -   **Future Tasks:**
-    -   **P2:** Implement referral milestone rewards.
-    -   **P3:** Explore a Watch Party feature for synchronized viewing.
+    -   **P1:** Enhance the Creator Portal with automated payouts (Stripe Connect/Flutterwave) and AI-powered content moderation.
+    -   **P2:** Implement a Watch Party feature for synchronized viewing.
+    -   **P3:** Implement a referral leaderboard to gamify the referral system.
 
 **Completed work in this session**
--   **See All Pages:** Implemented navigation from See All buttons to new dedicated category pages.
--   **Vertical Video Player Redesign:**
-    -   Created a full-screen, vertical, ReelShort-style player using React Portals.
-    -   Implemented tap-to-show/auto-hide controls (header, side actions, progress bar, quality selector).
-    -   Added a draggable/seekable progress bar with time display.
-    -   Added a quality selector (480p, 720p, 1080p-VIP).
--   **Guest Viewing & Sign-up Prompts:**
-    -   Enabled guests to watch the first episode for free.
-    -   Implemented strategic sign-up prompts (mid-video, end-of-video, locked episode access).
-    -   Created a Next Episode Preview prompt to encourage sign-ups after a free episode.
--   **Hero Carousel Fixes:**
-    -   Fixed the play button to navigate directly to the video player.
-    -   Implemented auto-scrolling.
--   **App Stability:** Resolved multiple app reloading/flickering issues related to state management in the video player.
--   **Logo Redesign:** Iterated through several logo concepts with the user and implemented the final K▶NA design, including updating PWA icons.
+-   **Creator Partnership System (Phase 1):**
+    -   Integrated with **Bunny.net** for video hosting, transcoding, and secure streaming, using user-provided API keys.
+    -   Implemented backend APIs for creator application, admin approval, series/episode creation, and revenue tracking (60/40 split).
+    -   Built a frontend **Creator Portal** for creators to apply, manage content, and view earnings.
+-   **Backend Refactoring:**
+    -   Successfully restructured the entire monolithic  into a clean, modular architecture with , , and  directories.
+    -   Resolved hashing inconsistencies (migrated fully to ) that emerged during the refactor.
+-   **Referral Milestone Rewards & Notifications:**
+    -   Implemented a multi-tier milestone system (Bronze, Silver, etc.) with coin rewards.
+    -   Added backend APIs to track progress and claim rewards.
+    -   Built a UI in the Profile page to display milestone progress and claim buttons.
+    -   Created an in-app slide-down alert to notify users when they are close to reaching the next milestone.
+-   **Promotional Popup Feature:**
+    -   Implemented a backend API to serve promotional content.
+    -   Created a frontend modal that appears on app open (once per session) and after a timed delay.
+-   **Hero Carousel Refactor:**
+    -   Replaced the previous unstable, custom CSS-based hero carousel with a professional and stable implementation using **Swiper.js** (coverflow effect).
 
 **Earlier issues found/mentioned but not fixed**
 None.
 
 **Known issue recurrence from previous fork**
--   **Issue recurrence in previous fork:** 3D Hero Banner is not working correctly
--   **Recurrence count:** 3+
+-   **Issue recurrence in previous fork:** 3D Hero Banner is not working correctly.
+-   **Recurrence count:** 4+
 -   **Status:** IN PROGRESS
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Backend:** FastAPI, Python, MongoDB
--   **Frontend:** React.js, TailwindCSS, **PWA**, **React Portals**
--   **Authentication:** JWT (JSON Web Tokens)
--   **UI:** 3D Carousel (custom), Vertical Video Player (ReelShort-style)
+-   **Backend:** FastAPI, Python, MongoDB, Modular Architecture.
+-   **Frontend:** React.js, TailwindCSS, PWA, React Portals, Swiper.js.
+-   **Authentication:** JWT with  password hashing.
+-   **Video Hosting:** Bunny.net Stream for upload, transcoding, and secure delivery.
 
 **key DB schema**
 -   **users:** 
+-   **creators:** 
 -   **series:** 
 -   **episodes:** 
--   **featured_promos:**  (**New, In Progress**)
+-   **featured_promos:** 
 
 **All files of reference**
--   : Contains the entire backend logic. **Partially updated** for the featured promos feature.
--   : Contains the entire monolithic frontend application. **Heavily modified** with the video player, guest prompts, and other UI fixes.
--   : Contains all custom styles.
--   : The SVG/Image component for the app logo. **Updated** with the final K▶NA design.
+-   : The entire refactored backend directory is important. Key new files include:
+    -   : APIs for the creator portal.
+    -   : Logic for Bunny.net integration.
+    -   : Database models for creators and their content.
+    -   : Contains new credentials for Bunny.net.
+-   : The monolithic frontend, which was heavily modified to add the Creator Portal, milestone UI, and Swiper.js carousel.
+-   : Contains new styles for the Swiper carousel and other UI elements.
 
 **Areas that need refactoring**:
--   **CRITICAL:** The frontend file  is now over 3500 lines. It urgently needs to be broken down into a proper component architecture (e.g., , , ) to ensure maintainability.
--   The backend file  is also becoming large and should be split into modules for routes, models, and business logic.
+-   **CRITICAL:** The frontend file  is over 4500 lines long. It urgently needs to be broken down into a standard React architecture (, , ) to ensure maintainability and prevent future development from grinding to a halt.
 
 **key api endpoints**
--   : **Updated** to allow guest access for free episodes.
--   : **Updated** to allow optional authentication for progress saving.
--    (GET): **New endpoint** (in progress).
--    (POST, DELETE): **New admin endpoints** (in progress).
+-   : All endpoints for the creator portal (application, status, series management, dashboard).
+-   : Endpoints for admins to approve/reject creator applications.
+-   : Gets a user's progress toward referral milestones.
+-   : Claims a reward for a completed milestone.
+-   : Checks if a user is close to a milestone for triggering alerts.
 
 **Critical Info for New Agent**
--   **Frontend Monolith is a HIGH RISK:** The  file is extremely large and difficult to maintain. Propose and prioritize refactoring this file immediately after completing the current task.
--   **Hero Carousel is UNSTABLE:** This is a recurring pain point. The current custom CSS solution is brittle. Strongly recommend replacing it with a stable third-party library like  to finally resolve the issue.
--   **Last Task is Incomplete:** The promotional popup feature is only partially implemented on the backend. The agent must complete the backend work (seeding, APIs) and then implement the entire frontend component and logic.
+-   **PRIORITY 1: FIX THE HERO CAROUSEL.** The user's last action was to report the hero carousel as broken. You must investigate this immediately. Ask for specific details about the problem, as it appeared to be working from the agent's perspective. Do not move to other tasks until this is resolved.
+-   **PRIORITY 2: REFACTOR THE FRONTEND.** The  monolith is a major risk. Once the hero carousel is fixed, you must propose and execute a plan to refactor it into a proper component structure. The backend has already been refactored, so the frontend is the next logical step.
+-   **Creator System Dependencies:** The creator partnership system relies on user-provided API keys for Bunny.net, which are stored in . The entire video upload and streaming functionality depends on these keys being correct.
 
 **documents and test reports created in this job**
 -   
+-   
+-   
+-   
+-    (updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Requested promotional popup with app open & timed triggers, and an admin-managed Featured collection. (IN PROGRESS)
-2.  **User:** Asked how guests would be prompted to watch the next episode. (COMPLETED)
-3.  **User:** Requested a logo change to be word-based with a play button in the 'O'. (COMPLETED)
-4.  **User:** Stated the logo hadn't changed on the preview. (RESOLVED - caching issue)
-5.  **User:** Stated the hero auto-rotation was not working. (RESOLVED)
-6.  **User:** Asked how to clear the cache in the preview screen. (ANSWERED)
-7.  **User:** Stated they couldn't see the logo on the preview. (RESOLVED - caching issue)
-8.  **User:** Requested logo alignment adjustments. (COMPLETED)
-9.  **User:** Stated the new logo hadn't changed. (RESOLVED - caching issue)
-10. **User:** Requested a specific luxury logo style (Option 4). (COMPLETED, but later superseded)
+-   **10. Yes proceed:** User approved starting the Bunny.net implementation. (COMPLETED)
+-   **9. What approach should I use with minimal cost?:** User asked for the cheapest video hosting option. (ANSWERED)
+-   **8. One question - if the content is posted on Youtube cant it be accessed for free by the public?:** User raised a valid concern about using YouTube for paid content. (ANSWERED)
+-   **7. For all questions advise the best approach which will enable KONA to make revenue:** User asked for revenue-focused recommendations for the creator portal. (ANSWERED)
+-   **6. Now if I want to partner with content creators with everything automated - what should I implement?:** User requested the creator partnership feature. (COMPLETED)
+-   **5. The top hero is not working:** User reported the hero carousel is broken. (PENDING)
+-   **4. Di O2 and Back end refactoring:** User requested P2 (frontend) and backend refactoring. (PARTIALLY COMPLETED - Backend only)
+-   **3. Implement:** User approved implementing milestone notifications. (COMPLETED)
+-   **2. How cab rgus affect revenue?:** User asked about the revenue impact of milestones. (ANSWERED)
+-   **1. Tell me more about referral milestone reward:** User inquired about the milestone feature. (ANSWERED)
 
 **Project Health Check:**
--   **Broken:** The 3D Hero banner's feel is still not meeting user expectations. The promotional popup feature is incomplete.
--   **Mocked:** All application data (series, users, progress) is mocked and seeded on backend startup.
+-   **Broken:** The 3D Hero Banner is not working according to the user.
+-   **Mocked:** Initial series/user data is mocked on startup. Content uploaded by creators via the new portal is real and hosted on Bunny.net.
 
 **3rd Party Integrations**
--   **Stripe:** For international card payments.
--   **Flutterwave:** For African local payments.
+-   **Stripe:** For international card payments. Requires User API Key.
+-   **Flutterwave:** For African local payments. Requires User API Key.
+-   **Bunny.net Stream:** For video upload, transcoding, and secure streaming. Requires User API Key.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES, once for a previous feature.
+-   **Testing agent used after significant changes:** YES, used after every major feature implementation.
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None.
--   **Known regressions:** None.
+-   **Known regressions:** The Hero Carousel is potentially broken or not meeting user expectations.
 
 **Credentials to test flow:**
--   **Guest:** No credentials needed. Can navigate the site and watch the first episode of any series.
--   **New User:** Use the Sign In -> Sign up flow in the UI. New users automatically receive 50 welcome coins. Email and password can be anything (e.g.,  / ).
+-   **Admin & Approved Creator:**
+    -   **Email:** 
+    -   **Password:** 
+-   **Bunny.net credentials** are stored in .
 
 **What agent forgot to execute**
--   The agent was in the middle of implementing the backend for the promotional popup feature and did not get to the frontend implementation. This task must be completed.
--   The agent did not propose or prioritize the critical refactoring of , despite its growing complexity being a major risk. This should be the next major task after the popup is finished.</analysis>
+-   The agent did not fully complete the user's request for P2 and Backend refactoring. It successfully refactored the backend but did not refactor the P2 (Priority 2) task of the monolithic frontend ().
+-   The agent did not fully resolve the user's final bug report that The top hero is not working, instead asking for more information and then immediately moving to the next feature request from the user. This critical bug report was left unresolved.</analysis>
