@@ -1,311 +1,180 @@
-# MiniSeries App - Product Requirements Document
+# Kona - Mini-Series Streaming App
 
-## Original Problem Statement
-Build a mini series app like ReelShort/Pocket FM where users purchase coins as credits to watch episodic video series. Support geo-based payment routing for East/Central Africa with local payment methods. Implement referral system for growth.
+## Product Overview
+Kona is a mobile-first mini-series streaming platform with a coin-based economy for unlocking episodes. The app targets African and international markets with geo-targeted payment gateways.
 
-## Target Audience
-Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form drama series on mobile
+## Core Features
 
-## Core Requirements (Static)
-- User authentication (JWT)
-- Browse series catalog by genre
-- Watch video episodes
-- Coin-based monetization
-- Daily rewards system
-- Multi-region payment support (Africa + International)
-- Referral system for viral growth
+### 1. Streaming Platform
+- **Netflix-style UI** with hero carousel (Swiper.js), category tabs, and horizontal scrolling sections
+- **Full-screen vertical video player** with quality settings, playback speed control, and episode navigation
+- **Guest viewing** for Episode 1 (free), with sign-up prompts for subsequent episodes
+- **Continue Watching** and **My List** functionality
 
-## What's Been Implemented
+### 2. Coin-Based Economy
+- **Coin Packages**: 100, 300, 600, 1200 coins at various price points
+- **Episode Unlocking**: Spend coins to unlock locked episodes
+- **Welcome Bonus**: 50 coins for new users
+- **Daily Rewards**: 10 coins per day
 
-### Phase 1 - MVP (Jan 26, 2026)
-- [x] User registration with 50 coin welcome bonus
-- [x] JWT authentication (72hr expiry)
-- [x] Series & Episodes CRUD with sample content
-- [x] Coin packages (4 tiers: $0.99-$9.99)
-- [x] Stripe checkout integration
-- [x] Daily reward system (10 coins/day)
-- [x] Episode unlocking with coins
-- [x] Watch progress tracking
-- [x] Mobile-first dark theme (Neon Noir)
+### 3. Payment Integration
+- **Stripe**: For international card payments
+- **Flutterwave**: For African markets (M-Pesa, mobile money)
+- **Geo-detection**: Automatic payment gateway selection based on user location
 
-### Phase 2 - Geo-Payment Routing (Jan 26, 2026)
-- [x] IP-based geolocation detection
-- [x] Manual country selection
-- [x] East/Central Africa support (KE, TZ, UG, RW, CD, BI, SS)
-- [x] M-Pesa, MTN MoMo, Airtel Money integration (Flutterwave)
-- [x] Local currency display with exchange rates
-- [x] International card payments (Stripe)
+### 4. Referral System
+- **Referral Codes**: Unique 8-character codes for each user
+- **Referral Bonus**: 30 coins for referred user, 20 coins for referrer
+- **Milestone Rewards**: Bronze (5 refs, 100 coins), Silver (10 refs, 250 coins), Gold (25 refs, 500 coins), Platinum (50 refs, 1000 coins)
 
-### Phase 3 - Referral System (Jan 26, 2026)
-- [x] Unique referral codes per user (8 characters)
-- [x] Referral code validation API
-- [x] Referral rewards: 20 coins for referrer, 30 bonus for referee
-- [x] New users with referral get 80 coins (50 + 30 bonus)
-- [x] Referral stats tracking (count, earnings)
-- [x] Referral leaderboard API
-- [x] Profile page with referral card
-- [x] Copy referral code button
-- [x] Share button (Web Share API / clipboard fallback)
-- [x] Signup form with referral code input
-- [x] Real-time referral code validation with green checkmark
-- [x] URL parameter support (?ref=CODE)
-- [x] Recent referrals display in profile
+### 5. Creator Partnership System
+- **Application Process**: Creators apply with bio and content type
+- **Revenue Share**: 60-70% based on creator tier
+- **Video Hosting**: Bunny.net integration for upload, transcoding, and streaming
+- **Dashboard**: Real-time analytics for views, earnings, and payouts
 
-### Phase 4 - UI/UX Enhancements (Jan 26, 2026)
-- [x] Netflix-style UI overhaul with grid layout
-- [x] App rebranded to "Kona" with custom logo
-- [x] Hero Carousel - 3D curved card scroll with depth effect
-  - [x] Side cards appear smaller, lower, and darker
-  - [x] Touch swipe gesture support with snap scrolling
-  - [x] Red dot indicators for navigation
-  - [x] Smooth CSS transitions with 3D transforms
-- [x] Horizontal scroll carousels for all genre sections
-- [x] 25+ series with thumbnails for testing
-- [x] Coming Soon section with "Remind Me" feature
-  - [x] Release date badges
-  - [x] Reserved count display (e.g., "8.5K Reserved")
-  - [x] Reminder success modal with notification prompt
+### 6. Admin Panel
+- **User Management**: View and manage user accounts
+- **Content Management**: Approve/reject creator content
+- **Analytics**: Platform-wide stats (users, revenue, subscriptions)
+- **Transaction History**: Payment tracking
 
-### Phase 5 - PWA & Push Notifications (Jan 26, 2026)
-- [x] Progressive Web App (PWA) setup
-  - [x] Web App Manifest with app icons
-  - [x] Service Worker for caching and push
-  - [x] Apple touch icons for iOS
-- [x] Install App banner for mobile
-  - [x] Android: "Install Now" with beforeinstallprompt
-  - [x] iOS: Instructions to "Add to Home Screen"
-- [x] Push notification permission flow
-  - [x] Browser permission request
-  - [x] Denied state with settings instructions
-  - [x] Test notification on grant
+### 7. Subscription Plans
+- **Basic**: $4.99/month - 100 coins
+- **Premium**: $9.99/month - 250 coins
+- **VIP**: $19.99/month - 600 coins + HD quality + downloads
 
-### Phase 6 - Core Features (Jan 26, 2026)
-- [x] Search functionality
-  - [x] Real-time search as you type
-  - [x] Search results with thumbnails and EP1 FREE badge
-  - [x] Recent searches saved in localStorage
-  - [x] Browse by genre options
-- [x] Add to My List functionality
-  - [x] Add/remove from list API endpoints
-  - [x] Bookmark icon on series cards
-  - [x] My List section on homepage (for logged-in users)
-- [x] Continue Watching
-  - [x] Backend API to track watch progress
-  - [x] Real continue watching data from user's watch history
-- [x] First Episode Free
-  - [x] EP1 FREE badge on all series cards
-  - [x] First episode always has coins_required: 0 in database
+## Technical Architecture
 
-### Phase 7 - Monetization (Jan 26, 2026)
-- [x] Subscription Plans
-  - [x] Basic: $4.99/month - 100 coins
-  - [x] Premium: $9.99/month - 300 coins (Popular)
-  - [x] VIP: $14.99/month - 500 coins
-  - [x] Stripe checkout integration
-  - [x] Subscription page UI
-- [x] Admin Panel
-  - [x] Dashboard with stats (users, revenue, series, subscribers)
-  - [x] User management (view all users, see coins/subscription)
-  - [x] Series management (view all series)
-  - [x] Transaction history
+### Frontend (React)
+```
+/app/frontend/src/
+├── components/        # Reusable UI components
+│   ├── AuthModal.jsx
+│   ├── BottomNav.jsx
+│   ├── CoinBalance.jsx
+│   ├── SeriesCard.jsx
+│   ├── PromoPopup.jsx
+│   ├── MilestoneAlert.jsx
+│   └── ...
+├── pages/            # Route components
+│   ├── HomePage.jsx
+│   ├── SeriesDetailPage.jsx
+│   ├── VideoPlayerPage.jsx
+│   ├── StorePage.jsx
+│   ├── ProfilePage.jsx
+│   ├── CreatorPortal.jsx
+│   ├── CreatorLoginPage.jsx
+│   ├── AdminPage.jsx
+│   └── AdminLoginPage.jsx
+├── hooks/            # Custom React hooks
+│   ├── usePromoManager.js
+│   └── useMilestoneNotifications.js
+├── contexts/         # React Context providers
+│   └── AuthContext.jsx
+└── config.js         # App configuration
+```
 
-### Phase 8 - Navigation & UI Polish (Jan 26, 2026)
-- [x] Top 10 Number Styling (Netflix-style)
-  - [x] Large 144px font numbers on homepage
-  - [x] Stroke outline effect (3px #5a5a5a)
-  - [x] Numbers positioned behind thumbnails with z-index
-  - [x] 96px numbers on category page grid
-- [x] "See All" Navigation
-  - [x] All category "See All" buttons navigate to /category/{category-name}
-  - [x] CategoryPage component with back button and title
-  - [x] Grid layout for standard categories (3-column)
-  - [x] Special 2-column numbered grid for Top 10 category
-  - [x] Support for: trending, top-10, my-list, romance, thriller, drama, action, coming-soon, new-releases
+### Backend (FastAPI)
+```
+/app/backend/
+├── routes/
+│   ├── auth.py       # Authentication endpoints
+│   ├── series.py     # Series and episode management
+│   ├── payments.py   # Store, subscriptions, geo-detection
+│   ├── creator.py    # Creator portal APIs
+│   └── admin.py      # Admin panel APIs
+├── models/           # Pydantic models
+├── services/         # Business logic
+│   ├── bunny.py      # Bunny.net integration
+│   └── ...
+└── server.py         # Main FastAPI app
+```
 
-### Database Collections
-- users, series, episodes, coming_soon, payment_transactions, referrals
+### Database (MongoDB)
+- **users**: User accounts, coins, referrals, subscriptions
+- **series**: Series metadata, thumbnails, genres
+- **episodes**: Episode data, video URLs, unlock requirements
+- **creators**: Creator profiles, tiers, earnings
+- **transactions**: Payment records
 
 ## API Endpoints
 
-### Search & My List APIs (New)
-- GET /api/search?q={query} - Search series by title/description
-- POST /api/user/my-list/add - Add series to My List
-- POST /api/user/my-list/remove - Remove from My List
-- GET /api/user/my-list - Get user's My List with series data
-- GET /api/user/continue-watching - Get real watch progress
+### Authentication
+- `POST /api/auth/register` - Create account
+- `POST /api/auth/login` - Login
+- `GET /api/auth/me` - Get current user
 
-### Subscription APIs (New)
-- GET /api/subscriptions/plans - Get all subscription plans
-- POST /api/subscriptions/subscribe - Create Stripe subscription checkout
-- GET /api/user/subscription - Get user's current subscription
+### Series
+- `GET /api/series` - List all series
+- `GET /api/series/{id}` - Get series details
+- `GET /api/series/{id}/episodes` - Get episodes
 
-### Admin APIs (New)
-- GET /api/admin/stats - Dashboard statistics
-- GET /api/admin/users - List all users
-- PUT /api/admin/users/{id} - Update user (coins, subscription)
-- GET /api/admin/series - List all series
-- POST /api/admin/series - Create new series
-- DELETE /api/admin/series/{id} - Delete series
-- GET /api/admin/transactions - List all transactions
-- POST /api/admin/make-admin?email={email}&secret={secret} - Make user admin
+### Episodes
+- `GET /api/episodes/{id}` - Get episode details
+- `POST /api/episodes/unlock` - Unlock episode with coins
+- `POST /api/episodes/progress` - Save watch progress
 
-### Referral APIs
-- GET /api/referral/validate/{code} - Validate referral code
-- GET /api/referral/stats - Get user's referral statistics
-- GET /api/referral/leaderboard - Get top referrers
+### Store
+- `GET /api/store/packages` - Get coin packages
+- `POST /api/store/checkout` - Create checkout session
+- `GET /api/geo/detect` - Detect user location
+- `GET /api/geo/countries` - Get supported countries
 
-### User Registration (Updated)
-- POST /api/auth/register - Now accepts optional referral_code
+### Referral
+- `GET /api/referral/stats` - Get referral statistics
+- `GET /api/referral/milestones` - Get milestone progress
+- `POST /api/referral/milestones/{id}/claim` - Claim milestone reward
 
-## Reward Configuration
-- Welcome bonus: 50 coins
-- Daily reward: 10 coins
-- Referrer reward: 20 coins
-- Referee bonus: 30 coins
+### Creator
+- `POST /api/creator/apply` - Apply to become creator
+- `GET /api/creator/status` - Get creator status
+- `GET /api/creator/dashboard` - Get creator dashboard
+- `POST /api/creator/series` - Create new series
 
-## Subscription Plans
-| Plan | Price | Coins/Month | Features |
-|------|-------|-------------|----------|
-| Basic | $4.99 | 100 | 1 device, Standard quality |
-| Premium | $9.99 | 300 | 2 devices, HD, Early access |
-| VIP | $14.99 | 500 | 4 devices, 4K, Ad-free, Exclusive |
+### Admin
+- `GET /api/admin/stats` - Platform statistics
+- `GET /api/admin/users` - List users
+- `GET /api/admin/transactions` - Transaction history
 
-## Environment Variables Required
-- STRIPE_API_KEY (pre-configured)
-- FLUTTERWAVE_SECRET_KEY (needed for Africa payments)
-- FLUTTERWAVE_PUBLIC_KEY (needed for Africa payments)
+## Completed Work
 
-## Prioritized Backlog
+### January 2026
+- ✅ Initial MVP with coin system and video player
+- ✅ Stripe and Flutterwave payment integration
+- ✅ Referral system with milestone rewards
+- ✅ Creator partnership system with Bunny.net
+- ✅ Backend refactoring to modular architecture
+- ✅ **Frontend refactoring** - Broke down monolithic App.js (4500+ lines) into:
+  - 10+ page components
+  - 15+ reusable components
+  - Custom hooks for promo and milestone management
+  - Separate config and context files
+- ✅ Creator Login page (`/creator/login`)
+- ✅ Admin Login page (`/admin/login`)
 
-### P0 (Critical) - None remaining
+## Test Credentials
+- **Admin/Creator**: `milestone_test@test.com` / `test123`
 
-### P1 (High Priority)
-- Add Flutterwave API keys for live Africa payments
-- Video player with Bunny.net HLS streaming (signed URLs ready)
+## Deployment
+- Preview URL: https://stream-kona.preview.emergentagent.com
+- Backend: FastAPI on port 8001
+- Frontend: React on port 3000
+- Database: MongoDB
 
-### P2 (Nice to Have)
-- Update favicon to Kona logo
-- Social sharing to specific platforms
-- User reviews/ratings
-- Frontend refactoring (App.js now 4500+ lines)
-- Creator series detail page (/creator/series/:id)
+## Future Roadmap
 
-### P3 (Future)
-- Watch Party feature (synchronized viewing)
-- Creator analytics deep-dive
+### P1 - High Priority
+- Enhanced Creator Portal with automated payouts (Stripe Connect)
+- AI-powered content moderation
+- Push notifications via PWA
 
-## Completed This Session (Jan 27, 2026)
+### P2 - Medium Priority
+- Watch Party feature for synchronized viewing
+- Referral leaderboard
+- Offline downloads for VIP users
 
-### Creator Partnership System (Complete ✅)
-Full automated content creator partnership with Bunny.net integration:
-
-**Backend APIs:**
-- `POST /api/creator/apply` - Creator application
-- `GET /api/creator/status` - Check creator status
-- `GET /api/creator/dashboard` - Stats (earnings, views, payouts)
-- `POST /api/creator/series` - Create series
-- `POST /api/creator/episodes` - Create episode + Bunny.net video
-- `GET /api/creator/episodes/{id}/status` - Video encoding status
-- `POST /api/creator/series/{id}/submit` - Submit for review
-- `POST /api/creator/payout/request` - Request payout
-- Admin: `/api/admin/creators/*` - Approve, reject, upgrade tier
-
-**Revenue Model:**
-- 60% New → 65% Verified (10K+ views) → 70% Partner (100K+ views)
-- Milestone bonuses: 10K=500, 50K=2,500, 100K=10,000, 500K=50,000, 1M=150,000 coins
-
-**Bunny.net Integration:**
-- Video upload with auto-transcoding
-- Signed URLs for content protection
-- HLS streaming (multiple qualities)
-- Thumbnail generation
-
-**Frontend:**
-- Creator Portal page (`/creator`)
-- Application form with validation
-- Dashboard with stats and series list
-- Create series dialog
-- Link from Profile page
-
-### Backend Refactoring (Complete ✅)
-Refactored monolithic `server.py` (2215 lines) into modular structure:
-```
-/app/backend/
-├── server.py          # Main app entry (150 lines)
-├── config/
-│   └── settings.py    # Constants, packages, milestones config
-├── models/
-│   ├── schemas.py     # Pydantic models for all endpoints
-│   └── creator.py     # Creator-specific models
-├── services/
-│   ├── auth.py        # JWT, password hashing, user auth
-│   ├── database.py    # MongoDB connection
-│   ├── geo.py         # Geolocation, payment config
-│   └── bunny.py       # Bunny.net Stream service
-└── routes/
-    ├── auth.py        # Login, register, /auth/*
-    ├── referral.py    # Stats, milestones, /referral/*
-    ├── series.py      # Series, episodes, search
-    ├── users.py       # Rewards, lists, progress, unlock
-    ├── payments.py    # Store, checkout, subscriptions
-    ├── notifications.py # Push subscription, settings
-    ├── admin.py       # Admin CRUD + creator management
-    ├── promos.py      # Featured promos
-    └── creator.py     # Creator partnership APIs
-```
-
-### Frontend Refactoring (Started)
-- Created `/contexts/AuthContext.jsx` - extracted auth provider
-- Created `/config.js` - app configuration
-- App.js still functional (4000+ lines) - incremental extraction recommended
-
-### Milestone Notifications (New - Complete)
-- In-app alert banner when user is within 3 referrals of next milestone
-- Two notification types:
-  - **Proximity**: "Only X more referrals to unlock 🥇 Gold!" (purple gradient)
-  - **Claimable**: "🎉 You can claim your milestone reward!" (yellow gradient)
-- Alert appears 8-13 seconds after login (staggered to avoid popup overlap)
-- "Later" button dismisses, "Invite Friends"/"Claim Now!" navigates to profile
-- Session storage prevents repeat alerts for same milestone
-- Backend APIs for push notification subscriptions:
-  - GET/PUT /api/notifications/settings
-  - POST/DELETE /api/notifications/subscribe
-
-### Referral Milestone Rewards (P2 - Complete)
-- Implemented 5-tier milestone system for referral gamification:
-  - 🥉 Bronze: 10 referrals → 100 coins
-  - 🥈 Silver: 25 referrals → 300 coins  
-  - 🥇 Gold: 50 referrals → 600 coins
-  - 💎 Platinum: 100 referrals → 1500 coins
-  - 👑 Diamond: 200 referrals → 4000 coins
-- Backend APIs: GET /api/referral/milestones, POST /api/referral/milestones/{id}/claim
-- Profile page shows milestones card with:
-  - Progress bar to next milestone
-  - All tiers with lock/claimable/claimed status
-  - Yellow pulsing "Claim!" button for unlocked milestones
-  - Green checkmark for claimed milestones
-- Coins automatically added to user balance on claim
-- Prevents double-claiming and claiming unreached milestones
-
-### Promotional Popup Feature (P0 - Complete)
-- Added promotional popup with admin-managed "featured_promos" collection
-- Two triggers: App open (1.5s delay, once per session) and Timed (10-15s after browsing)
-- Beautiful UI with promo image, title, subtitle, tags, description
-- "Watch Now" button navigates to series page
-- Session storage prevents re-showing popup in same session
-- Backend APIs: GET /api/promos/active, Admin CRUD at /api/admin/promos
-
-### Hero Carousel Fix (P0 - Complete)
-- Replaced brittle custom 3D CSS implementation with Swiper.js coverflow effect
-- Much more stable, professional feel with smooth animations
-- Features: Auto-play (4s), Touch swipe, Pagination dots, Loop mode
-- Side cards show with proper depth and opacity effects
-
-### Bug Fixes
-- Fixed guest viewing from series page - Episode 1 now plays without login
-- Fixed promo popup timed trigger to respect session storage
-
-## Previous Session
-- Fixed Top 10 number styling (Netflix-style large outlined numbers behind thumbnails)
-- Implemented "See All" navigation to dedicated category pages
-- Created CategoryPage component with grid layouts
+### P3 - Low Priority
+- Social features (comments, reactions)
+- Multi-language support
+- Creator verification badges
