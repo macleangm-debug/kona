@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useSearchParams, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 
 // Contexts
@@ -15,12 +15,14 @@ import {
   BottomNav, 
   InstallAppBanner, 
   PromoPopup, 
-  MilestoneAlert 
+  MilestoneAlert,
+  SearchModal
 } from "@/components";
+import DesktopHeader from "@/components/DesktopHeader";
 
 // Pages
+import HomePageResponsive from "@/pages/HomePageResponsive";
 import {
-  HomePage,
   SeriesDetailPage,
   VideoPlayerPage,
   StorePage,
@@ -29,7 +31,6 @@ import {
   CategoryPage,
   CreatorPortal,
   CreatorLoginPage,
-  AdminPage,
   AdminLoginPage,
   AdminDashboard
 } from "@/pages";
@@ -38,17 +39,28 @@ import {
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
+import 'swiper/css/navigation';
 
 // Main App Content - uses hooks that need AuthProvider
 const AppContent = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [showAuth, setShowAuth] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
   const [referralCode, setReferralCode] = useState("");
   const [forceSignUp, setForceSignUp] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   
   const { user } = useAuth();
   const { activePromo, showPromo, closePromo } = usePromoManager();
   const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
+
+  // Check viewport size
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Handle referral code from URL
   useEffect(() => {
@@ -65,10 +77,22 @@ const AppContent = () => {
     setShowAuth(true);
   };
 
+  // Pages that should have their own layout (no header/nav)
+  const fullScreenPages = ["/watch", "/admin", "/creator/login", "/admin/login"];
+  const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page));
+
   return (
-    <div className="min-h-screen bg-background text-white max-w-md mx-auto relative">
+    <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
+      {/* Desktop Header - Only on desktop and not on full-screen pages */}
+      {isDesktop && !isFullScreenPage && (
+        <DesktopHeader 
+          onAuthClick={() => handleAuthClick()} 
+          onSearchClick={() => setShowSearch(true)}
+        />
+      )}
+
       <Routes>
-        <Route path="/" element={<HomePage onAuthClick={() => handleAuthClick()} />} />
+        <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
         <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/watch/:id" element={<VideoPlayerPage onAuthClick={() => handleAuthClick(true)} />} />
         <Route path="/store" element={<StorePage />} />
@@ -82,8 +106,10 @@ const AppContent = () => {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
 
-      {/* Bottom Navigation */}
-      <BottomNav onAuthClick={() => handleAuthClick()} />
+      {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
+      {!isDesktop && !isFullScreenPage && (
+        <BottomNav onAuthClick={() => handleAuthClick()} />
+      )}
 
       {/* Auth Modal */}
       <AuthModal 
@@ -94,6 +120,12 @@ const AppContent = () => {
         }}
         initialReferralCode={referralCode}
         forceSignUp={forceSignUp}
+      />
+
+      {/* Search Modal */}
+      <SearchModal
+        open={showSearch}
+        onClose={() => setShowSearch(false)}
       />
 
       {/* Promotional Popup */}
@@ -110,8 +142,8 @@ const AppContent = () => {
         onDismiss={dismissAlert}
       />
 
-      {/* PWA Install Banner */}
-      <InstallAppBanner />
+      {/* PWA Install Banner - Mobile only */}
+      {!isDesktop && <InstallAppBanner />}
 
       {/* Toast Notifications */}
       <Toaster position="top-center" richColors />
