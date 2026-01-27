@@ -1213,14 +1213,14 @@ const HomePage = ({ onAuthClick }) => {
 
   // Auto-play carousel
   useEffect(() => {
-    if (heroSlides.length <= 1) return;
+    if (!heroSlides || heroSlides.length <= 1) return;
     
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % heroSlides.length);
     }, 4000); // Change slide every 4 seconds
     
     return () => clearInterval(interval);
-  }, [heroSlides.length]);
+  }, [heroSlides]);
 
   // Swipe handlers
   const handleTouchStart = (e) => {
