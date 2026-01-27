@@ -171,6 +171,36 @@ class AdminUserUpdate(BaseModel):
     coins: Optional[int] = None
     subscription: Optional[str] = None
 
+# Featured/Promoted Series Model
+class FeaturedPromo(BaseModel):
+    id: Optional[str] = None
+    series_id: str
+    title: str  # Custom promo title e.g. "CHRISTMAS"
+    subtitle: str  # e.g. "My Bossy CEO"
+    description: Optional[str] = None
+    promo_image: str  # Featured image URL
+    tags: List[str] = []  # e.g. ["Romance", "Drama", "Exclusive"]
+    badge_text: Optional[str] = None  # e.g. "SHORT DRAMA"
+    is_active: bool = True
+    priority: int = 1  # Higher = shown first
+    trigger_type: str = "both"  # "app_open", "timed", "both"
+    delay_seconds: int = 10  # For timed trigger
+    created_at: Optional[str] = None
+    expires_at: Optional[str] = None
+
+class FeaturedPromoCreate(BaseModel):
+    series_id: str
+    title: str
+    subtitle: str
+    description: Optional[str] = None
+    promo_image: str
+    tags: List[str] = []
+    badge_text: Optional[str] = None
+    priority: int = 1
+    trigger_type: str = "both"
+    delay_seconds: int = 10
+    expires_at: Optional[str] = None
+
 # ============ SUBSCRIPTION PLANS ============
 SUBSCRIPTION_PLANS = [
     {
