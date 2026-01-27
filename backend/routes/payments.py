@@ -6,7 +6,7 @@ from fastapi import APIRouter, HTTPException, Depends, Request
 
 from models.schemas import CheckoutRequest, SubscribeRequest
 from services import db, get_current_user, detect_country_from_ip, get_payment_config, convert_price
-from config.settings import STRIPE_API_KEY, COIN_PACKAGES, SUBSCRIPTION_PLANS
+from config.settings import STRIPE_API_KEY, COIN_PACKAGES, SUBSCRIPTION_PLANS, AFRICAN_COUNTRIES, INTERNATIONAL_CONFIG
 
 router = APIRouter(tags=["Payments"])
 
