@@ -59,7 +59,7 @@ async def register(data: UserCreate):
         "id": user_id,
         "email": data.email,
         "name": data.name,
-        "password_hash": hash_password(data.password),
+        "password": hash_password(data.password),
         "coins": coins,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "last_daily_reward": None,
@@ -76,7 +76,7 @@ async def register(data: UserCreate):
     }
     
     await db.users.insert_one(user)
-    del user["password_hash"]
+    del user["password"]
     if "_id" in user:
         del user["_id"]
     
