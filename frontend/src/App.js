@@ -1424,139 +1424,102 @@ const HomePage = ({ onAuthClick }) => {
       {/* Spacer for fixed header */}
       <div className="h-14" />
 
-      {/* Hero Carousel - True 3D Transform Based */}
+      {/* Hero Carousel - Swiper Coverflow Effect */}
       {heroSlides.length > 0 && (
-        <div 
-          className="mb-6 relative h-[420px]" 
-          data-testid="hero-carousel"
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Cards Container with 3D perspective */}
-          <div 
-            className="relative h-full w-full flex items-center justify-center"
-            style={{ perspective: '1000px' }}
+        <div className="mb-6 relative" data-testid="hero-carousel">
+          <Swiper
+            ref={swiperRef}
+            modules={[EffectCoverflow, Autoplay, Pagination]}
+            effect="coverflow"
+            grabCursor={true}
+            centeredSlides={true}
+            slidesPerView="auto"
+            loop={heroSlides.length > 2}
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true
+            }}
+            coverflowEffect={{
+              rotate: 0,
+              stretch: 0,
+              depth: 200,
+              modifier: 1.5,
+              slideShadows: false,
+            }}
+            pagination={{
+              clickable: true,
+              bulletClass: 'swiper-pagination-bullet hero-bullet',
+              bulletActiveClass: 'swiper-pagination-bullet-active hero-bullet-active',
+            }}
+            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+            className="hero-swiper"
+            style={{ paddingBottom: '40px' }}
           >
-            {heroSlides.map((heroSeries, index) => {
-              const offset = index - activeIndex;
-              const absOffset = Math.abs(offset);
-              const isActive = offset === 0;
-              
-              // Calculate transforms
-              const translateX = offset * 75; // Horizontal spacing
-              const translateZ = -absOffset * 150; // Depth
-              const rotateY = offset * 25; // Rotation
-              const scale = isActive ? 1 : 0.8;
-              const translateY = absOffset * 30; // Vertical drop
-              const opacity = absOffset > 1 ? 0 : 1;
-              const zIndex = 10 - absOffset;
-              
-              return (
+            {heroSlides.map((heroSeries, index) => (
+              <SwiperSlide key={heroSeries.id} className="hero-slide">
                 <div 
-                  key={heroSeries.id}
-                  className="absolute transition-all duration-500 ease-out cursor-pointer"
-                  style={{
-                    width: '70%',
-                    maxWidth: '280px',
-                    transform: `
-                      translateX(${translateX}%)
-                      translateY(${translateY}px)
-                      translateZ(${translateZ}px)
-                      rotateY(${rotateY}deg)
-                      scale(${scale})
-                    `,
-                    zIndex,
-                    opacity,
-                    transformStyle: 'preserve-3d',
-                  }}
-                  onClick={() => isActive ? navigate(`/watch/${heroSeries.id}-ep1`) : goToSlide(index)}
+                  className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl cursor-pointer mx-auto"
+                  style={{ maxWidth: '280px' }}
+                  onClick={() => navigate(`/watch/${heroSeries.id}-ep1`)}
                 >
-                  {/* Card */}
-                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl">
-                    {/* Background Image */}
-                    <img 
-                      src={heroSeries.thumbnail} 
-                      alt={heroSeries.title}
-                      className="w-full h-full object-cover"
-                    />
-                    
-                    {/* Gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                    
-                    {/* Dark overlay for side cards */}
-                    <div 
-                      className="absolute inset-0 bg-black transition-opacity duration-500"
-                      style={{ opacity: isActive ? 0 : 0.5 }}
-                    />
-                    
-                    {/* Top Badge */}
-                    <div className="absolute top-3 left-3 flex items-center gap-2">
-                      <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
-                        TOP {index + 1}
+                  {/* Background Image */}
+                  <img 
+                    src={heroSeries.thumbnail} 
+                    alt={heroSeries.title}
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                  
+                  {/* Top Badge */}
+                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
+                      TOP {index + 1}
+                    </span>
+                    {heroSeries.featured && (
+                      <span className="px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded">
+                        HOT
                       </span>
-                      {heroSeries.featured && (
-                        <span className="px-2 py-1 bg-yellow-500 text-black text-xs font-bold rounded">
-                          HOT
-                        </span>
-                      )}
-                    </div>
-                    
-                    {/* Episode Count */}
-                    <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
-                      {heroSeries.total_episodes} EP
-                    </div>
-                    
-                    {/* Play Button - Only on active card */}
-                    {isActive && (
-                      <button 
-                        className="absolute inset-0 flex items-center justify-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          // Navigate to first episode of this series
-                          navigate(`/watch/${heroSeries.id}-ep1`);
-                        }}
-                        data-testid={`hero-play-btn-${index}`}
-                      >
-                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
-                          <Play className="w-8 h-8 text-black fill-black ml-1" />
-                        </div>
-                      </button>
                     )}
-                    
-                    {/* Content at Bottom */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2">
-                        {heroSeries.title}
-                      </h2>
-                      <div className="flex items-center gap-2 text-sm text-white/80">
-                        <span>{heroSeries.genre}</span>
-                        <span>•</span>
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                        <span>{heroSeries.rating}</span>
-                      </div>
+                  </div>
+                  
+                  {/* Episode Count */}
+                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/60 backdrop-blur-sm rounded text-xs">
+                    {heroSeries.total_episodes} EP
+                  </div>
+                  
+                  {/* Play Button */}
+                  <button 
+                    className="absolute inset-0 flex items-center justify-center z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/watch/${heroSeries.id}-ep1`);
+                    }}
+                    data-testid={`hero-play-btn-${index}`}
+                  >
+                    <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+                      <Play className="w-8 h-8 text-black fill-black ml-1" />
+                    </div>
+                  </button>
+                  
+                  {/* Content at Bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h2 className="font-heading text-lg font-bold mb-1 line-clamp-2">
+                      {heroSeries.title}
+                    </h2>
+                    <div className="flex items-center gap-2 text-sm text-white/80">
+                      <span>{heroSeries.genre}</span>
+                      <span>•</span>
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <span>{heroSeries.rating}</span>
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Dot Indicators */}
-          <div className="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-2">
-            {heroSlides.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === activeIndex 
-                    ? "w-6 h-2 bg-red-500" 
-                    : "w-2 h-2 bg-white/40 hover:bg-white/60"
-                }`}
-                data-testid={`slide-dot-${index}`}
-              />
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
         </div>
       )}
 
