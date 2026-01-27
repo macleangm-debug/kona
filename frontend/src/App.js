@@ -30,7 +30,8 @@ import {
   CreatorPortal,
   CreatorLoginPage,
   AdminPage,
-  AdminLoginPage
+  AdminLoginPage,
+  AdminDashboard
 } from "@/pages";
 
 // Swiper CSS
@@ -76,8 +77,9 @@ const AppContent = () => {
         <Route path="/category/:category" element={<CategoryPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/creator" element={<CreatorPortal />} />
         <Route path="/creator/login" element={<CreatorLoginPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
       </Routes>
 
       {/* Bottom Navigation */}
