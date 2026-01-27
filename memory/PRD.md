@@ -180,7 +180,6 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 ### P0 (Critical) - None remaining
 
 ### P1 (High Priority)
-- 3D Hero Banner refinement (user reported not satisfied with current implementation)
 - Add Flutterwave API keys for live Africa payments
 - Video player with actual video content
 - Episode unlock flow testing
@@ -190,12 +189,32 @@ Young adults 18-35 in East/Central Africa who enjoy binge-watching short-form dr
 - Referral milestone rewards
 - Social sharing to specific platforms
 - User reviews/ratings
+- Frontend refactoring (App.js is 3700+ lines, needs component split)
 
 ### P3 (Future)
 - Watch Party feature (synchronized viewing)
-- Frontend refactoring (App.js is 3000+ lines, needs component split)
+- Backend refactoring (server.py into modules)
 
-## Completed This Session
+## Completed This Session (Jan 27, 2026)
+
+### Promotional Popup Feature (P0 - Complete)
+- Added promotional popup with admin-managed "featured_promos" collection
+- Two triggers: App open (1.5s delay, once per session) and Timed (10-15s after browsing)
+- Beautiful UI with promo image, title, subtitle, tags, description
+- "Watch Now" button navigates to series page
+- Session storage prevents re-showing popup in same session
+- Backend APIs: GET /api/promos/active, Admin CRUD at /api/admin/promos
+
+### Hero Carousel Fix (P0 - Complete)
+- Replaced brittle custom 3D CSS implementation with Swiper.js coverflow effect
+- Much more stable, professional feel with smooth animations
+- Features: Auto-play (4s), Touch swipe, Pagination dots, Loop mode
+- Side cards show with proper depth and opacity effects
+
+### Bug Fixes
+- Fixed guest viewing from series page - Episode 1 now plays without login
+
+## Previous Session
 - Fixed Top 10 number styling (Netflix-style large outlined numbers behind thumbnails)
 - Implemented "See All" navigation to dedicated category pages
 - Created CategoryPage component with grid layouts
