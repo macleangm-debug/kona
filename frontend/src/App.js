@@ -28,7 +28,9 @@ import {
   SubscriptionPage,
   CategoryPage,
   CreatorPortal,
-  AdminPage
+  CreatorLoginPage,
+  AdminPage,
+  AdminLoginPage
 } from "@/pages";
 
 // Swiper CSS
@@ -73,7 +75,9 @@ const AppContent = () => {
         <Route path="/subscriptions" element={<SubscriptionPage />} />
         <Route path="/category/:category" element={<CategoryPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/creator" element={<CreatorPortal />} />
+        <Route path="/creator/login" element={<CreatorLoginPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
       </Routes>
 
       {/* Bottom Navigation */}
