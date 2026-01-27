@@ -1372,49 +1372,7 @@ const HomePage = ({ onAuthClick }) => {
   // Hero carousel - use featured series or top series
   const heroSlides = featured.length > 0 ? featured : series.slice(0, 5);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-
-  // Auto-play carousel
-  useEffect(() => {
-    if (!heroSlides || heroSlides.length <= 1) return;
-    
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % heroSlides.length);
-    }, 4000); // Change slide every 4 seconds
-    
-    return () => clearInterval(interval);
-  }, [heroSlides]);
-
-  // Swipe handlers
-  const handleTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-    setIsDragging(true);
-  };
-
-  const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    if (!touchStart || !touchEnd) return;
-    
-    const distance = touchStart - touchEnd;
-    const minSwipeDistance = 50;
-    
-    if (distance > minSwipeDistance && activeIndex < heroSlides.length - 1) {
-      setActiveIndex(activeIndex + 1);
-    } else if (distance < -minSwipeDistance && activeIndex > 0) {
-      setActiveIndex(activeIndex - 1);
-    }
-  };
-
-  const goToSlide = (index) => {
-    setActiveIndex(Math.max(0, Math.min(heroSlides.length - 1, index)));
-  };
+  const swiperRef = useRef(null);
 
   if (loading) {
     return (
