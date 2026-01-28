@@ -165,6 +165,10 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
   - Top performing content table
   - Creator application management
   - Real-time stats overview
+- ✅ **Responsive Web View** - Netflix/YouTube-style layout:
+  - Desktop: Full-width with top navigation, hero billboard, horizontal scroll rows with hover effects
+  - Mobile: Original mobile-first design with bottom nav and Swiper carousel
+  - Responsive breakpoint at 1024px
 
 ## Test Credentials
 - **Admin**: `admin@kona.com` / `Admin123!`
