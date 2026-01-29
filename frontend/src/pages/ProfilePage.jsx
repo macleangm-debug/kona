@@ -14,12 +14,14 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
 
 export const ProfilePage = ({ onLogout }) => {
+  const { t } = useTranslation();
   const { user, logout, token, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [referralStats, setReferralStats] = useState(null);
   const [milestones, setMilestones] = useState(null);
   const [copied, setCopied] = useState(false);
   const [claimingMilestone, setClaimingMilestone] = useState(null);
+  const [showNotificationSettings, setShowNotificationSettings] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
