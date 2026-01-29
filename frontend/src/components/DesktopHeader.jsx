@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance } from "@/components/CoinBalance";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -28,11 +31,11 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
   }, []);
 
   const navItems = [
-    { label: "Home", path: "/" },
-    { label: "Discover", path: "/discover" },
-    { label: "Rewards", path: "/rewards", highlight: true },
-    { label: "My List", path: "/category/my-list", requiresAuth: true },
-    { label: "Coming Soon", path: "/category/coming-soon" },
+    { label: t("nav.home"), path: "/" },
+    { label: t("nav.discover"), path: "/discover" },
+    { label: t("nav.rewards"), path: "/rewards", highlight: true },
+    { label: t("nav.myList"), path: "/category/my-list", requiresAuth: true },
+    { label: t("nav.comingSoon"), path: "/category/coming-soon" },
   ];
 
   const handleLogout = () => {
