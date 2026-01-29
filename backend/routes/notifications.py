@@ -8,6 +8,14 @@ from services import db, get_current_user
 
 router = APIRouter(prefix="/notifications", tags=["Notifications"])
 
+# VAPID keys for push notifications (in production, store in env)
+VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U"
+
+@router.get("/vapid-key")
+async def get_vapid_key():
+    """Get VAPID public key for push subscription"""
+    return {"public_key": VAPID_PUBLIC_KEY}
+
 @router.post("/subscribe")
 async def save_push_subscription(subscription: PushSubscription, user: dict = Depends(get_current_user)):
     """Save push subscription for user"""
