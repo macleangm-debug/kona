@@ -87,8 +87,11 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
             </nav>
           </div>
 
-          {/* Right: Search + User */}
-          <div className="flex items-center gap-4">
+          {/* Right: Search + Language + User */}
+          <div className="flex items-center gap-3">
+            {/* Language Selector */}
+            <LanguageSelector showLabel={false} />
+
             {/* Search */}
             <button 
               onClick={onSearchClick}
@@ -124,26 +127,30 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
                     </div>
                     <DropdownMenuItem onClick={() => navigate("/profile")} className="cursor-pointer">
                       <User className="w-4 h-4 mr-2" />
-                      Profile
+                      {t("profile.title")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate("/leaderboard")} className="cursor-pointer">
+                      <Trophy className="w-4 h-4 mr-2 text-yellow-400" />
+                      {t("leaderboard.title")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/subscriptions")} className="cursor-pointer">
                       <Crown className="w-4 h-4 mr-2 text-yellow-400" />
-                      Upgrade to VIP
+                      {t("profile.upgradeToVip")}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => navigate("/creator")} className="cursor-pointer">
                       <Film className="w-4 h-4 mr-2 text-green-400" />
-                      Creator Studio
+                      {t("profile.creatorStudio")}
                     </DropdownMenuItem>
                     {user.is_admin && (
                       <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer">
                         <Settings className="w-4 h-4 mr-2" />
-                        Admin Panel
+                        {t("profile.adminPanel")}
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator className="bg-white/10" />
                     <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-400">
                       <LogOut className="w-4 h-4 mr-2" />
-                      Sign Out
+                      {t("auth.signOut")}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -154,7 +161,7 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
                 className="px-5 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold rounded-lg transition-colors"
                 data-testid="desktop-login-btn"
               >
-                Sign In
+                {t("auth.signIn")}
               </button>
             )}
           </div>
