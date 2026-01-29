@@ -51,21 +51,26 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 /app/frontend/src/
 ├── components/        # Reusable UI components
 │   ├── AuthModal.jsx
-│   ├── BottomNav.jsx
+│   ├── BottomNav.jsx       # Mobile navigation (Home, Discover, Rewards, Store, Profile)
+│   ├── DesktopHeader.jsx   # Desktop navigation (Home, Discover, Rewards, My List, Coming Soon)
 │   ├── CoinBalance.jsx
 │   ├── SeriesCard.jsx
+│   ├── SeriesCardDesktop.jsx
 │   ├── PromoPopup.jsx
 │   ├── MilestoneAlert.jsx
 │   └── ...
 ├── pages/            # Route components
 │   ├── HomePage.jsx
+│   ├── HomePageResponsive.jsx
+│   ├── DiscoverPage.jsx    # Content discovery with recommendations
+│   ├── RewardsPage.jsx     # Gamification hub (daily rewards, spin wheel, missions)
 │   ├── SeriesDetailPage.jsx
 │   ├── VideoPlayerPage.jsx
 │   ├── StorePage.jsx
 │   ├── ProfilePage.jsx
 │   ├── CreatorPortal.jsx
 │   ├── CreatorLoginPage.jsx
-│   ├── AdminPage.jsx
+│   ├── AdminDashboard.jsx
 │   └── AdminLoginPage.jsx
 ├── hooks/            # Custom React hooks
 │   ├── usePromoManager.js
