@@ -14,3 +14,4 @@ export { AdminLoginPage } from './AdminLoginPage';
 export { AdminDashboard } from './AdminDashboard';
 export { DiscoverPage } from './DiscoverPage';
 export { RewardsPage } from './RewardsPage';
+export { LeaderboardPage } from './LeaderboardPage';
