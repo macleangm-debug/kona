@@ -228,13 +228,14 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 
 ## Future Roadmap
 
-### P2 - Medium Priority
+### P1 - High Priority
 - Watch Party feature (WebSocket-based sync with live chat & reactions)
+
+### P2 - Medium Priority
 - AI-powered content moderation
-- Push notifications via PWA
+- Offline downloads for VIP users (Service Worker + IndexedDB)
 
 ### P3 - Low Priority
-- Multi-language support (English, Swahili, French)
-- Offline downloads for VIP users (Service Worker + IndexedDB)
 - Social features (comments, reactions)
 - Creator verification badges
+- Referral link sharing to specific social platforms
