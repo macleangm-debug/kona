@@ -189,6 +189,32 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
     - Lucky Spin wheel for bonus coins
     - Daily Missions with progress tracking (Watch 3 Episodes, Add to List, Refer a Friend, First Purchase)
     - Referral CTA linking to profile
+- ✅ **Multi-Language Support (P2)**
+  - Languages: English (en), Swahili (sw), French (fr)
+  - i18next library integration with browser language detection
+  - Language selector dropdown in header (flag icons)
+  - Translations for: Navigation, Auth, Rewards, Leaderboard, Profile, Notifications
+  - Language preference persists via localStorage
+  - Translated mobile bottom nav labels
+- ✅ **Referral Leaderboard Gamification (P2)**
+  - **Route:** `/leaderboard`
+  - **Period Tabs:** Weekly, Monthly, All Time
+  - **Prestige-Based Rewards:**
+    - #1: Gold Badge + 3-day VIP Trial + "Top Referrer" title
+    - #2: Silver Badge + 1-day VIP Trial
+    - #3: Bronze Badge + Early Access to new episodes
+    - Top 10: "Rising Star" badge
+  - Top referrers list with anonymized names, referral counts, and badges
+  - User's own rank highlighted
+  - CTA for non-logged-in users
+- ✅ **Push Notifications via PWA (P2)**
+  - Service Worker with push notification handlers (`/public/sw.js`)
+  - NotificationService for subscribing/unsubscribing to push
+  - VAPID key endpoint for push subscription
+  - Notification Settings UI in Profile page:
+    - Enable/Disable push notifications
+    - Notification type toggles: New Episodes, Daily Rewards, Milestone Alerts, Promotions
+  - Local notification testing support
 
 ## Test Credentials
 - **Admin**: `admin@kona.com` / `Admin123!`
