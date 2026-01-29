@@ -67,21 +67,63 @@ async def validate_referral_code(code: str):
     return {"valid": False}
 
 @router.get("/leaderboard")
-async def get_referral_leaderboard():
-    """Get top referrers (anonymized)"""
-    top_referrers = await db.users.find(
-        {"referral_count": {"$gt": 0}},
-        {"_id": 0, "name": 1, "referral_count": 1, "referral_earnings": 1}
-    ).sort("referral_count", -1).limit(10).to_list(10)
+async def get_referral_leaderboard(period: str = "weekly"):
+    """Get top referrers with period filter (weekly, monthly, all-time)"""
+    from datetime import datetime, timezone, timedelta
     
-    return [
-        {
-            "name": u["name"].split()[0] + " " + u["name"].split()[-1][0] + "." if len(u["name"].split()) > 1 else u["name"],
-            "referrals": u["referral_count"],
-            "earnings": u["referral_earnings"]
-        }
-        for u in top_referrers
+    # Calculate date filter based on period
+    now = datetime.now(timezone.utc)
+    date_filter = {}
+    
+    if period == "weekly":
+        # Start of current week (Monday)
+        start_of_week = now - timedelta(days=now.weekday())
+        start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+        date_filter = {"created_at": {"$gte": start_of_week.isoformat()}}
+    elif period == "monthly":
+        # Start of current month
+        start_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        date_filter = {"created_at": {"$gte": start_of_month.isoformat()}}
+    # all-time: no filter
+    
+    # Aggregate referrals by referrer
+    pipeline = [
+        {"$match": date_filter} if date_filter else {"$match": {}},
+        {"$group": {
+            "_id": "$referrer_id",
+            "referrals": {"$sum": 1},
+            "earnings": {"$sum": "$referrer_reward"}
+        }},
+        {"$sort": {"referrals": -1}},
+        {"$limit": 20}
     ]
+    
+    if date_filter:
+        pipeline[0] = {"$match": date_filter}
+    else:
+        pipeline.pop(0)
+    
+    referral_stats = await db.referrals.aggregate(pipeline).to_list(20)
+    
+    # Get user details for top referrers
+    result = []
+    for stat in referral_stats:
+        user = await db.users.find_one({"id": stat["_id"]}, {"_id": 0, "id": 1, "name": 1})
+        if user:
+            # Anonymize name (First name + Last initial)
+            name_parts = user.get("name", "User").split()
+            display_name = name_parts[0]
+            if len(name_parts) > 1:
+                display_name += " " + name_parts[-1][0] + "."
+            
+            result.append({
+                "user_id": user["id"],
+                "name": display_name,
+                "referrals": stat["referrals"],
+                "earnings": stat.get("earnings", 0)
+            })
+    
+    return result
 
 @router.get("/milestones")
 async def get_milestones(user: dict = Depends(get_current_user)):
