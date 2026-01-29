@@ -1,9 +1,11 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Home, Compass, Gift, ShoppingCart, User } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export const BottomNav = ({ onAuthClick }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
@@ -14,11 +16,11 @@ export const BottomNav = ({ onAuthClick }) => {
   }
   
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
-    { icon: Compass, label: "Discover", path: "/discover" },
-    { icon: Gift, label: "Rewards", path: "/rewards", requiresAuth: false, highlight: true },
-    { icon: ShoppingCart, label: "Store", path: "/store" },
-    { icon: User, label: "Profile", path: "/profile" },
+    { icon: Home, label: t("nav.home"), path: "/" },
+    { icon: Compass, label: t("nav.discover"), path: "/discover" },
+    { icon: Gift, label: t("nav.rewards"), path: "/rewards", requiresAuth: false, highlight: true },
+    { icon: ShoppingCart, label: t("nav.store"), path: "/store" },
+    { icon: User, label: t("nav.profile"), path: "/profile" },
   ];
 
   const handleNav = (item) => {
