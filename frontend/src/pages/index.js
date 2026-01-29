@@ -12,3 +12,5 @@ export { CreatorLoginPage } from './CreatorLoginPage';
 export { AdminPage } from './AdminPage';
 export { AdminLoginPage } from './AdminLoginPage';
 export { AdminDashboard } from './AdminDashboard';
+export { DiscoverPage } from './DiscoverPage';
+export { RewardsPage } from './RewardsPage';

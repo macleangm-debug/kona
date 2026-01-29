@@ -29,7 +29,8 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
 
   const navItems = [
     { label: "Home", path: "/" },
-    { label: "Series", path: "/category/trending" },
+    { label: "Discover", path: "/discover" },
+    { label: "Rewards", path: "/rewards", highlight: true },
     { label: "My List", path: "/category/my-list", requiresAuth: true },
     { label: "Coming Soon", path: "/category/coming-soon" },
   ];
@@ -68,10 +69,15 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
                     className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                       isActive 
                         ? "text-white bg-white/10" 
-                        : "text-gray-300 hover:text-white hover:bg-white/5"
+                        : item.highlight 
+                          ? "text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10"
+                          : "text-gray-300 hover:text-white hover:bg-white/5"
                     }`}
                   >
                     {item.label}
+                    {item.highlight && !isActive && (
+                      <span className="ml-1.5 inline-block w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
+                    )}
                   </button>
                 );
               })}
