@@ -399,6 +399,22 @@ Use my referral code: *${user?.referral_code}*
 
       {/* Quick Links */}
       <div className="space-y-2 mb-6">
+        {/* Leaderboard */}
+        <button 
+          onClick={() => navigate("/leaderboard")}
+          className="w-full flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 hover:from-yellow-500/30 hover:to-orange-500/30 transition-colors"
+          data-testid="leaderboard-btn"
+        >
+          <div className="flex items-center gap-3">
+            <Trophy className="w-5 h-5 text-yellow-400" />
+            <div className="text-left">
+              <p className="font-medium text-sm">{t("leaderboard.title")}</p>
+              <p className="text-xs text-muted-foreground">{t("leaderboard.subtitle")}</p>
+            </div>
+          </div>
+          <ChevronLeft className="w-5 h-5 rotate-180" />
+        </button>
+
         <button 
           onClick={() => navigate("/creator")}
           className="w-full flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-600/20 hover:from-green-500/30 hover:to-emerald-600/30 transition-colors"
@@ -407,7 +423,7 @@ Use my referral code: *${user?.referral_code}*
           <div className="flex items-center gap-3">
             <Film className="w-5 h-5 text-green-400" />
             <div className="text-left">
-              <p className="font-medium text-sm">Creator Portal</p>
+              <p className="font-medium text-sm">{t("profile.creatorStudio")}</p>
               <p className="text-xs text-muted-foreground">Upload & earn from your content</p>
             </div>
           </div>
@@ -421,7 +437,7 @@ Use my referral code: *${user?.referral_code}*
           <div className="flex items-center gap-3">
             <Crown className="w-5 h-5 text-yellow-400" />
             <div className="text-left">
-              <p className="font-medium text-sm">Subscription Plans</p>
+              <p className="font-medium text-sm">{t("profile.upgradeToVip")}</p>
               <p className="text-xs text-muted-foreground">Get monthly coins</p>
             </div>
           </div>
@@ -436,7 +452,7 @@ Use my referral code: *${user?.referral_code}*
             <div className="flex items-center gap-3">
               <Settings className="w-5 h-5" />
               <div className="text-left">
-                <p className="font-medium text-sm">Admin Panel</p>
+                <p className="font-medium text-sm">{t("profile.adminPanel")}</p>
                 <p className="text-xs text-muted-foreground">Manage platform</p>
               </div>
             </div>
@@ -444,6 +460,50 @@ Use my referral code: *${user?.referral_code}*
           </button>
         )}
       </div>
+
+      {/* Settings Section */}
+      <Card className="bg-card/50 border-white/10 p-6 mb-6">
+        <h3 className="font-heading font-semibold mb-4 flex items-center gap-2">
+          <Settings className="w-5 h-5" />
+          {t("profile.settings")}
+        </h3>
+        
+        {/* Language Setting */}
+        <div className="flex items-center justify-between py-3 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <Globe className="w-5 h-5 text-blue-400" />
+            <div>
+              <p className="font-medium text-sm">{t("profile.language")}</p>
+              <p className="text-xs text-muted-foreground">Select your preferred language</p>
+            </div>
+          </div>
+          <LanguageSelector />
+        </div>
+        
+        {/* Notifications Setting */}
+        <div className="py-3">
+          <button 
+            onClick={() => setShowNotificationSettings(!showNotificationSettings)}
+            className="w-full flex items-center justify-between"
+            data-testid="toggle-notifications-btn"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="w-5 h-5 text-purple-400" />
+              <div className="text-left">
+                <p className="font-medium text-sm">{t("profile.notifications")}</p>
+                <p className="text-xs text-muted-foreground">Manage push notifications</p>
+              </div>
+            </div>
+            <ChevronLeft className={`w-5 h-5 transition-transform ${showNotificationSettings ? '-rotate-90' : 'rotate-180'}`} />
+          </button>
+          
+          {showNotificationSettings && (
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <NotificationSettings />
+            </div>
+          )}
+        </div>
+      </Card>
 
       {/* Actions */}
       <Button 
