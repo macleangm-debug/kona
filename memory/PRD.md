@@ -169,6 +169,21 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
   - Desktop: Full-width with top navigation, hero billboard, horizontal scroll rows with hover effects
   - Mobile: Original mobile-first design with bottom nav and Swiper carousel
   - Responsive breakpoint at 1024px
+- ✅ **Discover & Rewards Navigation Tabs (P0)**
+  - **Mobile Navigation (BottomNav):** Home | Discover | Rewards (highlighted) | Store | Profile
+  - **Desktop Navigation (DesktopHeader):** Home | Discover | Rewards (highlighted) | My List | Coming Soon
+  - **Discover Page (`/discover`):**
+    - Personalized content discovery hub
+    - Quick category cards: Trending Now, Top Rated, New Releases, Quick Bites
+    - Content sections: Picked For You, Trending This Week, Highest Rated, If You Like Romance, Just Added
+    - "Because You Watched" recommendations (for logged-in users)
+    - Refresh button to regenerate recommendations
+  - **Rewards Page (`/rewards`):**
+    - Coin balance display
+    - Daily Login Bonus with streak counter
+    - Lucky Spin wheel for bonus coins
+    - Daily Missions with progress tracking (Watch 3 Episodes, Add to List, Refer a Friend, First Purchase)
+    - Referral CTA linking to profile
 
 ## Test Credentials
 - **Admin**: `admin@kona.com` / `Admin123!`
