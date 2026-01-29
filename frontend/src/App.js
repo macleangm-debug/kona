@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useSearchParams, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 
+// i18n
+import "@/i18n";
+
 // Contexts
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 // Hooks
 import { usePromoManager } from "@/hooks/usePromoManager";
