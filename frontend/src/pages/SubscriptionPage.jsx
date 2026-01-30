@@ -19,7 +19,8 @@ export const SubscriptionPage = () => {
     const fetchPlans = async () => {
       try {
         const res = await axios.get(`${API}/subscriptions/plans`);
-        setPlans(res.data);
+        // API returns {plans: [...]} object
+        setPlans(res.data.plans || res.data);
       } catch (e) {
         console.error(e);
       }
