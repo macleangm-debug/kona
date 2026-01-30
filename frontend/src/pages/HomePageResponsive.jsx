@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance, DailyRewardModal, ReminderSuccessModal, SearchModal } from "@/components";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
+import SpinInviteModal from "@/components/SpinInviteModal";
 
 // Content Row Component - Horizontal Scrollable
 const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveFromList, badge }) => {
