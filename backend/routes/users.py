@@ -41,6 +41,41 @@ DAILY_CHALLENGES = [
     {"id": "share_series", "title": "Social Star", "description": "Share a series with friends", "target": 1, "reward_type": "xp", "reward": 15},
 ]
 
+# Mystery Box rewards - Heavily weighted toward non-coin rewards
+MYSTERY_BOX_REWARDS = [
+    {"type": "coins", "value": 1, "weight": 15, "label": "1 Coin", "icon": "🪙"},
+    {"type": "coins", "value": 2, "weight": 10, "label": "2 Coins", "icon": "🪙"},
+    {"type": "coins", "value": 3, "weight": 5, "label": "3 Coins", "icon": "🪙"},
+    {"type": "badge", "value": "mystery_opener", "weight": 20, "label": "Mystery Badge", "icon": "🎭"},
+    {"type": "badge", "value": "lucky_finder", "weight": 15, "label": "Lucky Finder Badge", "icon": "🍀"},
+    {"type": "frame", "value": "mystery_frame", "weight": 15, "label": "Mystery Frame", "icon": "🖼️"},
+    {"type": "xp", "value": 50, "weight": 20, "label": "+50 XP", "icon": "⭐"},
+]
+MYSTERY_BOX_TRIGGER = 10  # Episodes needed to trigger mystery box
+
+# Character Cards per Series (sample data)
+CHARACTER_CARDS = {
+    "series-1": [
+        {"id": "s1-c1", "name": "Emma", "rarity": "common", "image": "emma.jpg"},
+        {"id": "s1-c2", "name": "James", "rarity": "common", "image": "james.jpg"},
+        {"id": "s1-c3", "name": "Sophie", "rarity": "rare", "image": "sophie.jpg"},
+        {"id": "s1-c4", "name": "Michael", "rarity": "epic", "image": "michael.jpg"},
+    ],
+    "series-2": [
+        {"id": "s2-c1", "name": "Alex", "rarity": "common", "image": "alex.jpg"},
+        {"id": "s2-c2", "name": "Diana", "rarity": "common", "image": "diana.jpg"},
+        {"id": "s2-c3", "name": "Marcus", "rarity": "rare", "image": "marcus.jpg"},
+        {"id": "s2-c4", "name": "Victoria", "rarity": "epic", "image": "victoria.jpg"},
+    ],
+    "series-3": [
+        {"id": "s3-c1", "name": "Lily", "rarity": "common", "image": "lily.jpg"},
+        {"id": "s3-c2", "name": "Ryan", "rarity": "common", "image": "ryan.jpg"},
+        {"id": "s3-c3", "name": "Zoe", "rarity": "rare", "image": "zoe.jpg"},
+        {"id": "s3-c4", "name": "Nathan", "rarity": "epic", "image": "nathan.jpg"},
+    ],
+}
+CARD_RARITY_WEIGHTS = {"common": 60, "rare": 30, "epic": 10}
+
 # ============ DAILY REWARDS ============
 @router.post("/rewards/claim")
 async def claim_daily_reward(user: dict = Depends(get_current_user)):
