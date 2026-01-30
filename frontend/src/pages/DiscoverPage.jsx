@@ -280,6 +280,38 @@ export const DiscoverPage = ({ onAuthClick }) => {
             previewImages={allSeries.filter(s => s.genre === "Romance").slice(0, 4).map(s => s.thumbnail)}
             seriesCount={allSeries.filter(s => s.genre === "Romance").length}
           />
+          <CategoryCard 
+            title="Drama" 
+            icon={Star} 
+            color="from-purple-500 to-violet-500"
+            onClick={() => navigate("/category/drama")}
+            previewImages={allSeries.filter(s => s.genre === "Drama").slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={allSeries.filter(s => s.genre === "Drama").length}
+          />
+          <CategoryCard 
+            title="Thriller" 
+            icon={Zap} 
+            color="from-slate-600 to-gray-800"
+            onClick={() => navigate("/category/thriller")}
+            previewImages={allSeries.filter(s => s.genre === "Thriller").slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={allSeries.filter(s => s.genre === "Thriller").length}
+          />
+          <CategoryCard 
+            title="Action" 
+            icon={TrendingUp} 
+            color="from-orange-500 to-red-600"
+            onClick={() => navigate("/category/action")}
+            previewImages={allSeries.filter(s => s.genre === "Action").slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={allSeries.filter(s => s.genre === "Action").length}
+          />
+          <CategoryCard 
+            title="Coming Soon" 
+            icon={Clock} 
+            color="from-blue-500 to-cyan-500"
+            onClick={() => navigate("/category/coming-soon")}
+            previewImages={comingSoon.slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={comingSoon.length}
+          />
         </div>
       </div>
 
