@@ -161,7 +161,7 @@ export const RewardsPage = ({ onAuthClick }) => {
   const { user, token, refreshUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [dailyReward, setDailyReward] = useState({ canClaim: false, streak: 0 });
-  const [spinData, setSpinData] = useState({ canSpin: false, lastSpin: null });
+  const [spinData, setSpinData] = useState({ canSpin: false, spinsRemaining: 0, maxSpins: 3 });
   const [isSpinning, setIsSpinning] = useState(false);
   const [claimingMission, setClaimingMission] = useState(null);
   const [claimingDaily, setClaimingDaily] = useState(false);
