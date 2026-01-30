@@ -128,3 +128,32 @@ code {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+/* Kona Loader Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes kona-pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(0.95);
+    }
+}
+
+.kona-loader-ring {
+    animation: spin 1.5s linear infinite;
+}
+
+.kona-loader-play {
+    animation: kona-pulse 1s ease-in-out infinite;
+}
