@@ -59,26 +59,28 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
               <KonaLogo2Full height={32} />
             </button>
             
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-1">
+            {/* Desktop Navigation - Pill Style with Icons */}
+            <nav className="hidden md:flex items-center bg-white/5 rounded-full p-1 border border-white/10">
               {navItems.map((item) => {
                 if (item.requiresAuth && !user) return null;
                 const isActive = location.pathname === item.path;
+                const Icon = item.icon;
                 return (
                   <button
                     key={item.path}
                     onClick={() => navigate(item.path)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-full transition-all ${
                       isActive 
-                        ? "text-white bg-white/10" 
+                        ? "text-white bg-primary shadow-lg shadow-primary/30" 
                         : item.highlight 
                           ? "text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10"
-                          : "text-gray-300 hover:text-white hover:bg-white/5"
+                          : "text-gray-400 hover:text-white hover:bg-white/10"
                     }`}
                   >
-                    {item.label}
+                    <Icon className="w-4 h-4" />
+                    <span className="hidden lg:inline">{item.label}</span>
                     {item.highlight && !isActive && (
-                      <span className="ml-1.5 inline-block w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
+                      <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse" />
                     )}
                   </button>
                 );
