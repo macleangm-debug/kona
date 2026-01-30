@@ -93,7 +93,7 @@ export const CategoryPage = ({ onAuthClick }) => {
   const useCarouselLayout = window.innerWidth >= 1024;
 
   return (
-    <div className="pb-20 pt-4 lg:pt-8" data-testid="category-page">
+    <div className="pb-20 pt-20 lg:pt-24" data-testid="category-page">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 lg:px-12 mb-6">
         <button 
