@@ -11,6 +11,7 @@ from .admin import router as admin_router
 from .promos import router as promos_router
 from .creator import router as creator_router
 from .payouts import router as payouts_router
+from .badges import router as badges_router
 
 # Create main API router
 api_router = APIRouter()
@@ -26,3 +27,4 @@ api_router.include_router(admin_router)
 api_router.include_router(promos_router)
 api_router.include_router(creator_router)
 api_router.include_router(payouts_router)
+api_router.include_router(badges_router)
