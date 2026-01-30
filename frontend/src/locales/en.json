@@ -191,6 +191,37 @@
     "addedToList": "Added to My List",
     "removedFromList": "Removed from My List",
     "rewardClaimed": "Reward claimed!",
-    "settingsSaved": "Settings saved"
+    "settingsSaved": "Settings saved",
+    "badgeEarned": "Badge Earned!"
+  },
+  "badges": {
+    "title": "Achievement Badges",
+    "earned": "Earned",
+    "inProgress": "In Progress",
+    "featured": "Featured Badges",
+    "featuredDesc": "Show up to 3 on your profile",
+    "checkNew": "Check for New Badges",
+    "noNewBadges": "No new badges earned yet. Keep going!",
+    "howToEarn": "How to Earn Badges",
+    "firstSteps": "First Steps",
+    "firstStepsDesc": "Watch your first episode",
+    "marathonMaster": "Marathon Master",
+    "marathonMasterDesc": "Watch 10+ episodes in one day",
+    "earlyAdopter": "Early Adopter",
+    "earlyAdopterDesc": "Joined in the first 3 months",
+    "superReferrer": "Super Referrer",
+    "superReferrerDesc": "Refer 10+ friends",
+    "seriesSlayer": "Series Slayer",
+    "seriesSlayerDesc": "Complete 5 full series",
+    "vipMember": "VIP Member",
+    "vipMemberDesc": "Subscribe to any VIP plan",
+    "missionAce": "Mission Ace",
+    "missionAceDesc": "Complete 50 daily missions",
+    "nightOwl": "Night Owl",
+    "nightOwlDesc": "Watch 5+ episodes after midnight",
+    "bigSpender": "Big Spender",
+    "bigSpenderDesc": "Purchase 1000+ coins total",
+    "loyalViewer": "Loyal Viewer",
+    "loyalViewerDesc": "Maintain a 30-day login streak"
   }
 }
