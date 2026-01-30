@@ -115,14 +115,73 @@ export const CategoryPage = ({ onAuthClick }) => {
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       ) : filteredSeries.length === 0 ? (
-        <div className="text-center py-12 px-4">
-          <p className="text-muted-foreground">No series found in this category</p>
-          {category === "my-list" && !user && (
-            <Button onClick={onAuthClick} className="mt-4 rounded-full">
-              Sign in to see your list
+        /* Empty State with CTA */
+        category === "my-list" ? (
+          <div className="px-4 lg:px-12">
+            <Card className="max-w-lg mx-auto p-8 bg-gradient-to-br from-primary/10 to-purple-600/10 border-primary/20 text-center">
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg shadow-primary/30">
+                <BookmarkPlus className="w-10 h-10 text-white" />
+              </div>
+              
+              <h2 className="font-heading text-2xl font-bold mb-3">
+                {user ? "Your List is Empty" : "Start Your Watchlist"}
+              </h2>
+              
+              <p className="text-gray-400 mb-6 max-w-sm mx-auto">
+                {user 
+                  ? "Save your favorite series here for easy access. Tap the + button on any series to add it to your list."
+                  : "Sign in to create your personal watchlist and never lose track of what you want to watch next."
+                }
+              </p>
+              
+              {!user ? (
+                <div className="space-y-3">
+                  <Button onClick={onAuthClick} className="w-full rounded-full" size="lg">
+                    <Heart className="w-5 h-5 mr-2" />
+                    Sign In to Start
+                  </Button>
+                  <p className="text-xs text-gray-500">
+                    Get personalized recommendations & save favorites
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <Button onClick={() => navigate("/discover")} className="w-full rounded-full" size="lg">
+                    <Compass className="w-5 h-5 mr-2" />
+                    Discover Series
+                  </Button>
+                  <Button onClick={() => navigate("/")} variant="outline" className="w-full rounded-full">
+                    <Play className="w-5 h-5 mr-2" />
+                    Browse Home
+                  </Button>
+                </div>
+              )}
+              
+              {/* Feature highlights */}
+              <div className="mt-8 pt-6 border-t border-white/10 grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <Sparkles className="w-5 h-5 mx-auto mb-1 text-yellow-400" />
+                  <p className="text-xs text-gray-400">Quick Access</p>
+                </div>
+                <div>
+                  <Heart className="w-5 h-5 mx-auto mb-1 text-red-400" />
+                  <p className="text-xs text-gray-400">Save Favorites</p>
+                </div>
+                <div>
+                  <Play className="w-5 h-5 mx-auto mb-1 text-green-400" />
+                  <p className="text-xs text-gray-400">Resume Anytime</p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <div className="text-center py-12 px-4">
+            <p className="text-muted-foreground">No series found in this category</p>
+            <Button onClick={() => navigate("/discover")} className="mt-4 rounded-full">
+              Discover Series
             </Button>
-          )}
-        </div>
+          </div>
+        )
       ) : category === "continue-watching" ? (
         /* Continue Watching - Carousel on desktop, grid on mobile */
         <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
