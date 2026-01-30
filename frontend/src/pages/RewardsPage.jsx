@@ -12,17 +12,17 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 
-// Spin Wheel Component
+// Spin Wheel Component - Revenue optimized (max 5 coins)
 const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
   const prizes = [
     { label: "1", color: "#6366f1" },
-    { label: "2", color: "#8b5cf6" },
-    { label: "3", color: "#22c55e" },
-    { label: "5", color: "#f59e0b" },
-    { label: "8", color: "#3b82f6" },
-    { label: "10", color: "#ef4444" },
-    { label: "15", color: "#ec4899" },
-    { label: "25", color: "#14b8a6" },
+    { label: "1", color: "#8b5cf6" },
+    { label: "2", color: "#22c55e" },
+    { label: "2", color: "#f59e0b" },
+    { label: "3", color: "#3b82f6" },
+    { label: "3", color: "#ef4444" },
+    { label: "4", color: "#ec4899" },
+    { label: "5", color: "#14b8a6" },
   ];
   
   const [rotation, setRotation] = useState(0);
