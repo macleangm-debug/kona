@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import { ChevronLeft, Play, Lock, Heart, Crown, Coins, Loader2 } from "lucide-react";
+import { ChevronLeft, Play, Lock, Heart, Crown, Coins } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -209,7 +209,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   if (loading || !episode) {
     return createPortal(
       <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <KonaLoader size={60} />
       </div>,
       document.body
     );

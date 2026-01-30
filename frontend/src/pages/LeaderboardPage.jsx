@@ -213,7 +213,7 @@ export const LeaderboardPage = ({ onAuthClick }) => {
         
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            <KonaLoader size={60} />
           </div>
         ) : leaderboard.length === 0 ? (
           <Card className="p-8 text-center bg-white/5 border-white/10">

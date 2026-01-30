@@ -113,7 +113,7 @@ export const CategoryPage = ({ onAuthClick }) => {
       {/* Content */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <KonaLoader size={60} />
         </div>
       ) : filteredSeries.length === 0 ? (
         /* Empty State with CTA */

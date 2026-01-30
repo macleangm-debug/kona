@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Crown, Check, Coins, Loader2 } from "lucide-react";
+import { ChevronLeft, Crown, Check, Coins } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -50,7 +50,7 @@ export const SubscriptionPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[80vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <KonaLoader size={60} />
       </div>
     );
   }
