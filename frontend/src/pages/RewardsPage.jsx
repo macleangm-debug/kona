@@ -255,13 +255,12 @@ export const RewardsPage = ({ onAuthClick }) => {
   };
 
   const handleSpin = async (prize) => {
-    setIsSpinning(false);
-    
     // Call backend to record spin and award coins
     try {
       const res = await axios.post(`${API}/spin`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      setIsSpinning(false);
       toast.success(`🎰 You won ${res.data.prize} coins!`);
       setSpinData(prev => ({
         ...prev,
@@ -270,18 +269,10 @@ export const RewardsPage = ({ onAuthClick }) => {
       }));
       await refreshUser();
     } catch (e) {
+      setIsSpinning(false);
       toast.error(e.response?.data?.detail || "Spin failed");
       setSpinData(prev => ({ ...prev, canSpin: false, spinsRemaining: 0 }));
     }
-  };
-
-  const handleSpinStart = async () => {
-    if (!user) { onAuthClick(); return; }
-    if (!spinData.canSpin || spinData.spinsRemaining <= 0) {
-      toast.error("No spins remaining! Come back tomorrow.");
-      return;
-    }
-    setIsSpinning(true);
   };
 
   const handleClaimMission = async (missionId) => {
