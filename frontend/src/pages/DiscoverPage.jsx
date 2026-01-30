@@ -245,32 +245,40 @@ export const DiscoverPage = ({ onAuthClick }) => {
         </div>
       </div>
 
-      {/* Quick Categories */}
+      {/* Quick Categories - Netflix-style Preview Cards */}
       <div className="px-4 lg:px-12 mb-8">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
           <CategoryCard 
             title="Trending Now" 
             icon={TrendingUp} 
-            color="from-red-500/20 to-orange-500/20 border border-red-500/30"
+            color="from-red-500 to-orange-500"
             onClick={() => navigate("/category/trending")}
+            previewImages={trending.slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={trending.length}
           />
           <CategoryCard 
             title="Top Rated" 
             icon={Star} 
-            color="from-yellow-500/20 to-amber-500/20 border border-yellow-500/30"
+            color="from-yellow-500 to-amber-500"
             onClick={() => navigate("/category/top-rated")}
+            previewImages={topRated.slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={topRated.length}
           />
           <CategoryCard 
             title="New Releases" 
             icon={Sparkles} 
-            color="from-green-500/20 to-emerald-500/20 border border-green-500/30"
+            color="from-green-500 to-emerald-500"
             onClick={() => navigate("/category/new-releases")}
+            previewImages={newReleases.slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={newReleases.length}
           />
           <CategoryCard 
-            title="Quick Bites" 
-            icon={Zap} 
-            color="from-blue-500/20 to-cyan-500/20 border border-blue-500/30"
-            onClick={() => navigate("/category/quick-bites")}
+            title="Romance" 
+            icon={Heart} 
+            color="from-pink-500 to-rose-500"
+            onClick={() => navigate("/category/romance")}
+            previewImages={allSeries.filter(s => s.genre === "Romance").slice(0, 4).map(s => s.thumbnail)}
+            seriesCount={allSeries.filter(s => s.genre === "Romance").length}
           />
         </div>
       </div>
