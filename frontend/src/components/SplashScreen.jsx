@@ -251,8 +251,5 @@ export const ContentLoader = ({ className = "" }) => (
     <KonaLoader size={32} />
   </div>
 );
-    </svg>
-  </div>
-);
 
 export default SplashScreen;
