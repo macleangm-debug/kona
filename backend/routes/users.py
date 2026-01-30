@@ -272,7 +272,6 @@ async def claim_streak_reward(days: int, user: dict = Depends(get_current_user))
 async def get_viewer_level(user: dict = Depends(get_current_user)):
     """Get user's viewer level based on episodes watched"""
     episodes_watched = user.get("total_episodes_watched", 0)
-    total_xp = user.get("total_xp", 0)
     
     # Determine current level
     current_level = VIEWER_LEVELS[0]
@@ -295,14 +294,46 @@ async def get_viewer_level(user: dict = Depends(get_current_user)):
         current_progress = episodes_watched - current_level["min_episodes"]
         progress = min(100, (current_progress / level_range) * 100) if level_range > 0 else 100
     
+    # For Legend users - show milestone progress
+    legend_progress = None
+    if current_level["name"] == "Legend":
+        # Find next Legend milestone
+        next_milestone = None
+        current_milestone = None
+        for milestone in LEGEND_MILESTONES:
+            if episodes_watched >= milestone["episodes"]:
+                current_milestone = milestone
+            else:
+                next_milestone = milestone
+                break
+        
+        if next_milestone:
+            legend_progress = {
+                "current_milestone": current_milestone,
+                "next_milestone": next_milestone,
+                "episodes_to_next": next_milestone["episodes"] - episodes_watched,
+                "progress_percent": round(((episodes_watched - (current_milestone["episodes"] if current_milestone else 150)) / 
+                                          (next_milestone["episodes"] - (current_milestone["episodes"] if current_milestone else 150))) * 100, 1)
+            }
+        else:
+            # User has achieved all milestones!
+            legend_progress = {
+                "current_milestone": current_milestone,
+                "next_milestone": None,
+                "all_milestones_complete": True,
+                "message": "You've achieved the highest level! You are a true Kona Master!"
+            }
+    
     return {
         "current_level": current_level,
         "next_level": next_level,
         "episodes_watched": episodes_watched,
         "episodes_to_next": episodes_needed,
         "progress_percent": round(progress, 1),
-        "total_xp": total_xp,
-        "all_levels": VIEWER_LEVELS
+        "all_levels": VIEWER_LEVELS,
+        "legend_milestones": LEGEND_MILESTONES if current_level["name"] == "Legend" else None,
+        "legend_progress": legend_progress,
+        "is_max_level": current_level["name"] == "Legend"
     }
 
 # ============ DAILY CHALLENGES ============
