@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Coins, Sparkles, ArrowRight, X, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,13 +11,7 @@ export const PurchasePrompt = ({ token, userCoins, onClose }) => {
   const [currentPrompt, setCurrentPrompt] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      fetchPrompts();
-    }
-  }, [token, userCoins]);
-
-  const fetchPrompts = async () => {
+  const fetchPrompts = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/purchase-prompt`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -29,7 +23,13 @@ export const PurchasePrompt = ({ token, userCoins, onClose }) => {
     } catch (e) {
       console.error(e);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchPrompts();
+    }
+  }, [token, userCoins, fetchPrompts]);
 
   const handleDismiss = () => {
     setDismissed(true);
