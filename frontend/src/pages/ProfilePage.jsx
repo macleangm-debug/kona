@@ -506,6 +506,11 @@ Use my referral code: *${user?.referral_code}*
         </div>
       </Card>
 
+      {/* Achievement Badges Section */}
+      <Card className="bg-card/50 border-white/10 p-6 mb-6">
+        <AchievementBadges />
+      </Card>
+
       {/* Actions */}
       <Button 
         variant="outline" 
@@ -513,7 +518,7 @@ Use my referral code: *${user?.referral_code}*
         onClick={handleLogout}
         data-testid="logout-btn"
       >
-        Sign Out
+        {t("auth.signOut")}
       </Button>
     </div>
   );
