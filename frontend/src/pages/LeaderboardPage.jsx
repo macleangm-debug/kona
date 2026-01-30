@@ -113,9 +113,9 @@ export const LeaderboardPage = ({ onAuthClick }) => {
   };
 
   return (
-    <div className="min-h-screen pb-20 lg:pb-8" data-testid="leaderboard-page">
+    <div className="min-h-screen pb-20 lg:pb-8 pt-20 lg:pt-24" data-testid="leaderboard-page">
       {/* Header */}
-      <div className="px-4 lg:px-12 pt-4 lg:pt-8 mb-6">
+      <div className="px-4 lg:px-12 mb-6">
         <button 
           onClick={() => navigate(-1)} 
           className="flex items-center gap-2 text-gray-400 hover:text-white mb-4 lg:hidden"
