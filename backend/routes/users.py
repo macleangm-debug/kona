@@ -30,7 +30,15 @@ VIEWER_LEVELS = [
     {"name": "Regular", "min_episodes": 10, "icon": "⭐", "perks": ["profile_frame_bronze"]},
     {"name": "Fan", "min_episodes": 30, "icon": "🔥", "perks": ["profile_frame_silver"]},
     {"name": "Superfan", "min_episodes": 75, "icon": "💎", "perks": ["profile_frame_gold"]},
-    {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access"]},
+    {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access", "legend_badge"]},
+]
+
+# Legend-exclusive milestone badges (for users who maxed out)
+LEGEND_MILESTONES = [
+    {"episodes": 200, "badge": "legend_200", "title": "Rising Legend"},
+    {"episodes": 300, "badge": "legend_300", "title": "True Legend"},
+    {"episodes": 500, "badge": "legend_500", "title": "Ultimate Legend"},
+    {"episodes": 1000, "badge": "legend_1000", "title": "Kona Master"},
 ]
 
 # Daily challenges - ALL badge rewards (no XP)
