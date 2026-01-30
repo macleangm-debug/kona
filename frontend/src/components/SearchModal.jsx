@@ -137,18 +137,18 @@ export const SearchModal = ({ open, onClose }) => {
             </div>
           )}
 
-          {/* Trending Genres */}
+          {/* Quick Genre Filters */}
           {!query && (
             <div className="mt-6">
-              <p className="text-sm font-medium mb-3">Browse by Genre</p>
-              <div className="grid grid-cols-2 gap-2">
-                {["Romance", "Drama", "Thriller", "Action"].map(genre => (
+              <p className="text-sm font-medium mb-3">Quick Filters</p>
+              <div className="flex flex-wrap gap-2">
+                {["Romance", "Drama", "Thriller", "Action", "Comedy", "Mystery"].map(genre => (
                   <button
                     key={genre}
                     onClick={() => setQuery(genre)}
-                    className="p-4 bg-gradient-to-br from-primary/20 to-purple-600/20 rounded-xl text-left hover:from-primary/30 hover:to-purple-600/30 transition-colors"
+                    className="px-4 py-2 bg-white/10 hover:bg-primary/30 rounded-full text-sm font-medium transition-colors"
                   >
-                    <span className="font-medium">{genre}</span>
+                    {genre}
                   </button>
                 ))}
               </div>
