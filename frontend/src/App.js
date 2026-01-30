@@ -27,6 +27,7 @@ import { SplashScreen } from "@/components/SplashScreen";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
+import NotificationsPage from "@/pages/NotificationsPage";
 import {
   SeriesDetailPage,
   VideoPlayerPage,
