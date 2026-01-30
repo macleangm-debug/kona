@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
+import { KonaLoader } from "@/components/SplashScreen";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
 
 // Netflix-style Content Preview Category Card

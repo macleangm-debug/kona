@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
+import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
 import { SeriesCard, ContinueWatchingCard, ComingSoonCard } from "@/components";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
+import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
 
 export const SubscriptionPage = () => {

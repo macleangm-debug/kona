@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
+import { KonaLoader } from "@/components/SplashScreen";
 
 const RankBadge = ({ rank }) => {
   if (rank === 1) return <Crown className="w-6 h-6 text-yellow-400" />;
