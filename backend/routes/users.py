@@ -11,9 +11,10 @@ from config.settings import DAILY_REWARD_COINS
 
 router = APIRouter(tags=["User"])
 
-# Spin wheel prize configuration
-SPIN_PRIZES = [5, 10, 15, 20, 25, 50, 5, 10]  # Weighted: more small prizes
-SPIN_WEIGHTS = [25, 20, 15, 12, 10, 3, 10, 5]  # Probability weights
+# Spin wheel prize configuration - Lower prizes, harder to get big wins
+SPIN_PRIZES = [1, 2, 3, 5, 8, 10, 15, 25]  # Lower prizes
+SPIN_WEIGHTS = [30, 25, 20, 12, 7, 4, 1.5, 0.5]  # Much harder to get high prizes
+MAX_SPINS_PER_DAY = 3  # Maximum spins allowed per day
 
 # ============ DAILY REWARDS ============
 @router.post("/rewards/claim")
