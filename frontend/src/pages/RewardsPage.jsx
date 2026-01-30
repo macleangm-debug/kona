@@ -400,6 +400,9 @@ export const RewardsPage = ({ onAuthClick }) => {
             onSpin={handleSpin} 
             canSpin={spinData.canSpin} 
             isSpinning={isSpinning}
+            onSpinStart={handleSpinStart}
+            spinsRemaining={spinData.spinsRemaining}
+            maxSpins={spinData.maxSpins}
           />
           <div className="mt-4 text-center">
             <Button
