@@ -154,7 +154,31 @@ export const AdminDashboard = () => {
     { id: "content", label: "Content", icon: Film },
     { id: "revenue", label: "Revenue", icon: DollarSign },
     { id: "creators", label: "Creators", icon: Crown },
+    ...(user?.is_super_admin ? [{ id: "docs", label: "Docs & System", icon: FileText }] : [])
   ];
+
+  const fetchDocs = async () => {
+    if (!user?.is_super_admin) return;
+    setDocsLoading(true);
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      const [guideRes, healthRes] = await Promise.all([
+        axios.get(`${API}/admin/docs/production-guide`, { headers }),
+        axios.get(`${API}/admin/system/health`, { headers })
+      ]);
+      setProductionGuide(guideRes.data);
+      setSystemHealth(healthRes.data);
+    } catch (e) {
+      console.error("Error fetching docs:", e);
+    }
+    setDocsLoading(false);
+  };
+
+  useEffect(() => {
+    if (activeTab === "docs" && !productionGuide) {
+      fetchDocs();
+    }
+  }, [activeTab]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white" data-testid="admin-dashboard">
