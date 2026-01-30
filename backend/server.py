@@ -130,6 +130,8 @@ async def seed_data():
 async def seed_super_admin():
     """Seed super admin account if not exists"""
     from services import hash_password, generate_referral_code
+    from datetime import datetime, timezone
+    import uuid
     
     SUPER_ADMIN_EMAIL = "superadmin@kona.com"
     SUPER_ADMIN_PASSWORD = "SuperAdmin2025!"
@@ -145,7 +147,6 @@ async def seed_super_admin():
             logger.info("✅ Updated existing admin to super admin")
         return
     
-    import uuid
     user_id = str(uuid.uuid4())
     referral_code = generate_referral_code(user_id)
     
