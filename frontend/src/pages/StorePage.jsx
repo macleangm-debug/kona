@@ -265,15 +265,16 @@ export const StorePage = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Payment Method Sheet */}
-      <Sheet open={showPaymentSheet} onOpenChange={setShowPaymentSheet}>
-        <SheetContent side="bottom" className="bg-card border-t border-white/10 rounded-t-3xl" data-testid="payment-sheet">
-          <SheetHeader>
-            <SheetTitle className="font-heading text-xl">Complete Purchase</SheetTitle>
-          </SheetHeader>
+      {/* Payment Method Modal */}
+      <Dialog open={showPaymentSheet} onOpenChange={setShowPaymentSheet}>
+        <DialogContent className="bg-card border border-white/10 rounded-2xl max-w-md mx-auto" data-testid="payment-modal">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl">Complete Purchase</DialogTitle>
+            <DialogDescription className="sr-only">Complete your coin purchase</DialogDescription>
+          </DialogHeader>
           
           {selectedPackage && (
-            <div className="py-4">
+            <div className="py-2">
               {/* Package Summary */}
               <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/30 mb-4">
                 <div className="flex items-center gap-3">
@@ -333,8 +334,8 @@ export const StorePage = () => {
               </Button>
             </div>
           )}
-        </SheetContent>
-      </Sheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
