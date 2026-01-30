@@ -427,8 +427,9 @@ export const HomePageResponsive = ({ onAuthClick }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="flex flex-col items-center justify-center h-screen bg-background">
+        <KonaLoader size={60} />
+        <p className="mt-4 text-sm text-gray-400 animate-pulse">Loading...</p>
       </div>
     );
   }
