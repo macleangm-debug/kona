@@ -15,7 +15,7 @@ export { SearchModal } from './SearchModal';
 export { KonaLogo2Full } from './KonaLogo';
 export { DesktopHeader } from './DesktopHeader';
 export { SeriesCardDesktop } from './SeriesCardDesktop';
-export { SplashScreen, KonaLoader } from './SplashScreen';
+export { SplashScreen, KonaLoader, PageLoader, ContentLoader } from './SplashScreen';
 
 // Gamification components
 export { PurchasePrompt, AlmostThereBanner } from './PurchasePrompt';
