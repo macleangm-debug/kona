@@ -239,7 +239,6 @@ export const RewardsPage = ({ onAuthClick }) => {
 
   const handleSpin = async (prize) => {
     setIsSpinning(false);
-    setSpinData({ ...spinData, canSpin: false });
     
     // Call backend to record spin and award coins
     try {
@@ -247,19 +246,22 @@ export const RewardsPage = ({ onAuthClick }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success(`🎰 You won ${res.data.prize} coins!`);
+      setSpinData(prev => ({
+        ...prev,
+        canSpin: res.data.spins_remaining > 0,
+        spinsRemaining: res.data.spins_remaining
+      }));
       await refreshUser();
     } catch (e) {
-      // Fallback - still show prize from wheel animation
-      localStorage.setItem('kona-last-spin', new Date().toDateString());
-      toast.success(`🎰 You won ${prize} coins!`);
-      refreshUser();
+      toast.error(e.response?.data?.detail || "Spin failed");
+      setSpinData(prev => ({ ...prev, canSpin: false, spinsRemaining: 0 }));
     }
   };
 
   const handleSpinStart = async () => {
     if (!user) { onAuthClick(); return; }
-    if (!spinData.canSpin) {
-      toast.error("Come back tomorrow for another spin!");
+    if (!spinData.canSpin || spinData.spinsRemaining <= 0) {
+      toast.error("No spins remaining! Come back tomorrow.");
       return;
     }
     setIsSpinning(true);
