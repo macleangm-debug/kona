@@ -47,13 +47,17 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining 
   };
 
   return (
-    <div className="relative w-64 h-64 mx-auto">
+    <div className="relative w-64 h-64 mx-auto my-4">
+      {/* Outer glow */}
+      <div className={`absolute inset-0 rounded-full ${isSpinning ? 'animate-pulse' : ''}`} 
+           style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)' }} />
+      
       {/* Wheel */}
       <div 
-        className="w-full h-full rounded-full relative overflow-hidden shadow-2xl"
+        className="w-full h-full rounded-full relative overflow-hidden shadow-2xl border-4 border-yellow-400"
         style={{
           transform: `rotate(${rotation}deg)`,
-          transition: isSpinning ? 'transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99)' : 'none'
+          transition: isSpinning ? 'transform 3.5s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'
         }}
       >
         {prizes.map((prize, i) => (
