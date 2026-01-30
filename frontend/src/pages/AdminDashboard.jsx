@@ -565,6 +565,123 @@ export const AdminDashboard = () => {
             </Card>
           </div>
         )}
+
+        {/* Docs & System Tab (Super Admin Only) */}
+        {activeTab === "docs" && user?.is_super_admin && (
+          <div className="space-y-6">
+            {docsLoading ? (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <>
+                {/* System Health */}
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                  <Card className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border-green-500/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Database className="w-5 h-5 text-green-400" />
+                      <span className="font-medium">Database</span>
+                    </div>
+                    <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30">
+                      {systemHealth?.database?.status || "unknown"}
+                    </Badge>
+                  </Card>
+                  
+                  <Card className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-blue-500/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Server className="w-5 h-5 text-blue-400" />
+                      <span className="font-medium">Cache</span>
+                    </div>
+                    <Badge variant="outline" className={`${systemHealth?.cache === 'connected' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'}`}>
+                      {systemHealth?.cache || "disabled"}
+                    </Badge>
+                  </Card>
+                  
+                  <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10 border-purple-500/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Shield className="w-5 h-5 text-purple-400" />
+                      <span className="font-medium">Rate Limiting</span>
+                    </div>
+                    <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30">
+                      {systemHealth?.scaling_features?.rate_limiting || "enabled"}
+                    </Badge>
+                  </Card>
+                  
+                  <Card className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/20">
+                    <div className="flex items-center gap-3 mb-2">
+                      <BarChart3 className="w-5 h-5 text-yellow-400" />
+                      <span className="font-medium">Indexes</span>
+                    </div>
+                    <Badge variant="outline" className="bg-green-500/20 text-green-400 border-green-500/30">
+                      {systemHealth?.scaling_features?.indexes || "optimized"}
+                    </Badge>
+                  </Card>
+                </div>
+
+                {/* Collection Stats */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Database className="w-5 h-5" />
+                    Collection Statistics
+                  </h3>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="p-4 rounded-lg bg-white/5">
+                      <p className="text-2xl font-bold">{systemHealth?.collections?.users?.toLocaleString() || 0}</p>
+                      <p className="text-sm text-muted-foreground">Users</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-white/5">
+                      <p className="text-2xl font-bold">{systemHealth?.collections?.series?.toLocaleString() || 0}</p>
+                      <p className="text-sm text-muted-foreground">Series</p>
+                    </div>
+                    <div className="p-4 rounded-lg bg-white/5">
+                      <p className="text-2xl font-bold">{systemHealth?.collections?.episodes?.toLocaleString() || 0}</p>
+                      <p className="text-sm text-muted-foreground">Episodes</p>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Production Guide */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <FileText className="w-5 h-5" />
+                      {productionGuide?.title || "Production Deployment Guide"}
+                    </h3>
+                    <Badge variant="outline" className="text-xs">
+                      Updated: {productionGuide?.last_updated ? new Date(productionGuide.last_updated).toLocaleDateString() : "N/A"}
+                    </Badge>
+                  </div>
+                  <div className="prose prose-invert prose-sm max-w-none overflow-auto max-h-[600px] pr-4 markdown-content">
+                    <ReactMarkdown
+                      components={{
+                        h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-white mt-6 mb-4" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="text-xl font-bold text-white mt-5 mb-3 border-b border-white/10 pb-2" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2" {...props} />,
+                        p: ({node, ...props}) => <p className="text-gray-300 mb-3" {...props} />,
+                        ul: ({node, ...props}) => <ul className="list-disc list-inside text-gray-300 mb-3 space-y-1" {...props} />,
+                        ol: ({node, ...props}) => <ol className="list-decimal list-inside text-gray-300 mb-3 space-y-1" {...props} />,
+                        li: ({node, ...props}) => <li className="text-gray-300" {...props} />,
+                        table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full border border-white/10" {...props} /></div>,
+                        thead: ({node, ...props}) => <thead className="bg-white/5" {...props} />,
+                        th: ({node, ...props}) => <th className="px-4 py-2 text-left text-sm font-semibold border border-white/10" {...props} />,
+                        td: ({node, ...props}) => <td className="px-4 py-2 text-sm border border-white/10" {...props} />,
+                        code: ({node, inline, ...props}) => 
+                          inline 
+                            ? <code className="bg-white/10 px-1.5 py-0.5 rounded text-purple-300 text-sm" {...props} />
+                            : <code className="block bg-black/30 p-4 rounded-lg overflow-x-auto text-sm text-green-300" {...props} />,
+                        pre: ({node, ...props}) => <pre className="bg-black/30 p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
+                        blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-400 my-4" {...props} />,
+                        hr: ({node, ...props}) => <hr className="border-white/10 my-6" {...props} />,
+                      }}
+                    >
+                      {productionGuide?.content || "Loading..."}
+                    </ReactMarkdown>
+                  </div>
+                </Card>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
