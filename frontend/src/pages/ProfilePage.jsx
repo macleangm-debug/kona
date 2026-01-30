@@ -163,7 +163,7 @@ Use my referral code: *${user?.referral_code}*
   if (!user) return null;
 
   return (
-    <div className="pb-20 px-4 pt-4" data-testid="profile-page">
+    <div className="min-h-screen pb-20 px-4 lg:px-12 pt-20 lg:pt-24" data-testid="profile-page">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold">Profile</h1>

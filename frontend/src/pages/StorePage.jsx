@@ -181,7 +181,7 @@ export const StorePage = () => {
   }
 
   return (
-    <div className="pb-20 px-4 pt-4" data-testid="store-page">
+    <div className="min-h-screen pb-20 px-4 lg:px-12 pt-20 lg:pt-24" data-testid="store-page">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold">Coin Store</h1>
