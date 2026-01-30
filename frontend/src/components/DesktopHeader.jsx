@@ -59,8 +59,8 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
               <KonaLogo2Full height={32} />
             </button>
             
-            {/* Desktop Navigation - Pill Style with Icons */}
-            <nav className="hidden md:flex items-center bg-white/5 rounded-full p-1 border border-white/10">
+            {/* Desktop Navigation - Clean Style with Icons */}
+            <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
                 if (item.requiresAuth && !user) return null;
                 const isActive = location.pathname === item.path;
