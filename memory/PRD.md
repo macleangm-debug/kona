@@ -240,7 +240,7 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 - **Creator**: `milestone_test@test.com` / `test123` (creator application needed)
 
 ## Deployment
-- Preview URL: https://miniseriesapp-1.preview.emergentagent.com
+- Preview URL: https://coinseries.preview.emergentagent.com
 - Backend: FastAPI on port 8001
 - Frontend: React on port 3000
 - Database: MongoDB
