@@ -37,6 +37,9 @@ export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("7d");
+  const [productionGuide, setProductionGuide] = useState(null);
+  const [systemHealth, setSystemHealth] = useState(null);
+  const [docsLoading, setDocsLoading] = useState(false);
 
   useEffect(() => {
     if (!user?.is_admin) {
