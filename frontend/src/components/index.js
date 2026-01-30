@@ -21,3 +21,6 @@ export { PurchasePrompt, AlmostThereBanner } from './PurchasePrompt';
 export { WatchStreak } from './WatchStreak';
 export { ViewerLevel } from './ViewerLevel';
 export { DailyChallenges } from './DailyChallenges';
+export { MysteryBox } from './MysteryBox';
+export { CharacterCards } from './CharacterCards';
+export { WeeklyLeaderboard } from './WeeklyLeaderboard';
