@@ -186,9 +186,9 @@ export const DiscoverPage = ({ onAuthClick }) => {
   }
 
   return (
-    <div className="min-h-screen pb-20 lg:pb-8" data-testid="discover-page">
+    <div className="min-h-screen pb-20 lg:pb-8 pt-20 lg:pt-24" data-testid="discover-page">
       {/* Header */}
-      <div className="px-4 lg:px-12 pt-4 lg:pt-8 mb-6">
+      <div className="px-4 lg:px-12 mb-6">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
