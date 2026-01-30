@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy } from "lucide-react";
+import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy, Home, Compass, Gift, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance } from "@/components/CoinBalance";
@@ -31,11 +31,10 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
   }, []);
 
   const navItems = [
-    { label: t("nav.home"), path: "/" },
-    { label: t("nav.discover"), path: "/discover" },
-    { label: t("nav.rewards"), path: "/rewards", highlight: true },
-    { label: t("nav.myList"), path: "/category/my-list", requiresAuth: true },
-    { label: t("nav.comingSoon"), path: "/category/coming-soon" },
+    { label: t("nav.home"), path: "/", icon: Home },
+    { label: t("nav.discover"), path: "/discover", icon: Compass },
+    { label: t("nav.rewards"), path: "/rewards", icon: Gift, highlight: true },
+    { label: t("nav.myList"), path: "/category/my-list", icon: Clock, requiresAuth: true },
   ];
 
   const handleLogout = () => {
