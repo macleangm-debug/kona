@@ -450,6 +450,14 @@ export const HomePageResponsive = ({ onAuthClick }) => {
             {user ? (
               <>
                 <button 
+                  className="p-2 hover:bg-white/10 rounded-full relative"
+                  onClick={() => navigate("/notifications")}
+                  data-testid="mobile-notifications-btn"
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                </button>
+                <button 
                   className="p-2 hover:bg-white/10 rounded-full"
                   onClick={() => setShowReward(true)}
                 >
