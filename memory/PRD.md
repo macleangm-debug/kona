@@ -237,6 +237,11 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 
 ## Test Credentials
 - **Admin**: `admin@kona.com` / `Admin123!`
+- **Super Admin**: `superadmin@kona.com` / `SuperAdmin2025!`
+  - Access to Production Deployment Guide
+  - System Health monitoring
+  - Full platform management
+- **Demo User**: `demo@kona.com` / `Demo123!`
 - **Creator**: `milestone_test@test.com` / `test123` (creator application needed)
 
 ## Deployment
