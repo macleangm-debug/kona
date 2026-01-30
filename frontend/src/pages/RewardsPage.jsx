@@ -81,21 +81,31 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, onSpinStart, spinsRemaining = 
       {/* Center button */}
       <button
         onClick={handleSpin}
-        disabled={!canSpin || isSpinning}
+        disabled={!canSpin || isSpinning || spinsRemaining <= 0}
         className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full 
-          ${canSpin && !isSpinning 
+          ${canSpin && !isSpinning && spinsRemaining > 0
             ? 'bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 cursor-pointer' 
             : 'bg-gray-600 cursor-not-allowed'
           } 
           flex items-center justify-center shadow-xl transition-all`}
       >
         <span className="text-white font-bold text-sm">
-          {isSpinning ? '...' : 'SPIN'}
+          {isSpinning ? '...' : spinsRemaining <= 0 ? '✗' : 'SPIN'}
         </span>
       </button>
       
       {/* Pointer */}
       <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-yellow-400" />
+      
+      {/* Spins remaining indicator */}
+      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-1">
+        {[...Array(maxSpins)].map((_, i) => (
+          <div 
+            key={i} 
+            className={`w-3 h-3 rounded-full ${i < spinsRemaining ? 'bg-yellow-400' : 'bg-gray-600'}`}
+          />
+        ))}
+      </div>
     </div>
   );
 };
