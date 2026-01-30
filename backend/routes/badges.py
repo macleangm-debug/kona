@@ -20,7 +20,7 @@ BADGES = [
         "icon": "sparkles",
         "color": "from-blue-500 to-cyan-500",
         "criteria": {"type": "episodes_watched", "target": 1},
-        "reward_coins": 5
+        "reward_coins": 3
     },
     {
         "id": "marathon_master",
@@ -29,7 +29,7 @@ BADGES = [
         "icon": "flame",
         "color": "from-orange-500 to-red-500",
         "criteria": {"type": "episodes_in_day", "target": 10},
-        "reward_coins": 50
+        "reward_coins": 10
     },
     {
         "id": "early_adopter",
@@ -38,7 +38,7 @@ BADGES = [
         "icon": "star",
         "color": "from-yellow-400 to-amber-500",
         "criteria": {"type": "early_signup", "target": 90},
-        "reward_coins": 100
+        "reward_coins": 15
     },
     {
         "id": "super_referrer",
@@ -47,7 +47,7 @@ BADGES = [
         "icon": "crown",
         "color": "from-purple-500 to-pink-500",
         "criteria": {"type": "referrals", "target": 10},
-        "reward_coins": 200
+        "reward_coins": 25
     },
     {
         "id": "series_slayer",
@@ -56,7 +56,7 @@ BADGES = [
         "icon": "film",
         "color": "from-green-500 to-emerald-500",
         "criteria": {"type": "series_completed", "target": 5},
-        "reward_coins": 150
+        "reward_coins": 10
     },
     {
         "id": "vip_member",
@@ -74,7 +74,7 @@ BADGES = [
         "icon": "target",
         "color": "from-red-500 to-rose-500",
         "criteria": {"type": "missions_completed", "target": 50},
-        "reward_coins": 100
+        "reward_coins": 15
     },
     {
         "id": "night_owl",
@@ -83,7 +83,7 @@ BADGES = [
         "icon": "moon",
         "color": "from-indigo-500 to-purple-600",
         "criteria": {"type": "night_episodes", "target": 5},
-        "reward_coins": 30
+        "reward_coins": 5
     },
     {
         "id": "big_spender",
@@ -92,7 +92,7 @@ BADGES = [
         "icon": "coins",
         "color": "from-yellow-500 to-orange-500",
         "criteria": {"type": "coins_purchased", "target": 1000},
-        "reward_coins": 50
+        "reward_coins": 0
     },
     {
         "id": "loyal_viewer",
@@ -101,7 +101,7 @@ BADGES = [
         "icon": "refresh",
         "color": "from-teal-500 to-green-500",
         "criteria": {"type": "login_streak", "target": 30},
-        "reward_coins": 100
+        "reward_coins": 20
     }
 ]
 
