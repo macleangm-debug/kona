@@ -105,9 +105,13 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
             {user ? (
               <>
                 {/* Notifications */}
-                <button className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors relative">
+                <button 
+                  onClick={() => navigate("/notifications")}
+                  className="p-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors relative"
+                  data-testid="desktop-notifications-btn"
+                >
                   <Bell className="w-5 h-5" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                 </button>
 
                 {/* Coin Balance */}
