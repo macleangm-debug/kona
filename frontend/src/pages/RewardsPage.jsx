@@ -13,22 +13,23 @@ import { API } from "@/config";
 import { toast } from "sonner";
 
 // Spin Wheel Component
-const SpinWheel = ({ onSpin, canSpin, isSpinning }) => {
+const SpinWheel = ({ onSpin, canSpin, isSpinning, onSpinStart, spinsRemaining = 0, maxSpins = 3 }) => {
   const prizes = [
-    { label: "5", color: "#8b5cf6" },
-    { label: "10", color: "#22c55e" },
-    { label: "2", color: "#f59e0b" },
-    { label: "20", color: "#ef4444" },
-    { label: "3", color: "#3b82f6" },
-    { label: "15", color: "#ec4899" },
     { label: "1", color: "#6366f1" },
-    { label: "50", color: "#14b8a6" },
+    { label: "2", color: "#8b5cf6" },
+    { label: "3", color: "#22c55e" },
+    { label: "5", color: "#f59e0b" },
+    { label: "8", color: "#3b82f6" },
+    { label: "10", color: "#ef4444" },
+    { label: "15", color: "#ec4899" },
+    { label: "25", color: "#14b8a6" },
   ];
   
   const [rotation, setRotation] = useState(0);
 
   const handleSpin = () => {
-    if (!canSpin || isSpinning) return;
+    if (!canSpin || isSpinning || spinsRemaining <= 0) return;
+    onSpinStart();
     
     // Random rotation (3-5 full spins + random position)
     const spins = 3 + Math.random() * 2;
