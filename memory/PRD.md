@@ -215,6 +215,25 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
     - Enable/Disable push notifications
     - Notification type toggles: New Episodes, Daily Rewards, Milestone Alerts, Promotions
   - Local notification testing support
+- ✅ **Achievement Badges System**
+  - **Route:** `/api/badges/*`
+  - **10 Badges:**
+    - 🔥 Marathon Master - Watch 10+ episodes in one day
+    - ⭐ Early Adopter - Joined in first 3 months
+    - 👑 Super Referrer - Refer 10+ friends
+    - 🎬 Series Slayer - Complete 5 full series
+    - 💎 VIP Member - Subscribe to any VIP plan
+    - 🎯 Mission Ace - Complete 50 daily missions
+    - 🌙 Night Owl - Watch 5+ episodes after midnight
+    - 💰 Big Spender - Purchase 1000+ coins total
+    - 🔄 Loyal Viewer - 30-day login streak
+    - ✨ First Steps - Watch first episode
+  - **Features:**
+    - Badge showcase (select up to 3 featured badges)
+    - Progress tracking for incomplete badges
+    - Coin rewards when badges are earned
+    - "Check for New Badges" button
+    - Badge leaderboard
 
 ## Test Credentials
 - **Admin**: `admin@kona.com` / `Admin123!`
