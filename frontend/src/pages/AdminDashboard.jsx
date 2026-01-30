@@ -4,7 +4,8 @@ import axios from "axios";
 import { 
   ChevronLeft, Users, Film, CreditCard, TrendingUp, 
   DollarSign, Eye, Crown, Check, X, Clock, Loader2,
-  BarChart3, PieChart, ArrowUpRight, ArrowDownRight
+  BarChart3, PieChart, ArrowUpRight, ArrowDownRight,
+  FileText, Server, Shield, Database
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
 
 // Chart colors
 const COLORS = ['#8b5cf6', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'];
