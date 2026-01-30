@@ -10,17 +10,50 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
 
-// Recommendation Category Card
-const CategoryCard = ({ title, icon: Icon, color, onClick }) => (
+// Netflix-style Content Preview Category Card
+const CategoryCard = ({ title, icon: Icon, color, onClick, previewImages = [], seriesCount = 0 }) => (
   <button
     onClick={onClick}
-    className={`flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r ${color} hover:scale-[1.02] transition-transform`}
+    className="group relative overflow-hidden rounded-xl aspect-[16/9] min-w-[280px] lg:min-w-[320px] hover:scale-[1.02] transition-all duration-300 shadow-lg"
   >
-    <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-      <Icon className="w-5 h-5" />
+    {/* Background Images Grid */}
+    <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-0.5">
+      {previewImages.slice(0, 4).map((img, i) => (
+        <div 
+          key={i} 
+          className="bg-cover bg-center"
+          style={{ backgroundImage: `url(${img})` }}
+        />
+      ))}
+      {/* Fill empty slots with gradient */}
+      {[...Array(Math.max(0, 4 - previewImages.length))].map((_, i) => (
+        <div key={`empty-${i}`} className={`bg-gradient-to-br ${color}`} />
+      ))}
     </div>
-    <span className="font-semibold">{title}</span>
-    <ChevronRight className="w-5 h-5 ml-auto" />
+    
+    {/* Gradient Overlay */}
+    <div className={`absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent opacity-80 group-hover:opacity-90 transition-opacity`} />
+    
+    {/* Content */}
+    <div className="absolute inset-0 flex flex-col justify-end p-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${color} flex items-center justify-center shadow-lg`}>
+          <Icon className="w-5 h-5 text-white" />
+        </div>
+        <div className="flex-1 text-left">
+          <h3 className="font-bold text-lg text-white">{title}</h3>
+          {seriesCount > 0 && (
+            <p className="text-xs text-gray-300">{seriesCount} series</p>
+          )}
+        </div>
+        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+          <Play className="w-4 h-4 text-white fill-white" />
+        </div>
+      </div>
+    </div>
+    
+    {/* Hover border effect */}
+    <div className={`absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-white/30 transition-colors`} />
   </button>
 );
 
