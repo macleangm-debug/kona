@@ -33,23 +33,23 @@ VIEWER_LEVELS = [
     {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access"]},
 ]
 
-# Daily challenges (mostly non-coin rewards)
+# Daily challenges - ALL badge rewards (no XP)
 DAILY_CHALLENGES = [
-    {"id": "watch_1", "title": "Daily Watch", "description": "Watch 1 episode today", "target": 1, "reward_type": "xp", "reward": 10},
-    {"id": "watch_3", "title": "Triple Play", "description": "Watch 3 episodes today", "target": 3, "reward_type": "xp", "reward": 30},
+    {"id": "watch_1", "title": "Daily Watch", "description": "Watch 1 episode today", "target": 1, "reward_type": "badge", "reward": "daily_watcher"},
+    {"id": "watch_3", "title": "Triple Play", "description": "Watch 3 episodes today", "target": 3, "reward_type": "badge", "reward": "binge_starter"},
     {"id": "genre_explore", "title": "Genre Explorer", "description": "Watch from 2 different genres", "target": 2, "reward_type": "badge", "reward": "explorer"},
-    {"id": "share_series", "title": "Social Star", "description": "Share a series with friends", "target": 1, "reward_type": "xp", "reward": 15},
+    {"id": "share_series", "title": "Social Star", "description": "Share a series with friends", "target": 1, "reward_type": "badge", "reward": "social_star"},
 ]
 
-# Mystery Box rewards - Heavily weighted toward non-coin rewards
+# Mystery Box rewards - Heavily weighted toward non-coin rewards (NO XP)
 MYSTERY_BOX_REWARDS = [
     {"type": "coins", "value": 1, "weight": 15, "label": "1 Coin", "icon": "🪙"},
     {"type": "coins", "value": 2, "weight": 10, "label": "2 Coins", "icon": "🪙"},
     {"type": "coins", "value": 3, "weight": 5, "label": "3 Coins", "icon": "🪙"},
-    {"type": "badge", "value": "mystery_opener", "weight": 20, "label": "Mystery Badge", "icon": "🎭"},
-    {"type": "badge", "value": "lucky_finder", "weight": 15, "label": "Lucky Finder Badge", "icon": "🍀"},
+    {"type": "badge", "value": "mystery_opener", "weight": 25, "label": "Mystery Badge", "icon": "🎭"},
+    {"type": "badge", "value": "lucky_finder", "weight": 20, "label": "Lucky Finder", "icon": "🍀"},
     {"type": "frame", "value": "mystery_frame", "weight": 15, "label": "Mystery Frame", "icon": "🖼️"},
-    {"type": "xp", "value": 50, "weight": 20, "label": "+50 XP", "icon": "⭐"},
+    {"type": "badge", "value": "treasure_hunter", "weight": 10, "label": "Treasure Hunter", "icon": "💎"},
 ]
 MYSTERY_BOX_TRIGGER = 10  # Episodes needed to trigger mystery box
 
