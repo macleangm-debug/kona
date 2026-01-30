@@ -55,49 +55,66 @@ async def get_reward_status(user: dict = Depends(get_current_user)):
 @router.get("/spin/status")
 async def get_spin_status(user: dict = Depends(get_current_user)):
     """Check if user can spin the wheel today"""
-    last_spin = user.get("last_spin")
+    last_spin_date = user.get("last_spin_date")
+    spins_today = user.get("spins_today", 0)
     now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
     
-    if not last_spin:
-        return {"can_spin": True, "prizes": SPIN_PRIZES}
+    # Reset spins if it's a new day
+    if last_spin_date != today:
+        spins_today = 0
     
-    last_spin_dt = datetime.fromisoformat(last_spin.replace('Z', '+00:00'))
-    hours_since = (now - last_spin_dt).total_seconds() / 3600
-    can_spin = hours_since >= 24
+    can_spin = spins_today < MAX_SPINS_PER_DAY
+    spins_remaining = MAX_SPINS_PER_DAY - spins_today
     
     return {
         "can_spin": can_spin, 
-        "hours_until_next": max(0, 24 - hours_since) if not can_spin else 0,
+        "spins_remaining": spins_remaining,
+        "max_spins": MAX_SPINS_PER_DAY,
+        "spins_used": spins_today,
         "prizes": SPIN_PRIZES
     }
 
 @router.post("/spin")
 async def spin_wheel(user: dict = Depends(get_current_user)):
     """Spin the wheel and win coins"""
-    last_spin = user.get("last_spin")
+    last_spin_date = user.get("last_spin_date")
+    spins_today = user.get("spins_today", 0)
     now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
     
-    if last_spin:
-        last_spin_dt = datetime.fromisoformat(last_spin.replace('Z', '+00:00'))
-        hours_since = (now - last_spin_dt).total_seconds() / 3600
-        if hours_since < 24:
-            raise HTTPException(status_code=400, detail=f"Can spin again in {24 - int(hours_since)} hours")
+    # Reset spins if it's a new day
+    if last_spin_date != today:
+        spins_today = 0
     
-    # Select prize based on weights
+    # Check if user has spins remaining
+    if spins_today >= MAX_SPINS_PER_DAY:
+        raise HTTPException(status_code=400, detail=f"No spins remaining today. Come back tomorrow!")
+    
+    # Select prize based on weights (heavily favor lower prizes)
     prize = random.choices(SPIN_PRIZES, weights=SPIN_WEIGHTS, k=1)[0]
     prize_index = SPIN_PRIZES.index(prize)
     
-    # Award coins
+    # Award coins and update spin count
     new_coins = user["coins"] + prize
+    new_spins_today = spins_today + 1
+    
     await db.users.update_one(
         {"id": user["id"]},
-        {"$set": {"coins": new_coins, "last_spin": now.isoformat()}}
+        {"$set": {
+            "coins": new_coins, 
+            "last_spin_date": today,
+            "spins_today": new_spins_today
+        }}
     )
+    
+    spins_remaining = MAX_SPINS_PER_DAY - new_spins_today
     
     return {
         "prize": prize,
         "prize_index": prize_index,
         "new_balance": new_coins,
+        "spins_remaining": spins_remaining,
         "message": f"You won {prize} coins!"
     }
 
