@@ -355,202 +355,130 @@ export const RewardsPage = ({ onAuthClick }) => {
 
   return (
     <div className="min-h-screen pb-20 lg:pb-8 pt-20 lg:pt-24" data-testid="rewards-page">
-      {/* Header */}
+      {/* Header with Coin Balance */}
       <div className="px-4 lg:px-12 mb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30">
-            <Gift className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="font-heading text-2xl lg:text-3xl font-bold">Rewards</h1>
-            <p className="text-sm text-gray-400">Earn free coins daily</p>
-          </div>
-        </div>
-        
-        {/* Coin Balance */}
-        <Card className="p-4 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30">
-          <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+              <Gift className="w-5 h-5 text-white" />
+            </div>
             <div>
-              <p className="text-sm text-gray-400">Your Balance</p>
-              <p className="text-3xl font-bold flex items-center gap-2">
-                <Coins className="w-7 h-7 text-yellow-400" />
-                {user.coins}
-              </p>
+              <h1 className="font-heading text-xl lg:text-2xl font-bold">Rewards</h1>
+              <p className="text-xs text-gray-400">Earn badges & coins</p>
             </div>
-            <Button onClick={() => navigate("/store")} variant="outline" className="rounded-full border-yellow-500/50">
-              Get More
-            </Button>
           </div>
-        </Card>
-      </div>
-
-      {/* Daily Reward */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
-          Daily Reward
-        </h2>
-        <Card className={`p-6 ${dailyReward.canClaim ? 'bg-gradient-to-r from-primary/20 to-purple-600/20 border-primary/30' : 'bg-white/5 border-white/10'}`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                dailyReward.canClaim 
-                  ? 'bg-gradient-to-br from-yellow-400 to-orange-500 animate-pulse' 
-                  : 'bg-gray-700'
-              }`}>
-                <Gift className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="font-semibold">Daily Login Bonus</h3>
-                <p className="text-sm text-gray-400">
-                  {dailyReward.canClaim ? 'Claim your free coins!' : 'Come back tomorrow'}
+          <Card className="px-4 py-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30">
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-xs text-gray-400">Balance</p>
+                <p className="text-xl font-bold flex items-center gap-1">
+                  <Coins className="w-5 h-5 text-yellow-400" />
+                  {user.coins}
                 </p>
-                <p className="text-xs text-primary mt-1">🔥 {dailyReward.streak} day streak</p>
               </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-yellow-400 flex items-center gap-1">
-                <Coins className="w-5 h-5" />
-                10
-              </p>
-              <Button
-                onClick={handleClaimDaily}
-                disabled={!dailyReward.canClaim || claimingDaily}
-                className={`mt-2 rounded-full ${dailyReward.canClaim ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : ''}`}
-              >
-                {claimingDaily ? <Loader2 className="w-4 h-4 animate-spin" /> : dailyReward.canClaim ? 'Claim!' : 'Claimed ✓'}
+              <Button onClick={() => navigate("/store")} size="sm" variant="outline" className="rounded-full border-yellow-500/50 text-xs">
+                Buy
               </Button>
             </div>
-          </div>
-        </Card>
-      </div>
-
-      {/* Spin Wheel */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-yellow-400" />
-          Lucky Spin
-        </h2>
-        <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
-          <div className="text-center mb-4">
-            <p className="text-sm text-gray-400 mb-1">Spin daily to win coins!</p>
-            <p className={`text-xs ${spinData.spinsRemaining > 0 ? 'text-green-400' : 'text-gray-500'}`}>
-              {spinData.spinsRemaining > 0 
-                ? `✨ ${spinData.spinsRemaining}/${spinData.maxSpins} spins remaining` 
-                : 'No spins left today'}
-            </p>
-          </div>
-          <SpinWheel 
-            onSpin={handleSpin} 
-            canSpin={spinData.canSpin} 
-            isSpinning={isSpinning}
-            setIsSpinning={setIsSpinning}
-            spinsRemaining={spinData.spinsRemaining}
-            maxSpins={spinData.maxSpins}
-          />
-          <div className="mt-12 text-center">
-            <p className="text-sm text-gray-400 mb-2">
-              {isSpinning ? '🎰 Good luck!' : spinData.spinsRemaining > 0 ? 'Tap the wheel or button to spin!' : ''}
-            </p>
-          </div>
-        </Card>
-      </div>
-
-      {/* Missions */}
-      <div className="px-4 lg:px-12 mb-8">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="font-heading text-lg font-semibold flex items-center gap-2">
-            <Target className="w-5 h-5 text-green-400" />
-            Daily Missions
-          </h2>
-          <span className="text-sm text-gray-400">{completedMissions}/{totalMissions} completed</span>
+          </Card>
         </div>
-        <div className="space-y-3">
-          {missions.map(mission => (
-            <MissionCard
-              key={mission.id}
-              mission={mission}
-              onClaim={handleClaimMission}
-              claiming={claimingMission}
+      </div>
+
+      {/* Main Grid Layout */}
+      <div className="px-4 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          
+          {/* Left Column: Spin Wheel */}
+          <Card className="p-4 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-heading text-base font-semibold flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-yellow-400" />
+                Lucky Spin
+              </h2>
+              <span className={`text-xs ${spinData.spinsRemaining > 0 ? 'text-green-400' : 'text-gray-500'}`}>
+                {spinData.spinsRemaining}/{spinData.maxSpins} left
+              </span>
+            </div>
+            <SpinWheel 
+              onSpin={handleSpin} 
+              canSpin={spinData.canSpin} 
+              isSpinning={isSpinning}
+              setIsSpinning={setIsSpinning}
+              spinsRemaining={spinData.spinsRemaining}
+              maxSpins={spinData.maxSpins}
             />
-          ))}
-        </div>
-      </div>
+          </Card>
 
-      {/* Referral CTA */}
-      <div className="px-4 lg:px-12 mb-8">
-        <Card className="p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30">
+          {/* Right Column: Daily Reward + Mystery Box + Streak */}
+          <div className="space-y-4">
+            {/* Daily Reward - Compact */}
+            <Card className={`p-3 ${dailyReward.canClaim ? 'bg-gradient-to-r from-primary/20 to-purple-600/20 border-primary/30' : 'bg-white/5 border-white/10'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    dailyReward.canClaim ? 'bg-gradient-to-br from-yellow-400 to-orange-500 animate-pulse' : 'bg-gray-700'
+                  }`}>
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Daily Login</h3>
+                    <p className="text-xs text-primary">🔥 {dailyReward.streak} day streak</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-lg font-bold text-yellow-400 flex items-center gap-1">
+                    <Coins className="w-4 h-4" />10
+                  </span>
+                  <Button
+                    onClick={handleClaimDaily}
+                    disabled={!dailyReward.canClaim || claimingDaily}
+                    size="sm"
+                    className={`rounded-full text-xs ${dailyReward.canClaim ? 'bg-yellow-500 hover:bg-yellow-600 text-black' : ''}`}
+                  >
+                    {claimingDaily ? '...' : dailyReward.canClaim ? 'Claim' : '✓'}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+
+            {/* Mystery Box - Compact */}
+            <MysteryBox token={token} onUpdate={refreshUser} />
+
+            {/* Watch Streak - Compact */}
+            <WatchStreak token={token} onUpdate={refreshUser} />
+          </div>
+        </div>
+
+        {/* Second Row: Challenges + Leaderboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <DailyChallenges token={token} onUpdate={refreshUser} />
+          <WeeklyLeaderboard token={token} userId={user?.id} />
+        </div>
+
+        {/* Third Row: Cards + Level */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          <CharacterCards token={token} />
+          <ViewerLevel token={token} />
+        </div>
+
+        {/* Referral CTA - Full Width */}
+        <Card className="p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30 mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
-              <Users className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
+              <Users className="w-5 h-5 text-green-400" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold">Invite Friends, Earn More!</h3>
-              <p className="text-sm text-gray-400">Get coins when friends make a purchase</p>
+              <h3 className="font-semibold text-sm">Invite Friends, Earn More!</h3>
+              <p className="text-xs text-gray-400">Get coins when friends make a purchase</p>
             </div>
-            <Button onClick={() => navigate("/profile")} variant="outline" className="rounded-full border-green-500/50">
+            <Button onClick={() => navigate("/profile")} size="sm" variant="outline" className="rounded-full border-green-500/50 text-xs">
               Invite
             </Button>
           </div>
         </Card>
-      </div>
 
-      {/* Purchase Prompt - Shows when coins are low */}
-      <div className="px-4 lg:px-12 mb-8">
+        {/* Purchase Prompt */}
         <PurchasePrompt token={token} userCoins={user?.coins} />
-      </div>
-
-      {/* Mystery Box */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Gift className="w-5 h-5 text-purple-400" />
-          Mystery Box
-        </h2>
-        <MysteryBox token={token} onUpdate={refreshUser} />
-      </div>
-
-      {/* Watch Streak */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          🔥 Watch Streak
-        </h2>
-        <WatchStreak token={token} onUpdate={refreshUser} />
-      </div>
-
-      {/* Daily Challenges */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Target className="w-5 h-5 text-emerald-400" />
-          Daily Challenges
-        </h2>
-        <DailyChallenges token={token} onUpdate={refreshUser} />
-      </div>
-
-      {/* Weekly Leaderboard */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-indigo-400" />
-          Weekly Watch Race
-        </h2>
-        <WeeklyLeaderboard token={token} userId={user?.id} />
-      </div>
-
-      {/* Character Cards Collection */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Star className="w-5 h-5 text-amber-400" />
-          Character Cards
-        </h2>
-        <CharacterCards token={token} />
-      </div>
-
-      {/* Viewer Level */}
-      <div className="px-4 lg:px-12 mb-8">
-        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-violet-400" />
-          Your Level
-        </h2>
-        <ViewerLevel token={token} />
       </div>
     </div>
   );
