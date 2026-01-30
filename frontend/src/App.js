@@ -58,10 +58,21 @@ const AppContent = () => {
   const [referralCode, setReferralCode] = useState("");
   const [forceSignUp, setForceSignUp] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [showSplash, setShowSplash] = useState(() => {
+    // Only show splash once per session
+    const hasSeenSplash = sessionStorage.getItem('kona_splash_shown');
+    return !hasSeenSplash;
+  });
   
   const { user } = useAuth();
   const { activePromo, showPromo, closePromo } = usePromoManager();
   const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
+
+  // Handle splash screen completion
+  const handleSplashComplete = () => {
+    sessionStorage.setItem('kona_splash_shown', 'true');
+    setShowSplash(false);
+  };
 
   // Check viewport size
   useEffect(() => {
