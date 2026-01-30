@@ -1,37 +1,70 @@
 """
 Series, episodes, and content routes
+With Redis caching for high performance (10M+ users)
 """
 from typing import List
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 
 from models.schemas import SeriesResponse, EpisodeResponse, ReminderRequest
 from services import db, get_current_user, get_optional_user
+from services.cache import cache, CACHE_TTL, series_key, series_list_key, episodes_key
+from services.rate_limiter import limiter
 
 router = APIRouter(tags=["Series"])
 
 @router.get("/series", response_model=List[SeriesResponse])
-async def get_series():
+@limiter.limit("60/minute")
+async def get_series(request: Request):
+    """Get all series with caching"""
+    cache_key = series_list_key("all")
+    
+    # Try cache first
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
+    # Fetch from DB
     series = await db.series.find({}, {"_id": 0}).to_list(100)
     if not series:
-        # Import seed_data from main server if needed
         from server import seed_data
         await seed_data()
         series = await db.series.find({}, {"_id": 0}).to_list(100)
+    
+    # Cache the result
+    await cache.set(cache_key, series, CACHE_TTL["series_list"])
     return series
 
 @router.get("/series/featured", response_model=List[SeriesResponse])
-async def get_featured_series():
+@limiter.limit("60/minute")
+async def get_featured_series(request: Request):
+    """Get featured series with caching"""
+    cache_key = series_list_key("featured")
+    
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     series = await db.series.find({"featured": True}, {"_id": 0}).to_list(10)
+    await cache.set(cache_key, series, CACHE_TTL["series_list"])
     return series
 
 @router.get("/series/coming-soon")
-async def get_coming_soon():
-    """Get list of upcoming series"""
+@limiter.limit("60/minute")
+async def get_coming_soon(request: Request):
+    """Get list of upcoming series with caching"""
+    cache_key = "coming_soon:list"
+    
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     coming_soon = await db.coming_soon.find({}, {"_id": 0}).to_list(20)
+    await cache.set(cache_key, coming_soon, CACHE_TTL["series_list"])
     return coming_soon
 
 @router.post("/series/remind")
-async def set_reminder(data: ReminderRequest, user: dict = Depends(get_current_user)):
+@limiter.limit("20/minute")
+async def set_reminder(request: Request, data: ReminderRequest, user: dict = Depends(get_current_user)):
     """Set a reminder for upcoming series"""
     series = await db.coming_soon.find_one({"id": data.series_id}, {"_id": 0})
     if not series:
