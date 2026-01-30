@@ -1,6 +1,7 @@
 """
 User-related routes (rewards, lists, progress, unlock)
 """
+import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends
 
@@ -9,6 +10,10 @@ from services import db, get_current_user, get_optional_user
 from config.settings import DAILY_REWARD_COINS
 
 router = APIRouter(tags=["User"])
+
+# Spin wheel prize configuration
+SPIN_PRIZES = [5, 10, 15, 20, 25, 50, 5, 10]  # Weighted: more small prizes
+SPIN_WEIGHTS = [25, 20, 15, 12, 10, 3, 10, 5]  # Probability weights
 
 # ============ DAILY REWARDS ============
 @router.post("/rewards/claim")
@@ -44,6 +49,56 @@ async def get_reward_status(user: dict = Depends(get_current_user)):
     hours_until_next = max(0, 24 - hours_since) if not can_claim else 0
     
     return {"can_claim": can_claim, "hours_until_next": hours_until_next, "reward_amount": DAILY_REWARD_COINS}
+
+# ============ SPIN WHEEL ============
+@router.get("/spin/status")
+async def get_spin_status(user: dict = Depends(get_current_user)):
+    """Check if user can spin the wheel today"""
+    last_spin = user.get("last_spin")
+    now = datetime.now(timezone.utc)
+    
+    if not last_spin:
+        return {"can_spin": True, "prizes": SPIN_PRIZES}
+    
+    last_spin_dt = datetime.fromisoformat(last_spin.replace('Z', '+00:00'))
+    hours_since = (now - last_spin_dt).total_seconds() / 3600
+    can_spin = hours_since >= 24
+    
+    return {
+        "can_spin": can_spin, 
+        "hours_until_next": max(0, 24 - hours_since) if not can_spin else 0,
+        "prizes": SPIN_PRIZES
+    }
+
+@router.post("/spin")
+async def spin_wheel(user: dict = Depends(get_current_user)):
+    """Spin the wheel and win coins"""
+    last_spin = user.get("last_spin")
+    now = datetime.now(timezone.utc)
+    
+    if last_spin:
+        last_spin_dt = datetime.fromisoformat(last_spin.replace('Z', '+00:00'))
+        hours_since = (now - last_spin_dt).total_seconds() / 3600
+        if hours_since < 24:
+            raise HTTPException(status_code=400, detail=f"Can spin again in {24 - int(hours_since)} hours")
+    
+    # Select prize based on weights
+    prize = random.choices(SPIN_PRIZES, weights=SPIN_WEIGHTS, k=1)[0]
+    prize_index = SPIN_PRIZES.index(prize)
+    
+    # Award coins
+    new_coins = user["coins"] + prize
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"coins": new_coins, "last_spin": now.isoformat()}}
+    )
+    
+    return {
+        "prize": prize,
+        "prize_index": prize_index,
+        "new_balance": new_coins,
+        "message": f"You won {prize} coins!"
+    }
 
 # ============ MY LIST ============
 @router.get("/users/me/my-list")
