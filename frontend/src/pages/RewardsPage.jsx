@@ -235,19 +235,31 @@ export const RewardsPage = ({ onAuthClick }) => {
     setClaimingDaily(false);
   };
 
-  const handleSpin = (prize) => {
+  const handleSpin = async (prize) => {
     setIsSpinning(false);
-    localStorage.setItem('kona-last-spin', new Date().toDateString());
     setSpinData({ ...spinData, canSpin: false });
     
-    // In production, call API to award coins
-    toast.success(`🎰 You won ${prize} coins!`);
-    refreshUser();
+    // Call backend to record spin and award coins
+    try {
+      const res = await axios.post(`${API}/spin`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(`🎰 You won ${res.data.prize} coins!`);
+      await refreshUser();
+    } catch (e) {
+      // Fallback - still show prize from wheel animation
+      localStorage.setItem('kona-last-spin', new Date().toDateString());
+      toast.success(`🎰 You won ${prize} coins!`);
+      refreshUser();
+    }
   };
 
-  const handleSpinStart = () => {
+  const handleSpinStart = async () => {
     if (!user) { onAuthClick(); return; }
-    if (!spinData.canSpin) return;
+    if (!spinData.canSpin) {
+      toast.error("Come back tomorrow for another spin!");
+      return;
+    }
     setIsSpinning(true);
   };
 
