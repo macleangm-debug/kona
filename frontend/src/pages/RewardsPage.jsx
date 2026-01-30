@@ -11,6 +11,10 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
+import { WatchStreak } from "@/components/WatchStreak";
+import { ViewerLevel } from "@/components/ViewerLevel";
+import { DailyChallenges } from "@/components/DailyChallenges";
+import { PurchasePrompt } from "@/components/PurchasePrompt";
 
 // Spin Wheel Component - Revenue optimized (max 5 coins)
 const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
