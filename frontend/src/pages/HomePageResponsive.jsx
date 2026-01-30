@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Search, Gift, Star, Play, Info, Plus, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import { Search, Gift, Star, Play, Info, Plus, Check, Volume2, VolumeX, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -14,7 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
-import { CoinBalance, DailyRewardModal, ReminderSuccessModal, SearchModal } from "@/components";
+import { CoinBalance, DailyRewardModal, ReminderSuccessModal, SearchModal, KonaLoader } from "@/components";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
 import SpinInviteModal from "@/components/SpinInviteModal";
 
