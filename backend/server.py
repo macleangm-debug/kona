@@ -190,6 +190,9 @@ async def lifespan(app: FastAPI):
     # Seed data
     await seed_data()
     
+    # Seed super admin
+    await seed_super_admin()
+    
     logger.info("✅ Kona Backend ready for 10M+ users!")
     yield
     
