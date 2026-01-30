@@ -23,6 +23,7 @@ import {
   SearchModal
 } from "@/components";
 import DesktopHeader from "@/components/DesktopHeader";
+import { SplashScreen } from "@/components/SplashScreen";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
