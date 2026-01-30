@@ -56,19 +56,18 @@ export const DailyChallenges = ({ token, onUpdate }) => {
   const { challenges, total_completed } = challengeData;
 
   const getRewardIcon = (rewardType) => {
-    switch (rewardType) {
-      case "xp": return <Star className="w-3 h-3 text-violet-400" />;
-      case "badge": return <Award className="w-3 h-3 text-yellow-400" />;
-      default: return <Star className="w-3 h-3 text-gray-400" />;
-    }
+    return <Award className="w-3 h-3 text-yellow-400" />;
   };
 
   const getRewardText = (challenge) => {
-    switch (challenge.reward_type) {
-      case "xp": return `+${challenge.reward} XP`;
-      case "badge": return `Badge`;
-      default: return challenge.reward;
-    }
+    // All rewards are badges now
+    const badgeNames = {
+      "daily_watcher": "Daily Watcher",
+      "binge_starter": "Binge Starter",
+      "explorer": "Explorer",
+      "social_star": "Social Star"
+    };
+    return badgeNames[challenge.reward] || "Badge";
   };
 
   return (
