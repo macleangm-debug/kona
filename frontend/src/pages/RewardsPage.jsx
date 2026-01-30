@@ -284,9 +284,9 @@ export const RewardsPage = ({ onAuthClick }) => {
   const totalMissions = missions.length;
 
   return (
-    <div className="min-h-screen pb-20 lg:pb-8" data-testid="rewards-page">
+    <div className="min-h-screen pb-20 lg:pb-8 pt-20 lg:pt-24" data-testid="rewards-page">
       {/* Header */}
-      <div className="px-4 lg:px-12 pt-4 lg:pt-8 mb-6">
+      <div className="px-4 lg:px-12 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center shadow-lg shadow-yellow-500/30">
             <Gift className="w-6 h-6 text-white" />
