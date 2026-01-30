@@ -439,6 +439,309 @@ async def get_purchase_prompt(user: dict = Depends(get_current_user)):
         "episode_cost": EPISODE_COST
     }
 
+# ============ MYSTERY BOX ============
+@router.get("/mystery-box/status")
+async def get_mystery_box_status(user: dict = Depends(get_current_user)):
+    """Check if user has a mystery box to open"""
+    episodes_watched = user.get("total_episodes_watched", 0)
+    last_box_at = user.get("last_mystery_box_at", 0)
+    
+    # Calculate if new box is available
+    boxes_earned = episodes_watched // MYSTERY_BOX_TRIGGER
+    boxes_opened = last_box_at // MYSTERY_BOX_TRIGGER if last_box_at > 0 else 0
+    has_pending_box = boxes_earned > boxes_opened
+    
+    # Progress to next box
+    episodes_since_last = episodes_watched % MYSTERY_BOX_TRIGGER
+    progress_percent = (episodes_since_last / MYSTERY_BOX_TRIGGER) * 100
+    episodes_to_next = MYSTERY_BOX_TRIGGER - episodes_since_last
+    
+    return {
+        "has_pending_box": has_pending_box,
+        "boxes_opened": boxes_opened,
+        "episodes_watched": episodes_watched,
+        "progress_to_next": round(progress_percent, 1),
+        "episodes_to_next": episodes_to_next,
+        "trigger_every": MYSTERY_BOX_TRIGGER
+    }
+
+@router.post("/mystery-box/open")
+async def open_mystery_box(user: dict = Depends(get_current_user)):
+    """Open a mystery box and get reward"""
+    episodes_watched = user.get("total_episodes_watched", 0)
+    last_box_at = user.get("last_mystery_box_at", 0)
+    
+    boxes_earned = episodes_watched // MYSTERY_BOX_TRIGGER
+    boxes_opened = last_box_at // MYSTERY_BOX_TRIGGER if last_box_at > 0 else 0
+    
+    if boxes_earned <= boxes_opened:
+        raise HTTPException(status_code=400, detail="No mystery box available")
+    
+    # Select random reward based on weights
+    weights = [r["weight"] for r in MYSTERY_BOX_REWARDS]
+    reward = random.choices(MYSTERY_BOX_REWARDS, weights=weights, k=1)[0]
+    
+    # Apply reward
+    update_data = {"last_mystery_box_at": episodes_watched}
+    reward_details = {"type": reward["type"], "value": reward["value"], "label": reward["label"], "icon": reward["icon"]}
+    
+    if reward["type"] == "coins":
+        new_coins = user.get("coins", 0) + reward["value"]
+        update_data["coins"] = new_coins
+        reward_details["new_balance"] = new_coins
+    elif reward["type"] == "badge":
+        user_badges = user.get("badges", {})
+        user_badges[reward["value"]] = {
+            "earned_at": datetime.now(timezone.utc).isoformat(),
+            "type": "mystery_box"
+        }
+        update_data["badges"] = user_badges
+    elif reward["type"] == "frame":
+        user_frames = user.get("profile_frames", [])
+        if reward["value"] not in user_frames:
+            user_frames.append(reward["value"])
+            update_data["profile_frames"] = user_frames
+    elif reward["type"] == "xp":
+        new_xp = user.get("total_xp", 0) + reward["value"]
+        update_data["total_xp"] = new_xp
+        reward_details["new_xp"] = new_xp
+    
+    await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+    
+    return {
+        "reward": reward_details,
+        "message": f"You got {reward['label']}!",
+        "next_box_in": MYSTERY_BOX_TRIGGER
+    }
+
+# ============ CHARACTER CARDS ============
+@router.get("/cards/collection")
+async def get_card_collection(user: dict = Depends(get_current_user)):
+    """Get user's card collection"""
+    collected_cards = user.get("collected_cards", [])
+    
+    # Build collection stats per series
+    collection = []
+    total_cards = 0
+    total_collected = 0
+    
+    for series_id, cards in CHARACTER_CARDS.items():
+        series = await db.series.find_one({"id": series_id}, {"_id": 0, "title": 1, "thumbnail": 1})
+        series_cards = []
+        collected_count = 0
+        
+        for card in cards:
+            is_collected = card["id"] in collected_cards
+            if is_collected:
+                collected_count += 1
+                total_collected += 1
+            series_cards.append({
+                **card,
+                "collected": is_collected
+            })
+        
+        total_cards += len(cards)
+        set_complete = collected_count == len(cards)
+        
+        collection.append({
+            "series_id": series_id,
+            "series_title": series["title"] if series else "Unknown",
+            "series_thumbnail": series["thumbnail"] if series else None,
+            "cards": series_cards,
+            "collected_count": collected_count,
+            "total_cards": len(cards),
+            "set_complete": set_complete
+        })
+    
+    return {
+        "collection": collection,
+        "total_collected": total_collected,
+        "total_cards": total_cards,
+        "completion_percent": round((total_collected / total_cards) * 100, 1) if total_cards > 0 else 0
+    }
+
+@router.post("/cards/draw/{series_id}")
+async def draw_card(series_id: str, user: dict = Depends(get_current_user)):
+    """Draw a random card after watching an episode (called automatically)"""
+    if series_id not in CHARACTER_CARDS:
+        raise HTTPException(status_code=400, detail="No cards for this series")
+    
+    collected_cards = user.get("collected_cards", [])
+    series_cards = CHARACTER_CARDS[series_id]
+    
+    # Filter out already collected cards
+    available_cards = [c for c in series_cards if c["id"] not in collected_cards]
+    
+    if not available_cards:
+        return {"message": "You have all cards from this series!", "card": None, "already_complete": True}
+    
+    # Weighted random selection by rarity
+    weights = [CARD_RARITY_WEIGHTS.get(c["rarity"], 50) for c in available_cards]
+    selected_card = random.choices(available_cards, weights=weights, k=1)[0]
+    
+    # Award the card
+    collected_cards.append(selected_card["id"])
+    
+    # Check if set is now complete
+    set_complete = all(c["id"] in collected_cards for c in series_cards)
+    
+    update_data = {"collected_cards": collected_cards}
+    badge_awarded = None
+    
+    # Award badge for completing set
+    if set_complete:
+        user_badges = user.get("badges", {})
+        badge_id = f"collector_{series_id}"
+        if badge_id not in user_badges:
+            user_badges[badge_id] = {
+                "earned_at": datetime.now(timezone.utc).isoformat(),
+                "type": "card_collection"
+            }
+            update_data["badges"] = user_badges
+            badge_awarded = badge_id
+    
+    await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+    
+    return {
+        "card": selected_card,
+        "is_new": True,
+        "set_complete": set_complete,
+        "badge_awarded": badge_awarded,
+        "message": f"You got {selected_card['name']}!" + (" 🎉 Set complete!" if set_complete else "")
+    }
+
+# ============ WEEKLY WATCH LEADERBOARD ============
+@router.get("/leaderboard/weekly")
+async def get_weekly_leaderboard(user: dict = Depends(get_optional_user)):
+    """Get weekly watch leaderboard - no coin rewards, just status"""
+    now = datetime.now(timezone.utc)
+    
+    # Get start of current week (Monday)
+    start_of_week = now - timedelta(days=now.weekday())
+    start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_key = start_of_week.strftime("%Y-W%W")
+    
+    # Get top 50 users by weekly watch count
+    pipeline = [
+        {"$match": {f"weekly_watch.{week_key}": {"$exists": True}}},
+        {"$project": {
+            "_id": 0,
+            "id": 1,
+            "name": 1,
+            "weekly_episodes": f"$weekly_watch.{week_key}",
+            "viewer_level": 1,
+            "profile_frame": 1
+        }},
+        {"$sort": {"weekly_episodes": -1}},
+        {"$limit": 50}
+    ]
+    
+    leaderboard = await db.users.aggregate(pipeline).to_list(50)
+    
+    # Add ranks and determine badges
+    for i, entry in enumerate(leaderboard):
+        entry["rank"] = i + 1
+        if i == 0:
+            entry["badge"] = "weekly_champion"
+            entry["badge_icon"] = "👑"
+        elif i < 3:
+            entry["badge"] = "weekly_top3"
+            entry["badge_icon"] = "🏆"
+        elif i < 10:
+            entry["badge"] = "weekly_top10"
+            entry["badge_icon"] = "⭐"
+        else:
+            entry["badge"] = None
+            entry["badge_icon"] = None
+    
+    # Get current user's position if logged in
+    user_rank = None
+    user_episodes = 0
+    if user:
+        user_weekly = user.get("weekly_watch", {}).get(week_key, 0)
+        user_episodes = user_weekly
+        
+        # Find user's rank
+        count = await db.users.count_documents({
+            f"weekly_watch.{week_key}": {"$gt": user_weekly}
+        })
+        user_rank = count + 1
+    
+    return {
+        "week": week_key,
+        "leaderboard": leaderboard,
+        "user_rank": user_rank,
+        "user_episodes": user_episodes,
+        "rewards": [
+            {"rank": "1st", "reward": "Weekly Champion Badge + Profile Crown", "icon": "👑"},
+            {"rank": "2nd-3rd", "reward": "Top 3 Badge + Silver Border", "icon": "🏆"},
+            {"rank": "4th-10th", "reward": "Top 10 Badge", "icon": "⭐"},
+        ],
+        "ends_in_days": 7 - now.weekday()
+    }
+
+@router.post("/leaderboard/weekly/claim")
+async def claim_weekly_reward(user: dict = Depends(get_current_user)):
+    """Claim weekly leaderboard reward (badge only, no coins)"""
+    now = datetime.now(timezone.utc)
+    
+    # Get previous week
+    start_of_last_week = now - timedelta(days=now.weekday() + 7)
+    last_week_key = start_of_last_week.strftime("%Y-W%W")
+    
+    # Check if already claimed
+    claimed_weeks = user.get("claimed_weekly_rewards", [])
+    if last_week_key in claimed_weeks:
+        raise HTTPException(status_code=400, detail="Already claimed this week's reward")
+    
+    # Get user's rank from last week
+    user_episodes = user.get("weekly_watch", {}).get(last_week_key, 0)
+    if user_episodes == 0:
+        raise HTTPException(status_code=400, detail="No watch activity last week")
+    
+    count = await db.users.count_documents({
+        f"weekly_watch.{last_week_key}": {"$gt": user_episodes}
+    })
+    rank = count + 1
+    
+    # Determine reward based on rank
+    badge_id = None
+    badge_name = None
+    
+    if rank == 1:
+        badge_id = f"weekly_champion_{last_week_key}"
+        badge_name = "Weekly Champion"
+    elif rank <= 3:
+        badge_id = f"weekly_top3_{last_week_key}"
+        badge_name = "Weekly Top 3"
+    elif rank <= 10:
+        badge_id = f"weekly_top10_{last_week_key}"
+        badge_name = "Weekly Top 10"
+    else:
+        raise HTTPException(status_code=400, detail="Rank not eligible for rewards (Top 10 only)")
+    
+    # Award badge
+    user_badges = user.get("badges", {})
+    user_badges[badge_id] = {
+        "earned_at": now.isoformat(),
+        "type": "weekly_leaderboard",
+        "rank": rank,
+        "week": last_week_key
+    }
+    claimed_weeks.append(last_week_key)
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"badges": user_badges, "claimed_weekly_rewards": claimed_weeks}}
+    )
+    
+    return {
+        "message": f"Claimed {badge_name} badge!",
+        "badge": badge_id,
+        "rank": rank,
+        "week": last_week_key
+    }
+
 # ============ MY LIST ============
 @router.get("/users/me/my-list")
 async def get_my_list(user: dict = Depends(get_current_user)):
