@@ -23,6 +23,7 @@ export const CategoryPage = ({ onAuthClick }) => {
   // Category configuration
   const categoryConfig = {
     trending: { title: "Trending Now", emoji: "🔥", filter: (s) => s },
+    "top-rated": { title: "Top Rated", emoji: "⭐", filter: (s) => s.filter(item => item.rating >= 4.5) },
     "my-list": { title: "My List", emoji: "📚", filter: (s) => s.filter(item => myList.includes(item.id)) },
     romance: { title: "Romance", emoji: "💕", filter: (s) => s.filter(item => item.genre === "Romance") },
     "continue-watching": { title: "Continue Watching", emoji: "▶️", filter: () => continueWatching },
