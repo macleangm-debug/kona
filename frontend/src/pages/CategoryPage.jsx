@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { SeriesCard, ContinueWatchingCard, ComingSoonCard } from "@/components";
+import SeriesCardDesktop from "@/components/SeriesCardDesktop";
 
 export const CategoryPage = ({ onAuthClick }) => {
   const navigate = useNavigate();
@@ -88,10 +89,13 @@ export const CategoryPage = ({ onAuthClick }) => {
     }
   };
 
+  // Check if we should use carousel layout (desktop-style horizontal scroll)
+  const useCarouselLayout = window.innerWidth >= 1024;
+
   return (
-    <div className="pb-20 pt-4" data-testid="category-page">
+    <div className="pb-20 pt-4 lg:pt-8" data-testid="category-page">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 mb-6">
+      <div className="flex items-center gap-3 px-4 lg:px-12 mb-6">
         <button 
           onClick={() => navigate(-1)}
           className="p-2 rounded-full bg-background/80 hover:bg-background"
@@ -99,7 +103,7 @@ export const CategoryPage = ({ onAuthClick }) => {
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h1 className="font-heading text-xl font-bold">
+        <h1 className="font-heading text-xl lg:text-2xl font-bold">
           {currentCategory.title} {currentCategory.emoji}
         </h1>
       </div>
@@ -119,41 +123,44 @@ export const CategoryPage = ({ onAuthClick }) => {
           )}
         </div>
       ) : category === "continue-watching" ? (
-        /* Continue Watching Grid */
-        <div className="grid grid-cols-3 gap-3 px-4">
+        /* Continue Watching - Carousel on desktop, grid on mobile */
+        <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
           {filteredSeries.map((item, i) => (
-            <div key={i}>
-              <ContinueWatchingCard
+            <div key={i} className="flex-shrink-0">
+              <SeriesCardDesktop
                 series={item.series}
-                episode={item.episode}
-                progress={item.progress}
                 onClick={() => navigate(`/series/${item.series.id}`)}
+                inMyList={myList.includes(item.series.id)}
+                onAddToList={handleAddToList}
+                onRemoveFromList={handleRemoveFromList}
               />
             </div>
           ))}
         </div>
       ) : category === "coming-soon" ? (
-        /* Coming Soon Grid */
-        <div className="grid grid-cols-3 gap-3 px-4">
+        /* Coming Soon - Carousel layout */
+        <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
           {filteredSeries.map((s) => (
-            <div key={s.id}>
-              <ComingSoonCard
+            <div key={s.id} className="flex-shrink-0">
+              <SeriesCardDesktop
                 series={s}
-                isReminded={false}
-                onRemind={() => {}}
+                onClick={() => navigate(`/series/${s.id}`)}
+                inMyList={myList.includes(s.id)}
+                onAddToList={handleAddToList}
+                onRemoveFromList={handleRemoveFromList}
+                showComingSoon={true}
               />
             </div>
           ))}
         </div>
       ) : (
-        /* Standard Grid */
-        <div className="grid grid-cols-3 gap-3 px-4">
+        /* Standard layout - Carousel on desktop */
+        <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2 flex-wrap lg:flex-nowrap">
           {filteredSeries.map((s) => (
-            <div key={s.id}>
-              <SeriesCard 
+            <div key={s.id} className="flex-shrink-0 w-[calc(33.333%-8px)] lg:w-auto">
+              <SeriesCardDesktop
                 series={s}
                 onClick={() => navigate(`/series/${s.id}`)}
-                showViews={false}
                 inMyList={myList.includes(s.id)}
                 onAddToList={handleAddToList}
                 onRemoveFromList={handleRemoveFromList}
