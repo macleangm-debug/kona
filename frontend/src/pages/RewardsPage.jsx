@@ -418,18 +418,14 @@ export const RewardsPage = ({ onAuthClick }) => {
             onSpin={handleSpin} 
             canSpin={spinData.canSpin} 
             isSpinning={isSpinning}
-            onSpinStart={handleSpinStart}
+            setIsSpinning={setIsSpinning}
             spinsRemaining={spinData.spinsRemaining}
             maxSpins={spinData.maxSpins}
           />
-          <div className="mt-8 text-center">
-            <Button
-              onClick={handleSpinStart}
-              disabled={!spinData.canSpin || isSpinning || spinData.spinsRemaining <= 0}
-              className="rounded-full px-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            >
-              {isSpinning ? 'Spinning...' : spinData.spinsRemaining > 0 ? `Spin Now! (${spinData.spinsRemaining} left)` : 'Come Back Tomorrow'}
-            </Button>
+          <div className="mt-12 text-center">
+            <p className="text-sm text-gray-400 mb-2">
+              {isSpinning ? '🎰 Good luck!' : spinData.spinsRemaining > 0 ? 'Tap the wheel or button to spin!' : ''}
+            </p>
           </div>
         </Card>
       </div>
