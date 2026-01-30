@@ -475,7 +475,7 @@ export const RewardsPage = ({ onAuthClick }) => {
       </div>
 
       {/* Referral CTA */}
-      <div className="px-4 lg:px-12">
+      <div className="px-4 lg:px-12 mb-8">
         <Card className="p-6 bg-gradient-to-r from-green-500/20 to-emerald-500/20 border-green-500/30">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
@@ -483,13 +483,44 @@ export const RewardsPage = ({ onAuthClick }) => {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold">Invite Friends, Earn More!</h3>
-              <p className="text-sm text-gray-400">Get 20 coins for every friend who joins</p>
+              <p className="text-sm text-gray-400">Get coins when friends make a purchase</p>
             </div>
             <Button onClick={() => navigate("/profile")} variant="outline" className="rounded-full border-green-500/50">
               Invite
             </Button>
           </div>
         </Card>
+      </div>
+
+      {/* Purchase Prompt - Shows when coins are low */}
+      <div className="px-4 lg:px-12 mb-8">
+        <PurchasePrompt token={token} userCoins={user?.coins} />
+      </div>
+
+      {/* Watch Streak */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          🔥 Watch Streak
+        </h2>
+        <WatchStreak token={token} onUpdate={refreshUser} />
+      </div>
+
+      {/* Daily Challenges */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          <Target className="w-5 h-5 text-emerald-400" />
+          Daily Challenges
+        </h2>
+        <DailyChallenges token={token} onUpdate={refreshUser} />
+      </div>
+
+      {/* Viewer Level */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-violet-400" />
+          Your Level
+        </h2>
+        <ViewerLevel token={token} />
       </div>
     </div>
   );
