@@ -104,28 +104,39 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining 
       {/* Center button */}
       <button
         onClick={handleSpin}
-        disabled={!canSpin || isSpinning || spinsRemaining <= 0}
-        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full 
-          ${canSpin && !isSpinning && spinsRemaining > 0
-            ? 'bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 cursor-pointer' 
+        disabled={!canSpin || isSpinning || spinsRemaining <= 0 || isAnimating}
+        className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full 
+          ${canSpin && !isAnimating && spinsRemaining > 0
+            ? 'bg-gradient-to-br from-yellow-400 to-orange-500 hover:from-yellow-300 hover:to-orange-400 cursor-pointer hover:scale-110' 
             : 'bg-gray-600 cursor-not-allowed'
           } 
-          flex items-center justify-center shadow-xl transition-all`}
+          flex items-center justify-center shadow-2xl transition-all duration-300 border-4 border-white/30`}
+        style={{
+          boxShadow: canSpin && !isAnimating && spinsRemaining > 0 
+            ? '0 0 30px rgba(251, 191, 36, 0.6)' 
+            : 'none'
+        }}
       >
-        <span className="text-white font-bold text-sm">
-          {isSpinning ? '...' : spinsRemaining <= 0 ? '✗' : 'SPIN'}
+        <span className="text-white font-bold text-lg">
+          {isAnimating ? '🎰' : spinsRemaining <= 0 ? '✗' : 'SPIN'}
         </span>
       </button>
       
-      {/* Pointer */}
-      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-yellow-400" />
+      {/* Pointer arrow */}
+      <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+        <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[28px] border-l-transparent border-r-transparent border-t-yellow-400 drop-shadow-lg" />
+      </div>
       
       {/* Spins remaining indicator */}
-      <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 flex gap-1">
+      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex gap-2">
         {[...Array(maxSpins)].map((_, i) => (
           <div 
             key={i} 
-            className={`w-3 h-3 rounded-full ${i < spinsRemaining ? 'bg-yellow-400' : 'bg-gray-600'}`}
+            className={`w-4 h-4 rounded-full transition-all ${
+              i < spinsRemaining 
+                ? 'bg-yellow-400 shadow-lg shadow-yellow-400/50' 
+                : 'bg-gray-600'
+            }`}
           />
         ))}
       </div>
