@@ -127,6 +127,52 @@ async def seed_data():
     
     logger.info(f"Seeded {len(series_data)} series, {len(episodes)} episodes, {len(coming_soon)} coming soon, {len(featured_promos)} promos")
 
+async def seed_super_admin():
+    """Seed super admin account if not exists"""
+    from services import hash_password, generate_referral_code
+    
+    SUPER_ADMIN_EMAIL = "superadmin@kona.com"
+    SUPER_ADMIN_PASSWORD = "SuperAdmin2025!"
+    
+    existing = await db.users.find_one({"email": SUPER_ADMIN_EMAIL})
+    if existing:
+        # Ensure is_super_admin flag is set
+        if not existing.get("is_super_admin"):
+            await db.users.update_one(
+                {"email": SUPER_ADMIN_EMAIL},
+                {"$set": {"is_super_admin": True, "is_admin": True}}
+            )
+            logger.info("✅ Updated existing admin to super admin")
+        return
+    
+    import uuid
+    user_id = str(uuid.uuid4())
+    referral_code = generate_referral_code(user_id)
+    
+    super_admin = {
+        "id": user_id,
+        "email": SUPER_ADMIN_EMAIL,
+        "name": "Super Admin",
+        "password": hash_password(SUPER_ADMIN_PASSWORD),
+        "coins": 99999,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_daily_reward": None,
+        "referral_code": referral_code,
+        "referral_count": 0,
+        "referral_earnings": 0,
+        "referred_by": None,
+        "my_list": [],
+        "unlocked_episodes": [],
+        "watch_progress": {},
+        "reminders": [],
+        "is_admin": True,
+        "is_super_admin": True,
+        "claimed_milestones": []
+    }
+    
+    await db.users.insert_one(super_admin)
+    logger.info("✅ Super Admin account created: superadmin@kona.com / SuperAdmin2025!")
+
 # ============ APP LIFECYCLE ============
 @asynccontextmanager
 async def lifespan(app: FastAPI):
