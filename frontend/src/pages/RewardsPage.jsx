@@ -402,8 +402,10 @@ export const RewardsPage = ({ onAuthClick }) => {
         <Card className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-500/20">
           <div className="text-center mb-4">
             <p className="text-sm text-gray-400 mb-1">Spin daily to win coins!</p>
-            <p className={`text-xs ${spinData.canSpin ? 'text-green-400' : 'text-gray-500'}`}>
-              {spinData.canSpin ? '✨ Free spin available!' : 'Next spin tomorrow'}
+            <p className={`text-xs ${spinData.spinsRemaining > 0 ? 'text-green-400' : 'text-gray-500'}`}>
+              {spinData.spinsRemaining > 0 
+                ? `✨ ${spinData.spinsRemaining}/${spinData.maxSpins} spins remaining` 
+                : 'No spins left today'}
             </p>
           </div>
           <SpinWheel 
@@ -414,13 +416,13 @@ export const RewardsPage = ({ onAuthClick }) => {
             spinsRemaining={spinData.spinsRemaining}
             maxSpins={spinData.maxSpins}
           />
-          <div className="mt-4 text-center">
+          <div className="mt-8 text-center">
             <Button
               onClick={handleSpinStart}
-              disabled={!spinData.canSpin || isSpinning}
+              disabled={!spinData.canSpin || isSpinning || spinData.spinsRemaining <= 0}
               className="rounded-full px-8 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
             >
-              {isSpinning ? 'Spinning...' : spinData.canSpin ? 'Spin Now!' : 'Come Back Tomorrow'}
+              {isSpinning ? 'Spinning...' : spinData.spinsRemaining > 0 ? `Spin Now! (${spinData.spinsRemaining} left)` : 'Come Back Tomorrow'}
             </Button>
           </div>
         </Card>
