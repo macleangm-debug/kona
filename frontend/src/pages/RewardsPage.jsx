@@ -194,13 +194,24 @@ export const RewardsPage = ({ onAuthClick }) => {
         streak: dailyRes.data.streak || 1
       });
 
-      // Check spin wheel status (mock - would be a real endpoint)
-      const lastSpin = localStorage.getItem('kona-last-spin');
-      const today = new Date().toDateString();
-      setSpinData({
-        canSpin: lastSpin !== today,
-        lastSpin: lastSpin
-      });
+      // Check spin wheel status from backend
+      try {
+        const spinRes = await axios.get(`${API}/spin/status`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSpinData({
+          canSpin: spinRes.data.can_spin,
+          hoursUntilNext: spinRes.data.hours_until_next || 0
+        });
+      } catch (e) {
+        // Fallback to localStorage if endpoint fails
+        const lastSpin = localStorage.getItem('kona-last-spin');
+        const today = new Date().toDateString();
+        setSpinData({
+          canSpin: lastSpin !== today,
+          lastSpin: lastSpin
+        });
+      }
 
     } catch (e) {
       console.error(e);
