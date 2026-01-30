@@ -500,6 +500,15 @@ export const RewardsPage = ({ onAuthClick }) => {
         <PurchasePrompt token={token} userCoins={user?.coins} />
       </div>
 
+      {/* Mystery Box */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          <Gift className="w-5 h-5 text-purple-400" />
+          Mystery Box
+        </h2>
+        <MysteryBox token={token} onUpdate={refreshUser} />
+      </div>
+
       {/* Watch Streak */}
       <div className="px-4 lg:px-12 mb-8">
         <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
@@ -515,6 +524,24 @@ export const RewardsPage = ({ onAuthClick }) => {
           Daily Challenges
         </h2>
         <DailyChallenges token={token} onUpdate={refreshUser} />
+      </div>
+
+      {/* Weekly Leaderboard */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-indigo-400" />
+          Weekly Watch Race
+        </h2>
+        <WeeklyLeaderboard token={token} userId={user?.id} />
+      </div>
+
+      {/* Character Cards Collection */}
+      <div className="px-4 lg:px-12 mb-8">
+        <h2 className="font-heading text-lg font-semibold mb-3 flex items-center gap-2">
+          <Star className="w-5 h-5 text-amber-400" />
+          Character Cards
+        </h2>
+        <CharacterCards token={token} />
       </div>
 
       {/* Viewer Level */}
