@@ -183,31 +183,74 @@ export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
 };
 
 // Mini loading spinner with logo (for inline loading states)
-export const KonaLoader = ({ size = 40, className = "" }) => (
-  <div className={`relative ${className}`} style={{ width: size, height: size }}>
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 100 100"
-      className="animate-pulse"
-    >
-      <defs>
-        <linearGradient id="loaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#A855F7" />
-        </linearGradient>
-      </defs>
-      <rect 
-        x="10" y="10" 
-        width="80" height="80" 
-        rx="16" 
-        fill="none" 
-        stroke="url(#loaderGrad)" 
-        strokeWidth="6"
-        className="animate-spin"
-        style={{ transformOrigin: 'center', animationDuration: '2s' }}
-      />
-      <path d="M38 30 L38 70 L72 50 Z" fill="url(#loaderGrad)" />
+export const KonaLoader = ({ size = 40, className = "", showText = false }) => (
+  <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
+    <div className="relative" style={{ width: size, height: size }}>
+      {/* Animated ring */}
+      <svg 
+        width={size} 
+        height={size} 
+        viewBox="0 0 100 100"
+        className="absolute inset-0"
+      >
+        <defs>
+          <linearGradient id="loaderGradRing" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#8B5CF6" />
+            <stop offset="100%" stopColor="#A855F7" />
+          </linearGradient>
+        </defs>
+        <rect 
+          x="10" y="10" 
+          width="80" height="80" 
+          rx="16" 
+          fill="none" 
+          stroke="url(#loaderGradRing)" 
+          strokeWidth="4"
+          strokeDasharray="240"
+          strokeDashoffset="60"
+          style={{ 
+            transformOrigin: 'center',
+            animation: 'spin 1.5s linear infinite'
+          }}
+        />
+      </svg>
+      
+      {/* Static play icon with pulse */}
+      <svg 
+        width={size} 
+        height={size} 
+        viewBox="0 0 100 100"
+        className="absolute inset-0 animate-pulse"
+      >
+        <defs>
+          <linearGradient id="loaderGradPlay" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#8B5CF6" />
+            <stop offset="100%" stopColor="#A855F7" />
+          </linearGradient>
+        </defs>
+        <path d="M38 30 L38 70 L72 50 Z" fill="url(#loaderGradPlay)" />
+      </svg>
+    </div>
+    {showText && (
+      <span className="text-xs text-gray-400 animate-pulse">Loading...</span>
+    )}
+  </div>
+);
+
+// Full page loading state
+export const PageLoader = ({ message = "Loading..." }) => (
+  <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+    <KonaLoader size={60} />
+    <p className="mt-4 text-sm text-gray-400 animate-pulse">{message}</p>
+  </div>
+);
+
+// Inline content loader (for cards, sections)
+export const ContentLoader = ({ className = "" }) => (
+  <div className={`flex items-center justify-center p-8 ${className}`}>
+    <KonaLoader size={32} />
+  </div>
+);
     </svg>
   </div>
 );
