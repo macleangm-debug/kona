@@ -245,10 +245,26 @@ Kona is a mobile-first mini-series streaming platform with a coin-based economy 
 - Frontend: React on port 3000
 - Database: MongoDB
 
+## Documentation
+
+### Production Deployment Guide
+- **Location:** `/app/docs/production_guide.md`
+- **Created:** December 2025
+- **Contents:**
+  - Architecture diagram for 10M+ users
+  - Infrastructure requirements by tier (Startup → Enterprise)
+  - Detailed cost estimates: $230/month (100K users) → $45,000/month (10M users)
+  - Deployment checklist (pre-launch, launch day, post-launch)
+  - Monitoring & alerting configuration
+  - Scaling strategy (HPA, database sharding)
+  - Security checklist
+  - Disaster recovery procedures
+
 ## Future Roadmap
 
 ### P1 - High Priority
 - Watch Party feature (WebSocket-based sync with live chat & reactions)
+- Integrate `ConfirmationModal.jsx` for critical user actions
 
 ### P2 - Medium Priority
 - AI-powered content moderation
