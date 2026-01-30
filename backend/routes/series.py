@@ -88,19 +88,39 @@ async def set_reminder(request: Request, data: ReminderRequest, user: dict = Dep
     return {"message": "Reminder set successfully!", "series_id": data.series_id}
 
 @router.get("/series/{series_id}", response_model=SeriesResponse)
-async def get_series_detail(series_id: str):
+@limiter.limit("100/minute")
+async def get_series_detail(request: Request, series_id: str):
+    """Get series detail with caching"""
+    cache_key = series_key(series_id)
+    
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     series = await db.series.find_one({"id": series_id}, {"_id": 0})
     if not series:
         raise HTTPException(status_code=404, detail="Series not found")
+    
+    await cache.set(cache_key, series, CACHE_TTL["series"])
     return series
 
 @router.get("/series/{series_id}/episodes", response_model=List[EpisodeResponse])
-async def get_episodes(series_id: str):
+@limiter.limit("100/minute")
+async def get_episodes(request: Request, series_id: str):
+    """Get episodes with caching"""
+    cache_key = episodes_key(series_id)
+    
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached
+    
     episodes = await db.episodes.find({"series_id": series_id}, {"_id": 0}).sort("episode_number", 1).to_list(100)
+    await cache.set(cache_key, episodes, CACHE_TTL["episodes"])
     return episodes
 
 @router.get("/episodes/{episode_id}")
-async def get_episode(episode_id: str, user: dict = Depends(get_optional_user)):
+@limiter.limit("100/minute")
+async def get_episode(request: Request, episode_id: str, user: dict = Depends(get_optional_user)):
     """Get episode details - allows guests for free episodes"""
     episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0})
     if not episode:
