@@ -121,6 +121,7 @@ export const DiscoverPage = ({ onAuthClick }) => {
   const { user, token } = useAuth();
   const [allSeries, setAllSeries] = useState([]);
   const [myList, setMyList] = useState([]);
+  const [comingSoon, setComingSoon] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -138,9 +139,13 @@ export const DiscoverPage = ({ onAuthClick }) => {
 
   const fetchData = async () => {
     try {
-      const seriesRes = await axios.get(`${API}/series`);
+      const [seriesRes, comingSoonRes] = await Promise.all([
+        axios.get(`${API}/series`),
+        axios.get(`${API}/series/coming-soon`)
+      ]);
       const series = seriesRes.data;
       setAllSeries(series);
+      setComingSoon(comingSoonRes.data);
 
       // Generate personalized recommendations
       generateRecommendations(series);
