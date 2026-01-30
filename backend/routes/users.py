@@ -143,6 +143,267 @@ async def spin_wheel(user: dict = Depends(get_current_user)):
         "message": f"You won {prize} coins!"
     }
 
+# ============ WATCH STREAKS ============
+@router.get("/streak/status")
+async def get_streak_status(user: dict = Depends(get_current_user)):
+    """Get user's current watch streak status"""
+    current_streak = user.get("watch_streak", 0)
+    last_watch_date = user.get("last_watch_date")
+    streak_rewards_claimed = user.get("streak_rewards_claimed", [])
+    
+    now = datetime.now(timezone.utc)
+    today = now.date()
+    
+    # Check if streak is still valid (watched yesterday or today)
+    if last_watch_date:
+        last_date = datetime.fromisoformat(last_watch_date.replace('Z', '+00:00')).date()
+        days_since = (today - last_date).days
+        if days_since > 1:
+            current_streak = 0  # Streak broken
+    
+    # Calculate next milestone
+    next_milestone = None
+    for days, reward in sorted(STREAK_REWARDS.items()):
+        if days > current_streak:
+            next_milestone = {"days": days, "coins": reward["coins"], "badge": reward["badge"]}
+            break
+    
+    # Check claimable rewards
+    claimable_rewards = []
+    for days, reward in STREAK_REWARDS.items():
+        if current_streak >= days and str(days) not in streak_rewards_claimed:
+            claimable_rewards.append({"days": days, **reward})
+    
+    return {
+        "current_streak": current_streak,
+        "last_watch_date": last_watch_date,
+        "next_milestone": next_milestone,
+        "claimable_rewards": claimable_rewards,
+        "all_milestones": [{"days": d, **r} for d, r in STREAK_REWARDS.items()]
+    }
+
+@router.post("/streak/claim/{days}")
+async def claim_streak_reward(days: int, user: dict = Depends(get_current_user)):
+    """Claim a streak milestone reward"""
+    current_streak = user.get("watch_streak", 0)
+    streak_rewards_claimed = user.get("streak_rewards_claimed", [])
+    
+    if days not in STREAK_REWARDS:
+        raise HTTPException(status_code=400, detail="Invalid milestone")
+    
+    if current_streak < days:
+        raise HTTPException(status_code=400, detail=f"Need {days}-day streak to claim")
+    
+    if str(days) in streak_rewards_claimed:
+        raise HTTPException(status_code=400, detail="Already claimed")
+    
+    reward = STREAK_REWARDS[days]
+    new_coins = user["coins"] + reward["coins"]
+    streak_rewards_claimed.append(str(days))
+    
+    # Also award the badge
+    user_badges = user.get("badges", {})
+    user_badges[reward["badge"]] = {
+        "earned_at": datetime.now(timezone.utc).isoformat(),
+        "type": "streak"
+    }
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "coins": new_coins,
+            "streak_rewards_claimed": streak_rewards_claimed,
+            "badges": user_badges
+        }}
+    )
+    
+    return {
+        "message": f"Claimed {reward['coins']} coins and {reward['badge']} badge!",
+        "coins_awarded": reward["coins"],
+        "badge_awarded": reward["badge"],
+        "new_balance": new_coins
+    }
+
+# ============ VIEWER LEVELS ============
+@router.get("/viewer-level")
+async def get_viewer_level(user: dict = Depends(get_current_user)):
+    """Get user's viewer level based on episodes watched"""
+    episodes_watched = user.get("total_episodes_watched", 0)
+    total_xp = user.get("total_xp", 0)
+    
+    # Determine current level
+    current_level = VIEWER_LEVELS[0]
+    next_level = None
+    
+    for i, level in enumerate(VIEWER_LEVELS):
+        if episodes_watched >= level["min_episodes"]:
+            current_level = level
+            if i < len(VIEWER_LEVELS) - 1:
+                next_level = VIEWER_LEVELS[i + 1]
+        else:
+            break
+    
+    # Calculate progress to next level
+    progress = 100
+    episodes_needed = 0
+    if next_level:
+        episodes_needed = next_level["min_episodes"] - episodes_watched
+        level_range = next_level["min_episodes"] - current_level["min_episodes"]
+        current_progress = episodes_watched - current_level["min_episodes"]
+        progress = min(100, (current_progress / level_range) * 100) if level_range > 0 else 100
+    
+    return {
+        "current_level": current_level,
+        "next_level": next_level,
+        "episodes_watched": episodes_watched,
+        "episodes_to_next": episodes_needed,
+        "progress_percent": round(progress, 1),
+        "total_xp": total_xp,
+        "all_levels": VIEWER_LEVELS
+    }
+
+# ============ DAILY CHALLENGES ============
+@router.get("/challenges/daily")
+async def get_daily_challenges(user: dict = Depends(get_current_user)):
+    """Get today's challenges and progress"""
+    now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    
+    # Get or reset daily progress
+    challenge_date = user.get("challenge_date")
+    if challenge_date != today:
+        # Reset for new day
+        daily_progress = {c["id"]: 0 for c in DAILY_CHALLENGES}
+        completed_today = []
+    else:
+        daily_progress = user.get("daily_challenge_progress", {})
+        completed_today = user.get("challenges_completed_today", [])
+    
+    challenges = []
+    for challenge in DAILY_CHALLENGES:
+        progress = daily_progress.get(challenge["id"], 0)
+        is_complete = progress >= challenge["target"]
+        is_claimed = challenge["id"] in completed_today
+        
+        challenges.append({
+            **challenge,
+            "progress": progress,
+            "is_complete": is_complete,
+            "is_claimed": is_claimed
+        })
+    
+    return {
+        "date": today,
+        "challenges": challenges,
+        "total_completed": len(completed_today)
+    }
+
+@router.post("/challenges/claim/{challenge_id}")
+async def claim_challenge_reward(challenge_id: str, user: dict = Depends(get_current_user)):
+    """Claim a completed challenge reward"""
+    now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    
+    # Find challenge
+    challenge = next((c for c in DAILY_CHALLENGES if c["id"] == challenge_id), None)
+    if not challenge:
+        raise HTTPException(status_code=400, detail="Invalid challenge")
+    
+    # Check progress
+    challenge_date = user.get("challenge_date", today)
+    daily_progress = user.get("daily_challenge_progress", {})
+    completed_today = user.get("challenges_completed_today", [])
+    
+    if challenge_date != today:
+        raise HTTPException(status_code=400, detail="Challenge expired")
+    
+    progress = daily_progress.get(challenge_id, 0)
+    if progress < challenge["target"]:
+        raise HTTPException(status_code=400, detail="Challenge not complete")
+    
+    if challenge_id in completed_today:
+        raise HTTPException(status_code=400, detail="Already claimed")
+    
+    # Award reward
+    completed_today.append(challenge_id)
+    total_xp = user.get("total_xp", 0)
+    user_badges = user.get("badges", {})
+    
+    update_data = {
+        "challenges_completed_today": completed_today,
+        "challenge_date": today
+    }
+    
+    reward_message = ""
+    if challenge["reward_type"] == "xp":
+        total_xp += challenge["reward"]
+        update_data["total_xp"] = total_xp
+        reward_message = f"+{challenge['reward']} XP"
+    elif challenge["reward_type"] == "badge":
+        user_badges[challenge["reward"]] = {
+            "earned_at": now.isoformat(),
+            "type": "challenge"
+        }
+        update_data["badges"] = user_badges
+        reward_message = f"Badge: {challenge['reward']}"
+    
+    await db.users.update_one({"id": user["id"]}, {"$set": update_data})
+    
+    return {
+        "message": f"Challenge complete! {reward_message}",
+        "reward_type": challenge["reward_type"],
+        "reward": challenge["reward"],
+        "total_xp": total_xp
+    }
+
+# ============ PURCHASE PROMPTS ============
+@router.get("/purchase-prompt")
+async def get_purchase_prompt(user: dict = Depends(get_current_user)):
+    """Get contextual purchase prompts based on user state"""
+    coins = user.get("coins", 0)
+    
+    # Standard episode costs
+    EPISODE_COST = 15
+    
+    prompts = []
+    
+    # "Almost there" prompt
+    if 0 < coins < EPISODE_COST:
+        coins_needed = EPISODE_COST - coins
+        prompts.append({
+            "type": "almost_there",
+            "title": "Almost There!",
+            "message": f"Just {coins_needed} more coins to unlock your next episode!",
+            "cta": "Get Coins",
+            "priority": 1
+        })
+    
+    # Low balance prompt
+    if coins == 0:
+        prompts.append({
+            "type": "empty_wallet",
+            "title": "Your wallet is empty",
+            "message": "Top up now and continue watching!",
+            "cta": "Buy Coins",
+            "priority": 2
+        })
+    
+    # First purchase bonus (check if user has never purchased)
+    if not user.get("has_purchased"):
+        prompts.append({
+            "type": "first_purchase",
+            "title": "First Purchase Bonus!",
+            "message": "Buy any coin pack and get 20% extra coins!",
+            "cta": "Claim Bonus",
+            "priority": 0
+        })
+    
+    return {
+        "prompts": sorted(prompts, key=lambda x: x["priority"]),
+        "current_balance": coins,
+        "episode_cost": EPISODE_COST
+    }
+
 # ============ MY LIST ============
 @router.get("/users/me/my-list")
 async def get_my_list(user: dict = Depends(get_current_user)):
