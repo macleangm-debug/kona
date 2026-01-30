@@ -337,3 +337,71 @@ async def process_payout(payout_id: str, user: dict = Depends(require_admin)):
         raise HTTPException(status_code=404, detail="Payout not found or already processed")
     
     return {"message": "Payout marked as processed"}
+
+# ============ SUPER ADMIN DOCUMENTATION ============
+@router.get("/docs/production-guide")
+async def get_production_guide(user: dict = Depends(require_super_admin)):
+    """Get production deployment guide (Super Admin only)"""
+    guide_path = "/app/docs/production_guide.md"
+    
+    if not os.path.exists(guide_path):
+        raise HTTPException(status_code=404, detail="Production guide not found")
+    
+    with open(guide_path, "r") as f:
+        content = f.read()
+    
+    return {
+        "title": "Production Deployment Guide",
+        "content": content,
+        "last_updated": datetime.fromtimestamp(os.path.getmtime(guide_path)).isoformat()
+    }
+
+@router.get("/docs/list")
+async def list_docs(user: dict = Depends(require_super_admin)):
+    """List available documentation (Super Admin only)"""
+    docs_dir = "/app/docs"
+    docs = []
+    
+    if os.path.exists(docs_dir):
+        for filename in os.listdir(docs_dir):
+            if filename.endswith(".md"):
+                filepath = os.path.join(docs_dir, filename)
+                docs.append({
+                    "id": filename.replace(".md", ""),
+                    "name": filename.replace("_", " ").replace(".md", "").title(),
+                    "path": f"/api/admin/docs/{filename.replace('.md', '')}",
+                    "last_updated": datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat()
+                })
+    
+    return {"docs": docs}
+
+@router.get("/system/health")
+async def get_system_health(user: dict = Depends(require_super_admin)):
+    """Get detailed system health (Super Admin only)"""
+    from services.cache import cache
+    from services.database import check_db_health
+    
+    db_health = await check_db_health()
+    cache_status = "connected" if cache.enabled else "disabled"
+    
+    # Get collection stats
+    users_count = await db.users.estimated_document_count()
+    series_count = await db.series.estimated_document_count()
+    episodes_count = await db.episodes.estimated_document_count()
+    
+    return {
+        "database": db_health,
+        "cache": cache_status,
+        "collections": {
+            "users": users_count,
+            "series": series_count,
+            "episodes": episodes_count
+        },
+        "scaling_features": {
+            "rate_limiting": "enabled",
+            "connection_pooling": "enabled (maxPoolSize=100)",
+            "indexes": "optimized",
+            "caching": cache_status
+        }
+    }
+
