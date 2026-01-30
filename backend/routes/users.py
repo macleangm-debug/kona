@@ -11,10 +11,35 @@ from config.settings import DAILY_REWARD_COINS
 
 router = APIRouter(tags=["User"])
 
-# Spin wheel prize configuration - Lower prizes, harder to get big wins
-SPIN_PRIZES = [1, 2, 3, 5, 8, 10, 15, 25]  # Lower prizes
-SPIN_WEIGHTS = [30, 25, 20, 12, 7, 4, 1.5, 0.5]  # Much harder to get high prizes
+# Spin wheel prize configuration - Revenue optimized (max 5 coins)
+SPIN_PRIZES = [1, 1, 2, 2, 3, 3, 4, 5]  # Very low prizes
+SPIN_WEIGHTS = [25, 25, 18, 12, 8, 6, 4, 2]  # 50% chance for 1 coin, 2% for 5
 MAX_SPINS_PER_DAY = 3  # Maximum spins allowed per day
+
+# Watch streak rewards - minimal coins to encourage purchases
+STREAK_REWARDS = {
+    3: {"coins": 2, "badge": "streak_3"},
+    7: {"coins": 5, "badge": "streak_7"},
+    14: {"coins": 8, "badge": "streak_14"},
+    30: {"coins": 15, "badge": "streak_30"},
+}
+
+# Viewer levels based on total watch time (in episodes)
+VIEWER_LEVELS = [
+    {"name": "Newcomer", "min_episodes": 0, "icon": "🌱", "perks": []},
+    {"name": "Regular", "min_episodes": 10, "icon": "⭐", "perks": ["profile_frame_bronze"]},
+    {"name": "Fan", "min_episodes": 30, "icon": "🔥", "perks": ["profile_frame_silver"]},
+    {"name": "Superfan", "min_episodes": 75, "icon": "💎", "perks": ["profile_frame_gold"]},
+    {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access"]},
+]
+
+# Daily challenges (mostly non-coin rewards)
+DAILY_CHALLENGES = [
+    {"id": "watch_1", "title": "Daily Watch", "description": "Watch 1 episode today", "target": 1, "reward_type": "xp", "reward": 10},
+    {"id": "watch_3", "title": "Triple Play", "description": "Watch 3 episodes today", "target": 3, "reward_type": "xp", "reward": 30},
+    {"id": "genre_explore", "title": "Genre Explorer", "description": "Watch from 2 different genres", "target": 2, "reward_type": "badge", "reward": "explorer"},
+    {"id": "share_series", "title": "Social Star", "description": "Share a series with friends", "target": 1, "reward_type": "xp", "reward": 15},
+]
 
 # ============ DAILY REWARDS ============
 @router.post("/rewards/claim")
