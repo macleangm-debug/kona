@@ -26,38 +26,55 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining 
   ];
   
   const [rotation, setRotation] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const handleSpin = () => {
-    if (!canSpin || isSpinning || spinsRemaining <= 0) return;
+    if (!canSpin || isSpinning || spinsRemaining <= 0 || isAnimating) return;
     
     // Start spinning animation
     setIsSpinning(true);
+    setIsAnimating(true);
     
-    // Random rotation (4-6 full spins + random position)
-    const spins = 4 + Math.random() * 2;
-    const newRotation = rotation + (spins * 360) + Math.random() * 360;
-    setRotation(newRotation);
+    // Random rotation (8-12 full spins + random position for dramatic effect)
+    const spins = 8 + Math.random() * 4;
+    const extraDegrees = Math.random() * 360;
+    const newRotation = rotation + (spins * 360) + extraDegrees;
     
-    // Calculate prize after animation completes
+    // Small delay to ensure state is set before animation
+    requestAnimationFrame(() => {
+      setRotation(newRotation);
+    });
+    
+    // Calculate prize after animation completes (5 seconds)
     setTimeout(() => {
       const normalizedRotation = newRotation % 360;
       const prizeIndex = Math.floor((360 - normalizedRotation + 22.5) / 45) % 8;
+      setIsAnimating(false);
       onSpin(parseInt(prizes[prizeIndex].label));
-    }, 3500);
+    }, 5000);
   };
 
   return (
-    <div className="relative w-64 h-64 mx-auto my-4">
-      {/* Outer glow */}
-      <div className={`absolute inset-0 rounded-full ${isSpinning ? 'animate-pulse' : ''}`} 
-           style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.4)' }} />
-      
-      {/* Wheel */}
+    <div className="relative w-72 h-72 mx-auto my-6">
+      {/* Outer glow effect */}
       <div 
-        className="w-full h-full rounded-full relative overflow-hidden shadow-2xl border-4 border-yellow-400"
+        className={`absolute inset-0 rounded-full transition-all duration-300 ${isAnimating ? 'scale-105' : 'scale-100'}`}
+        style={{ 
+          boxShadow: isAnimating 
+            ? '0 0 60px rgba(168, 85, 247, 0.6), 0 0 100px rgba(168, 85, 247, 0.3)' 
+            : '0 0 30px rgba(168, 85, 247, 0.3)' 
+        }} 
+      />
+      
+      {/* Wheel container */}
+      <div 
+        className="w-full h-full rounded-full relative overflow-hidden border-4 border-yellow-400"
         style={{
           transform: `rotate(${rotation}deg)`,
-          transition: isSpinning ? 'transform 3.5s cubic-bezier(0.2, 0.8, 0.2, 1)' : 'none'
+          transition: isAnimating 
+            ? 'transform 5s cubic-bezier(0.2, 0.8, 0.3, 1)' 
+            : 'none',
+          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
         }}
       >
         {prizes.map((prize, i) => (
