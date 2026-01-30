@@ -2,9 +2,11 @@
 Admin routes
 """
 import uuid
+import os
 from datetime import datetime, timezone
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 
 from models.schemas import (
     AdminSeriesCreate, AdminEpisodeCreate, AdminUserUpdate,
@@ -18,6 +20,12 @@ async def require_admin(user: dict = Depends(get_current_user)):
     """Dependency to require admin privileges"""
     if not user.get("is_admin"):
         raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+async def require_super_admin(user: dict = Depends(get_current_user)):
+    """Dependency to require super admin privileges"""
+    if not user.get("is_super_admin"):
+        raise HTTPException(status_code=403, detail="Super Admin access required")
     return user
 
 # ============ ADMIN SERIES ============
