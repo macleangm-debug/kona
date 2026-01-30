@@ -84,19 +84,22 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
 
   return (
     <div className="pb-20" data-testid="series-detail-page">
+      {/* Spacer for fixed header */}
+      <div className="h-16 lg:h-20" />
+      
       {/* Hero */}
       <div className="relative h-64">
         <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <button
           onClick={() => navigate(-1)}
-          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
+          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center z-10"
           data-testid="back-btn"
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
         {user && (
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-4 right-4 z-10">
             <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
           </div>
         )}
