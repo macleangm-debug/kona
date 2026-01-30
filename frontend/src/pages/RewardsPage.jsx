@@ -201,15 +201,17 @@ export const RewardsPage = ({ onAuthClick }) => {
         });
         setSpinData({
           canSpin: spinRes.data.can_spin,
-          hoursUntilNext: spinRes.data.hours_until_next || 0
+          spinsRemaining: spinRes.data.spins_remaining,
+          maxSpins: spinRes.data.max_spins,
+          spinsUsed: spinRes.data.spins_used
         });
       } catch (e) {
-        // Fallback to localStorage if endpoint fails
-        const lastSpin = localStorage.getItem('kona-last-spin');
-        const today = new Date().toDateString();
+        // Fallback
         setSpinData({
-          canSpin: lastSpin !== today,
-          lastSpin: lastSpin
+          canSpin: true,
+          spinsRemaining: 3,
+          maxSpins: 3,
+          spinsUsed: 0
         });
       }
 
