@@ -13,7 +13,7 @@ import { API } from "@/config";
 import { toast } from "sonner";
 
 // Spin Wheel Component
-const SpinWheel = ({ onSpin, canSpin, isSpinning, onSpinStart, spinsRemaining = 0, maxSpins = 3 }) => {
+const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
   const prizes = [
     { label: "1", color: "#6366f1" },
     { label: "2", color: "#8b5cf6" },
@@ -29,19 +29,21 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, onSpinStart, spinsRemaining = 
 
   const handleSpin = () => {
     if (!canSpin || isSpinning || spinsRemaining <= 0) return;
-    onSpinStart();
     
-    // Random rotation (3-5 full spins + random position)
-    const spins = 3 + Math.random() * 2;
+    // Start spinning animation
+    setIsSpinning(true);
+    
+    // Random rotation (4-6 full spins + random position)
+    const spins = 4 + Math.random() * 2;
     const newRotation = rotation + (spins * 360) + Math.random() * 360;
     setRotation(newRotation);
     
-    // Calculate prize after animation
+    // Calculate prize after animation completes
     setTimeout(() => {
       const normalizedRotation = newRotation % 360;
       const prizeIndex = Math.floor((360 - normalizedRotation + 22.5) / 45) % 8;
       onSpin(parseInt(prizes[prizeIndex].label));
-    }, 3000);
+    }, 3500);
   };
 
   return (
