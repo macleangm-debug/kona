@@ -838,7 +838,18 @@ async def get_my_list(user: dict = Depends(get_current_user)):
 # Alias routes for frontend compatibility
 @router.get("/user/my-list")
 async def get_my_list_alias(user: dict = Depends(get_current_user)):
-    return await get_my_list(user)
+    # Re-fetch user to get latest my_list
+    fresh_user = await db.users.find_one({"id": user["id"]}, {"_id": 0})
+    my_list_ids = fresh_user.get("my_list", []) if fresh_user else []
+    if not my_list_ids:
+        return []
+    
+    series = await db.series.find(
+        {"id": {"$in": my_list_ids}},
+        {"_id": 0}
+    ).to_list(100)
+    
+    return series
 
 @router.post("/user/my-list/add")
 async def add_to_my_list_alias(data: MyListRequest, user: dict = Depends(get_current_user)):
