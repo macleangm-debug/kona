@@ -287,6 +287,26 @@ All accessible via Super Admin → Docs & System tab:
 12. 🤝 Creator Partnership Program - Revenue share, onboarding
 13. 🔒 Security & Data Protection - Policies, compliance
 
+### January 31, 2026 - Investment Calculator & Business Documents
+- ✅ **Investment Calculator** - Full financial projection tool at `/investment`:
+  - User growth projections with 24-month forecasts
+  - Revenue vs Costs comparison charts
+  - Cumulative profit tracking
+  - ROI over time analysis
+  - Key unit economics (LTV, CAC, LTV:CAC ratio, churn, margin, ARPU, payback)
+  - Risk assessment with HIGH/MEDIUM/LOW indicators
+  - Strategic recommendations
+  - Industry benchmarks comparison
+  - African streaming market size data
+- ✅ **7 New Business Documents** added to Admin Docs & System:
+  1. Investor Pitch Deck (funding presentation)
+  2. Financial Projections (3-5 year forecasts)
+  3. Competitor Analysis (Netflix, ReelShort, Showmax comparison)
+  4. API Documentation (complete endpoint reference)
+  5. Disaster Recovery Plan (backup & failover procedures)
+  6. Content Moderation Guidelines (policies & enforcement)
+  7. Creator Payout Schedule (payment terms & processes)
+
 ### January 31, 2026 - Major Feature Implementation
 - ✅ **Watch Party with Video Sync** - Complete implementation:
   - Real-time video playback synchronization (2-second polling)
