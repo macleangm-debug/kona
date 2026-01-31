@@ -498,6 +498,20 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           <span className="text-white text-xs">5.5K</span>
         </button>
 
+        {/* Picture-in-Picture */}
+        {isPipSupported && (
+          <button 
+            onClick={togglePictureInPicture}
+            className="flex flex-col items-center gap-1"
+            data-testid="pip-btn"
+          >
+            <div className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center ${isPipActive ? 'bg-primary/50' : 'bg-black/30'}`}>
+              <PictureInPicture2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-white text-xs">{isPipActive ? 'Exit PiP' : 'PiP'}</span>
+          </button>
+        )}
+
         {/* Episodes */}
         <button 
           onClick={() => setShowEpisodes(true)}
