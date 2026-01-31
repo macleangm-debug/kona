@@ -368,7 +368,7 @@ Use my referral code: *${user?.referral_code}*
                 ) : milestone.can_claim ? (
                   <Button
                     size="sm"
-                    onClick={() => claimMilestone(milestone.id)}
+                    onClick={() => setPendingClaimMilestone(milestone)}
                     disabled={claimingMilestone === milestone.id}
                     className="bg-yellow-500 hover:bg-yellow-600 text-black rounded-full text-xs px-3"
                     data-testid={`claim-${milestone.id}`}
