@@ -353,160 +353,74 @@ const InvestmentCalculatorTab = ({ token }) => {
 };
 
 // Infrastructure Calculator Tab Component - 99% Uptime Affordable Approach
-const InfrastructureCalculatorTab = () => {
+const InfrastructureCalculatorTab = ({ token }) => {
   const [totalUsers, setTotalUsers] = useState(10000);
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const calculateInfrastructure = () => {
-    // Calculations based on industry standards for 99% uptime
-    const concurrentUsers = Math.ceil(totalUsers * 0.1); // 10% concurrent at peak
-    const requestsPerSecond = Math.ceil(concurrentUsers * 0.5); // 0.5 requests/user/sec
-    const videoStreams = Math.ceil(concurrentUsers * 0.3); // 30% actively streaming
-    const bandwidthGbps = (videoStreams * 3) / 1000; // 3 Mbps per stream average
-    
-    // Database sizing
-    const dbStorageGB = Math.ceil(totalUsers * 0.01); // ~10MB per user data
-    const dbConnections = Math.min(Math.ceil(concurrentUsers / 10), 500);
-    
-    // CDN & Storage
-    const videoStorageTB = Math.ceil(totalUsers / 10000); // 1TB per 10k users (content library)
-    const cdnBandwidthTB = Math.ceil(bandwidthGbps * 3600 * 24 * 30 / 8 / 1000); // Monthly
-    
-    // Affordable cloud costs (using budget options)
-    const serverCost = calculateServerCost(concurrentUsers);
-    const dbCost = calculateDbCost(dbStorageGB, dbConnections);
-    const cdnCost = calculateCdnCost(cdnBandwidthTB, videoStorageTB);
-    const monitoringCost = 20; // Basic monitoring
-    const backupCost = Math.ceil(dbStorageGB * 0.05);
-    
-    const totalMonthlyCost = serverCost + dbCost + cdnCost + monitoringCost + backupCost;
-    const costPerUser = totalMonthlyCost / totalUsers;
-    
-    setResult({
-      users: {
-        total: totalUsers,
-        concurrent: concurrentUsers,
-        streaming: videoStreams
-      },
-      compute: {
-        requestsPerSecond,
-        recommendedInstances: calculateInstances(concurrentUsers),
-        serverType: getServerRecommendation(concurrentUsers),
-        cost: serverCost
-      },
-      database: {
-        storageGB: dbStorageGB,
-        connections: dbConnections,
-        type: getDbRecommendation(totalUsers),
-        cost: dbCost
-      },
-      cdn: {
-        storageTB: videoStorageTB,
-        bandwidthTB: cdnBandwidthTB,
-        provider: getCdnRecommendation(totalUsers),
-        cost: cdnCost
-      },
-      monitoring: {
-        tools: getMonitoringRecommendation(totalUsers),
-        cost: monitoringCost
-      },
-      backup: {
-        strategy: getBackupRecommendation(totalUsers),
-        cost: backupCost
-      },
-      totalCost: {
-        monthly: totalMonthlyCost,
-        yearly: totalMonthlyCost * 12,
-        perUser: costPerUser
-      },
-      uptimeComponents: getUptimeComponents(totalUsers),
-      affordableTips: getAffordableTips(totalUsers)
-    });
-  };
-
-  // Helper functions for calculations
-  const calculateServerCost = (concurrent) => {
-    if (concurrent <= 100) return 20; // Shared hosting / small VPS
-    if (concurrent <= 500) return 50; // Medium VPS
-    if (concurrent <= 2000) return 150; // Large VPS or small dedicated
-    if (concurrent <= 10000) return 400; // Multiple servers
-    return Math.ceil(concurrent / 25); // Scale horizontally
-  };
-
-  const calculateDbCost = (storage, connections) => {
-    if (storage <= 5) return 0; // Free tier
-    if (storage <= 20) return 15; // Basic shared
-    if (storage <= 100) return 50; // Small dedicated
-    return Math.ceil(storage * 0.5) + Math.ceil(connections * 0.1);
-  };
-
-  const calculateCdnCost = (bandwidthTB, storageTB) => {
-    // Bunny.net pricing (very affordable)
-    const storageCost = storageTB * 5; // ~$5/TB storage
-    const bandwidthCost = bandwidthTB * 10; // ~$10/TB bandwidth
-    return Math.ceil(storageCost + bandwidthCost);
-  };
-
-  const calculateInstances = (concurrent) => {
-    if (concurrent <= 500) return 1;
-    if (concurrent <= 2000) return 2;
-    if (concurrent <= 5000) return 3;
-    return Math.ceil(concurrent / 2000);
-  };
-
-  const getServerRecommendation = (concurrent) => {
-    if (concurrent <= 100) return { name: "Shared VPS (2GB)", provider: "Hetzner/DigitalOcean", specs: "2 vCPU, 2GB RAM" };
-    if (concurrent <= 500) return { name: "Small VPS (4GB)", provider: "Hetzner Cloud", specs: "2 vCPU, 4GB RAM" };
-    if (concurrent <= 2000) return { name: "Medium VPS (8GB)", provider: "Hetzner/Vultr", specs: "4 vCPU, 8GB RAM" };
-    return { name: "Multiple VPS with Load Balancer", provider: "Hetzner + Cloudflare LB", specs: "4-8 vCPU, 8-16GB RAM each" };
-  };
-
-  const getDbRecommendation = (users) => {
-    if (users <= 5000) return { name: "MongoDB Atlas Free/Shared", tier: "M0-M2", cost: "Free-$9/mo" };
-    if (users <= 50000) return { name: "MongoDB Atlas M10", tier: "M10", cost: "$57/mo" };
-    return { name: "MongoDB Atlas M20+", tier: "M20", cost: "$140+/mo" };
-  };
-
-  const getCdnRecommendation = (users) => {
-    if (users <= 10000) return { name: "Bunny.net", reason: "Cheapest CDN, $0.01/GB" };
-    if (users <= 100000) return { name: "Bunny.net + Cloudflare", reason: "Cost-effective combo" };
-    return { name: "Bunny.net Stream", reason: "Built-in video optimization" };
-  };
-
-  const getMonitoringRecommendation = (users) => {
-    if (users <= 10000) return ["UptimeRobot (free)", "Sentry (free tier)", "Custom health checks"];
-    return ["Better Uptime ($20/mo)", "Sentry Team", "Prometheus + Grafana"];
-  };
-
-  const getBackupRecommendation = (users) => {
-    if (users <= 10000) return "Daily automated backups to S3/Backblaze B2";
-    return "Hourly backups + cross-region replication";
-  };
-
-  const getUptimeComponents = (users) => [
-    { component: "Load Balancer / Reverse Proxy", solution: users <= 10000 ? "Cloudflare (free)" : "Cloudflare Pro ($20/mo)", impact: "Route traffic, DDoS protection" },
-    { component: "Multi-zone Deployment", solution: users <= 50000 ? "Single region, 2 availability zones" : "Multi-region active-passive", impact: "Survive zone failures" },
-    { component: "Health Checks", solution: "UptimeRobot + Custom endpoints", impact: "Detect issues in <1 min" },
-    { component: "Auto-restart", solution: "PM2 / Supervisor / Docker restart", impact: "Recover from crashes" },
-    { component: "Database Replica", solution: users <= 10000 ? "MongoDB Atlas built-in" : "Read replicas", impact: "DB failover" },
-    { component: "CDN Redundancy", solution: "Bunny.net multi-PoP", impact: "Global content availability" }
-  ];
-
-  const getAffordableTips = (users) => {
-    const tips = [
-      { tip: "Use Hetzner over AWS/GCP", savings: "60-70% cheaper for same specs", priority: "HIGH" },
-      { tip: "Bunny.net for video CDN", savings: "10x cheaper than CloudFront", priority: "HIGH" },
-      { tip: "MongoDB Atlas free tier to start", savings: "Free for up to 5GB", priority: "HIGH" },
-      { tip: "Cloudflare free for DNS + CDN", savings: "Free SSL, DDoS protection", priority: "HIGH" },
-      { tip: "Use spot/preemptible instances for non-critical", savings: "50-80% off", priority: "MEDIUM" }
-    ];
-    if (users > 10000) {
-      tips.push({ tip: "Reserved instances for predictable workloads", savings: "30-40% off", priority: "MEDIUM" });
+  const calculateInfrastructure = async () => {
+    if (totalUsers < 100) {
+      toast.error("Please enter at least 100 users");
+      return;
     }
-    if (users > 50000) {
-      tips.push({ tip: "Negotiate enterprise deals with providers", savings: "Custom pricing", priority: "HIGH" });
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await axios.post(`${API}/infrastructure/calculate`, {
+        total_users: totalUsers
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Transform snake_case to camelCase for frontend consistency
+      const data = response.data;
+      setResult({
+        users: data.users,
+        compute: {
+          requestsPerSecond: data.compute.requests_per_second,
+          recommendedInstances: data.compute.recommended_instances,
+          serverType: data.compute.server_type,
+          cost: data.compute.cost
+        },
+        database: {
+          storageGB: data.database.storage_gb,
+          connections: data.database.connections,
+          type: data.database.type,
+          cost: data.database.cost
+        },
+        cdn: {
+          storageTB: data.cdn.storage_tb,
+          bandwidthTB: data.cdn.bandwidth_tb,
+          provider: data.cdn.provider,
+          cost: data.cdn.cost
+        },
+        monitoring: {
+          tools: data.monitoring.tools,
+          cost: data.monitoring.cost
+        },
+        backup: {
+          strategy: data.backup.strategy,
+          cost: data.backup.cost
+        },
+        totalCost: {
+          monthly: data.total_cost.monthly,
+          yearly: data.total_cost.yearly,
+          perUser: data.total_cost.per_user
+        },
+        uptimeComponents: data.uptime_components,
+        affordableTips: data.affordable_tips
+      });
+      toast.success("Infrastructure calculated successfully!");
+    } catch (err) {
+      console.error("Infrastructure calculation error:", err);
+      setError(err.response?.data?.detail || "Failed to calculate infrastructure");
+      toast.error("Failed to calculate infrastructure");
+    } finally {
+      setLoading(false);
     }
-    return tips;
   };
 
   const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
