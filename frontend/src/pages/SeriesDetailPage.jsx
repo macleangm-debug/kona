@@ -126,6 +126,22 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
         </div>
         <p className="text-muted-foreground text-sm mb-6">{series.description}</p>
 
+        {/* Watch Party Button */}
+        {user && episodes.length > 0 && (
+          <Button
+            onClick={() => {
+              setSelectedEpisodeForParty(episodes[0]);
+              setShowWatchParty(true);
+            }}
+            variant="outline"
+            className="w-full mb-6 border-primary/50 text-primary hover:bg-primary/10"
+            data-testid="watch-party-btn"
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Start Watch Party
+          </Button>
+        )}
+
         {/* Episodes */}
         <h2 className="font-heading text-lg font-semibold mb-3">Episodes</h2>
         <div className="space-y-2">
