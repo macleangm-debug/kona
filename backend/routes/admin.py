@@ -362,24 +362,47 @@ async def process_payout(payout_id: str, user: dict = Depends(require_admin)):
     return {"message": "Payout marked as processed"}
 
 # ============ SUPER ADMIN DOCUMENTATION ============
-@router.get("/docs/production-guide")
-async def get_production_guide(user: dict = Depends(require_super_admin)):
-    """Get production deployment guide (Super Admin only)"""
-    guide_path = "/app/docs/production_guide.md"
+
+# Document metadata mapping
+DOC_METADATA = {
+    "production_guide": {"title": "Production Deployment Guide", "icon": "🚀", "category": "P0"},
+    "launch_checklist": {"title": "Launch Checklist", "icon": "✅", "category": "P0"},
+    "marketing_plan": {"title": "Marketing & Go-to-Market Plan", "icon": "📈", "category": "P0"},
+    "monetization_strategy": {"title": "Monetization & Pricing Strategy", "icon": "💰", "category": "P0"},
+    "legal_compliance": {"title": "Legal & Compliance Checklist", "icon": "⚖️", "category": "P0"},
+    "kpi_metrics": {"title": "KPI & Metrics Dashboard", "icon": "📊", "category": "P1"},
+    "content_strategy": {"title": "Content Strategy & Pipeline", "icon": "🎬", "category": "P1"},
+    "support_playbook": {"title": "Customer Support Playbook", "icon": "🎧", "category": "P1"},
+    "crisis_management": {"title": "Crisis Management Plan", "icon": "🚨", "category": "P1"},
+    "growth_retention": {"title": "Growth & Retention Playbook", "icon": "🌱", "category": "P2"},
+    "localization_expansion": {"title": "Localization & Expansion Guide", "icon": "🌍", "category": "P2"},
+    "creator_partnership": {"title": "Creator Partnership Program", "icon": "🤝", "category": "P2"},
+    "security_data_protection": {"title": "Security & Data Protection", "icon": "🔒", "category": "P2"},
+}
+
+@router.get("/docs/{doc_id}")
+async def get_document(doc_id: str, user: dict = Depends(require_super_admin)):
+    """Get any document by ID (Super Admin only)"""
+    doc_path = f"/app/docs/{doc_id}.md"
     
-    if not os.path.exists(guide_path):
-        raise HTTPException(status_code=404, detail="Production guide not found")
+    if not os.path.exists(doc_path):
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
     
-    with open(guide_path, "r") as f:
+    with open(doc_path, "r") as f:
         content = f.read()
     
+    metadata = DOC_METADATA.get(doc_id, {"title": doc_id.replace("_", " ").title(), "icon": "📄", "category": "Other"})
+    
     return {
-        "title": "Production Deployment Guide",
+        "id": doc_id,
+        "title": metadata["title"],
+        "icon": metadata["icon"],
+        "category": metadata["category"],
         "content": content,
-        "last_updated": datetime.fromtimestamp(os.path.getmtime(guide_path)).isoformat()
+        "last_updated": datetime.fromtimestamp(os.path.getmtime(doc_path)).isoformat()
     }
 
-@router.get("/docs/list")
+@router.get("/docs")
 async def list_docs(user: dict = Depends(require_super_admin)):
     """List available documentation (Super Admin only)"""
     docs_dir = "/app/docs"
@@ -388,11 +411,22 @@ async def list_docs(user: dict = Depends(require_super_admin)):
     if os.path.exists(docs_dir):
         for filename in os.listdir(docs_dir):
             if filename.endswith(".md"):
+                doc_id = filename.replace(".md", "")
                 filepath = os.path.join(docs_dir, filename)
+                metadata = DOC_METADATA.get(doc_id, {"title": doc_id.replace("_", " ").title(), "icon": "📄", "category": "Other"})
                 docs.append({
-                    "id": filename.replace(".md", ""),
-                    "name": filename.replace("_", " ").replace(".md", "").title(),
-                    "path": f"/api/admin/docs/{filename.replace('.md', '')}",
+                    "id": doc_id,
+                    "title": metadata["title"],
+                    "icon": metadata["icon"],
+                    "category": metadata["category"],
+                    "last_updated": datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat()
+                })
+    
+    # Sort by category priority
+    category_order = {"P0": 0, "P1": 1, "P2": 2, "Other": 3}
+    docs.sort(key=lambda x: category_order.get(x["category"], 99))
+    
+    return {"docs": docs}
                     "last_updated": datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat()
                 })
     
