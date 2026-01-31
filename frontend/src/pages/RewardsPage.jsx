@@ -489,6 +489,15 @@ export const RewardsPage = ({ onAuthClick }) => {
         {/* Purchase Prompt */}
         <PurchasePrompt token={token} userCoins={user?.coins} />
       </div>
+
+      {/* Reward Claimed Modal */}
+      <RewardClaimedModal
+        open={showRewardModal}
+        onOpenChange={setShowRewardModal}
+        rewardAmount={rewardModalData.amount}
+        rewardType={rewardModalData.type}
+        onConfirm={() => setShowRewardModal(false)}
+      />
     </div>
   );
 };
