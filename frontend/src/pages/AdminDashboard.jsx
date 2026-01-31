@@ -586,6 +586,11 @@ export const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Launch Checklist Tab (Super Admin Only) */}
+        {activeTab === "checklist" && user?.is_super_admin && (
+          <LaunchChecklistTab token={token} />
+        )}
+
         {/* Docs & System Tab (Super Admin Only) */}
         {activeTab === "docs" && user?.is_super_admin && (
           <div className="space-y-6">
