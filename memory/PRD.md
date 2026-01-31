@@ -295,6 +295,12 @@ All accessible via Super Admin → Docs & System tab:
 - ✅ **Issue 5: Search Modal Desktop Fix** - Search overlay is now smaller and centered on desktop (lg:max-h-[500px] lg:w-[600px]).
 - ✅ **Free Episode Abuse Prevention** - Daily rewards now require watching at least 1 episode (10%+ progress) before claiming. Episodes watched today are tracked via `/api/episodes/progress` endpoint.
 
+### January 31, 2026 - Round 2 UI/UX Fixes
+- ✅ **Search Contained in Card** - Search modal is now a Dialog (not Sheet), contained in a card with max-width 600px on desktop, scrollable results area.
+- ✅ **Notifications as Dropdown** - Removed dedicated NotificationsPage route. Notifications now show in a dropdown modal from header bell icon.
+- ✅ **Login/Signup Animated Modals Working** - Fixed modal rendering issues. "Welcome back, Demo User! 🎉" with green checkmark animation.
+- ✅ **Save/Bookmark Button Working** - Added `/api/user/my-list/add` and `/api/user/my-list/remove` alias routes. My List now persists and displays correctly.
+
 ## Future Roadmap
 
 ### P1 - High Priority
