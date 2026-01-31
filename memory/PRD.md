@@ -415,3 +415,90 @@ All accessible via Super Admin → Docs & System tab:
 - `/app/frontend/src/pages/InvestmentCalculator.jsx`
 - `/app/frontend/src/pages/NotificationsPage.jsx`
 
+---
+
+## Session Update - January 31, 2026 (Gamification Features)
+
+### ✅ Implemented 5 Profit-Focused Gamification Features
+
+All features designed with LOW rewards to encourage coin purchases.
+
+#### 1. Watch Streaks (Updated Rewards)
+- Day 3: **3 coins**
+- Day 7: **7 coins**
+- Day 14: **15 coins**
+- Day 30: **30 coins + badge**
+- **Streak Shield:** 50 coins to protect streak (revenue driver)
+
+#### 2. Daily Scratch Card (NEW)
+- Unlocks after watching 1 episode
+- 3x3 grid with reveal animation
+- Prize distribution (profit-optimized):
+  - 70% chance: **1 coin**
+  - 12% chance: **2 coins**
+  - 5% chance: **3 coins**
+  - 5% chance: **5 coins**
+  - 2% chance: **10 coins**
+  - 1% chance: **25 coins** (jackpot - keeps hope alive)
+
+#### 3. Episode Trivia (NEW)
+- Available after watching an episode
+- 3 multiple-choice questions
+- **1 coin per correct answer**
+- **+2 bonus for perfect score**
+- Max ~5-7 coins per episode
+
+#### 4. Viewer Level System (Updated - Perks, Not Coins)
+- **Newcomer** (0 episodes): Starting level
+- **Regular** (10 episodes): Bronze profile frame
+- **Fan** (30 episodes): Silver frame + early trailers
+- **Superfan** (75 episodes): Gold frame + **5% coin purchase bonus**
+- **Legend** (150 episodes): Platinum frame + **10% coin purchase bonus** + early access
+
+#### 5. Prediction Games (NEW)
+- Predict episode outcomes before watching
+- **3 coins for correct prediction**
+- Streak bonuses:
+  - 3 correct in a row: **+5 coins**
+  - 5 correct in a row: **+10 coins**
+  - 10 correct in a row: **+25 coins**
+- 40% correct chance (balanced excitement)
+
+### Daily Max Free Coins: ~15-20 coins
+(Episode unlock cost: 30-50 coins = **users still need to purchase**)
+
+### New API Endpoints
+- `GET /api/games/scratch-card/status` - Check scratch card eligibility
+- `POST /api/games/scratch-card/scratch` - Scratch and win
+- `GET /api/games/streak/shield/status` - Check shield status
+- `POST /api/games/streak/shield` - Buy streak shield (50 coins)
+- `GET /api/games/prediction/streak` - Get prediction streak
+- `GET /api/games/prediction/{episode_id}` - Get prediction question
+- `POST /api/games/prediction/submit` - Submit prediction
+- `POST /api/games/prediction/resolve/{episode_id}` - Resolve after watching
+- `GET /api/games/trivia/{episode_id}` - Get trivia questions
+- `POST /api/games/trivia/submit` - Submit trivia answers
+
+### New Files Created
+- `/app/backend/routes/gamification.py` - All gamification APIs
+- `/app/frontend/src/components/ScratchCard.jsx` - Scratch card UI
+- `/app/frontend/src/components/EpisodeTrivia.jsx` - Trivia game UI
+- `/app/frontend/src/components/PredictionGame.jsx` - Prediction game + streak UI
+- `/app/frontend/src/components/StreakShield.jsx` - Streak shield purchase UI
+
+### Files Modified
+- `/app/backend/routes/__init__.py` - Added gamification router
+- `/app/backend/routes/users.py` - Updated streak rewards and viewer levels
+- `/app/frontend/src/pages/RewardsPage.jsx` - Integrated new components
+
+### Testing
+- ✅ All 11 backend tests passed
+- ✅ All frontend components render correctly
+- ✅ Test file: `/app/backend/tests/test_gamification.py`
+- ✅ Test report: `/app/test_reports/iteration_13.json`
+
+### Mocked Components
+- Trivia questions are generic (not episode-specific)
+- Prediction outcomes are random (40% correct chance)
+
+
