@@ -194,7 +194,10 @@ export const AdminDashboard = () => {
     { id: "content", label: "Content", icon: Film },
     { id: "revenue", label: "Revenue", icon: DollarSign },
     { id: "creators", label: "Creators", icon: Crown },
-    ...(user?.is_super_admin ? [{ id: "docs", label: "Docs & System", icon: FileText }] : [])
+    ...(user?.is_super_admin ? [
+      { id: "checklist", label: "Launch Checklist", icon: Check },
+      { id: "docs", label: "Docs & System", icon: FileText }
+    ] : [])
   ];
 
   return (
