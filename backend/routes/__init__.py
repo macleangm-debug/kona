@@ -14,6 +14,7 @@ from .payouts import router as payouts_router
 from .badges import router as badges_router
 from .watch_party import router as watch_party_router
 from .downloads import router as downloads_router
+from .investment import router as investment_router
 
 # Create main API router
 api_router = APIRouter()
@@ -32,3 +33,4 @@ api_router.include_router(payouts_router)
 api_router.include_router(badges_router)
 api_router.include_router(watch_party_router)
 api_router.include_router(downloads_router)
+api_router.include_router(investment_router)
