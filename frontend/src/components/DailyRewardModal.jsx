@@ -28,7 +28,7 @@ export const DailyRewardModal = ({ open, onClose, onClaim }) => {
             <Gift className="w-10 h-10 text-white" />
           </div>
           <h2 className="font-heading text-2xl mb-2">Daily Reward!</h2>
-          <p className="text-muted-foreground mb-6">Claim your free 10 coins today</p>
+          <p className="text-muted-foreground mb-6">Claim your free 3 coins today</p>
           
           {claimed ? (
             <div className="flex items-center justify-center gap-2 text-green-400">
