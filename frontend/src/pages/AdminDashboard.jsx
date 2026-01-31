@@ -162,15 +162,15 @@ export const AdminDashboard = () => {
   // Fetch docs when docs tab is selected (must be before early return)
   useEffect(() => {
     const fetchDocsData = async () => {
-      if (!user?.is_super_admin || activeTab !== "docs" || productionGuide) return;
+      if (!user?.is_super_admin || activeTab !== "docs") return;
       setDocsLoading(true);
       try {
         const headers = { Authorization: `Bearer ${token}` };
-        const [guideRes, healthRes] = await Promise.all([
-          axios.get(`${API}/admin/docs/production-guide`, { headers }),
+        const [docRes, healthRes] = await Promise.all([
+          axios.get(`${API}/admin/docs/${activeDocId}`, { headers }),
           axios.get(`${API}/admin/system/health`, { headers })
         ]);
-        setProductionGuide(guideRes.data);
+        setCurrentDoc(docRes.data);
         setSystemHealth(healthRes.data);
       } catch (e) {
         console.error("Error fetching docs:", e);
@@ -178,7 +178,7 @@ export const AdminDashboard = () => {
       setDocsLoading(false);
     };
     fetchDocsData();
-  }, [activeTab, user?.is_super_admin, productionGuide, token]);
+  }, [activeTab, user?.is_super_admin, activeDocId, token]);
 
   if (loading) {
     return (
