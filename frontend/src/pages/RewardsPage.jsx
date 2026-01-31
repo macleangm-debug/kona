@@ -18,6 +18,7 @@ import { PurchasePrompt } from "@/components/PurchasePrompt";
 import { MysteryBox } from "@/components/MysteryBox";
 import { CharacterCards } from "@/components/CharacterCards";
 import { WeeklyLeaderboard } from "@/components/WeeklyLeaderboard";
+import { RewardClaimedModal } from "@/components/AnimatedModals";
 
 // Spin Wheel Component - Revenue optimized (max 5 coins)
 const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
