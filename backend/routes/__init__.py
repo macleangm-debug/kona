@@ -16,6 +16,7 @@ from .watch_party import router as watch_party_router
 from .downloads import router as downloads_router
 from .investment import router as investment_router
 from .infrastructure import router as infrastructure_router
+from .gamification import router as gamification_router
 
 # Create main API router
 api_router = APIRouter()
