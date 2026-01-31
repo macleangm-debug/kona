@@ -1278,6 +1278,16 @@ export const AdminDashboard = () => {
           <LaunchChecklistTab token={token} />
         )}
 
+        {/* Investment Calculator Tab (Super Admin Only) */}
+        {activeTab === "investment" && user?.is_super_admin && (
+          <InvestmentCalculatorTab token={token} />
+        )}
+
+        {/* Infrastructure Calculator Tab (Super Admin Only) */}
+        {activeTab === "infrastructure" && user?.is_super_admin && (
+          <InfrastructureCalculatorTab />
+        )}
+
         {/* Docs & System Tab (Super Admin Only) */}
         {activeTab === "docs" && user?.is_super_admin && (
           <div className="space-y-6">
