@@ -218,6 +218,8 @@ export const RewardsPage = ({ onAuthClick }) => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [claimingMission, setClaimingMission] = useState(null);
   const [claimingDaily, setClaimingDaily] = useState(false);
+  const [showRewardModal, setShowRewardModal] = useState(false);
+  const [rewardModalData, setRewardModalData] = useState({ amount: 0, type: "Daily Reward" });
 
   // Mock missions data (in production, fetch from API)
   const [missions, setMissions] = useState([
