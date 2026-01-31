@@ -399,6 +399,9 @@ export const RewardsPage = ({ onAuthClick }) => {
 
       {/* Main Grid Layout */}
       <div className="px-4 lg:px-12">
+        {/* Economy Warnings - Shows diminishing returns, expiring coins, etc. */}
+        <EconomyWarnings token={token} onPurchaseClick={() => navigate("/store")} />
+        
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
           
           {/* Left Column: Spin Wheel */}
