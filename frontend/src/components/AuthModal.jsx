@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { APP_CONFIG, API } from "@/config";
 import { toast } from "sonner";
 import axios from "axios";
+import { LoginSuccessModal, SignupSuccessModal } from "@/components/AnimatedModals";
 
 export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp = false }) => {
   const [isLogin, setIsLogin] = useState(initialReferralCode || forceSignUp ? false : true);
@@ -17,7 +18,12 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const [referralValid, setReferralValid] = useState(null);
   const [referralBonus, setReferralBonus] = useState(0);
   const [loading, setLoading] = useState(false);
-  const { login, register } = useAuth();
+  const { login, register, user } = useAuth();
+  
+  // Success modal states
+  const [showLoginSuccess, setShowLoginSuccess] = useState(false);
+  const [showSignupSuccess, setShowSignupSuccess] = useState(false);
+  const [signupBonusInfo, setSignupBonusInfo] = useState({ welcome: 0, referral: 0 });
 
   // Update referral code when initialReferralCode changes (from URL)
   useEffect(() => {
