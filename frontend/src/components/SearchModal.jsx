@@ -57,8 +57,8 @@ export const SearchModal = ({ open, onClose }) => {
 
   return (
     <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="top" className="h-[85vh] bg-background border-b border-white/10">
-        <div className="pt-4">
+      <SheetContent side="top" className="h-[85vh] lg:h-auto lg:max-h-[500px] lg:w-[600px] lg:mx-auto lg:mt-4 lg:rounded-2xl bg-background border-b lg:border border-white/10">
+        <div className="pt-4 lg:pt-2">
           {/* Search Input */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

@@ -182,6 +182,10 @@ Use my referral code: *${user?.referral_code}*
         <CoinBalance coins={user.coins} onClick={() => navigate("/store")} />
       </div>
 
+      {/* Desktop Two-Column Layout */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+        {/* Left Column */}
+        <div>
       {/* User Info */}
       <Card className="bg-card/50 border-white/10 p-6 mb-6">
         <div className="flex items-center gap-4">
@@ -306,6 +310,9 @@ Use my referral code: *${user?.referral_code}*
         )}
       </Card>
 
+        </div>
+        {/* Right Column */}
+        <div>
       {/* Referral Milestones */}
       {milestones && (
         <Card className="bg-card/50 border-white/10 p-6 mb-6" data-testid="milestones-card">
@@ -522,6 +529,9 @@ Use my referral code: *${user?.referral_code}*
       <Card className="bg-card/50 border-white/10 p-6 mb-6">
         <AchievementBadges />
       </Card>
+        </div>
+      </div>
+      {/* End Desktop Two-Column Layout */}
 
       {/* Actions */}
       <Button 

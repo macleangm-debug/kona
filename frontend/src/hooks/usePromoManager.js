@@ -7,9 +7,9 @@ import { API } from "@/config";
 const PROMO_EXCLUDED_PATHS = ['/admin', '/admin/login', '/creator/login', '/watch-party'];
 
 // Minimum scroll distance before showing promo (pixels)
-const MIN_SCROLL_BEFORE_PROMO = 300;
-// Minimum time on page before showing promo (ms)
-const MIN_TIME_BEFORE_PROMO = 8000;
+const MIN_SCROLL_BEFORE_PROMO = 400;
+// Minimum time on page before showing promo (ms) - ONLY as secondary condition with scroll
+const MIN_TIME_BEFORE_PROMO = 30000;
 
 export const usePromoManager = () => {
   const [activePromo, setActivePromo] = useState(null);
@@ -64,15 +64,16 @@ export const usePromoManager = () => {
     fetchPromos();
   }, []);
 
-  // Show promo only after user has scrolled OR spent enough time
+  // Show promo only after user has scrolled (primary trigger) - time alone is not enough
   useEffect(() => {
     if (promos.length === 0 || hasShownAppOpen || isExcludedPath) return;
 
     const sessionShown = sessionStorage.getItem('kona-promo-shown');
     if (sessionShown) return;
 
-    // Wait for user engagement (scroll or time)
-    const hasEngaged = hasScrolled || timeOnPage >= MIN_TIME_BEFORE_PROMO;
+    // Require scroll engagement first - don't show just on time alone
+    // Only show after scrolling AND minimum time has passed (to ensure user is engaged)
+    const hasEngaged = hasScrolled && timeOnPage >= 5000; // 5 sec minimum + scroll
     if (!hasEngaged) return;
 
     // Find a promo with app_open or both trigger type
