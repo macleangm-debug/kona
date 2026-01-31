@@ -140,6 +140,27 @@ export const AdminDashboard = () => {
     }
   };
 
+  // Fetch docs when docs tab is selected (must be before early return)
+  useEffect(() => {
+    const fetchDocsData = async () => {
+      if (!user?.is_super_admin || activeTab !== "docs" || productionGuide) return;
+      setDocsLoading(true);
+      try {
+        const headers = { Authorization: `Bearer ${token}` };
+        const [guideRes, healthRes] = await Promise.all([
+          axios.get(`${API}/admin/docs/production-guide`, { headers }),
+          axios.get(`${API}/admin/system/health`, { headers })
+        ]);
+        setProductionGuide(guideRes.data);
+        setSystemHealth(healthRes.data);
+      } catch (e) {
+        console.error("Error fetching docs:", e);
+      }
+      setDocsLoading(false);
+    };
+    fetchDocsData();
+  }, [activeTab, user?.is_super_admin, productionGuide, token]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
