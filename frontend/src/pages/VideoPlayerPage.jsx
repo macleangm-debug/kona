@@ -120,7 +120,50 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
   const [isSeeking, setIsSeeking] = useState(false);
   const [showQualityMenu, setShowQualityMenu] = useState(false);
+  const [isPipActive, setIsPipActive] = useState(false);
+  const [isPipSupported, setIsPipSupported] = useState(false);
   const progressBarRef = useRef(null);
+
+  // Check PiP support on mount
+  useEffect(() => {
+    setIsPipSupported('pictureInPictureEnabled' in document && document.pictureInPictureEnabled);
+  }, []);
+
+  // Handle PiP toggle
+  const togglePictureInPicture = async () => {
+    const video = document.getElementById('main-video');
+    if (!video) return;
+    
+    try {
+      if (document.pictureInPictureElement) {
+        await document.exitPictureInPicture();
+        setIsPipActive(false);
+      } else if (isPipSupported) {
+        await video.requestPictureInPicture();
+        setIsPipActive(true);
+      }
+    } catch (err) {
+      console.error('PiP error:', err);
+      toast.error('Picture-in-Picture not available');
+    }
+  };
+
+  // Listen for PiP events
+  useEffect(() => {
+    const video = document.getElementById('main-video');
+    if (!video) return;
+
+    const handleEnterPip = () => setIsPipActive(true);
+    const handleLeavePip = () => setIsPipActive(false);
+
+    video.addEventListener('enterpictureinpicture', handleEnterPip);
+    video.addEventListener('leavepictureinpicture', handleLeavePip);
+
+    return () => {
+      video.removeEventListener('enterpictureinpicture', handleEnterPip);
+      video.removeEventListener('leavepictureinpicture', handleLeavePip);
+    };
+  }, [episode]);
 
   const calculateSeekPosition = (clientX) => {
     if (!progressBarRef.current || duration <= 0) return null;
