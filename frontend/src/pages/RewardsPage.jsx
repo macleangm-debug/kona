@@ -439,7 +439,7 @@ export const RewardsPage = ({ onAuthClick }) => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-yellow-400 flex items-center gap-1">
-                    <Coins className="w-4 h-4" />10
+                    <Coins className="w-4 h-4" />3
                   </span>
                   <Button
                     onClick={handleClaimDaily}
