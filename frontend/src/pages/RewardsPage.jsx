@@ -228,7 +228,7 @@ export const RewardsPage = ({ onAuthClick }) => {
   const [missions, setMissions] = useState([
     { id: 1, title: "Watch 3 Episodes", description: "Watch any 3 episodes today", icon: Play, reward: 15, current: 2, target: 3, claimed: false },
     { id: 2, title: "Daily Login", description: "Log in to the app", icon: Calendar, reward: 5, current: 1, target: 1, claimed: true },
-    { id: 3, title: "Add to List", description: "Add 5 series to your list", icon: Star, reward: 10, current: 3, target: 5, claimed: false },
+    { id: 3, title: "Add to List", description: "Add 5 series to your list", icon: Star, reward: 5, current: 3, target: 5, claimed: false },
     { id: 4, title: "Refer a Friend", description: "Invite 1 friend to join", icon: Users, reward: 30, current: 0, target: 1, claimed: false },
     { id: 5, title: "First Purchase", description: "Buy your first coin pack", icon: Coins, reward: 50, current: 0, target: 1, claimed: false },
   ]);

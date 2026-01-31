@@ -217,7 +217,7 @@ export const HomePage = ({ onAuthClick }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       await refreshUser();
-      toast.success("You got 10 coins!");
+      toast.success("You got 3 coins!");
       setCanClaimReward(false);
       return true;
     } catch (e) {
