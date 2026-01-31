@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance } from "@/components/CoinBalance";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,7 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Track scroll for header background
   React.useEffect(() => {
