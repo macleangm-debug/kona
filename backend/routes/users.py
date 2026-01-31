@@ -835,6 +835,39 @@ async def get_my_list(user: dict = Depends(get_current_user)):
     
     return series
 
+# Alias routes for frontend compatibility
+@router.get("/user/my-list")
+async def get_my_list_alias(user: dict = Depends(get_current_user)):
+    return await get_my_list(user)
+
+@router.post("/user/my-list/add")
+async def add_to_my_list_alias(data: MyListRequest, user: dict = Depends(get_current_user)):
+    my_list = user.get("my_list", [])
+    if data.series_id in my_list:
+        return {"message": "Already in list", "my_list": my_list}
+    
+    my_list.append(data.series_id)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"my_list": my_list}}
+    )
+    
+    return {"message": "Added to list", "my_list": my_list}
+
+@router.post("/user/my-list/remove")
+async def remove_from_my_list_alias(data: MyListRequest, user: dict = Depends(get_current_user)):
+    my_list = user.get("my_list", [])
+    if data.series_id not in my_list:
+        return {"message": "Not in list", "my_list": my_list}
+    
+    my_list.remove(data.series_id)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"my_list": my_list}}
+    )
+    
+    return {"message": "Removed from list", "my_list": my_list}
+
 @router.post("/users/me/my-list")
 async def add_to_my_list(data: MyListRequest, user: dict = Depends(get_current_user)):
     my_list = user.get("my_list", [])
