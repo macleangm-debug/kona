@@ -25,6 +25,8 @@ class UserResponse(BaseModel):
     referral_code: Optional[str] = None
     referral_count: int = 0
     referral_earnings: int = 0
+    is_admin: bool = False
+    is_super_admin: bool = False
 
 class TokenResponse(BaseModel):
     token: str
