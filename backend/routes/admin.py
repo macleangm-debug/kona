@@ -427,10 +427,6 @@ async def list_docs(user: dict = Depends(require_super_admin)):
     docs.sort(key=lambda x: category_order.get(x["category"], 99))
     
     return {"docs": docs}
-                    "last_updated": datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat()
-                })
-    
-    return {"docs": docs}
 
 @router.get("/system/health")
 async def get_system_health(user: dict = Depends(require_super_admin)):
