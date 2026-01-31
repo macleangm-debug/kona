@@ -140,6 +140,13 @@ async def get_admin_stats(user: dict = Depends(require_admin)):
         "total_coins_circulation": total_coins
     }
 
+# ============ ADMIN TRANSACTIONS ============
+@router.get("/transactions")
+async def list_transactions(user: dict = Depends(require_admin), limit: int = 20):
+    """List recent transactions"""
+    transactions = await db.transactions.find({}, {"_id": 0}).sort("created_at", -1).limit(limit).to_list(limit)
+    return {"transactions": transactions}
+
 # ============ ADMIN PROMOS ============
 @router.get("/promos")
 async def list_promos(user: dict = Depends(require_admin)):
