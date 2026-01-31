@@ -301,7 +301,9 @@ export const RewardsPage = ({ onAuthClick }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsSpinning(false);
-      toast.success(`🎰 You won ${res.data.prize} coins!`);
+      // Show animated modal for spin win
+      setRewardModalData({ amount: res.data.prize, type: "Lucky Spin" });
+      setShowRewardModal(true);
       setSpinData(prev => ({
         ...prev,
         canSpin: res.data.spins_remaining > 0,
