@@ -16,12 +16,12 @@ SPIN_PRIZES = [1, 1, 2, 2, 3, 3, 4, 5]  # Very low prizes
 SPIN_WEIGHTS = [25, 25, 18, 12, 8, 6, 4, 2]  # 50% chance for 1 coin, 2% for 5
 MAX_SPINS_PER_DAY = 3  # Maximum spins allowed per day
 
-# Watch streak rewards - minimal coins to encourage purchases
+# Watch streak rewards - PROFIT FOCUSED (very low coins to encourage purchases)
 STREAK_REWARDS = {
-    3: {"coins": 2, "badge": "streak_3"},
-    7: {"coins": 5, "badge": "streak_7"},
-    14: {"coins": 8, "badge": "streak_14"},
-    30: {"coins": 15, "badge": "streak_30"},
+    3: {"coins": 3, "badge": "streak_3"},      # Day 3: 3 coins
+    7: {"coins": 7, "badge": "streak_7"},      # Day 7: 7 coins
+    14: {"coins": 15, "badge": "streak_14"},   # Day 14: 15 coins
+    30: {"coins": 30, "badge": "streak_30"},   # Day 30: 30 coins + badge (biggest reward)
 }
 
 # Viewer levels based on total watch time (in episodes)
