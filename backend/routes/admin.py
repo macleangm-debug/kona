@@ -29,6 +29,12 @@ async def require_super_admin(user: dict = Depends(get_current_user)):
     return user
 
 # ============ ADMIN SERIES ============
+@router.get("/series")
+async def list_series(user: dict = Depends(require_admin)):
+    """List all series for admin"""
+    series = await db.series.find({}, {"_id": 0}).sort("views", -1).to_list(100)
+    return series
+
 @router.post("/series")
 async def create_series(data: AdminSeriesCreate, user: dict = Depends(require_admin)):
     series_id = f"series-{uuid.uuid4().hex[:8]}"
