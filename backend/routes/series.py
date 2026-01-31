@@ -165,3 +165,55 @@ async def search_series(q: str, limit: int = 20):
     ).limit(limit).to_list(limit)
     
     return results
+
+from pydantic import BaseModel
+from datetime import datetime, timezone
+
+class EpisodeProgressRequest(BaseModel):
+    episode_id: str
+    progress: int  # 0-100
+
+@router.post("/episodes/progress")
+async def save_episode_progress(data: EpisodeProgressRequest, user: dict = Depends(get_optional_user)):
+    """Save episode watch progress and track daily viewing for rewards"""
+    if not user:
+        return {"message": "Progress not saved (guest)", "saved": False}
+    
+    now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    
+    watch_progress = user.get("watch_progress", {})
+    old_progress = watch_progress.get(data.episode_id, 0)
+    watch_progress[data.episode_id] = max(old_progress, data.progress)
+    
+    # Track episodes watched today (count new episode views at 10%+ progress)
+    last_watch_date = user.get("last_watch_date", "")
+    episodes_watched_today = user.get("episodes_watched_today", 0)
+    watched_episodes_today_list = user.get("watched_episodes_today_list", [])
+    
+    # Reset if new day
+    if last_watch_date != today:
+        episodes_watched_today = 0
+        watched_episodes_today_list = []
+    
+    # Count as watched if progress >= 10% and not already counted today
+    if data.progress >= 10 and data.episode_id not in watched_episodes_today_list:
+        episodes_watched_today += 1
+        watched_episodes_today_list.append(data.episode_id)
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "watch_progress": watch_progress,
+            "last_watch_date": today,
+            "episodes_watched_today": episodes_watched_today,
+            "watched_episodes_today_list": watched_episodes_today_list
+        }}
+    )
+    
+    return {
+        "message": "Progress saved", 
+        "progress": data.progress, 
+        "saved": True,
+        "episodes_watched_today": episodes_watched_today
+    }
