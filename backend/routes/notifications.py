@@ -147,7 +147,7 @@ async def seed_sample_notifications(user: dict = Depends(get_current_user)):
         {
             "type": "reward",
             "title": "Daily Reward Claimed!",
-            "message": "You received 10 coins from your daily login bonus.",
+            "message": "You received 3 coins from your daily login bonus.",
             "action_url": "/rewards"
         },
         {
