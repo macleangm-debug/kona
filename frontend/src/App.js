@@ -27,10 +27,8 @@ import { SplashScreen } from "@/components/SplashScreen";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
-import NotificationsPage from "@/pages/NotificationsPage";
 import WatchPartyPage from "@/pages/WatchPartyPage";
 import DownloadsPage from "@/pages/DownloadsPage";
-import InvestmentCalculator from "@/pages/InvestmentCalculator";
 import {
   SeriesDetailPage,
   VideoPlayerPage,
