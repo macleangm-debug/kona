@@ -458,3 +458,42 @@ async def get_system_health(user: dict = Depends(require_super_admin)):
         }
     }
 
+# ============ LAUNCH CHECKLIST PROGRESS ============
+@router.get("/checklist")
+async def get_checklist_progress(user: dict = Depends(require_super_admin)):
+    """Get launch checklist progress"""
+    checklist = await db.launch_checklist.find_one({"id": "main"}, {"_id": 0})
+    if not checklist:
+        # Initialize with default checklist items
+        checklist = {
+            "id": "main",
+            "completed_items": [],
+            "last_updated": datetime.now(timezone.utc).isoformat()
+        }
+        await db.launch_checklist.insert_one(checklist)
+    return checklist
+
+@router.post("/checklist/toggle")
+async def toggle_checklist_item(item_id: str, user: dict = Depends(require_super_admin)):
+    """Toggle a checklist item"""
+    checklist = await db.launch_checklist.find_one({"id": "main"})
+    if not checklist:
+        checklist = {"id": "main", "completed_items": []}
+        await db.launch_checklist.insert_one(checklist)
+    
+    completed = checklist.get("completed_items", [])
+    if item_id in completed:
+        completed.remove(item_id)
+        action = "unchecked"
+    else:
+        completed.append(item_id)
+        action = "checked"
+    
+    await db.launch_checklist.update_one(
+        {"id": "main"},
+        {"$set": {"completed_items": completed, "last_updated": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"item_id": item_id, "action": action, "completed_items": completed}
+
+
