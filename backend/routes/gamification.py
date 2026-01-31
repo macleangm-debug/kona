@@ -318,6 +318,25 @@ class PredictionSubmit(BaseModel):
     prediction_index: int
 
 
+@router.get("/prediction/streak")
+async def get_prediction_streak(user: dict = Depends(get_current_user)):
+    """Get user's current prediction streak"""
+    streak = user.get("prediction_streak", 0)
+    
+    # Find next streak bonus
+    next_bonus = None
+    for streak_count, bonus in sorted(PREDICTION_REWARDS["streak_bonus"].items()):
+        if streak < streak_count:
+            next_bonus = {"streak": streak_count, "bonus": bonus, "needed": streak_count - streak}
+            break
+    
+    return {
+        "current_streak": streak,
+        "next_bonus": next_bonus,
+        "streak_bonuses": PREDICTION_REWARDS["streak_bonus"]
+    }
+
+
 @router.get("/prediction/{episode_id}")
 async def get_prediction(episode_id: str, user: dict = Depends(get_current_user)):
     """Get prediction options for an upcoming episode"""
