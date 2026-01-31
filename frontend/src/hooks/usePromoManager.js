@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { API } from "@/config";
+
+// Pages where promos should not appear
+const PROMO_EXCLUDED_PATHS = ['/admin', '/admin/login', '/creator/login'];
 
 export const usePromoManager = () => {
   const [activePromo, setActivePromo] = useState(null);
@@ -8,6 +12,12 @@ export const usePromoManager = () => {
   const [promos, setPromos] = useState([]);
   const [hasShownAppOpen, setHasShownAppOpen] = useState(false);
   const [hasShownTimed, setHasShownTimed] = useState(false);
+  const location = useLocation();
+
+  // Check if current path should exclude promos
+  const isExcludedPath = PROMO_EXCLUDED_PATHS.some(path => 
+    location.pathname.startsWith(path)
+  );
 
   // Fetch promos on mount
   useEffect(() => {
@@ -24,7 +34,7 @@ export const usePromoManager = () => {
 
   // Check session storage for app-open trigger
   useEffect(() => {
-    if (promos.length === 0 || hasShownAppOpen) return;
+    if (promos.length === 0 || hasShownAppOpen || isExcludedPath) return;
 
     const sessionShown = sessionStorage.getItem('kona-promo-shown');
     if (sessionShown) return;
@@ -41,11 +51,13 @@ export const usePromoManager = () => {
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [promos, hasShownAppOpen]);
+  }, [promos, hasShownAppOpen, isExcludedPath]);
 
   // Timed trigger (10 seconds after browsing) - only once per session
   useEffect(() => {
-    // Skip if session already showed promos
+    // Skip if on excluded path or session already showed promos
+    if (isExcludedPath) return;
+    
     const sessionShown = sessionStorage.getItem('kona-promo-shown');
     if (sessionShown) return;
     
@@ -68,7 +80,14 @@ export const usePromoManager = () => {
       }, delay);
       return () => clearTimeout(timer);
     }
-  }, [promos, hasShownTimed, showPromo, activePromo]);
+  }, [promos, hasShownTimed, showPromo, activePromo, isExcludedPath]);
+
+  // Close promo when navigating to excluded paths
+  useEffect(() => {
+    if (isExcludedPath && showPromo) {
+      setShowPromo(false);
+    }
+  }, [isExcludedPath, showPromo]);
 
   const closePromo = () => {
     setShowPromo(false);
