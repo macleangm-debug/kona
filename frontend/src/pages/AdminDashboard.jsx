@@ -1199,7 +1199,7 @@ export const AdminDashboard = () => {
 
         {/* Infrastructure Calculator Tab (Super Admin Only) */}
         {activeTab === "infrastructure" && user?.is_super_admin && (
-          <InfrastructureCalculatorTab />
+          <InfrastructureCalculatorTab token={token} />
         )}
 
         {/* Docs & System Tab (Super Admin Only) */}
