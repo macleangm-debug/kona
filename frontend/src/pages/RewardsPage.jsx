@@ -280,12 +280,14 @@ export const RewardsPage = ({ onAuthClick }) => {
     if (!token) { onAuthClick(); return; }
     setClaimingDaily(true);
     try {
-      await axios.post(`${API}/rewards/claim`, {}, {
+      const res = await axios.post(`${API}/rewards/claim`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await refreshUser();
       setDailyReward({ ...dailyReward, canClaim: false });
-      toast.success("🎉 You got 10 coins!");
+      // Show animated modal instead of toast
+      setRewardModalData({ amount: res.data?.coins || 10, type: "Daily Reward" });
+      setShowRewardModal(true);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to claim");
     }
