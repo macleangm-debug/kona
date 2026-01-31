@@ -289,7 +289,7 @@ export const RewardsPage = ({ onAuthClick }) => {
       await refreshUser();
       setDailyReward({ ...dailyReward, canClaim: false });
       // Show animated modal instead of toast
-      setRewardModalData({ amount: res.data?.coins || 10, type: "Daily Reward" });
+      setRewardModalData({ amount: res.data?.coins || 3, type: "Daily Reward" });
       setShowRewardModal(true);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to claim");
