@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Star, Eye, Lock, Clock, Play, Coins, Loader2 } from "lucide-react";
+import { ChevronLeft, Star, Eye, Lock, Clock, Play, Coins, Loader2, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { CoinBalance, UnlockSheet } from "@/components";
+import { WatchPartyModal } from "@/components/WatchPartyModal";
 
 export const SeriesDetailPage = ({ onAuthClick }) => {
   const { id } = useParams();
@@ -17,6 +19,8 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
   const [unlockedEpisodes, setUnlockedEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [unlockSheet, setUnlockSheet] = useState({ open: false, episode: null });
+  const [showWatchParty, setShowWatchParty] = useState(false);
+  const [selectedEpisodeForParty, setSelectedEpisodeForParty] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
