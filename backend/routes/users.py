@@ -89,12 +89,27 @@ CARD_RARITY_WEIGHTS = {"common": 60, "rare": 30, "epic": 10}
 async def claim_daily_reward(user: dict = Depends(get_current_user)):
     last_claim = user.get("last_daily_reward")
     now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
     
     if last_claim:
         last_claim_dt = datetime.fromisoformat(last_claim.replace('Z', '+00:00'))
         hours_since = (now - last_claim_dt).total_seconds() / 3600
         if hours_since < 24:
             raise HTTPException(status_code=400, detail=f"Can claim again in {24 - int(hours_since)} hours")
+    
+    # Check if user has watched at least 1 episode today
+    episodes_watched_today = user.get("episodes_watched_today", 0)
+    last_watch_date = user.get("last_watch_date", "")
+    
+    # Reset counter if last watch was not today
+    if last_watch_date != today:
+        episodes_watched_today = 0
+    
+    if episodes_watched_today < 1:
+        raise HTTPException(
+            status_code=400, 
+            detail="Watch at least 1 episode today to claim your daily reward!"
+        )
     
     new_coins = user["coins"] + DAILY_REWARD_COINS
     await db.users.update_one(
@@ -108,16 +123,41 @@ async def claim_daily_reward(user: dict = Depends(get_current_user)):
 async def get_reward_status(user: dict = Depends(get_current_user)):
     last_claim = user.get("last_daily_reward")
     now = datetime.now(timezone.utc)
+    today = now.date().isoformat()
+    
+    # Check episode watching requirement
+    episodes_watched_today = user.get("episodes_watched_today", 0)
+    last_watch_date = user.get("last_watch_date", "")
+    
+    if last_watch_date != today:
+        episodes_watched_today = 0
+    
+    watch_requirement_met = episodes_watched_today >= 1
     
     if not last_claim:
-        return {"can_claim": True, "hours_until_next": 0, "reward_amount": DAILY_REWARD_COINS}
+        return {
+            "can_claim": watch_requirement_met, 
+            "hours_until_next": 0, 
+            "reward_amount": DAILY_REWARD_COINS,
+            "watch_requirement_met": watch_requirement_met,
+            "episodes_watched_today": episodes_watched_today,
+            "episodes_required": 1
+        }
     
     last_claim_dt = datetime.fromisoformat(last_claim.replace('Z', '+00:00'))
     hours_since = (now - last_claim_dt).total_seconds() / 3600
-    can_claim = hours_since >= 24
-    hours_until_next = max(0, 24 - hours_since) if not can_claim else 0
+    time_requirement_met = hours_since >= 24
+    can_claim = time_requirement_met and watch_requirement_met
+    hours_until_next = max(0, 24 - hours_since) if not time_requirement_met else 0
     
-    return {"can_claim": can_claim, "hours_until_next": hours_until_next, "reward_amount": DAILY_REWARD_COINS}
+    return {
+        "can_claim": can_claim, 
+        "hours_until_next": hours_until_next, 
+        "reward_amount": DAILY_REWARD_COINS,
+        "watch_requirement_met": watch_requirement_met,
+        "episodes_watched_today": episodes_watched_today,
+        "episodes_required": 1
+    }
 
 # ============ SPIN WHEEL ============
 @router.get("/spin/status")
