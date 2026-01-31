@@ -119,7 +119,6 @@ const AppContent = () => {
         <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
         <Route path="/discover" element={<DiscoverPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/rewards" element={<RewardsPage onAuthClick={() => handleAuthClick()} />} />
-        <Route path="/notifications" element={<NotificationsPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/leaderboard" element={<LeaderboardPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/series/:id" element={<SeriesDetailPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/watch/:id" element={<VideoPlayerPage onAuthClick={() => handleAuthClick(true)} />} />
@@ -134,7 +133,6 @@ const AppContent = () => {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/watch-party/:partyCode" element={<WatchPartyPage />} />
         <Route path="/downloads" element={<DownloadsPage />} />
-        <Route path="/investment" element={<InvestmentCalculator />} />
       </Routes>
 
       {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
