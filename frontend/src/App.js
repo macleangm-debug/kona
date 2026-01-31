@@ -134,6 +134,7 @@ const AppContent = () => {
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/watch-party/:partyCode" element={<WatchPartyPage />} />
+        <Route path="/downloads" element={<DownloadsPage />} />
       </Routes>
 
       {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
