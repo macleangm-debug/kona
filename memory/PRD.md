@@ -287,16 +287,26 @@ All accessible via Super Admin → Docs & System tab:
 12. 🤝 Creator Partnership Program - Revenue share, onboarding
 13. 🔒 Security & Data Protection - Policies, compliance
 
+### January 31, 2026 - UI/UX Fixes
+- ✅ **Issue 1: Promo Popup Fix** - Now requires scroll (400px) AND 5+ seconds on page before showing. No more aggressive popups on initial load.
+- ✅ **Issue 2: Animated Modals Integration** - LogoutConfirmModal and ClaimRewardModal (from AnimatedModals.jsx) are used in ProfilePage for logout and milestone claiming with animated waving hand emoji.
+- ✅ **Issue 3: Picture-in-Picture (PiP) Support** - Added PiP button to video player controls. Shows when browser supports it.
+- ✅ **Issue 4: Profile & Notifications Desktop Layout** - Profile page uses 2-column grid layout on desktop (lg:grid-cols-2). Notifications page uses 2-3 column grid (lg:grid-cols-2 xl:grid-cols-3).
+- ✅ **Issue 5: Search Modal Desktop Fix** - Search overlay is now smaller and centered on desktop (lg:max-h-[500px] lg:w-[600px]).
+
 ## Future Roadmap
 
 ### P1 - High Priority
 - ~~Watch Party feature (WebSocket-based sync with live chat & reactions)~~ ✅ COMPLETED
 - ~~Integrate `ConfirmationModal.jsx` for critical user actions~~ ✅ COMPLETED
 - ~~Animated Confirmation Modals~~ ✅ COMPLETED
+- Watch Party video sync - Integrate Bunny.net or real-time provider for synchronized video playback
 
 ### P2 - Medium Priority
 - AI-powered content moderation
 - ~~Offline downloads for VIP users (Service Worker + IndexedDB)~~ ✅ COMPLETED (with revenue protection)
+- Full service worker implementation for offline downloads
+- Interactive Launch Checklist in Admin Dashboard
 
 ### P3 - Low Priority
 - Social features (comments, reactions)
