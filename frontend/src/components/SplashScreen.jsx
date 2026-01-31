@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
   const [phase, setPhase] = useState('zoom-in'); // zoom-in, glow, zoom-out
+  const onCompleteRef = useRef(onComplete);
+  const hasCompleted = useRef(false);
+
+  // Keep the ref updated
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     // Phase 1: Zoom in (0-800ms)
@@ -10,7 +17,10 @@ export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
     const timer2 = setTimeout(() => setPhase('zoom-out'), 2000);
     // Phase 3: Zoom out and fade (2000-2500ms)
     const timer3 = setTimeout(() => {
-      if (onComplete) onComplete();
+      if (!hasCompleted.current && onCompleteRef.current) {
+        hasCompleted.current = true;
+        onCompleteRef.current();
+      }
     }, minDuration);
 
     return () => {
@@ -18,7 +28,7 @@ export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [onComplete, minDuration]);
+  }, [minDuration]);
 
   return (
     <div 
