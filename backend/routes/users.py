@@ -25,12 +25,13 @@ STREAK_REWARDS = {
 }
 
 # Viewer levels based on total watch time (in episodes)
+# PROFIT FOCUSED: Perks are status/bonuses, NOT free coins
 VIEWER_LEVELS = [
-    {"name": "Newcomer", "min_episodes": 0, "icon": "🌱", "perks": []},
-    {"name": "Regular", "min_episodes": 10, "icon": "⭐", "perks": ["profile_frame_bronze"]},
-    {"name": "Fan", "min_episodes": 30, "icon": "🔥", "perks": ["profile_frame_silver"]},
-    {"name": "Superfan", "min_episodes": 75, "icon": "💎", "perks": ["profile_frame_gold"]},
-    {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access", "legend_badge"]},
+    {"name": "Newcomer", "min_episodes": 0, "icon": "🌱", "perks": [], "coin_bonus": 0},
+    {"name": "Regular", "min_episodes": 10, "icon": "⭐", "perks": ["profile_frame_bronze"], "coin_bonus": 0},
+    {"name": "Fan", "min_episodes": 30, "icon": "🔥", "perks": ["profile_frame_silver", "early_trailers"], "coin_bonus": 0},
+    {"name": "Superfan", "min_episodes": 75, "icon": "💎", "perks": ["profile_frame_gold", "5%_coin_bonus"], "coin_bonus": 5},
+    {"name": "Legend", "min_episodes": 150, "icon": "👑", "perks": ["profile_frame_platinum", "early_access", "legend_badge", "10%_coin_bonus"], "coin_bonus": 10},
 ]
 
 # Legend-exclusive milestone badges (for users who maxed out)
