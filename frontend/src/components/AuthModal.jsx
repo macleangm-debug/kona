@@ -167,6 +167,24 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
         </p>
       </DialogContent>
     </Dialog>
+
+      {/* Login Success Modal */}
+      <LoginSuccessModal
+        open={showLoginSuccess}
+        onOpenChange={setShowLoginSuccess}
+        userName={user?.name || name}
+        onConfirm={handleSuccessClose}
+      />
+
+      {/* Signup Success Modal */}
+      <SignupSuccessModal
+        open={showSignupSuccess}
+        onOpenChange={setShowSignupSuccess}
+        bonusCoins={signupBonusInfo.welcome}
+        referralBonus={signupBonusInfo.referral}
+        onConfirm={handleSuccessClose}
+      />
+    </>
   );
 };
 
