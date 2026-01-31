@@ -49,6 +49,7 @@ export const ProfilePage = ({ onLogout }) => {
 
   const claimMilestone = async (milestoneId) => {
     setClaimingMilestone(milestoneId);
+    setClaimLoading(true);
     try {
       const res = await axios.post(
         `${API}/referral/milestones/${milestoneId}/claim`,
@@ -62,16 +63,22 @@ export const ProfilePage = ({ onLogout }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMilestones(milestonesRes.data);
+      setPendingClaimMilestone(null);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to claim milestone");
     }
     setClaimingMilestone(null);
+    setClaimLoading(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    setLogoutLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 500));
     logout();
     navigate("/");
     toast.success("Logged out successfully");
+    setLogoutLoading(false);
+    setShowLogoutModal(false);
   };
 
   const copyReferralCode = () => {
