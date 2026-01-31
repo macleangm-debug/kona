@@ -22,6 +22,7 @@ import { RewardClaimedModal } from "@/components/AnimatedModals";
 import { ScratchCard } from "@/components/ScratchCard";
 import { StreakShield } from "@/components/StreakShield";
 import { PredictionStreak } from "@/components/PredictionGame";
+import { EconomyWarnings } from "@/components/EconomyWarnings";
 
 // Spin Wheel Component - Revenue optimized (max 5 coins)
 const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
