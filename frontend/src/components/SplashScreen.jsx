@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
+export const SplashScreen = ({ onComplete, minDuration = 1200 }) => {
   const [phase, setPhase] = useState('zoom-in'); // zoom-in, glow, zoom-out
   const onCompleteRef = useRef(onComplete);
   const hasCompleted = useRef(false);
@@ -11,11 +11,11 @@ export const SplashScreen = ({ onComplete, minDuration = 2500 }) => {
   }, [onComplete]);
 
   useEffect(() => {
-    // Phase 1: Zoom in (0-800ms)
-    const timer1 = setTimeout(() => setPhase('glow'), 800);
-    // Phase 2: Glow effect (800-2000ms)
-    const timer2 = setTimeout(() => setPhase('zoom-out'), 2000);
-    // Phase 3: Zoom out and fade (2000-2500ms)
+    // Phase 1: Zoom in (0-300ms) - FASTER
+    const timer1 = setTimeout(() => setPhase('glow'), 300);
+    // Phase 2: Glow effect (300-800ms) - FASTER
+    const timer2 = setTimeout(() => setPhase('zoom-out'), 800);
+    // Phase 3: Zoom out and fade (800-1200ms) - FASTER
     const timer3 = setTimeout(() => {
       if (!hasCompleted.current && onCompleteRef.current) {
         hasCompleted.current = true;
