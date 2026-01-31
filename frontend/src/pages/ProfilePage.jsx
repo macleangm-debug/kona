@@ -13,7 +13,7 @@ import { CoinBalance } from "@/components";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { AchievementBadges } from "@/components/AchievementBadges";
-import { LogoutConfirmModal, ClaimRewardModal } from "@/components/ConfirmationModal";
+import { LogoutConfirmModal, ClaimRewardModal } from "@/components/AnimatedModals";
 
 export const ProfilePage = ({ onLogout }) => {
   const { t } = useTranslation();
