@@ -319,6 +319,93 @@ export const AnimatedConfirmationModal = ({
   );
 };
 
+// Login Success Modal with confetti
+export const LoginSuccessModal = ({ open, onOpenChange, userName, onConfirm }) => (
+  <AnimatedConfirmationModal
+    open={open}
+    onOpenChange={onOpenChange}
+    variant="success"
+    animationType="confetti"
+    title={`Welcome back, ${userName || 'Friend'}! 🎉`}
+    description="Great to see you again! Your coins and progress are waiting."
+    confirmText="Let's Go!"
+    cancelText="Close"
+    onConfirm={onConfirm}
+  />
+);
+
+// Signup Success Modal with coins animation
+export const SignupSuccessModal = ({ open, onOpenChange, bonusCoins, referralBonus, onConfirm }) => (
+  <AnimatedConfirmationModal
+    open={open}
+    onOpenChange={onOpenChange}
+    variant="success"
+    animationType="coins"
+    title="Welcome to Kona! 🎬"
+    description="Your account is ready. Start watching amazing mini-series!"
+    confirmText="Start Watching"
+    cancelText="Close"
+    onConfirm={onConfirm}
+  >
+    <div className="space-y-2">
+      <motion.div 
+        className="flex items-center justify-between p-3 bg-yellow-500/10 rounded-lg"
+        initial={{ x: -20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <span className="text-gray-300">Welcome Bonus</span>
+        <span className="font-semibold text-yellow-400 flex items-center gap-1">
+          <Coins className="w-4 h-4" /> +{bonusCoins}
+        </span>
+      </motion.div>
+      {referralBonus > 0 && (
+        <motion.div 
+          className="flex items-center justify-between p-3 bg-green-500/10 rounded-lg"
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <span className="text-gray-300">Referral Bonus</span>
+          <span className="font-semibold text-green-400 flex items-center gap-1">
+            <Coins className="w-4 h-4" /> +{referralBonus}
+          </span>
+        </motion.div>
+      )}
+    </div>
+  </AnimatedConfirmationModal>
+);
+
+// Reward Claimed Modal
+export const RewardClaimedModal = ({ open, onOpenChange, rewardAmount, rewardType = "Daily Reward", onConfirm }) => (
+  <AnimatedConfirmationModal
+    open={open}
+    onOpenChange={onOpenChange}
+    variant="success"
+    animationType="coins"
+    title="Reward Claimed! 🎁"
+    description={`You earned coins from your ${rewardType}!`}
+    confirmText="Awesome!"
+    onConfirm={onConfirm}
+  >
+    <motion.div 
+      className="flex items-center justify-center p-4 bg-gradient-to-r from-yellow-500/20 via-orange-500/20 to-yellow-500/20 rounded-xl"
+      animate={{ 
+        backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+      }}
+      transition={{ duration: 3, repeat: Infinity }}
+    >
+      <motion.span 
+        className="text-3xl font-bold text-yellow-400"
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 1 }}
+      >
+        +{rewardAmount} coins
+      </motion.span>
+    </motion.div>
+  </AnimatedConfirmationModal>
+);
+
 // Logout Modal with waving animation
 export const LogoutConfirmModal = ({ open, onOpenChange, onConfirm, loading }) => (
   <AnimatedConfirmationModal
