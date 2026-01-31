@@ -527,11 +527,29 @@ Use my referral code: *${user?.referral_code}*
       <Button 
         variant="outline" 
         className="w-full border-red-500/50 text-red-400 hover:bg-red-500/10 rounded-full"
-        onClick={handleLogout}
+        onClick={() => setShowLogoutModal(true)}
         data-testid="logout-btn"
       >
         {t("auth.signOut")}
       </Button>
+
+      {/* Logout Confirmation Modal */}
+      <LogoutConfirmModal
+        open={showLogoutModal}
+        onOpenChange={setShowLogoutModal}
+        onConfirm={handleLogout}
+        loading={logoutLoading}
+      />
+
+      {/* Claim Reward Confirmation Modal */}
+      <ClaimRewardModal
+        open={!!pendingClaimMilestone}
+        onOpenChange={(open) => !open && setPendingClaimMilestone(null)}
+        rewardName={pendingClaimMilestone?.name || ""}
+        rewardAmount={pendingClaimMilestone?.reward_coins || 0}
+        onConfirm={() => claimMilestone(pendingClaimMilestone?.id)}
+        loading={claimLoading}
+      />
     </div>
   );
 };
