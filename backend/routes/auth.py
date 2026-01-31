@@ -147,5 +147,7 @@ async def get_me(user: dict = Depends(get_current_user)):
         "last_daily_reward": user.get("last_daily_reward"),
         "referral_code": user.get("referral_code"),
         "referral_count": user.get("referral_count", 0),
-        "referral_earnings": user.get("referral_earnings", 0)
+        "referral_earnings": user.get("referral_earnings", 0),
+        "is_admin": user.get("is_admin", False),
+        "is_super_admin": user.get("is_super_admin", False)
     }
