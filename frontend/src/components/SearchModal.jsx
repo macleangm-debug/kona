@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, X, ChevronLeft, Loader2 } from "lucide-react";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import axios from "axios";
 import { API } from "@/config";
 
@@ -40,7 +41,6 @@ export const SearchModal = ({ open, onClose }) => {
   }, [query]);
 
   const handleSelect = (series) => {
-    // Save to recent searches
     const updated = [series.title, ...recentSearches.filter(s => s !== series.title)].slice(0, 5);
     setRecentSearches(updated);
     localStorage.setItem("kona-recent-searches", JSON.stringify(updated));
@@ -56,9 +56,9 @@ export const SearchModal = ({ open, onClose }) => {
   };
 
   return (
-    <Sheet open={open} onOpenChange={onClose}>
-      <SheetContent side="top" className="h-[85vh] lg:h-auto lg:max-h-[500px] lg:w-[600px] lg:mx-auto lg:mt-4 lg:rounded-2xl bg-background border-b lg:border border-white/10">
-        <div className="pt-4 lg:pt-2">
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-[95vw] lg:max-w-[600px] max-h-[80vh] p-0 bg-card border-white/10 overflow-hidden" data-testid="search-modal">
+        <Card className="bg-transparent border-0 p-4">
           {/* Search Input */}
           <div className="relative mb-4">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -79,84 +79,87 @@ export const SearchModal = ({ open, onClose }) => {
             )}
           </div>
 
-          {/* Loading */}
-          {loading && (
-            <div className="flex justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
-            </div>
-          )}
+          {/* Scrollable Content Area */}
+          <div className="max-h-[55vh] overflow-y-auto pr-1">
+            {/* Loading */}
+            {loading && (
+              <div className="flex justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              </div>
+            )}
 
-          {/* Results */}
-          {!loading && results.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs text-muted-foreground mb-2">{results.length} results</p>
-              {results.map(series => (
-                <div
-                  key={series.id}
-                  onClick={() => handleSelect(series)}
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary cursor-pointer"
-                >
-                  <img src={series.thumbnail} alt="" className="w-12 h-16 object-cover rounded" />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-sm line-clamp-1">{series.title}</h4>
-                    <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} Eps <span className="text-green-400">• Free EP1</span></p>
+            {/* Results */}
+            {!loading && results.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground mb-2">{results.length} results</p>
+                {results.map(series => (
+                  <div
+                    key={series.id}
+                    onClick={() => handleSelect(series)}
+                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-secondary cursor-pointer"
+                  >
+                    <img src={series.thumbnail} alt="" className="w-12 h-16 object-cover rounded" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-sm line-clamp-1">{series.title}</h4>
+                      <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} Eps <span className="text-green-400">• Free EP1</span></p>
+                    </div>
+                    <ChevronLeft className="w-4 h-4 rotate-180 text-muted-foreground" />
                   </div>
-                  <ChevronLeft className="w-4 h-4 rotate-180 text-muted-foreground" />
+                ))}
+              </div>
+            )}
+
+            {/* No Results */}
+            {!loading && query && results.length === 0 && (
+              <div className="text-center py-8">
+                <Search className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">No results found</p>
+                <p className="text-xs text-muted-foreground mt-1">Try different keywords</p>
+              </div>
+            )}
+
+            {/* Recent Searches */}
+            {!query && recentSearches.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium">Recent Searches</p>
+                  <button onClick={clearRecent} className="text-xs text-primary">Clear</button>
                 </div>
-              ))}
-            </div>
-          )}
-
-          {/* No Results */}
-          {!loading && query && results.length === 0 && (
-            <div className="text-center py-12">
-              <Search className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-              <p className="text-muted-foreground">No results found</p>
-              <p className="text-xs text-muted-foreground mt-1">Try different keywords</p>
-            </div>
-          )}
-
-          {/* Recent Searches */}
-          {!query && recentSearches.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium">Recent Searches</p>
-                <button onClick={clearRecent} className="text-xs text-primary">Clear</button>
+                <div className="flex flex-wrap gap-2">
+                  {recentSearches.map((term, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setQuery(term)}
+                      className="px-3 py-1.5 bg-secondary rounded-full text-sm"
+                    >
+                      {term}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex flex-wrap gap-2">
-                {recentSearches.map((term, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setQuery(term)}
-                    className="px-3 py-1.5 bg-secondary rounded-full text-sm"
-                  >
-                    {term}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Quick Genre Filters */}
-          {!query && (
-            <div className="mt-6">
-              <p className="text-sm font-medium mb-3">Quick Filters</p>
-              <div className="flex flex-wrap gap-2">
-                {["Romance", "Drama", "Thriller", "Action", "Comedy", "Mystery"].map(genre => (
-                  <button
-                    key={genre}
-                    onClick={() => setQuery(genre)}
-                    className="px-4 py-2 bg-white/10 hover:bg-primary/30 rounded-full text-sm font-medium transition-colors"
-                  >
-                    {genre}
-                  </button>
-                ))}
+            {/* Quick Genre Filters */}
+            {!query && (
+              <div className="mt-4">
+                <p className="text-sm font-medium mb-3">Quick Filters</p>
+                <div className="flex flex-wrap gap-2">
+                  {["Romance", "Drama", "Thriller", "Action", "Comedy", "Mystery"].map(genre => (
+                    <button
+                      key={genre}
+                      onClick={() => setQuery(genre)}
+                      className="px-4 py-2 bg-white/10 hover:bg-primary/30 rounded-full text-sm font-medium transition-colors"
+                    >
+                      {genre}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+            )}
+          </div>
+        </Card>
+      </DialogContent>
+    </Dialog>
   );
 };
 
