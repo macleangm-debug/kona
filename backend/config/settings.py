@@ -10,8 +10,8 @@ DB_NAME = os.environ.get("DB_NAME", "test_database")
 JWT_SECRET = os.environ.get("JWT_SECRET", "kona-mini-series-jwt-secret-key-2024-secure")
 STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
 
-# Daily Rewards
-DAILY_REWARD_COINS = 10
+# Daily Rewards - PROFIT FOCUSED (very low to encourage purchases)
+DAILY_REWARD_COINS = 3
 
 # Referral Rewards
 REFERRAL_REWARD_REFERRER = 20
