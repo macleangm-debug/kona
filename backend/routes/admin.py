@@ -187,6 +187,16 @@ async def delete_promo(promo_id: str, user: dict = Depends(require_admin)):
 
 
 # ============ ADMIN CREATOR MANAGEMENT ============
+@router.get("/creator-applications")
+async def list_creator_applications(user: dict = Depends(require_admin), status: str = None):
+    """List all creator applications (alias for /creators)"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    creators = await db.creators.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    return {"applications": creators}
+
 @router.get("/creators")
 async def list_creators(user: dict = Depends(require_admin), status: str = None):
     """List all creator applications"""
