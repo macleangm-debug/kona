@@ -232,6 +232,14 @@ export const AdminDashboard = () => {
     { id: "localization_expansion", name: "Localization Guide", icon: "🌍", category: "P2 - Scale", color: "green" },
     { id: "creator_partnership", name: "Creator Partnership", icon: "🤝", category: "P2 - Scale", color: "green" },
     { id: "security_data_protection", name: "Security & Data", icon: "🔒", category: "P2 - Scale", color: "green" },
+    // New Documents
+    { id: "investor_pitch_deck", name: "Investor Pitch Deck", icon: "💼", category: "P0 - Launch Critical", color: "red" },
+    { id: "financial_projections", name: "Financial Projections", icon: "📉", category: "P0 - Launch Critical", color: "red" },
+    { id: "competitor_analysis", name: "Competitor Analysis", icon: "🎯", category: "P1 - First Month", color: "yellow" },
+    { id: "api_documentation", name: "API Documentation", icon: "📡", category: "P1 - First Month", color: "yellow" },
+    { id: "disaster_recovery", name: "Disaster Recovery", icon: "🛡️", category: "P1 - First Month", color: "yellow" },
+    { id: "content_moderation", name: "Content Moderation", icon: "👁️", category: "P1 - First Month", color: "yellow" },
+    { id: "creator_payout_schedule", name: "Creator Payouts", icon: "💳", category: "P2 - Scale", color: "green" },
   ];
 
   useEffect(() => {
