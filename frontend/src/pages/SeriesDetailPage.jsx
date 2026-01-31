@@ -193,6 +193,16 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
         onUnlock={handleUnlock}
         userCoins={user?.coins || 0}
       />
+
+      {/* Watch Party Modal */}
+      <WatchPartyModal
+        open={showWatchParty}
+        onOpenChange={setShowWatchParty}
+        seriesId={id}
+        episodeId={selectedEpisodeForParty?.id}
+        seriesTitle={series?.title}
+        episodeNumber={selectedEpisodeForParty?.episode_number || 1}
+      />
     </div>
   );
 };
