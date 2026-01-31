@@ -10,6 +10,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   PieChart as RechartsPie, Pie, Cell,
