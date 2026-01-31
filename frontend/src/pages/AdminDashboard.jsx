@@ -23,6 +23,179 @@ import ReactMarkdown from "react-markdown";
 // Chart colors
 const COLORS = ['#8b5cf6', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'];
 
+// Launch Checklist Items (mirrors the launch_checklist.md document)
+const CHECKLIST_ITEMS = [
+  { id: "technical-1", category: "Technical Infrastructure", label: "Domain configured & SSL certificates installed" },
+  { id: "technical-2", category: "Technical Infrastructure", label: "CDN setup for global video delivery" },
+  { id: "technical-3", category: "Technical Infrastructure", label: "Database backups automated" },
+  { id: "technical-4", category: "Technical Infrastructure", label: "Error monitoring & alerting configured" },
+  { id: "technical-5", category: "Technical Infrastructure", label: "Load testing completed (1000+ concurrent users)" },
+  { id: "content-1", category: "Content Ready", label: "Minimum 10 complete series uploaded" },
+  { id: "content-2", category: "Content Ready", label: "Episode thumbnails & metadata optimized" },
+  { id: "content-3", category: "Content Ready", label: "Coming soon content queued (3+ series)" },
+  { id: "content-4", category: "Content Ready", label: "Content moderation workflow tested" },
+  { id: "payment-1", category: "Payment Systems", label: "Stripe integration tested (all regions)" },
+  { id: "payment-2", category: "Payment Systems", label: "M-Pesa/Flutterwave integration tested (Africa)" },
+  { id: "payment-3", category: "Payment Systems", label: "Coin purchase flows validated" },
+  { id: "payment-4", category: "Payment Systems", label: "Subscription billing cycle confirmed" },
+  { id: "legal-1", category: "Legal & Compliance", label: "Terms of Service published" },
+  { id: "legal-2", category: "Legal & Compliance", label: "Privacy Policy published" },
+  { id: "legal-3", category: "Legal & Compliance", label: "GDPR compliance verified" },
+  { id: "legal-4", category: "Legal & Compliance", label: "Content licensing agreements signed" },
+  { id: "marketing-1", category: "Marketing Ready", label: "App Store listing approved (if applicable)" },
+  { id: "marketing-2", category: "Marketing Ready", label: "Social media accounts created" },
+  { id: "marketing-3", category: "Marketing Ready", label: "Launch announcement prepared" },
+  { id: "marketing-4", category: "Marketing Ready", label: "Referral system tested end-to-end" },
+  { id: "support-1", category: "Support Ready", label: "Help/FAQ section published" },
+  { id: "support-2", category: "Support Ready", label: "Support email configured" },
+  { id: "support-3", category: "Support Ready", label: "Crisis response plan documented" },
+];
+
+// Launch Checklist Tab Component
+const LaunchChecklistTab = ({ token }) => {
+  const [checklist, setChecklist] = useState({ completed_items: [] });
+  const [loading, setLoading] = useState(true);
+  const [toggling, setToggling] = useState(null);
+
+  useEffect(() => {
+    fetchChecklist();
+  }, [token]);
+
+  const fetchChecklist = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/checklist`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setChecklist(res.data);
+    } catch (e) {
+      console.error("Failed to fetch checklist:", e);
+    }
+    setLoading(false);
+  };
+
+  const toggleItem = async (itemId) => {
+    setToggling(itemId);
+    try {
+      const res = await axios.post(`${API}/admin/checklist/toggle?item_id=${itemId}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setChecklist(prev => ({ ...prev, completed_items: res.data.completed_items }));
+      toast.success(`Item ${res.data.action}`);
+    } catch (e) {
+      toast.error("Failed to toggle item");
+    }
+    setToggling(null);
+  };
+
+  const completedCount = checklist.completed_items?.length || 0;
+  const totalCount = CHECKLIST_ITEMS.length;
+  const progress = Math.round((completedCount / totalCount) * 100);
+
+  // Group items by category
+  const categories = [...new Set(CHECKLIST_ITEMS.map(item => item.category))];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Progress Overview */}
+      <Card className="p-6 bg-gradient-to-br from-primary/20 to-purple-500/10 border-primary/20">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-2xl font-bold">Launch Readiness</h2>
+            <p className="text-muted-foreground">Track your progress towards launch</p>
+          </div>
+          <div className="text-right">
+            <p className="text-4xl font-bold text-primary">{progress}%</p>
+            <p className="text-sm text-muted-foreground">{completedCount} of {totalCount} complete</p>
+          </div>
+        </div>
+        <Progress value={progress} className="h-3" />
+        
+        {progress === 100 && (
+          <div className="mt-4 p-3 bg-green-500/20 rounded-lg border border-green-500/30 flex items-center gap-3">
+            <Check className="w-6 h-6 text-green-400" />
+            <span className="font-medium text-green-400">🚀 Ready for Launch!</span>
+          </div>
+        )}
+      </Card>
+
+      {/* Category Progress */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {categories.map(category => {
+          const categoryItems = CHECKLIST_ITEMS.filter(item => item.category === category);
+          const categoryCompleted = categoryItems.filter(item => 
+            checklist.completed_items?.includes(item.id)
+          ).length;
+          const categoryProgress = Math.round((categoryCompleted / categoryItems.length) * 100);
+          
+          return (
+            <Card key={category} className="p-4 bg-white/5 border-white/10">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-sm">{category}</h3>
+                <span className="text-xs text-muted-foreground">{categoryCompleted}/{categoryItems.length}</span>
+              </div>
+              <Progress value={categoryProgress} className="h-2" />
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Checklist Items by Category */}
+      {categories.map(category => (
+        <Card key={category} className="p-6 bg-white/5 border-white/10">
+          <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+            {category === "Technical Infrastructure" && <Server className="w-5 h-5 text-blue-400" />}
+            {category === "Content Ready" && <Film className="w-5 h-5 text-purple-400" />}
+            {category === "Payment Systems" && <DollarSign className="w-5 h-5 text-green-400" />}
+            {category === "Legal & Compliance" && <Shield className="w-5 h-5 text-yellow-400" />}
+            {category === "Marketing Ready" && <TrendingUp className="w-5 h-5 text-pink-400" />}
+            {category === "Support Ready" && <Users className="w-5 h-5 text-cyan-400" />}
+            {category}
+          </h3>
+          <div className="space-y-2">
+            {CHECKLIST_ITEMS.filter(item => item.category === category).map(item => {
+              const isCompleted = checklist.completed_items?.includes(item.id);
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => toggleItem(item.id)}
+                  disabled={toggling === item.id}
+                  className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all text-left ${
+                    isCompleted 
+                      ? 'bg-green-500/10 border border-green-500/30' 
+                      : 'bg-white/5 border border-transparent hover:bg-white/10'
+                  }`}
+                  data-testid={`checklist-item-${item.id}`}
+                >
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    isCompleted ? 'bg-green-500' : 'border-2 border-gray-500'
+                  }`}>
+                    {toggling === item.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : isCompleted ? (
+                      <Check className="w-4 h-4 text-white" />
+                    ) : null}
+                  </div>
+                  <span className={`flex-1 ${isCompleted ? 'text-green-400 line-through' : 'text-gray-300'}`}>
+                    {item.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+};
+
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
