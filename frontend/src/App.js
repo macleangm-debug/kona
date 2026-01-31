@@ -71,10 +71,10 @@ const AppContent = () => {
   const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
 
   // Handle splash screen completion
-  const handleSplashComplete = () => {
+  const handleSplashComplete = useCallback(() => {
     sessionStorage.setItem('kona_splash_shown', 'true');
     setShowSplash(false);
-  };
+  }, []);
 
   // Check viewport size
   useEffect(() => {
