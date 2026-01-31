@@ -68,21 +68,30 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
     try {
       if (isLogin) {
         await login(email, password);
-        toast.success("Welcome back!");
+        setShowLoginSuccess(true);
       } else {
         await register(email, password, name, referralValid ? referralCode : null);
-        const bonusMsg = referralValid ? ` Plus ${APP_CONFIG.referralBonus} bonus coins from referral!` : "";
-        toast.success(`Account created! You got ${APP_CONFIG.welcomeBonus} welcome coins!${bonusMsg}`);
+        setSignupBonusInfo({
+          welcome: APP_CONFIG.welcomeBonus,
+          referral: referralValid ? APP_CONFIG.referralBonus : 0
+        });
+        setShowSignupSuccess(true);
       }
-      onClose();
     } catch (err) {
       toast.error(err.response?.data?.detail || "Something went wrong");
     }
     setLoading(false);
   };
 
+  const handleSuccessClose = () => {
+    setShowLoginSuccess(false);
+    setShowSignupSuccess(false);
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <>
+      <Dialog open={open && !showLoginSuccess && !showSignupSuccess} onOpenChange={onClose}>
       <DialogContent className="max-w-[340px] bg-card border-white/10" data-testid="auth-modal">
         <DialogHeader>
           <DialogTitle className="font-heading text-2xl">
