@@ -200,6 +200,506 @@ const LaunchChecklistTab = ({ token }) => {
   );
 };
 
+// Investment Calculator Tab Component (Embedded)
+const InvestmentCalculatorTab = ({ token }) => {
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+  const [inputs, setInputs] = useState({
+    current_users: 1000,
+    target_users: 100000,
+    monthly_growth_rate: 0.15,
+    months_to_project: 24,
+    initial_investment: 50000
+  });
+
+  const calculateProjections = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.post(`${API}/investment/calculate`, inputs);
+      setResult(res.data);
+    } catch (e) {
+      console.error("Failed to calculate:", e);
+    }
+    setLoading(false);
+  };
+
+  const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+  const formatNumber = (value) => new Intl.NumberFormat('en-US').format(value);
+
+  return (
+    <div className="space-y-6">
+      {/* Input Section */}
+      <Card className="p-6 bg-white/5 border-white/10">
+        <h2 className="font-semibold text-lg mb-4 flex items-center gap-2">
+          <Calculator className="w-5 h-5 text-primary" />
+          Investment Projection Parameters
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div>
+            <label className="text-sm text-muted-foreground mb-2 block">Current Users</label>
+            <Input type="number" value={inputs.current_users} onChange={(e) => setInputs({...inputs, current_users: parseInt(e.target.value) || 0})} className="bg-white/5 border-white/10" />
+          </div>
+          <div>
+            <label className="text-sm text-muted-foreground mb-2 block">Target Users</label>
+            <Input type="number" value={inputs.target_users} onChange={(e) => setInputs({...inputs, target_users: parseInt(e.target.value) || 0})} className="bg-white/5 border-white/10" />
+          </div>
+          <div>
+            <label className="text-sm text-muted-foreground mb-2 block">Initial Investment ($)</label>
+            <Input type="number" value={inputs.initial_investment} onChange={(e) => setInputs({...inputs, initial_investment: parseInt(e.target.value) || 0})} className="bg-white/5 border-white/10" />
+          </div>
+          <div>
+            <label className="text-sm text-muted-foreground mb-2 block">Monthly Growth: {(inputs.monthly_growth_rate * 100).toFixed(0)}%</label>
+            <Slider value={[inputs.monthly_growth_rate * 100]} max={50} min={5} step={1} onValueChange={([v]) => setInputs({...inputs, monthly_growth_rate: v / 100})} />
+          </div>
+          <div>
+            <label className="text-sm text-muted-foreground mb-2 block">Projection: {inputs.months_to_project} months</label>
+            <Slider value={[inputs.months_to_project]} max={60} min={6} step={6} onValueChange={([v]) => setInputs({...inputs, months_to_project: v})} />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={calculateProjections} disabled={loading} className="w-full">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Calculator className="w-4 h-4 mr-2" />}
+              Calculate
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {result && (
+        <>
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-blue-500/20">
+              <p className="text-xs text-muted-foreground">Final Users</p>
+              <p className="text-2xl font-bold text-blue-400">{formatNumber(result.summary.final_users)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border-green-500/20">
+              <p className="text-xs text-muted-foreground">Total Revenue</p>
+              <p className="text-2xl font-bold text-green-400">{formatCurrency(result.summary.total_revenue)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10 border-purple-500/20">
+              <p className="text-xs text-muted-foreground">Net Profit</p>
+              <p className={`text-2xl font-bold ${result.summary.net_profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>{formatCurrency(result.summary.net_profit)}</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/20">
+              <p className="text-xs text-muted-foreground">Break-Even</p>
+              <p className="text-2xl font-bold text-yellow-400">{result.break_even_month ? `Month ${result.break_even_month}` : 'N/A'}</p>
+            </Card>
+          </div>
+
+          {/* Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2"><Users className="w-4 h-4 text-blue-400" />User Growth</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={result.projections}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis dataKey="month" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }} />
+                    <Area type="monotone" dataKey="users" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2"><DollarSign className="w-4 h-4 text-green-400" />Revenue vs Costs</h3>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={result.projections}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis dataKey="month" stroke="#666" />
+                    <YAxis stroke="#666" />
+                    <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: '1px solid #333' }} />
+                    <Line type="monotone" dataKey="revenue" stroke="#22c55e" strokeWidth={2} />
+                    <Line type="monotone" dataKey="costs" stroke="#ef4444" strokeWidth={2} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </Card>
+          </div>
+
+          {/* Key Metrics */}
+          <Card className="p-6 bg-white/5 border-white/10">
+            <h3 className="font-semibold mb-4">Key Unit Economics</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">LTV</p><p className="text-lg font-bold text-green-400">{formatCurrency(result.key_metrics.lifetime_value)}</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">CAC</p><p className="text-lg font-bold text-red-400">{formatCurrency(result.key_metrics.customer_acquisition_cost)}</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">LTV:CAC</p><p className={`text-lg font-bold ${result.key_metrics.ltv_cac_ratio >= 3 ? 'text-green-400' : 'text-yellow-400'}`}>{result.key_metrics.ltv_cac_ratio}x</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">Churn</p><p className="text-lg font-bold text-yellow-400">{result.key_metrics.monthly_churn_rate}</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">Margin</p><p className="text-lg font-bold text-blue-400">{result.key_metrics.gross_margin}</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">ARPU</p><p className="text-lg font-bold text-purple-400">{formatCurrency(result.key_metrics.avg_revenue_per_user)}</p></div>
+              <div className="p-3 bg-white/5 rounded-lg"><p className="text-xs text-muted-foreground">Payback</p><p className="text-lg font-bold text-cyan-400">{result.key_metrics.payback_period_months} mo</p></div>
+            </div>
+          </Card>
+
+          {/* Recommendations */}
+          <Card className="p-6 bg-white/5 border-white/10">
+            <h3 className="font-semibold mb-4 flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" />Recommendations</h3>
+            <div className="space-y-2">
+              {result.recommendations.map((rec, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm">{rec}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+};
+
+// Infrastructure Calculator Tab Component - 99% Uptime Affordable Approach
+const InfrastructureCalculatorTab = () => {
+  const [totalUsers, setTotalUsers] = useState(10000);
+  const [result, setResult] = useState(null);
+
+  const calculateInfrastructure = () => {
+    // Calculations based on industry standards for 99% uptime
+    const concurrentUsers = Math.ceil(totalUsers * 0.1); // 10% concurrent at peak
+    const requestsPerSecond = Math.ceil(concurrentUsers * 0.5); // 0.5 requests/user/sec
+    const videoStreams = Math.ceil(concurrentUsers * 0.3); // 30% actively streaming
+    const bandwidthGbps = (videoStreams * 3) / 1000; // 3 Mbps per stream average
+    
+    // Database sizing
+    const dbStorageGB = Math.ceil(totalUsers * 0.01); // ~10MB per user data
+    const dbConnections = Math.min(Math.ceil(concurrentUsers / 10), 500);
+    
+    // CDN & Storage
+    const videoStorageTB = Math.ceil(totalUsers / 10000); // 1TB per 10k users (content library)
+    const cdnBandwidthTB = Math.ceil(bandwidthGbps * 3600 * 24 * 30 / 8 / 1000); // Monthly
+    
+    // Affordable cloud costs (using budget options)
+    const serverCost = calculateServerCost(concurrentUsers);
+    const dbCost = calculateDbCost(dbStorageGB, dbConnections);
+    const cdnCost = calculateCdnCost(cdnBandwidthTB, videoStorageTB);
+    const monitoringCost = 20; // Basic monitoring
+    const backupCost = Math.ceil(dbStorageGB * 0.05);
+    
+    const totalMonthlyCost = serverCost + dbCost + cdnCost + monitoringCost + backupCost;
+    const costPerUser = totalMonthlyCost / totalUsers;
+    
+    setResult({
+      users: {
+        total: totalUsers,
+        concurrent: concurrentUsers,
+        streaming: videoStreams
+      },
+      compute: {
+        requestsPerSecond,
+        recommendedInstances: calculateInstances(concurrentUsers),
+        serverType: getServerRecommendation(concurrentUsers),
+        cost: serverCost
+      },
+      database: {
+        storageGB: dbStorageGB,
+        connections: dbConnections,
+        type: getDbRecommendation(totalUsers),
+        cost: dbCost
+      },
+      cdn: {
+        storageTB: videoStorageTB,
+        bandwidthTB: cdnBandwidthTB,
+        provider: getCdnRecommendation(totalUsers),
+        cost: cdnCost
+      },
+      monitoring: {
+        tools: getMonitoringRecommendation(totalUsers),
+        cost: monitoringCost
+      },
+      backup: {
+        strategy: getBackupRecommendation(totalUsers),
+        cost: backupCost
+      },
+      totalCost: {
+        monthly: totalMonthlyCost,
+        yearly: totalMonthlyCost * 12,
+        perUser: costPerUser
+      },
+      uptimeComponents: getUptimeComponents(totalUsers),
+      affordableTips: getAffordableTips(totalUsers)
+    });
+  };
+
+  // Helper functions for calculations
+  const calculateServerCost = (concurrent) => {
+    if (concurrent <= 100) return 20; // Shared hosting / small VPS
+    if (concurrent <= 500) return 50; // Medium VPS
+    if (concurrent <= 2000) return 150; // Large VPS or small dedicated
+    if (concurrent <= 10000) return 400; // Multiple servers
+    return Math.ceil(concurrent / 25); // Scale horizontally
+  };
+
+  const calculateDbCost = (storage, connections) => {
+    if (storage <= 5) return 0; // Free tier
+    if (storage <= 20) return 15; // Basic shared
+    if (storage <= 100) return 50; // Small dedicated
+    return Math.ceil(storage * 0.5) + Math.ceil(connections * 0.1);
+  };
+
+  const calculateCdnCost = (bandwidthTB, storageTB) => {
+    // Bunny.net pricing (very affordable)
+    const storageCost = storageTB * 5; // ~$5/TB storage
+    const bandwidthCost = bandwidthTB * 10; // ~$10/TB bandwidth
+    return Math.ceil(storageCost + bandwidthCost);
+  };
+
+  const calculateInstances = (concurrent) => {
+    if (concurrent <= 500) return 1;
+    if (concurrent <= 2000) return 2;
+    if (concurrent <= 5000) return 3;
+    return Math.ceil(concurrent / 2000);
+  };
+
+  const getServerRecommendation = (concurrent) => {
+    if (concurrent <= 100) return { name: "Shared VPS (2GB)", provider: "Hetzner/DigitalOcean", specs: "2 vCPU, 2GB RAM" };
+    if (concurrent <= 500) return { name: "Small VPS (4GB)", provider: "Hetzner Cloud", specs: "2 vCPU, 4GB RAM" };
+    if (concurrent <= 2000) return { name: "Medium VPS (8GB)", provider: "Hetzner/Vultr", specs: "4 vCPU, 8GB RAM" };
+    return { name: "Multiple VPS with Load Balancer", provider: "Hetzner + Cloudflare LB", specs: "4-8 vCPU, 8-16GB RAM each" };
+  };
+
+  const getDbRecommendation = (users) => {
+    if (users <= 5000) return { name: "MongoDB Atlas Free/Shared", tier: "M0-M2", cost: "Free-$9/mo" };
+    if (users <= 50000) return { name: "MongoDB Atlas M10", tier: "M10", cost: "$57/mo" };
+    return { name: "MongoDB Atlas M20+", tier: "M20", cost: "$140+/mo" };
+  };
+
+  const getCdnRecommendation = (users) => {
+    if (users <= 10000) return { name: "Bunny.net", reason: "Cheapest CDN, $0.01/GB" };
+    if (users <= 100000) return { name: "Bunny.net + Cloudflare", reason: "Cost-effective combo" };
+    return { name: "Bunny.net Stream", reason: "Built-in video optimization" };
+  };
+
+  const getMonitoringRecommendation = (users) => {
+    if (users <= 10000) return ["UptimeRobot (free)", "Sentry (free tier)", "Custom health checks"];
+    return ["Better Uptime ($20/mo)", "Sentry Team", "Prometheus + Grafana"];
+  };
+
+  const getBackupRecommendation = (users) => {
+    if (users <= 10000) return "Daily automated backups to S3/Backblaze B2";
+    return "Hourly backups + cross-region replication";
+  };
+
+  const getUptimeComponents = (users) => [
+    { component: "Load Balancer / Reverse Proxy", solution: users <= 10000 ? "Cloudflare (free)" : "Cloudflare Pro ($20/mo)", impact: "Route traffic, DDoS protection" },
+    { component: "Multi-zone Deployment", solution: users <= 50000 ? "Single region, 2 availability zones" : "Multi-region active-passive", impact: "Survive zone failures" },
+    { component: "Health Checks", solution: "UptimeRobot + Custom endpoints", impact: "Detect issues in <1 min" },
+    { component: "Auto-restart", solution: "PM2 / Supervisor / Docker restart", impact: "Recover from crashes" },
+    { component: "Database Replica", solution: users <= 10000 ? "MongoDB Atlas built-in" : "Read replicas", impact: "DB failover" },
+    { component: "CDN Redundancy", solution: "Bunny.net multi-PoP", impact: "Global content availability" }
+  ];
+
+  const getAffordableTips = (users) => {
+    const tips = [
+      { tip: "Use Hetzner over AWS/GCP", savings: "60-70% cheaper for same specs", priority: "HIGH" },
+      { tip: "Bunny.net for video CDN", savings: "10x cheaper than CloudFront", priority: "HIGH" },
+      { tip: "MongoDB Atlas free tier to start", savings: "Free for up to 5GB", priority: "HIGH" },
+      { tip: "Cloudflare free for DNS + CDN", savings: "Free SSL, DDoS protection", priority: "HIGH" },
+      { tip: "Use spot/preemptible instances for non-critical", savings: "50-80% off", priority: "MEDIUM" }
+    ];
+    if (users > 10000) {
+      tips.push({ tip: "Reserved instances for predictable workloads", savings: "30-40% off", priority: "MEDIUM" });
+    }
+    if (users > 50000) {
+      tips.push({ tip: "Negotiate enterprise deals with providers", savings: "Custom pricing", priority: "HIGH" });
+    }
+    return tips;
+  };
+
+  const formatCurrency = (value) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+
+  return (
+    <div className="space-y-6">
+      {/* Input Section */}
+      <Card className="p-6 bg-gradient-to-br from-blue-500/20 to-purple-500/10 border-blue-500/20">
+        <h2 className="font-semibold text-xl mb-2 flex items-center gap-2">
+          <Server className="w-6 h-6 text-blue-400" />
+          Infrastructure Calculator for 99% Uptime
+        </h2>
+        <p className="text-sm text-muted-foreground mb-6">
+          Enter your total user count to get an affordable infrastructure plan that ensures 99%+ uptime
+        </p>
+        
+        <div className="flex flex-col md:flex-row gap-4 items-end">
+          <div className="flex-1">
+            <label className="text-sm text-muted-foreground mb-2 block">Total Users</label>
+            <Input 
+              type="number" 
+              value={totalUsers} 
+              onChange={(e) => setTotalUsers(parseInt(e.target.value) || 0)} 
+              className="bg-white/5 border-white/10 text-2xl h-14 font-bold"
+              placeholder="Enter total users"
+            />
+          </div>
+          <Button onClick={calculateInfrastructure} size="lg" className="h-14 px-8">
+            <Cpu className="w-5 h-5 mr-2" />
+            Calculate Infrastructure
+          </Button>
+        </div>
+      </Card>
+
+      {result && (
+        <>
+          {/* Cost Summary */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="p-4 bg-gradient-to-br from-green-500/20 to-green-600/10 border-green-500/20">
+              <p className="text-xs text-muted-foreground">Monthly Cost</p>
+              <p className="text-3xl font-bold text-green-400">{formatCurrency(result.totalCost.monthly)}</p>
+              <p className="text-xs text-green-300 mt-1">Total infrastructure</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-blue-500/20 to-blue-600/10 border-blue-500/20">
+              <p className="text-xs text-muted-foreground">Cost Per User</p>
+              <p className="text-3xl font-bold text-blue-400">${result.totalCost.perUser.toFixed(3)}</p>
+              <p className="text-xs text-blue-300 mt-1">Per user/month</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-purple-500/20 to-purple-600/10 border-purple-500/20">
+              <p className="text-xs text-muted-foreground">Concurrent Users</p>
+              <p className="text-3xl font-bold text-purple-400">{result.users.concurrent.toLocaleString()}</p>
+              <p className="text-xs text-purple-300 mt-1">Peak capacity</p>
+            </Card>
+            <Card className="p-4 bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 border-yellow-500/20">
+              <p className="text-xs text-muted-foreground">Video Streams</p>
+              <p className="text-3xl font-bold text-yellow-400">{result.users.streaming.toLocaleString()}</p>
+              <p className="text-xs text-yellow-300 mt-1">Simultaneous</p>
+            </Card>
+          </div>
+
+          {/* Infrastructure Breakdown */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Compute */}
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Cpu className="w-5 h-5 text-blue-400" />
+                Compute (Servers)
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between"><span className="text-muted-foreground">Recommendation</span><span className="font-medium">{result.compute.serverType.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Provider</span><Badge variant="outline">{result.compute.serverType.provider}</Badge></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Specs</span><span>{result.compute.serverType.specs}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Instances Needed</span><span className="font-bold">{result.compute.recommendedInstances}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Requests/sec Capacity</span><span>{result.compute.requestsPerSecond}</span></div>
+                <div className="flex justify-between pt-2 border-t border-white/10"><span className="font-medium">Monthly Cost</span><span className="font-bold text-green-400">{formatCurrency(result.compute.cost)}</span></div>
+              </div>
+            </Card>
+
+            {/* Database */}
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Database className="w-5 h-5 text-purple-400" />
+                Database
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between"><span className="text-muted-foreground">Recommendation</span><span className="font-medium">{result.database.type.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Tier</span><Badge variant="outline">{result.database.type.tier}</Badge></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Storage Needed</span><span>{result.database.storageGB} GB</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Connections</span><span>{result.database.connections}</span></div>
+                <div className="flex justify-between pt-2 border-t border-white/10"><span className="font-medium">Monthly Cost</span><span className="font-bold text-green-400">{formatCurrency(result.database.cost)}</span></div>
+              </div>
+            </Card>
+
+            {/* CDN */}
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Globe className="w-5 h-5 text-cyan-400" />
+                CDN & Video Delivery
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between"><span className="text-muted-foreground">Provider</span><span className="font-medium">{result.cdn.provider.name}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Why</span><span className="text-sm text-right max-w-[200px]">{result.cdn.provider.reason}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Video Storage</span><span>{result.cdn.storageTB} TB</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Bandwidth/Month</span><span>{result.cdn.bandwidthTB} TB</span></div>
+                <div className="flex justify-between pt-2 border-t border-white/10"><span className="font-medium">Monthly Cost</span><span className="font-bold text-green-400">{formatCurrency(result.cdn.cost)}</span></div>
+              </div>
+            </Card>
+
+            {/* Monitoring & Backup */}
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-yellow-400" />
+                Monitoring & Backup
+              </h3>
+              <div className="space-y-3">
+                <div><span className="text-muted-foreground">Monitoring Tools:</span>
+                  <div className="flex flex-wrap gap-1 mt-1">{result.monitoring.tools.map((t, i) => <Badge key={i} variant="outline" className="text-xs">{t}</Badge>)}</div>
+                </div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Backup Strategy</span><span className="text-sm text-right max-w-[200px]">{result.backup.strategy}</span></div>
+                <div className="flex justify-between pt-2 border-t border-white/10"><span className="font-medium">Combined Cost</span><span className="font-bold text-green-400">{formatCurrency(result.monitoring.cost + result.backup.cost)}</span></div>
+              </div>
+            </Card>
+          </div>
+
+          {/* 99% Uptime Components */}
+          <Card className="p-6 bg-white/5 border-white/10">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Zap className="w-5 h-5 text-green-400" />
+              99% Uptime Architecture Components
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {result.uptimeComponents.map((item, i) => (
+                <div key={i} className="p-4 bg-white/5 rounded-lg">
+                  <p className="font-medium text-sm">{item.component}</p>
+                  <p className="text-xs text-primary mt-1">{item.solution}</p>
+                  <p className="text-xs text-muted-foreground mt-2">{item.impact}</p>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Affordable Tips */}
+          <Card className="p-6 bg-gradient-to-br from-green-500/10 to-emerald-500/5 border-green-500/20">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-400" />
+              Cost-Saving Tips (Affordable Approach)
+            </h3>
+            <div className="space-y-3">
+              {result.affordableTips.map((tip, i) => (
+                <div key={i} className="flex items-start gap-3 p-3 bg-green-500/10 rounded-lg">
+                  <Badge variant="outline" className={`flex-shrink-0 ${tip.priority === 'HIGH' ? 'border-green-500 text-green-400' : 'border-yellow-500 text-yellow-400'}`}>
+                    {tip.priority}
+                  </Badge>
+                  <div>
+                    <p className="font-medium text-sm">{tip.tip}</p>
+                    <p className="text-xs text-green-400 mt-1">Savings: {tip.savings}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* Summary */}
+          <Card className="p-6 bg-gradient-to-br from-primary/20 to-purple-500/10 border-primary/20">
+            <h3 className="font-semibold mb-4">Summary: Affordable 99% Uptime for {totalUsers.toLocaleString()} Users</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Monthly Budget Breakdown:</p>
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between"><span>Servers (Hetzner)</span><span>{formatCurrency(result.compute.cost)}</span></div>
+                  <div className="flex justify-between"><span>Database (MongoDB Atlas)</span><span>{formatCurrency(result.database.cost)}</span></div>
+                  <div className="flex justify-between"><span>CDN (Bunny.net)</span><span>{formatCurrency(result.cdn.cost)}</span></div>
+                  <div className="flex justify-between"><span>Monitoring & Backup</span><span>{formatCurrency(result.monitoring.cost + result.backup.cost)}</span></div>
+                  <div className="flex justify-between font-bold pt-2 border-t border-white/10"><span>Total Monthly</span><span className="text-green-400">{formatCurrency(result.totalCost.monthly)}</span></div>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Key Points:</p>
+                <ul className="text-sm space-y-1">
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" />99% uptime achievable</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" />Budget-friendly providers</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" />Scalable architecture</li>
+                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-green-400" />Auto-recovery systems</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+};
+
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
