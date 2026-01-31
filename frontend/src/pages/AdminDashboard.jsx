@@ -448,9 +448,9 @@ const InfrastructureCalculatorTab = ({ token }) => {
               placeholder="Enter total users"
             />
           </div>
-          <Button onClick={calculateInfrastructure} size="lg" className="h-14 px-8">
-            <Cpu className="w-5 h-5 mr-2" />
-            Calculate Infrastructure
+          <Button onClick={calculateInfrastructure} size="lg" className="h-14 px-8" disabled={loading}>
+            {loading ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Cpu className="w-5 h-5 mr-2" />}
+            {loading ? "Calculating..." : "Calculate Infrastructure"}
           </Button>
         </div>
       </Card>
