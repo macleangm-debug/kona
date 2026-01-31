@@ -37,9 +37,28 @@ export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState("7d");
-  const [productionGuide, setProductionGuide] = useState(null);
+  const [currentDoc, setCurrentDoc] = useState(null);
+  const [docsList, setDocsList] = useState([]);
   const [systemHealth, setSystemHealth] = useState(null);
   const [docsLoading, setDocsLoading] = useState(false);
+  const [activeDocId, setActiveDocId] = useState("production_guide");
+
+  // Document definitions with icons and categories
+  const documentConfig = [
+    { id: "production_guide", name: "Production Guide", icon: "🚀", category: "P0 - Launch Critical", color: "red" },
+    { id: "launch_checklist", name: "Launch Checklist", icon: "✅", category: "P0 - Launch Critical", color: "red" },
+    { id: "marketing_plan", name: "Marketing Plan", icon: "📈", category: "P0 - Launch Critical", color: "red" },
+    { id: "monetization_strategy", name: "Monetization Strategy", icon: "💰", category: "P0 - Launch Critical", color: "red" },
+    { id: "legal_compliance", name: "Legal & Compliance", icon: "⚖️", category: "P0 - Launch Critical", color: "red" },
+    { id: "kpi_metrics", name: "KPI & Metrics", icon: "📊", category: "P1 - First Month", color: "yellow" },
+    { id: "content_strategy", name: "Content Strategy", icon: "🎬", category: "P1 - First Month", color: "yellow" },
+    { id: "support_playbook", name: "Support Playbook", icon: "🎧", category: "P1 - First Month", color: "yellow" },
+    { id: "crisis_management", name: "Crisis Management", icon: "🚨", category: "P1 - First Month", color: "yellow" },
+    { id: "growth_retention", name: "Growth & Retention", icon: "🌱", category: "P2 - Scale", color: "green" },
+    { id: "localization_expansion", name: "Localization Guide", icon: "🌍", category: "P2 - Scale", color: "green" },
+    { id: "creator_partnership", name: "Creator Partnership", icon: "🤝", category: "P2 - Scale", color: "green" },
+    { id: "security_data_protection", name: "Security & Data", icon: "🔒", category: "P2 - Scale", color: "green" },
+  ];
 
   useEffect(() => {
     if (!user?.is_admin) {
