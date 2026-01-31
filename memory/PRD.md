@@ -363,3 +363,55 @@ All accessible via Super Admin → Docs & System tab:
 - Social features (comments, reactions)
 - Creator verification badges
 - Referral link sharing to specific social platforms
+
+---
+
+## Session Update - January 31, 2026 (Current)
+
+### ✅ Completed This Session
+
+#### 1. Code Cleanup & Refactoring
+- **Removed redundant files:**
+  - `/app/frontend/src/pages/InvestmentCalculator.jsx` (functionality moved to Admin Dashboard)
+  - `/app/frontend/src/pages/NotificationsPage.jsx` (replaced by NotificationsDropdown)
+- **Cleaned up routes in App.js** - Removed `/notifications` and `/investment` routes
+
+#### 2. Critical Bug Fix: Splash Screen Infinite Loop
+- **Issue:** Splash screen was stuck and never completing, blocking all page access
+- **Root Cause:** The `onComplete` callback in SplashScreen was being recreated on every render, causing the `useEffect` timers to reset continuously
+- **Fix:** 
+  - Added `useCallback` wrapper for `handleSplashComplete` in `App.js`
+  - Refactored `SplashScreen.jsx` to use `useRef` for the callback, preventing dependency-triggered re-runs
+  - Added `hasCompleted` ref to prevent double-firing
+
+#### 3. Infrastructure Calculator - Full Backend Implementation
+- **New API endpoint:** `POST /api/infrastructure/calculate`
+- **New file:** `/app/backend/routes/infrastructure.py`
+- **Features:**
+  - Takes total user count (100 - 10,000,000) as input
+  - Calculates concurrent users (10% of total), video streams (30% of concurrent)
+  - Returns comprehensive infrastructure recommendations:
+    - **Compute:** Server type, provider, specs, instances needed, cost
+    - **Database:** MongoDB Atlas tier, storage, connections, cost
+    - **CDN:** Bunny.net configuration, storage TB, bandwidth TB, cost
+    - **Monitoring:** Tool recommendations (UptimeRobot, Sentry, etc.), cost
+    - **Backup:** Strategy recommendations, cost
+  - **99% Uptime Architecture Components:** Load balancer, multi-zone deployment, health checks, auto-restart, database replica, CDN redundancy
+  - **Cost-Saving Tips:** Priority-based tips (HIGH/MEDIUM) for affordable infrastructure
+  - **Total Cost Summary:** Monthly, yearly, per-user costs
+- **Frontend updated:** `InfrastructureCalculatorTab` now calls the API with loading state, error handling, and success toast
+
+### API Endpoints Added
+- `POST /api/infrastructure/calculate` - Calculate infrastructure requirements for 99% uptime
+
+### Files Modified
+- `/app/frontend/src/App.js` - Added useCallback, removed redundant imports/routes
+- `/app/frontend/src/components/SplashScreen.jsx` - Fixed infinite loop bug
+- `/app/frontend/src/pages/AdminDashboard.jsx` - Updated InfrastructureCalculatorTab to use API
+- `/app/backend/routes/__init__.py` - Added infrastructure router
+- `/app/backend/routes/infrastructure.py` - NEW: Infrastructure calculator API
+
+### Files Removed
+- `/app/frontend/src/pages/InvestmentCalculator.jsx`
+- `/app/frontend/src/pages/NotificationsPage.jsx`
+
