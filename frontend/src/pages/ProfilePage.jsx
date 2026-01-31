@@ -24,6 +24,10 @@ export const ProfilePage = ({ onLogout }) => {
   const [copied, setCopied] = useState(false);
   const [claimingMilestone, setClaimingMilestone] = useState(null);
   const [showNotificationSettings, setShowNotificationSettings] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
+  const [pendingClaimMilestone, setPendingClaimMilestone] = useState(null);
+  const [claimLoading, setClaimLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
