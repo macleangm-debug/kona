@@ -329,7 +329,9 @@ export const RewardsPage = ({ onAuthClick }) => {
     ));
     
     const mission = missions.find(m => m.id === missionId);
-    toast.success(`🎉 Claimed ${mission?.reward} coins!`);
+    // Show animated modal for mission claim
+    setRewardModalData({ amount: mission?.reward || 0, type: mission?.title || "Mission" });
+    setShowRewardModal(true);
     refreshUser();
     setClaimingMission(null);
   };
