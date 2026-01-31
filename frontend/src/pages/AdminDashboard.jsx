@@ -5,12 +5,15 @@ import {
   ChevronLeft, Users, Film, CreditCard, TrendingUp, 
   DollarSign, Eye, Crown, Check, X, Clock, Loader2,
   BarChart3, PieChart, ArrowUpRight, ArrowDownRight,
-  FileText, Server, Shield, Database
+  FileText, Server, Shield, Database, Calculator, Cpu, 
+  HardDrive, Wifi, Globe, Zap, AlertTriangle, CheckCircle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
   PieChart as RechartsPie, Pie, Cell,
