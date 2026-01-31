@@ -1,133 +1,158 @@
-// Kona Service Worker for PWA & Push Notifications
-const CACHE_NAME = 'kona-v1';
-const urlsToCache = [
+// Kona Service Worker for Offline Downloads
+const CACHE_NAME = 'kona-offline-cache-v1';
+const STATIC_CACHE = 'kona-static-v1';
+
+// Assets to pre-cache
+const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/static/js/bundle.js',
   '/manifest.json'
 ];
 
-// Install event - cache assets
+// Install event
 self.addEventListener('install', (event) => {
+  console.log('[SW] Installing...');
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
-        console.log('Kona SW: Cache opened');
-        return cache.addAll(urlsToCache);
-      })
-      .catch((err) => {
-        console.log('Kona SW: Cache failed', err);
-      })
+    caches.open(STATIC_CACHE)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
-// Activate event - cleanup old caches
+// Activate event
 self.addEventListener('activate', (event) => {
+  console.log('[SW] Activating...');
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            console.log('Kona SW: Removing old cache', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames
+          .filter((name) => name !== CACHE_NAME && name !== STATIC_CACHE)
+          .map((name) => caches.delete(name))
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - serve cached content when offline
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request);
-      })
-      .catch(() => {
-        // Fallback for offline
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
-      })
-  );
-});
-
-// Push notification event
-self.addEventListener('push', (event) => {
-  console.log('Kona SW: Push received');
+  const url = new URL(event.request.url);
   
-  let data = {
-    title: 'Kona',
-    body: 'New episode available!',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    tag: 'kona-notification',
-    data: { url: '/' }
-  };
-
-  if (event.data) {
-    try {
-      data = { ...data, ...event.data.json() };
-    } catch (e) {
-      data.body = event.data.text();
-    }
-  }
-
-  const options = {
-    body: data.body,
-    icon: data.icon || '/icons/icon-192x192.png',
-    badge: data.badge || '/icons/icon-72x72.png',
-    tag: data.tag || 'kona-notification',
-    vibrate: [100, 50, 100],
-    data: data.data || { url: '/' },
-    actions: [
-      { action: 'open', title: 'Watch Now' },
-      { action: 'close', title: 'Dismiss' }
-    ]
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
-});
-
-// Notification click event
-self.addEventListener('notificationclick', (event) => {
-  console.log('Kona SW: Notification clicked');
-  event.notification.close();
-
-  if (event.action === 'close') {
+  // Handle offline video requests
+  if (url.pathname.startsWith('/offline-video/')) {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        if (response) {
+          return response;
+        }
+        return new Response('Video not available offline', { status: 404 });
+      })
+    );
     return;
   }
 
-  const urlToOpen = event.notification.data?.url || '/';
+  // Network-first strategy for API calls
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
 
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        // If app is already open, focus it
-        for (const client of clientList) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            client.navigate(urlToOpen);
-            return client.focus();
+  // Cache-first strategy for static assets
+  if (event.request.destination === 'image' || 
+      event.request.destination === 'style' || 
+      event.request.destination === 'script') {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        if (response) {
+          return response;
+        }
+        return fetch(event.request).then((fetchResponse) => {
+          if (!fetchResponse || fetchResponse.status !== 200) {
+            return fetchResponse;
           }
+          const responseClone = fetchResponse.clone();
+          caches.open(STATIC_CACHE).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
+          return fetchResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // Default: network-first
+  event.respondWith(
+    fetch(event.request)
+      .then((response) => {
+        if (response.ok && event.request.destination === 'document') {
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE).then((cache) => {
+            cache.put(event.request, responseClone);
+          });
         }
-        // Otherwise open new window
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
-        }
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then((response) => {
+          if (response) {
+            return response;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('/');
+          }
+          return new Response('Offline', { status: 503 });
+        });
       })
   );
 });
 
-// Background sync for offline actions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'sync-reminders') {
-    console.log('Kona SW: Syncing reminders');
-    // Sync any offline reminder actions
+// Handle messages from the main thread
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'CACHE_VIDEO') {
+    const { url, cacheKey } = event.data;
+    event.waitUntil(
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) throw new Error('Failed to fetch video');
+          return caches.open(CACHE_NAME).then((cache) => {
+            return cache.put(cacheKey, response);
+          });
+        })
+        .then(() => {
+          event.source.postMessage({ type: 'VIDEO_CACHED', cacheKey });
+        })
+        .catch((error) => {
+          event.source.postMessage({ type: 'VIDEO_CACHE_ERROR', cacheKey, error: error.message });
+        })
+    );
+  }
+  
+  if (event.data && event.data.type === 'DELETE_CACHED_VIDEO') {
+    const { cacheKey } = event.data;
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.delete(cacheKey);
+      })
+    );
   }
 });
+
+// Background sync for failed downloads
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'retry-downloads') {
+    event.waitUntil(retryFailedDownloads());
+  }
+});
+
+async function retryFailedDownloads() {
+  console.log('[SW] Retrying failed downloads...');
+}
+
+console.log('[SW] Service Worker loaded');
