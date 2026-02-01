@@ -231,17 +231,37 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
                     alt={series.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                   
-                  <div className="absolute top-2 left-2">
-                    <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded">
-                      {index + 1}
+                  {/* Ranking badge */}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-bold rounded-lg shadow-lg">
+                      #{index + 1}
                     </span>
                   </div>
                   
-                  <div className="absolute bottom-0 left-0 right-0 p-3">
-                    <h3 className="font-bold text-sm line-clamp-1">{series.title}</h3>
-                    <p className="text-xs text-gray-400">{series.genre}</p>
+                  {/* Episode count */}
+                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-xs">
+                    {series.total_episodes} EP
+                  </div>
+                  
+                  {/* Play button overlay on active */}
+                  {index === activeIndex && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform">
+                        <Play className="w-8 h-8 text-black fill-black ml-1" />
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Bottom info */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+                    <h3 className="font-bold text-base line-clamp-1 mb-1">{series.title}</h3>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <span>{series.genre}</span>
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      <span>{series.rating}</span>
+                    </div>
                   </div>
                 </div>
               </SwiperSlide>
