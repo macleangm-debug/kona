@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import { ChevronLeft, Play, Lock, Heart, Crown, Coins, PictureInPicture2 } from "lucide-react";
+import { ChevronLeft, Play, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
