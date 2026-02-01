@@ -29,7 +29,7 @@ def generate_kona_promo():
     video_bytes = video_gen.text_to_video(
         prompt=prompt,
         model="sora-2",
-        size="1792x1024",  # Widescreen format
+        size="1280x720",   # HD widescreen format
         duration=8,        # 8 seconds
         max_wait_time=600
     )
