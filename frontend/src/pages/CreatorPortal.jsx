@@ -59,6 +59,18 @@ export const CreatorPortal = () => {
         ]);
         setDashboard(dashboardRes.data);
         setSeries(seriesRes.data);
+        
+        // Fetch earnings and tier info
+        try {
+          const [earningsRes, tiersRes] = await Promise.all([
+            axios.get(`${API}/revenue/creator/${user?.id}/earnings`, { headers: { Authorization: `Bearer ${token}` } }),
+            axios.get(`${API}/revenue/tiers`, { headers: { Authorization: `Bearer ${token}` } })
+          ]);
+          setEarnings(earningsRes.data);
+          setRevenueTiers(tiersRes.data);
+        } catch (e) {
+          console.error("Failed to fetch earnings:", e);
+        }
       }
     } catch (e) {
       console.error(e);
