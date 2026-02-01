@@ -352,6 +352,401 @@ const InvestmentCalculatorTab = ({ token }) => {
   );
 };
 
+// Revenue Settings Tab Component - Manage expenses, creator tiers, payouts
+const RevenueSettingsTab = ({ token }) => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [calcGross, setCalcGross] = useState(100);
+  const [calcViews, setCalcViews] = useState(50000);
+  const [calcResult, setCalcResult] = useState(null);
+  const [pendingPayouts, setPendingPayouts] = useState(null);
+
+  useEffect(() => {
+    if (token) {
+      fetchSettings();
+      fetchPendingPayouts();
+    }
+  }, [token]);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/revenue/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSettings(res.data);
+    } catch (e) {
+      console.error(e);
+      // Use defaults if not configured
+      setSettings({
+        expenses: { payment_gateway: 4, cdn_hosting: 8, content_moderation: 3, total: 15 },
+        creator_tiers: [
+          { name: "New Creator", min_views: 0, max_views: 10000, share: 65 },
+          { name: "Rising Star", min_views: 10001, max_views: 100000, share: 68 },
+          { name: "Verified Creator", min_views: 100001, max_views: 1000000, share: 70 },
+          { name: "Premium Partner", min_views: 1000001, max_views: null, share: 75 }
+        ],
+        min_payout_threshold: 10,
+        payout_cycle_days: 7
+      });
+    }
+    setLoading(false);
+  };
+
+  const fetchPendingPayouts = async () => {
+    try {
+      const res = await axios.get(`${API}/revenue/payouts/pending`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPendingPayouts(res.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSaveSettings = async () => {
+    setSaving(true);
+    try {
+      await axios.put(`${API}/revenue/settings`, {
+        expenses: {
+          payment_gateway: settings.expenses.payment_gateway,
+          cdn_hosting: settings.expenses.cdn_hosting,
+          content_moderation: settings.expenses.content_moderation
+        },
+        creator_tiers: settings.creator_tiers,
+        min_payout_threshold: settings.min_payout_threshold,
+        payout_cycle_days: settings.payout_cycle_days
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Revenue settings saved!");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to save");
+    }
+    setSaving(false);
+  };
+
+  const updateExpense = (field, value) => {
+    const newExpenses = { ...settings.expenses, [field]: parseFloat(value) || 0 };
+    newExpenses.total = newExpenses.payment_gateway + newExpenses.cdn_hosting + newExpenses.content_moderation;
+    setSettings({ ...settings, expenses: newExpenses });
+  };
+
+  const updateTier = (index, field, value) => {
+    const newTiers = [...settings.creator_tiers];
+    newTiers[index] = { ...newTiers[index], [field]: field === 'name' ? value : (parseFloat(value) || 0) };
+    setSettings({ ...settings, creator_tiers: newTiers });
+  };
+
+  const calculateRevenue = async () => {
+    try {
+      const res = await axios.post(`${API}/revenue/calculate?gross_revenue=${calcGross}&total_views=${calcViews}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCalcResult(res.data);
+    } catch (e) {
+      toast.error("Calculation failed");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const totalExpense = settings?.expenses?.total || 15;
+  const platformShare = 100 - (settings?.creator_tiers?.[0]?.share || 65);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Revenue Distribution Settings</h2>
+          <p className="text-gray-400">Configure expenses, creator shares, and payout rules</p>
+        </div>
+        <Button onClick={handleSaveSettings} disabled={saving} className="bg-primary">
+          {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+          Save All Settings
+        </Button>
+      </div>
+
+      {/* Revenue Flow Visualization */}
+      <Card className="p-6 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/20">
+        <h3 className="font-bold mb-4 flex items-center gap-2">
+          <TrendingUp className="w-5 h-5 text-purple-400" />
+          Revenue Flow (Current Settings)
+        </h3>
+        <div className="flex items-center justify-between text-center">
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-white">100%</div>
+            <div className="text-sm text-gray-400">Gross Revenue</div>
+          </div>
+          <div className="text-2xl text-gray-500">→</div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-red-400">-{totalExpense}%</div>
+            <div className="text-sm text-gray-400">System Expenses</div>
+          </div>
+          <div className="text-2xl text-gray-500">→</div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-blue-400">{(100 - totalExpense).toFixed(0)}%</div>
+            <div className="text-sm text-gray-400">Net Revenue</div>
+          </div>
+          <div className="text-2xl text-gray-500">→</div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-green-400">{settings?.creator_tiers?.[0]?.share || 65}%</div>
+            <div className="text-sm text-gray-400">Creator Share</div>
+          </div>
+          <div className="text-2xl text-gray-500">+</div>
+          <div className="flex-1">
+            <div className="text-3xl font-bold text-yellow-400">{platformShare}%</div>
+            <div className="text-sm text-gray-400">Platform Share</div>
+          </div>
+        </div>
+        <div className="mt-4 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+          <p className="text-sm text-yellow-300">
+            <AlertTriangle className="w-4 h-4 inline mr-2" />
+            <strong>Note:</strong> Free coins and rewards do NOT count towards creator payouts. Only purchased coins generate revenue.
+          </p>
+        </div>
+      </Card>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Expense Settings */}
+        <Card className="p-6 bg-white/5 border-white/10">
+          <h3 className="font-bold mb-4 flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-red-400" />
+            System Expenses
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-gray-400 mb-1 block">Payment Gateway Fees (%)</label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  value={settings?.expenses?.payment_gateway || 0}
+                  onChange={(e) => updateExpense('payment_gateway', e.target.value)}
+                  className="bg-white/5 border-white/20"
+                />
+                <span className="text-gray-400 text-sm w-40">Stripe, M-Pesa, etc.</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm text-gray-400 mb-1 block">CDN & Hosting (%)</label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  value={settings?.expenses?.cdn_hosting || 0}
+                  onChange={(e) => updateExpense('cdn_hosting', e.target.value)}
+                  className="bg-white/5 border-white/20"
+                />
+                <span className="text-gray-400 text-sm w-40">Video streaming costs</span>
+              </div>
+            </div>
+            <div>
+              <label className="text-sm text-gray-400 mb-1 block">Content Moderation (%)</label>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  max="20"
+                  value={settings?.expenses?.content_moderation || 0}
+                  onChange={(e) => updateExpense('content_moderation', e.target.value)}
+                  className="bg-white/5 border-white/20"
+                />
+                <span className="text-gray-400 text-sm w-40">Review & compliance</span>
+              </div>
+            </div>
+            <div className="pt-4 border-t border-white/10">
+              <div className="flex justify-between items-center">
+                <span className="font-bold">Total Expenses</span>
+                <span className={`text-2xl font-bold ${totalExpense > 20 ? 'text-red-400' : 'text-green-400'}`}>
+                  {totalExpense.toFixed(1)}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Creator Tiers */}
+        <Card className="p-6 bg-white/5 border-white/10">
+          <h3 className="font-bold mb-4 flex items-center gap-2">
+            <Crown className="w-5 h-5 text-yellow-400" />
+            Creator Revenue Tiers
+          </h3>
+          <div className="space-y-3">
+            {settings?.creator_tiers?.map((tier, index) => (
+              <div key={index} className="p-3 rounded-lg bg-white/5 border border-white/10">
+                <div className="flex items-center justify-between mb-2">
+                  <Input
+                    value={tier.name}
+                    onChange={(e) => updateTier(index, 'name', e.target.value)}
+                    className="bg-transparent border-none p-0 font-bold text-white w-40"
+                  />
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-400 text-sm">Share:</span>
+                    <Input
+                      type="number"
+                      min="50"
+                      max="90"
+                      value={tier.share}
+                      onChange={(e) => updateTier(index, 'share', e.target.value)}
+                      className="w-20 bg-white/10 border-white/20 text-center"
+                    />
+                    <span className="text-green-400 font-bold">%</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span>Views:</span>
+                  <Input
+                    type="number"
+                    value={tier.min_views}
+                    onChange={(e) => updateTier(index, 'min_views', e.target.value)}
+                    className="w-24 h-6 bg-white/5 border-white/10 text-xs"
+                  />
+                  <span>to</span>
+                  <Input
+                    type="number"
+                    value={tier.max_views || ''}
+                    placeholder="∞"
+                    onChange={(e) => updateTier(index, 'max_views', e.target.value)}
+                    className="w-24 h-6 bg-white/5 border-white/10 text-xs"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Revenue Calculator */}
+      <Card className="p-6 bg-white/5 border-white/10">
+        <h3 className="font-bold mb-4 flex items-center gap-2">
+          <Calculator className="w-5 h-5 text-blue-400" />
+          Revenue Calculator
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Gross Revenue ($)</label>
+            <Input
+              type="number"
+              value={calcGross}
+              onChange={(e) => setCalcGross(parseFloat(e.target.value) || 0)}
+              className="bg-white/5 border-white/20"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Creator's Total Views</label>
+            <Input
+              type="number"
+              value={calcViews}
+              onChange={(e) => setCalcViews(parseInt(e.target.value) || 0)}
+              className="bg-white/5 border-white/20"
+            />
+          </div>
+          <div className="flex items-end">
+            <Button onClick={calculateRevenue} className="w-full bg-blue-600 hover:bg-blue-700">
+              Calculate Split
+            </Button>
+          </div>
+        </div>
+
+        {calcResult && (
+          <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/20">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-white">${calcResult.gross_revenue}</div>
+                <div className="text-xs text-gray-400">Gross Revenue</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-red-400">-${calcResult.expenses.amount}</div>
+                <div className="text-xs text-gray-400">Expenses ({calcResult.expenses.total_percent}%)</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-400">${calcResult.creator.amount}</div>
+                <div className="text-xs text-gray-400">Creator ({calcResult.creator.tier} - {calcResult.creator.share_percent}%)</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-yellow-400">${calcResult.platform.amount}</div>
+                <div className="text-xs text-gray-400">Platform ({calcResult.platform.share_percent}%)</div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Card>
+
+      {/* Pending Payouts */}
+      <Card className="p-6 bg-white/5 border-white/10">
+        <h3 className="font-bold mb-4 flex items-center gap-2">
+          <DollarSign className="w-5 h-5 text-green-400" />
+          Pending Creator Payouts
+        </h3>
+        {pendingPayouts?.pending_payouts?.length > 0 ? (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm text-gray-400 pb-2 border-b border-white/10">
+              <span>Creator</span>
+              <span>Pending Amount</span>
+              <span>Status</span>
+            </div>
+            {pendingPayouts.pending_payouts.map((payout, i) => (
+              <div key={i} className="flex justify-between items-center py-2">
+                <div>
+                  <div className="font-medium">{payout.name}</div>
+                  <div className="text-xs text-gray-400">{payout.email}</div>
+                </div>
+                <div className="text-green-400 font-bold">${payout.pending_amount}</div>
+                <Badge variant={payout.eligible ? "default" : "outline"}>
+                  {payout.eligible ? "Ready" : `Min $${pendingPayouts.min_threshold}`}
+                </Badge>
+              </div>
+            ))}
+            <div className="pt-4 border-t border-white/10 flex justify-between">
+              <span className="text-gray-400">Total Pending</span>
+              <span className="text-xl font-bold text-green-400">${pendingPayouts.total_pending}</span>
+            </div>
+          </div>
+        ) : (
+          <p className="text-gray-400 text-center py-4">No pending payouts</p>
+        )}
+      </Card>
+
+      {/* Payout Settings */}
+      <Card className="p-6 bg-white/5 border-white/10">
+        <h3 className="font-bold mb-4">Payout Configuration</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Minimum Payout Threshold ($)</label>
+            <Input
+              type="number"
+              value={settings?.min_payout_threshold || 10}
+              onChange={(e) => setSettings({ ...settings, min_payout_threshold: parseFloat(e.target.value) || 0 })}
+              className="bg-white/5 border-white/20"
+            />
+          </div>
+          <div>
+            <label className="text-sm text-gray-400 mb-1 block">Payout Cycle (Days)</label>
+            <Input
+              type="number"
+              value={settings?.payout_cycle_days || 7}
+              onChange={(e) => setSettings({ ...settings, payout_cycle_days: parseInt(e.target.value) || 7 })}
+              className="bg-white/5 border-white/20"
+            />
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 // Infrastructure Calculator Tab Component - 99% Uptime Affordable Approach
 const InfrastructureCalculatorTab = ({ token }) => {
   const [totalUsers, setTotalUsers] = useState(10000);
