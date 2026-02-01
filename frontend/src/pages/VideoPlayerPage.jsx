@@ -713,13 +713,18 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
         {/* Control buttons */}
         <div className="flex items-center justify-between px-4 py-3 bg-black/50 backdrop-blur-sm">
-          {/* Upgrade to VIP */}
+          {/* Data Saver Toggle */}
           <button 
-            onClick={() => navigate("/subscriptions")}
-            className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-500 to-yellow-600 text-black px-3 py-1.5 rounded-full text-xs font-bold shadow-lg"
+            onClick={toggleDataSaver}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+              dataSaver 
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                : 'bg-white/10 text-white/70 hover:bg-white/20'
+            }`}
+            data-testid="data-saver-toggle"
           >
-            <Crown className="w-3.5 h-3.5" />
-            Upgrade to VIP &gt;
+            <Wifi className="w-3.5 h-3.5" />
+            Data Saver
           </button>
 
           {/* Playback controls */}
@@ -730,46 +735,186 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             >
               {playbackSpeed}X
             </button>
+            
+            {/* Settings button */}
+            <button 
+              onClick={() => setShowSettingsMenu(!showSettingsMenu)}
+              className="text-white bg-white/20 p-1.5 rounded"
+              data-testid="settings-btn"
+            >
+              <Settings2 className="w-4 h-4" />
+            </button>
+            
             <div className="relative">
               <button 
                 onClick={() => setShowQualityMenu(!showQualityMenu)}
-                className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded"
+                className={`text-white text-xs font-medium px-2.5 py-1 rounded flex items-center gap-1 ${
+                  autoQuality ? 'bg-blue-500/30' : 'bg-white/20'
+                }`}
+                data-testid="quality-selector"
               >
+                {autoQuality && <Zap className="w-3 h-3 text-blue-400" />}
                 {videoQuality}
               </button>
-              {/* Quality menu */}
+              
+              {/* Enhanced Quality menu with bandwidth info */}
               {showQualityMenu && (
-                <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-lg overflow-hidden min-w-[100px]">
+                <div className="absolute bottom-full right-0 mb-2 bg-black/95 backdrop-blur-lg rounded-xl overflow-hidden min-w-[180px] border border-white/10 shadow-xl">
+                  {/* Auto Quality Toggle */}
+                  <button
+                    onClick={() => {
+                      setAutoQuality(!autoQuality);
+                      if (!autoQuality) {
+                        toast.info("Auto quality enabled");
+                      }
+                    }}
+                    className={`w-full px-3 py-2.5 text-left text-xs flex items-center justify-between hover:bg-white/10 border-b border-white/10 ${
+                      autoQuality ? 'bg-blue-500/10' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <Zap className={`w-3.5 h-3.5 ${autoQuality ? 'text-blue-400' : 'text-white/50'}`} />
+                      <span className={autoQuality ? 'text-blue-400' : 'text-white'}>Auto</span>
+                    </div>
+                    {autoQuality && <Check className="w-3.5 h-3.5 text-blue-400" />}
+                  </button>
+                  
+                  {/* Quality Options */}
                   {[
-                    { value: "480p", label: "480p", vip: false },
-                    { value: "720p", label: "720p", vip: false },
-                    { value: "1080p", label: "1080p", vip: true }
-                  ].map((quality) => (
-                    <button
-                      key={quality.value}
-                      onClick={() => {
-                        if (quality.vip) {
-                          navigate("/subscriptions");
-                        } else {
-                          setVideoQuality(quality.value);
-                        }
-                        setShowQualityMenu(false);
-                      }}
-                      className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between hover:bg-white/10 ${
-                        videoQuality === quality.value ? 'text-primary' : 'text-white'
-                      }`}
-                    >
-                      <span>{quality.label}</span>
-                      {quality.vip && (
-                        <span className="bg-yellow-500 text-black text-[8px] font-bold px-1 rounded">VIP</span>
-                      )}
-                    </button>
-                  ))}
+                    { value: "360p", label: "360p", bandwidth: "~0.2 GB/hr", desc: "Data saver", tier: "free" },
+                    { value: "480p", label: "480p", bandwidth: "~0.4 GB/hr", desc: "Standard", tier: "free" },
+                    { value: "720p", label: "HD 720p", bandwidth: "~0.9 GB/hr", desc: "Recommended", tier: "basic" },
+                    { value: "1080p", label: "Full HD", bandwidth: "~1.8 GB/hr", desc: "Best quality", tier: "vip" }
+                  ].map((quality) => {
+                    // Check if user can access this quality
+                    const allowedQualities = streamingConfig?.allowed_qualities || ["360p", "480p"];
+                    const isAllowed = allowedQualities.includes(quality.value);
+                    const isVipOnly = quality.tier === "vip" && !isAllowed;
+                    
+                    return (
+                      <button
+                        key={quality.value}
+                        onClick={() => {
+                          if (isVipOnly) {
+                            navigate("/subscriptions");
+                            setShowQualityMenu(false);
+                          } else if (isAllowed) {
+                            handleQualityChange(quality.value);
+                            setAutoQuality(false);
+                          } else {
+                            toast.error("Upgrade to access this quality");
+                          }
+                        }}
+                        className={`w-full px-3 py-2.5 text-left text-xs hover:bg-white/10 ${
+                          videoQuality === quality.value && !autoQuality ? 'bg-primary/10' : ''
+                        } ${!isAllowed ? 'opacity-50' : ''}`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className={videoQuality === quality.value && !autoQuality ? 'text-primary font-medium' : 'text-white'}>
+                                {quality.label}
+                              </span>
+                              {isVipOnly && (
+                                <span className="bg-yellow-500 text-black text-[8px] font-bold px-1 rounded">VIP</span>
+                              )}
+                            </div>
+                            <span className="text-white/40 text-[10px]">{quality.bandwidth} · {quality.desc}</span>
+                          </div>
+                          {videoQuality === quality.value && !autoQuality && (
+                            <Check className="w-3.5 h-3.5 text-primary" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                  
+                  {/* Bandwidth tip */}
+                  <div className="px-3 py-2 bg-white/5 border-t border-white/10">
+                    <p className="text-[10px] text-white/40">
+                      {networkStatus === "slow" 
+                        ? "⚠️ Slow connection detected. Using lower quality."
+                        : "💡 Lower quality = less data usage"}
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
+        
+        {/* Settings Menu Overlay */}
+        {showSettingsMenu && (
+          <div 
+            className="absolute inset-0 bg-black/80 z-40 flex items-end justify-center"
+            onClick={() => setShowSettingsMenu(false)}
+          >
+            <div 
+              className="bg-gray-900/95 backdrop-blur-lg rounded-t-2xl p-4 w-full max-w-md mb-0 border-t border-white/10"
+              onClick={e => e.stopPropagation()}
+            >
+              <h3 className="text-white font-medium mb-4">Streaming Settings</h3>
+              
+              {/* Auto Quality */}
+              <div className="flex items-center justify-between py-3 border-b border-white/10">
+                <div>
+                  <p className="text-white text-sm">Auto Quality</p>
+                  <p className="text-white/50 text-xs">Adjusts based on your connection</p>
+                </div>
+                <button 
+                  onClick={() => setAutoQuality(!autoQuality)}
+                  className={`w-12 h-6 rounded-full transition-colors ${autoQuality ? 'bg-primary' : 'bg-white/20'}`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${autoQuality ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+              
+              {/* Data Saver */}
+              <div className="flex items-center justify-between py-3 border-b border-white/10">
+                <div>
+                  <p className="text-white text-sm">Data Saver</p>
+                  <p className="text-white/50 text-xs">Always play at lowest quality (360p)</p>
+                </div>
+                <button 
+                  onClick={toggleDataSaver}
+                  className={`w-12 h-6 rounded-full transition-colors ${dataSaver ? 'bg-green-500' : 'bg-white/20'}`}
+                >
+                  <div className={`w-5 h-5 bg-white rounded-full transition-transform ${dataSaver ? 'translate-x-6' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+              
+              {/* Current Quality Info */}
+              <div className="py-3">
+                <p className="text-white/50 text-xs mb-2">Current Settings</p>
+                <div className="bg-white/5 rounded-lg p-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-white/70">Quality</span>
+                    <span className="text-white">{videoQuality}</span>
+                  </div>
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-white/70">Est. Data/hr</span>
+                    <span className="text-white">
+                      {videoQuality === "360p" ? "~0.2 GB" : 
+                       videoQuality === "480p" ? "~0.4 GB" :
+                       videoQuality === "720p" ? "~0.9 GB" : "~1.8 GB"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-white/70">Your Tier</span>
+                    <span className="text-primary capitalize">{streamingConfig?.tier || "free"}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <button 
+                onClick={() => setShowSettingsMenu(false)}
+                className="w-full mt-2 py-3 bg-primary rounded-lg text-white font-medium"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Episodes Sheet */}
