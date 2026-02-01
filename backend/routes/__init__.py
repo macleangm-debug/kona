@@ -18,6 +18,7 @@ from .investment import router as investment_router
 from .infrastructure import router as infrastructure_router
 from .gamification import router as gamification_router
 from .safeguards import router as safeguards_router
+from .revenue import router as revenue_router
 
 # Create main API router
 api_router = APIRouter()
