@@ -212,7 +212,7 @@ const HeroBillboard = ({ series, onPlay, onMoreInfo, inMyList, onAddToList }) =>
   );
 };
 
-// Mobile Hero Carousel (existing Swiper implementation)
+// Mobile Hero Carousel with 3D Coverflow Effect
 const MobileHeroCarousel = ({ series, onCardClick }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
@@ -229,16 +229,16 @@ const MobileHeroCarousel = ({ series, onCardClick }) => {
         slidesPerView="auto"
         loop={series.length > 2}
         autoplay={{
-          delay: 4000,
+          delay: 3500,
           disableOnInteraction: false,
           pauseOnMouseEnter: true
         }}
         coverflowEffect={{
-          rotate: 0,
+          rotate: 25,           // 25 degree rotation for side cards
           stretch: 0,
-          depth: 200,
-          modifier: 1.5,
-          slideShadows: false,
+          depth: 250,           // Increased depth for more 3D effect
+          modifier: 1,
+          slideShadows: true,   // Enable shadows for depth
         }}
         pagination={{
           clickable: true,
@@ -247,12 +247,12 @@ const MobileHeroCarousel = ({ series, onCardClick }) => {
         }}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
         className="hero-swiper"
-        style={{ paddingBottom: '40px' }}
+        style={{ paddingBottom: '40px', perspective: '1200px' }}
       >
         {series.map((heroSeries, index) => (
           <SwiperSlide key={heroSeries.id} className="hero-slide">
             <div 
-              className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl cursor-pointer mx-auto"
+              className="relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl cursor-pointer mx-auto transition-transform duration-300"
               style={{ maxWidth: '280px' }}
               onClick={() => navigate(`/watch/${heroSeries.id}-ep1`)}
             >
