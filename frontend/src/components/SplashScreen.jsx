@@ -30,29 +30,17 @@ export const SplashScreen = ({ onComplete, minDuration = 600 }) => {
 
   return (
     <div 
-      className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-500 ${
-        phase === 'zoom-out' ? 'opacity-0' : 'opacity-100'
+      className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-300 ${
+        phase === 'zoom-out' ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
       data-testid="splash-screen"
     >
-      {/* Background glow effect */}
+      {/* Animated Logo Container - Fast animation */}
       <div 
-        className={`absolute inset-0 transition-opacity duration-1000 ${
-          phase === 'glow' ? 'opacity-100' : 'opacity-0'
-        }`}
-        style={{
-          background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.3) 0%, transparent 50%)'
-        }}
-      />
-
-      {/* Animated Logo Container */}
-      <div 
-        className={`relative transition-all duration-700 ease-out ${
+        className={`relative transition-all duration-300 ease-out ${
           phase === 'zoom-in' 
-            ? 'scale-50 opacity-0' 
-            : phase === 'glow' 
-              ? 'scale-100 opacity-100' 
-              : 'scale-150 opacity-0'
+            ? 'scale-75 opacity-0' 
+            : 'scale-100 opacity-100'
         }`}
       >
         {/* Main Logo SVG with animations */}
