@@ -21,7 +21,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showEpisodes, setShowEpisodes] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [videoQuality, setVideoQuality] = useState("480p");
+  const [videoQuality, setVideoQuality] = useState("480p"); // Default to 480p for Africa market
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -29,6 +29,15 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [signUpPromptType, setSignUpPromptType] = useState(""); // "midway", "end", "next_episode"
   const lastSavedProgress = useRef(0);
   const hasShownMidwayPrompt = useRef(false);
+  
+  // CDN Optimization states
+  const [streamingConfig, setStreamingConfig] = useState(null);
+  const [autoQuality, setAutoQuality] = useState(true);
+  const [dataSaver, setDataSaver] = useState(false);
+  const [showSettingsMenu, setShowSettingsMenu] = useState(false);
+  const [networkStatus, setNetworkStatus] = useState("good"); // "good", "slow", "offline"
+  const [bufferingCount, setBufferingCount] = useState(0);
+  const videoRef = useRef(null);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
