@@ -21,6 +21,8 @@ export const CreatorPortal = () => {
   const [loading, setLoading] = useState(true);
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [showCreateSeries, setShowCreateSeries] = useState(false);
+  const [earnings, setEarnings] = useState(null);
+  const [revenueTiers, setRevenueTiers] = useState(null);
 
   // Application form state
   const [applyForm, setApplyForm] = useState({
