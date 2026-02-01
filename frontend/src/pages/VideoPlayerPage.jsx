@@ -215,7 +215,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         await axios.post(`${API}/streaming/data-saver?enabled=${newValue}`, {}, {
           headers: { Authorization: `Bearer ${token}` }
         });
-      } catch (e) {}
+      } catch (e) {
+        // Silently fail - preference still changes locally
+      }
     }
   };
 
