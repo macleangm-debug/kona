@@ -190,13 +190,13 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
         </div>
 
         {/* Right Side - 3D Carousel */}
-        <div className="w-1/2 h-full flex items-center justify-center pr-8">
+        <div className="w-1/2 h-full flex items-center justify-center pr-12">
           <Swiper
             modules={[EffectCoverflow, Autoplay, Navigation]}
             effect="coverflow"
             grabCursor={true}
             centeredSlides={true}
-            slidesPerView={2.5}
+            slidesPerView={2.2}
             loop={seriesList.length > 3}
             autoplay={{
               delay: 4000,
@@ -204,26 +204,26 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
               pauseOnMouseEnter: true
             }}
             coverflowEffect={{
-              rotate: 45,           // More dramatic 45 degree rotation
-              stretch: 50,          // Slight stretch for depth
-              depth: 350,           // Increased depth for more 3D pop
-              modifier: 1.2,        // Amplify the effect
+              rotate: 25,             // 25 degree rotation (same as mobile)
+              stretch: 80,            // More stretch for card spacing
+              depth: 300,             // Good depth for 3D effect
+              modifier: 1,
               slideShadows: true,
             }}
             navigation={true}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             className="w-full desktop-hero-swiper"
-            style={{ perspective: '1500px' }}
+            style={{ perspective: '1200px' }}
           >
             {seriesList.map((series, index) => (
               <SwiperSlide key={series.id}>
                 <div 
                   className={`relative aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 mx-auto ${
                     index === activeIndex 
-                      ? 'ring-4 ring-primary shadow-[0_0_40px_rgba(139,92,246,0.5)] scale-105' 
-                      : 'opacity-70 scale-90 hover:opacity-90'
+                      ? 'ring-4 ring-primary shadow-[0_0_50px_rgba(139,92,246,0.6)] scale-100' 
+                      : 'opacity-60 scale-95 hover:opacity-80'
                   }`}
-                  style={{ maxWidth: '260px' }}
+                  style={{ maxWidth: '280px' }}
                   onClick={() => navigate(`/series/${series.id}`)}
                 >
                   <img 
