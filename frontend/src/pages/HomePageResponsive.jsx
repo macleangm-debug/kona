@@ -190,13 +190,13 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
         </div>
 
         {/* Right Side - 3D Carousel */}
-        <div className="w-1/2 h-full flex items-center justify-center">
+        <div className="w-1/2 h-full flex items-center justify-center pr-8">
           <Swiper
             modules={[EffectCoverflow, Autoplay, Navigation]}
             effect="coverflow"
             grabCursor={true}
             centeredSlides={true}
-            slidesPerView={3}
+            slidesPerView={2.5}
             loop={seriesList.length > 3}
             autoplay={{
               delay: 4000,
@@ -204,24 +204,26 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
               pauseOnMouseEnter: true
             }}
             coverflowEffect={{
-              rotate: 25,           // 25 degree rotation
-              stretch: 0,
-              depth: 200,
-              modifier: 1,
+              rotate: 45,           // More dramatic 45 degree rotation
+              stretch: 50,          // Slight stretch for depth
+              depth: 350,           // Increased depth for more 3D pop
+              modifier: 1.2,        // Amplify the effect
               slideShadows: true,
             }}
             navigation={true}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full"
-            style={{ perspective: '1200px' }}
+            className="w-full desktop-hero-swiper"
+            style={{ perspective: '1500px' }}
           >
             {seriesList.map((series, index) => (
               <SwiperSlide key={series.id}>
                 <div 
-                  className={`relative aspect-[2/3] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 mx-auto ${
-                    index === activeIndex ? 'ring-4 ring-primary shadow-2xl scale-100' : 'opacity-80 scale-95'
+                  className={`relative aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 mx-auto ${
+                    index === activeIndex 
+                      ? 'ring-4 ring-primary shadow-[0_0_40px_rgba(139,92,246,0.5)] scale-105' 
+                      : 'opacity-70 scale-90 hover:opacity-90'
                   }`}
-                  style={{ maxWidth: '220px' }}
+                  style={{ maxWidth: '260px' }}
                   onClick={() => navigate(`/series/${series.id}`)}
                 >
                   <img 
