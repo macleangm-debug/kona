@@ -382,18 +382,43 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
   const playerContent = (
     <div className="fixed inset-0 bg-black z-[9999]" data-testid="video-player-page">
-      {/* Full-screen vertical video */}
+      {/* Full-screen vertical video with lazy loading */}
       <video
         id="main-video"
+        ref={videoRef}
         src={episode.video_url}
         autoPlay
         playsInline
+        preload="none"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnded}
+        onWaiting={handleWaiting}
         onClick={handleVideoTap}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
       />
+      
+      {/* Network/Quality indicator */}
+      <div className={`absolute top-16 left-3 z-30 flex items-center gap-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+        {networkStatus === "slow" && (
+          <div className="flex items-center gap-1 bg-yellow-500/20 px-2 py-1 rounded-full">
+            <WifiOff className="w-3 h-3 text-yellow-500" />
+            <span className="text-yellow-500 text-[10px]">Slow</span>
+          </div>
+        )}
+        {autoQuality && (
+          <div className="flex items-center gap-1 bg-white/10 px-2 py-1 rounded-full">
+            <Zap className="w-3 h-3 text-blue-400" />
+            <span className="text-blue-400 text-[10px]">Auto</span>
+          </div>
+        )}
+        {dataSaver && (
+          <div className="flex items-center gap-1 bg-green-500/20 px-2 py-1 rounded-full">
+            <Wifi className="w-3 h-3 text-green-500" />
+            <span className="text-green-500 text-[10px]">Data Saver</span>
+          </div>
+        )}
+      </div>
 
       {/* Sign Up Prompt Modal for Guests */}
       {showSignUpPrompt && (
