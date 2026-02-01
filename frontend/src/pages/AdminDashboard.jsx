@@ -1588,6 +1588,11 @@ export const AdminDashboard = () => {
           <LaunchChecklistTab token={token} />
         )}
 
+        {/* Revenue Settings Tab (Super Admin Only) */}
+        {activeTab === "revenue-settings" && user?.is_super_admin && (
+          <RevenueSettingsTab token={token} />
+        )}
+
         {/* Investment Calculator Tab (Super Admin Only) */}
         {activeTab === "investment" && user?.is_super_admin && (
           <InvestmentCalculatorTab token={token} />
