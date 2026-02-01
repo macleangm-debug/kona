@@ -332,6 +332,104 @@ export const CreatorPortal = () => {
           </Card>
         </div>
 
+        {/* Tier Progress Section */}
+        {earnings?.tier && (
+          <Card className="p-4 mb-4 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-yellow-400" />
+                <h3 className="font-bold">Your Creator Tier</h3>
+              </div>
+              <Badge variant="outline" className="border-yellow-500 text-yellow-400">
+                {earnings.tier.current.share}% Revenue Share
+              </Badge>
+            </div>
+            
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex-1">
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-medium">{earnings.tier.current.name}</span>
+                  {earnings.tier.next && (
+                    <span className="text-gray-400">→ {earnings.tier.next.name}</span>
+                  )}
+                </div>
+                {earnings.tier.next && (
+                  <>
+                    <Progress 
+                      value={(earnings.stats.total_views / earnings.tier.next.min_views) * 100} 
+                      className="h-2"
+                    />
+                    <p className="text-xs text-gray-400 mt-1">
+                      {earnings.tier.views_to_next.toLocaleString()} more views to unlock {earnings.tier.next.share}% share
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            {/* All Tiers */}
+            <div className="grid grid-cols-4 gap-2 text-center text-xs">
+              {revenueTiers?.tiers?.map((tier, i) => (
+                <div 
+                  key={i} 
+                  className={`p-2 rounded-lg ${
+                    earnings.tier.current.name === tier.name 
+                      ? 'bg-yellow-500/20 border border-yellow-500' 
+                      : 'bg-white/5'
+                  }`}
+                >
+                  <div className="font-bold text-sm">{tier.share}%</div>
+                  <div className="text-gray-400 truncate">{tier.name}</div>
+                  <div className="text-[10px] text-gray-500">{tier.min_views.toLocaleString()}+ views</div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Revenue Calculator Card */}
+        <Card className="p-4 mb-4 bg-white/5 border-white/10">
+          <div className="flex items-center gap-2 mb-3">
+            <DollarSign className="w-5 h-5 text-green-400" />
+            <h3 className="font-bold">Your Earnings Rate</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-4 text-center">
+            <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+              <div className="text-2xl font-bold text-green-400">
+                ${earnings?.rate_example?.per_100_gross || ((100 - 15) * 0.65).toFixed(0)}
+              </div>
+              <div className="text-xs text-gray-400">You earn per $100 gross</div>
+            </div>
+            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+              <div className="text-2xl font-bold text-red-400">
+                -${earnings?.rate_example?.expense_deduction || 15}
+              </div>
+              <div className="text-xs text-gray-400">System expenses</div>
+            </div>
+          </div>
+          <p className="text-xs text-gray-400 mt-3 text-center">
+            💡 Only purchased coins generate revenue. Free rewards don't count.
+          </p>
+        </Card>
+
+        {/* Creator Showcase Link */}
+        <Card className="p-4 mb-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border-purple-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold mb-1">Share with Other Creators</h3>
+              <p className="text-xs text-gray-400">Download promo materials to invite creators</p>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => window.open('/creator-showcase.html', '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-1" />
+              View
+            </Button>
+          </div>
+        </Card>
+
         {/* My Series */}
         <h3 className="font-heading font-semibold mb-3">My Series ({series.length})</h3>
         {series.length === 0 ? (
