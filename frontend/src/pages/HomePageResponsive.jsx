@@ -629,13 +629,13 @@ export const HomePageResponsive = ({ onAuthClick }) => {
       {/* Desktop spacer for fixed header */}
       {isDesktop && <div className="h-20" />}
 
-      {/* Hero Section */}
+      {/* Hero Section - 3D Rotating Carousel */}
       {isDesktop ? (
-        <HeroBillboard 
-          series={billboardSeries}
-          onPlay={() => navigate(`/watch/${billboardSeries?.id}-ep1`)}
-          onMoreInfo={() => navigate(`/series/${billboardSeries?.id}`)}
-          inMyList={myList.includes(billboardSeries?.id)}
+        <DesktopHeroCarousel 
+          seriesList={heroSeries}
+          onPlay={(series) => navigate(`/watch/${series?.id}-ep1`)}
+          onMoreInfo={(series) => navigate(`/series/${series?.id}`)}
+          myList={myList}
           onAddToList={handleAddToList}
         />
       ) : (
