@@ -157,3 +157,63 @@ code {
 .kona-loader-play {
     animation: kona-pulse 1s ease-in-out infinite;
 }
+
+/* Hero Carousel 3D Styles */
+.hero-swiper .swiper-slide {
+    width: 280px;
+    transition: all 0.3s ease;
+}
+
+.hero-swiper .swiper-slide-active {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.hero-swiper .swiper-slide-prev,
+.hero-swiper .swiper-slide-next {
+    opacity: 0.7;
+}
+
+/* Swiper pagination bullets */
+.hero-bullet {
+    width: 8px !important;
+    height: 8px !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    opacity: 1 !important;
+}
+
+.hero-bullet-active {
+    background: #8b5cf6 !important;
+    width: 24px !important;
+    border-radius: 4px !important;
+}
+
+/* Swiper navigation arrows */
+.swiper-button-next,
+.swiper-button-prev {
+    color: white !important;
+    background: rgba(0, 0, 0, 0.5) !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    backdrop-filter: blur(4px);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 18px !important;
+    font-weight: bold;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background: rgba(139, 92, 246, 0.7) !important;
+}
+
+/* Swiper 3D slide shadows */
+.swiper-slide-shadow-left,
+.swiper-slide-shadow-right {
+    background: linear-gradient(to left, rgba(0,0,0,0.5), rgba(0,0,0,0));
+    border-radius: 12px;
+}
+
