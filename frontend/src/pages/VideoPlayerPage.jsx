@@ -455,7 +455,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">Episode Locked</h3>
                 <p className="text-gray-400 text-sm mb-6">
-                  Sign up to continue watching. You'll get 50 FREE coins to unlock episodes!
+                  Sign up to continue watching. You&apos;ll get 50 FREE coins to unlock episodes!
                 </p>
               </div>
             )}
