@@ -1,0 +1,173 @@
+<analysis>**original_problem_statement:** The user wants to build a mini-series app called Kona, where users purchase coins to watch series. The application should be similar to industry standards like Netflix and ReelShort.
+
+**PRODUCT REQUIREMENTS:**
+-   A coin-based economy for unlocking episodes.
+-   Geo-targeted payment gateways (M-Pesa via Flutterwave, Stripe, and a mock KwikPay).
+-   A viral referral system with milestone-based rewards.
+-   A complete UI/UX overhaul to match Netflix, including a grid layout, hero banners, and content categories, with a responsive web view for desktop.
+-   A rotating/swipeable hero banner.
+-   Add to My List and Continue Watching functionality.
+-   A search feature.
+-   An admin panel with analytics for management.
+-   Subscription plans.
+-   The first episode of each series is free.
+-   The application should be an installable PWA with push notifications.
+-   A promotional popup.
+-   An automated system for content creators to partner, upload content, and earn revenue, with local payout options.
+-   Multi-language support (English, Swahili, French).
+-   New navigation tabs: Discover and Rewards.
+-   An Investment Calculator for financial projections.
+-   An Infrastructure Calculator to estimate technical requirements based on user load.
+
+**User's preferred language**: English
+
+**what currently exists?**
+A full-stack, mobile-first, and responsive-desktop mini-series web application named Kona (React/FastAPI/MongoDB). The application features a rich, Netflix-style UI with a 3D rotating hero carousel.
+-   **Backend:** A scalable FastAPI application with JWT authentication, a robust and profit-focused gamification system, a Super Admin role, and a comprehensive revenue distribution model. It includes APIs for an Infrastructure Calculator, creator payouts, and anti-abuse safeguards.
+-   **Frontend:** A React application featuring a comprehensive Admin Dashboard with tabs for Revenue Management, an Investment Calculator, and a functional Infrastructure Calculator. A Creator Portal now includes earnings/tier progress, and a separate Creator Showcase page with a downloadable AI-generated promo video has been created.
+-   **Users:** Two stable test users exist:  for general use and  for accessing the admin panel.
+
+**Last working item**:
+-   **Last item agent was working:** The agent was providing a consultative response to the user's question about how to optimize the application for lower CDN costs, in preparation for a large-scale deployment. The agent detailed several strategies, including video compression, Adaptive Bitrate Streaming (ABR), and specific Bunny.net configurations.
+-   **Status:** NONE (It was a consultative response, not an implementation task. Awaiting user decision.)
+-   **Agent Testing Done:** N/A
+-   **Which testing method agent to use?** N/A
+-   **User Testing Done:** N/A
+
+**All Pending/In progress Issue list**:
+-   There are no known pending bugs or technical issues.
+
+**In progress Task List**:
+-   **Task 1: CDN Cost Optimization**
+    -   **Where to resume:** The user has received a detailed list of CDN cost optimization strategies. The next step is to ask the user which strategies they approve for implementation (e.g., setting a default video quality, implementing Adaptive Bitrate Streaming).
+    -   **What will be achieved with this?** A significant reduction in monthly operational costs, making the business model more viable at scale.
+    -   **Status:** NOT STARTED
+    -   **Should Test frontend/backend/both after fix?** Both
+    -   **Blocked on something:** User decision on which optimization strategy to pursue.
+
+**Upcoming and Future Tasks**
+-   **Upcoming Tasks:**
+    -   (P0) **Implement Real Payment Gateways:** Based on the last conversation, the priority is to integrate Flutterwave to support mobile money payments (M-Pesa, Tigo Pesa) for the Tanzanian market, while keeping Stripe for international card payments.
+    -   (P1) **Create User-Facing Promo Video:** The agent was blocked by the Universal Key budget. This task can be resumed once the user adds a balance to their key.
+-   **Future Tasks:**
+    -   (P2) Add a PDF/CSV export option for the Investment Calculator results.
+    -   (P2) Implement social features like Watch Party invitations via push notifications.
+    -   (P2) Enhance the Creator Portal with fully automated payouts using real APIs.
+    -   (P2) Further gamify the referral leaderboard.
+    -   (P2) Implement full internationalization with Swahili and French translations.
+
+**Completed work in this session**
+-   **Infrastructure Calculator:** Made the calculator fully functional by creating a backend API and connecting the frontend component.
+-   **Code Cleanup:** Removed two redundant page components (, ) and their routes.
+-   **Critical Bug Fixes:**
+    -   Resolved an infinite loading loop caused by the splash screen.
+    -   Drastically improved the splash screen load time from ~2.5s to ~600ms.
+-   **Gamification Overhaul (Profit-Focused):**
+    -   Implemented 5 new gamification features: Watch Streaks, Daily Scratch Card, Episode Trivia, Viewer Level System, and Prediction Games, all with low rewards to incentivize coin purchases.
+-   **Anti-Abuse Safeguards:**
+    -   Reduced the daily login reward from 10 to 3 coins.
+    -   Implemented coin expiry, diminishing returns for non-paying users, a daily free coin cap, and gated premium games behind the user's first purchase.
+-   **Revenue Distribution System:**
+    -   Created a Revenue tab in the Admin Dashboard with editable settings for system expenses and creator revenue share tiers.
+    -   Added a Revenue Calculator and a section for managing creator payouts.
+-   **Creator Portal & Assets:**
+    -   Enhanced the Creator Portal to show earnings and tier progress.
+    -   Created a static Creator Showcase HTML page.
+    -   Generated a downloadable AI promo video for content creators.
+-   **UI/UX Enhancements:**
+    -   Implemented a dynamic, auto-rotating 3D hero carousel on the homepage for both desktop and mobile, with a 25° tilt effect as requested by the user.
+
+**Earlier issues found/mentioned but not fixed**
+-   None.
+
+**Known issue recurrence from previous fork**
+-   None.
+
+**Code Architecture**
+
+
+**Key Technical Concepts**
+-   **Frontend:** React.js, TailwindCSS, Swiper.js (for 3D carousel), Framer Motion, PWA.
+-   **Backend:** FastAPI, Python, MongoDB.
+-   **Architecture:** API-driven, component-based UI, Super Admin role, service-oriented backend routes, profit-driven gamification logic.
+-   **Integrations:** Sora 2 (via ) for AI video generation.
+
+**key DB schema**
+-   **users:** Significantly updated to support the new gamification and safeguard features, likely including fields for , , , , , and .
+
+**changes in tech stack**
+-    was installed and used for AI video generation.
+
+**All files of reference**
+-   **/app/frontend/src/pages/AdminDashboard.jsx**: Heavily modified to add the functional Infrastructure Calculator and the new Revenue Management tab.
+-   **/app/frontend/src/pages/HomePageResponsive.jsx**: Heavily modified to implement the 3D rotating hero carousel.
+-   **/app/frontend/src/pages/RewardsPage.jsx**: Updated to display all new gamification components and anti-abuse warnings.
+-   **/app/backend/routes/infrastructure.py**: New file for the Infrastructure Calculator API.
+-   **/app/backend/routes/gamification.py**: New file for the new gamification feature APIs.
+-   **/app/backend/routes/revenue.py**: New file for the revenue/payout management APIs.
+-   **/app/backend/routes/safeguards.py**: New file for the anti-abuse safeguard APIs.
+-   **/app/frontend/src/components/SplashScreen.jsx**: Modified to significantly reduce load time.
+-   **/app/frontend/public/creator-showcase.html**: New static promotional page for creators.
+-   **/app/frontend/public/kona_promo.mp4**: New AI-generated video for creators.
+
+**Areas that need refactoring**:
+-   None. All previously identified refactoring tasks were completed.
+
+**key api endpoints**
+-   : Calculates infrastructure recommendations.
+-   : Performs a daily scratch card action.
+-   : Gets trivia for an episode.
+-   : Makes a prediction.
+-   : Updates revenue distribution settings.
+-   : Gets a user's economic status (e.g., freeloader warnings).
+
+**Critical Info for New Agent**
+-   The application is functionally rich but still relies on mocked integrations for core services like payments (Stripe, Flutterwave) and video hosting (Bunny.net). The user's questions about deployment costs and payment methods indicate a shift towards production readiness.
+-   The immediate priority is to get the user's decision on **CDN cost optimization strategies**. The agent has already provided a detailed plan.
+-   The second priority is **Payment Gateway Integration**. The agent has advised that Flutterwave is essential for the target Tanzanian market due to the prevalence of mobile money.
+-   The **Emergent Universal Key budget has been exceeded**. This blocks any further use of AI generation tools (like Sora 2) until the user adds more balance.
+
+**documents and test reports created in this job**
+-   /app/test_reports/iteration_13.json
+-   /app/frontend/public/kona_promo.mp4
+-   /app/frontend/public/creator-showcase.html
+
+**Last 10 User Messages and any pending HUMAN messages**
+1.  **User:** Asked how to optimize for lower CDN costs. (COMPLETED - Agent provided detailed strategies).
+2.  **User:** Asked if people in Tanzania can pay with Stripe. (COMPLETED - Agent explained Stripe's limitations and recommended Flutterwave for mobile money).
+3.  **User:** Asked if the app is ready for deployment to 500k users. (COMPLETED - Agent provided a readiness check, cost estimate, and pre-launch checklist).
+4.  **User:** Asked for another promo video, this time for users. (BLOCKED - Agent attempted but hit the Universal Key budget limit).
+5.  **User:** Asked for a suggested revenue distribution model between Kona and creators. (COMPLETED - Agent provided a detailed model and implemented it as an editable feature in the admin panel).
+6.  **User:** Requested a short downloadable video to show how the app works. (COMPLETED - Agent created a Creator Showcase page and an AI-generated promo video).
+7.  **User:** Noted the splash screen was too long and could lose subscribers. (COMPLETED - Agent drastically reduced the splash screen duration).
+8.  **User:** Requested fixes for the 3D hero banner on both web and mobile. (COMPLETED - Agent implemented the requested 25-degree tilt and auto-rotation).
+9.  **User:** Asked for the rewards (Scratch Card, Watch Streak) location. (COMPLETED - Agent clarified they are on the Rewards page).
+10. **User:** Approved the profit-focused gamification strategy with low rewards. (COMPLETED - Agent implemented the full suite of features).
+
+**Project Health Check:**
+-   **Broken:** None.
+-   **Mocked:** Payment Gateways (Stripe, Flutterwave), Video Hosting (Bunny.net), Push Notifications (Firebase), Email Service, Redis Caching.
+
+**3rd Party Integrations**
+-   **Sora 2 (via ):** Used for video generation. Uses Emergent LLM Key. (Budget is currently exhausted).
+-   **Stripe:** International payments (mocked). Requires User API Key.
+-   **Flutterwave:** African local payments/payouts (mocked). Requires User API Key.
+-   **Bunny.net Stream:** Video hosting (mocked). Requires User API Key.
+-   **Recharts:** Frontend library for charts.
+-   **i18next / react-i18next:** For multi-language support.
+-   **Swiper.js:** For 3D hero carousel.
+
+**Testing status**
+-   **Testing agent used after significant changes:** YES (to verify the new gamification features).
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None.
+-   **Known regressions:** None.
+
+**Credentials to test flow:**
+-   **Email (Demo User):** 
+-   **Password (Demo User):** 
+-   **Email (Super Admin):** 
+-   **Password (Super Admin):** 
+
+**What agent forgot to execute**
+-   The agent was unable to create the second (user-facing) AI promo video because the Universal Key budget was exhausted. The task remains pending user action.</analysis>
