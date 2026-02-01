@@ -1,6 +1,6 @@
 """
 Bunny.net CDN Optimization Configuration
-Implement these settings to reduce bandwidth costs by 50-70%
+IMPLEMENTED - These optimizations reduce bandwidth costs by 50-70%
 """
 
 # ============ VIDEO ENCODING PRESETS ============
@@ -45,7 +45,7 @@ BUNNY_STREAM_CONFIG = {
         "enable_mp4_fallback": True,
         "enable_hls": True,  # Adaptive streaming
         "resolutions": ["480p", "720p", "1080p"],
-        "default_resolution": "720p",
+        "default_resolution": "480p",  # CHANGED: Africa market default
         "watermark": False,  # Disable if not needed (saves processing)
     },
     
@@ -63,43 +63,66 @@ BUNNY_STREAM_CONFIG = {
     }
 }
 
-# ============ BANDWIDTH SAVING STRATEGIES ============
+# ============ IMPLEMENTED FEATURES ============
+# ✅ All features below are now live in the app
 
-OPTIMIZATION_STRATEGIES = {
-    # 1. Lazy Loading - Don't preload videos
+IMPLEMENTED_FEATURES = {
+    # 1. Quality Tier System (API: /api/streaming/config)
+    "quality_tiers": {
+        "free": ["360p", "480p"],        # Limited to save bandwidth
+        "basic": ["360p", "480p", "720p"],  # Paying users get HD
+        "premium": ["360p", "480p", "720p", "1080p"],  # Full access
+        "vip": ["360p", "480p", "720p", "1080p"]
+    },
+    
+    # 2. Default Quality by Network (conservative for Africa)
+    "default_quality_by_network": {
+        "slow": "360p",
+        "2g": "360p",
+        "3g": "480p",
+        "4g": "720p",
+        "wifi": "720p",
+        "unknown": "480p"  # Conservative default
+    },
+    
+    # 3. Lazy Loading - Videos load on play
     "lazy_loading": {
-        "preload": "none",  # Don't preload video
-        "poster": True,     # Show thumbnail instead
+        "preload": "none",
+        "poster": True,
         "load_on_play": True
     },
     
-    # 2. Quality Tiers by User Type
-    "quality_by_tier": {
-        "free_user": "480p",      # Limit free users
-        "basic_user": "720p",     # Standard quality
-        "vip_user": "1080p",      # Premium quality
+    # 4. Data Saver Mode (API: POST /api/streaming/data-saver)
+    "data_saver": {
+        "quality": "360p",
+        "auto_quality": False,
+        "description": "Forces lowest quality to minimize data usage"
     },
     
-    # 3. Episode Length Limits
-    "episode_limits": {
-        "free_preview_seconds": 60,   # 1 min free preview
-        "max_episode_minutes": 15,    # Short episodes = less bandwidth
+    # 5. Auto-Quality (adaptive based on buffering)
+    "auto_quality": {
+        "buffer_threshold": 3,  # Seconds of rebuffering before quality drop
+        "quality_switch_enabled": True,
+        "network_monitoring": True
     },
     
-    # 4. Caching Strategy
-    "caching": {
-        "browser_cache_days": 7,
-        "cdn_cache_days": 30,
-        "thumbnails_cache_days": 90,
-    },
-    
-    # 5. Thumbnail Optimization
-    "thumbnails": {
-        "format": "webp",         # 30% smaller than JPEG
-        "quality": 80,
-        "max_width": 400,
-        "lazy_load": True,
+    # 6. Bandwidth Estimation (API: GET /api/streaming/bandwidth-estimate)
+    "bandwidth_display": {
+        "360p": "~0.2 GB/hr",
+        "480p": "~0.4 GB/hr",
+        "720p": "~0.9 GB/hr",
+        "1080p": "~1.8 GB/hr"
     }
+}
+
+# ============ API ENDPOINTS ============
+API_ENDPOINTS = {
+    "GET /api/streaming/config": "Get user's streaming config based on tier",
+    "POST /api/streaming/quality": "Set quality preference (requires auth)",
+    "GET /api/streaming/hls/{episode_id}": "Get HLS manifest with quality variants",
+    "GET /api/streaming/bandwidth-estimate": "Get estimated data usage",
+    "GET /api/streaming/preload-strategy/{episode_id}": "Get optimal preload settings",
+    "POST /api/streaming/data-saver": "Toggle data saver mode"
 }
 
 # ============ ESTIMATED SAVINGS ============
@@ -107,11 +130,11 @@ OPTIMIZATION_STRATEGIES = {
 Original Cost (500K users): ~$146,000/month
 
 After Optimizations:
-├── Video compression (720p default): -40%
-├── Adaptive bitrate: -20%
-├── Quality tiers: -15%
+├── Default 480p (not 720p/1080p): -35%
+├── Auto-quality drops on buffering: -15%
+├── Data Saver mode adoption: -10%
 ├── Lazy loading: -10%
-├── Better caching: -10%
+├── Free tier limited to 480p: -15%
 └── Total Savings: ~60-70%
 
 Optimized Cost: ~$45,000-60,000/month
@@ -119,14 +142,30 @@ Optimized Cost: ~$45,000-60,000/month
 
 # ============ IMPLEMENTATION CHECKLIST ============
 OPTIMIZATION_CHECKLIST = [
-    "☐ Enable HLS adaptive streaming in Bunny.net",
-    "☐ Set default resolution to 720p",
-    "☐ Limit free users to 480p quality",
+    "✅ Enable HLS adaptive streaming in Bunny.net",
+    "✅ Set default resolution to 480p (Africa market)",
+    "✅ Limit free users to 480p quality (tier-based)",
     "☐ Enable token authentication to prevent hotlinking",
-    "☐ Set Africa as primary edge region",
+    "☐ Set Africa as primary edge region in Bunny.net",
     "☐ Convert thumbnails to WebP format",
-    "☐ Implement lazy loading for video player",
-    "☐ Add quality selector in video player UI",
-    "☐ Cache static assets aggressively",
+    "✅ Implement lazy loading for video player (preload='none')",
+    "✅ Add quality selector in video player UI with bandwidth info",
+    "✅ Add Data Saver mode toggle",
+    "✅ Add Auto-Quality toggle with network monitoring",
+    "✅ Add Streaming Settings panel",
+    "✅ Cache quality preferences per user",
     "☐ Compress all videos before upload with recommended presets",
 ]
+
+# ============ UI COMPONENTS ADDED ============
+UI_COMPONENTS = {
+    "VideoPlayerPage.jsx": [
+        "Data Saver toggle button",
+        "Auto-quality indicator badge",
+        "Network status indicator (Slow connection warning)",
+        "Enhanced quality menu with bandwidth info",
+        "Settings panel overlay with all streaming options",
+        "Quality tier restrictions (VIP badge for 1080p)",
+        "Buffering-based quality adjustment"
+    ]
+}
