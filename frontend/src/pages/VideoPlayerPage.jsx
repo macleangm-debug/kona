@@ -107,6 +107,118 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     fetchData();
   }, [id, token]);
 
+  // Fetch streaming configuration for CDN optimization
+  useEffect(() => {
+    const fetchStreamingConfig = async () => {
+      try {
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`${API}/streaming/config`, { headers });
+        setStreamingConfig(res.data);
+        
+        // Set quality from user preference or default
+        if (res.data.current_quality) {
+          setVideoQuality(res.data.current_quality);
+        }
+        setAutoQuality(res.data.auto_quality ?? true);
+      } catch (e) {
+        console.log("Using default streaming config");
+      }
+    };
+    fetchStreamingConfig();
+  }, [token]);
+
+  // Network status monitoring for adaptive quality
+  useEffect(() => {
+    const checkNetwork = () => {
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (connection) {
+        const effectiveType = connection.effectiveType;
+        if (effectiveType === "slow-2g" || effectiveType === "2g") {
+          setNetworkStatus("slow");
+          if (autoQuality && videoQuality !== "360p") {
+            setVideoQuality("360p");
+            toast.info("Switched to 360p for slow connection");
+          }
+        } else if (effectiveType === "3g") {
+          setNetworkStatus("slow");
+          if (autoQuality && videoQuality === "720p" || videoQuality === "1080p") {
+            setVideoQuality("480p");
+            toast.info("Switched to 480p for 3G connection");
+          }
+        } else {
+          setNetworkStatus("good");
+        }
+      }
+    };
+    
+    checkNetwork();
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (connection) {
+      connection.addEventListener("change", checkNetwork);
+      return () => connection.removeEventListener("change", checkNetwork);
+    }
+  }, [autoQuality, videoQuality]);
+
+  // Handle buffering events for adaptive quality
+  const handleWaiting = useCallback(() => {
+    setBufferingCount(prev => {
+      const newCount = prev + 1;
+      // If buffering frequently and auto-quality enabled, lower quality
+      if (newCount >= 3 && autoQuality) {
+        const qualities = ["360p", "480p", "720p", "1080p"];
+        const currentIdx = qualities.indexOf(videoQuality);
+        if (currentIdx > 0) {
+          const newQuality = qualities[currentIdx - 1];
+          setVideoQuality(newQuality);
+          toast.info(`Switched to ${newQuality} due to slow connection`);
+          return 0; // Reset count
+        }
+      }
+      return newCount;
+    });
+  }, [autoQuality, videoQuality]);
+
+  // Save quality preference when changed
+  const handleQualityChange = async (quality) => {
+    setVideoQuality(quality);
+    setShowQualityMenu(false);
+    
+    if (token) {
+      try {
+        await axios.post(`${API}/streaming/quality`, 
+          { quality, auto_quality: autoQuality },
+          { headers: { Authorization: `Bearer ${token}` }}
+        );
+      } catch (e) {
+        // Silently fail - quality still changes locally
+      }
+    }
+  };
+
+  // Toggle data saver mode
+  const toggleDataSaver = async () => {
+    const newValue = !dataSaver;
+    setDataSaver(newValue);
+    
+    if (newValue) {
+      setVideoQuality("360p");
+      setAutoQuality(false);
+      toast.success("Data Saver ON - Playing at 360p");
+    } else {
+      setVideoQuality("480p");
+      setAutoQuality(true);
+      toast.info("Data Saver OFF");
+    }
+    
+    if (token) {
+      try {
+        await axios.post(`${API}/streaming/data-saver?enabled=${newValue}`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+      } catch (e) {}
+    }
+  };
+
   const handleTimeUpdate = (e) => {
     const video = e.target;
     setCurrentTime(video.currentTime);
