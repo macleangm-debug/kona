@@ -382,12 +382,25 @@ const HeroBillboard = ({ series, onPlay, onMoreInfo, inMyList, onAddToList }) =>
 const MobileHeroCarousel = ({ series, onCardClick }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
+  const swiperRef = React.useRef(null);
+
+  // Force autoplay to start/restart when component mounts or series changes
+  useEffect(() => {
+    if (swiperRef.current && swiperRef.current.swiper) {
+      const swiper = swiperRef.current.swiper;
+      if (swiper.autoplay) {
+        swiper.autoplay.start();
+      }
+    }
+  }, [series]);
 
   if (!series || series.length === 0) return null;
 
   return (
     <div className="mb-6 relative" data-testid="hero-carousel">
       <Swiper
+        ref={swiperRef}
+        key={`hero-swiper-${series.length}`}
         modules={[EffectCoverflow, Autoplay, Pagination]}
         effect="coverflow"
         grabCursor={true}
@@ -412,6 +425,12 @@ const MobileHeroCarousel = ({ series, onCardClick }) => {
           bulletActiveClass: 'swiper-pagination-bullet-active hero-bullet-active',
         }}
         onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+        onSwiper={(swiper) => {
+          // Ensure autoplay starts
+          if (swiper.autoplay) {
+            swiper.autoplay.start();
+          }
+        }}
         className="hero-swiper"
         style={{ paddingBottom: '40px', perspective: '1200px' }}
       >
