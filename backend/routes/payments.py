@@ -146,7 +146,7 @@ async def create_checkout(data: CheckoutRequest, user: dict = Depends(get_curren
                     "quantity": 1,
                 }],
                 mode="payment",
-                success_url=f"https://kona.app/success?session_id={{CHECKOUT_SESSION_ID}}",
+                success_url="https://kona.app/success?session_id={CHECKOUT_SESSION_ID}",
                 cancel_url="https://kona.app/store",
                 metadata={
                     "user_id": user["id"],
@@ -506,7 +506,7 @@ async def subscribe(data: SubscribeRequest, user: dict = Depends(get_current_use
                 "quantity": 1,
             }],
             mode="subscription",
-            success_url=f"https://kona.app/subscription/success?session_id={{CHECKOUT_SESSION_ID}}",
+            success_url="https://kona.app/subscription/success?session_id={CHECKOUT_SESSION_ID}",
             cancel_url="https://kona.app/subscriptions",
             metadata={
                 "user_id": user["id"],
