@@ -1,8 +1,17 @@
 """
 Payment and store routes
+Supports Stripe (international cards) and Flutterwave (African mobile money)
 """
 import stripe
+import httpx
+import hmac
+import hashlib
+import os
+from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Depends, Request
+from pydantic import BaseModel
+from typing import Optional
+import uuid
 
 from models.schemas import CheckoutRequest, SubscribeRequest
 from services import db, get_current_user, detect_country_from_ip, get_payment_config, convert_price
@@ -12,6 +21,24 @@ router = APIRouter(tags=["Payments"])
 
 # Initialize Stripe
 stripe.api_key = STRIPE_API_KEY
+
+# Flutterwave configuration
+FLUTTERWAVE_SECRET_KEY = os.environ.get("FLUTTERWAVE_SECRET_KEY", "")
+FLUTTERWAVE_PUBLIC_KEY = os.environ.get("FLUTTERWAVE_PUBLIC_KEY", "")
+FLUTTERWAVE_BASE_URL = "https://api.flutterwave.com/v3"
+
+
+class FlutterwaveCheckoutRequest(BaseModel):
+    package_id: str
+    payment_method: str  # mpesa, card, etc.
+    phone_number: str
+    email: str
+    country_code: str = "TZ"
+
+
+class FlutterwaveWebhookPayload(BaseModel):
+    event: str
+    data: dict
 
 @router.get("/geo/detect")
 async def detect_geo(request: Request):
