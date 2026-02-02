@@ -172,8 +172,11 @@ const AppContent = () => {
         onDismiss={dismissAlert}
       />
 
-      {/* PWA Install Banner - Mobile only */}
+      {/* PWA Install Banner - Mobile only (old) */}
       {!isDesktop && <InstallAppBanner />}
+      
+      {/* PWA Install Prompt - New enhanced version */}
+      <InstallPrompt />
 
       {/* Toast Notifications */}
       <Toaster position="top-center" richColors />
