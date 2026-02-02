@@ -86,6 +86,10 @@ CHARACTER_CARDS = {
 CARD_RARITY_WEIGHTS = {"common": 60, "rare": 30, "epic": 10}
 
 # ============ DAILY REWARDS ============
+# Tiered rewards: Free episodes = 1 coin, Paid episodes = 3 coins
+FREE_EPISODE_REWARD = 1
+PAID_EPISODE_REWARD = 3
+
 @router.post("/rewards/claim")
 async def claim_daily_reward(user: dict = Depends(get_current_user)):
     last_claim = user.get("last_daily_reward")
@@ -101,10 +105,14 @@ async def claim_daily_reward(user: dict = Depends(get_current_user)):
     # Check if user has watched at least 1 episode today
     episodes_watched_today = user.get("episodes_watched_today", 0)
     last_watch_date = user.get("last_watch_date", "")
+    free_episodes_today = user.get("free_episodes_watched_today", 0)
+    paid_episodes_today = user.get("paid_episodes_watched_today", 0)
     
     # Reset counter if last watch was not today
     if last_watch_date != today:
         episodes_watched_today = 0
+        free_episodes_today = 0
+        paid_episodes_today = 0
     
     if episodes_watched_today < 1:
         raise HTTPException(
@@ -112,13 +120,35 @@ async def claim_daily_reward(user: dict = Depends(get_current_user)):
             detail="Watch at least 1 episode today to claim your daily reward!"
         )
     
-    new_coins = user["coins"] + DAILY_REWARD_COINS
+    # Calculate tiered reward: Free episodes = 1 coin, Paid episodes = 3 coins
+    reward_amount = (free_episodes_today * FREE_EPISODE_REWARD) + (paid_episodes_today * PAID_EPISODE_REWARD)
+    # Cap the daily reward at 15 coins to prevent abuse
+    reward_amount = min(reward_amount, 15)
+    
+    new_coins = user["coins"] + reward_amount
     await db.users.update_one(
         {"id": user["id"]},
         {"$set": {"coins": new_coins, "last_daily_reward": now.isoformat()}}
     )
     
-    return {"message": f"Claimed {DAILY_REWARD_COINS} coins!", "coins": new_coins}
+    # Build reward breakdown message
+    breakdown = []
+    if free_episodes_today > 0:
+        breakdown.append(f"{free_episodes_today} free ep{'s' if free_episodes_today > 1 else ''} × {FREE_EPISODE_REWARD} = {free_episodes_today * FREE_EPISODE_REWARD}")
+    if paid_episodes_today > 0:
+        breakdown.append(f"{paid_episodes_today} paid ep{'s' if paid_episodes_today > 1 else ''} × {PAID_EPISODE_REWARD} = {paid_episodes_today * PAID_EPISODE_REWARD}")
+    
+    return {
+        "message": f"Claimed {reward_amount} coins!", 
+        "coins": new_coins,
+        "reward_breakdown": {
+            "free_episodes": free_episodes_today,
+            "paid_episodes": paid_episodes_today,
+            "free_reward": free_episodes_today * FREE_EPISODE_REWARD,
+            "paid_reward": paid_episodes_today * PAID_EPISODE_REWARD,
+            "total": reward_amount
+        }
+    }
 
 @router.get("/rewards/status")
 async def get_reward_status(user: dict = Depends(get_current_user)):
@@ -129,20 +159,35 @@ async def get_reward_status(user: dict = Depends(get_current_user)):
     # Check episode watching requirement
     episodes_watched_today = user.get("episodes_watched_today", 0)
     last_watch_date = user.get("last_watch_date", "")
+    free_episodes_today = user.get("free_episodes_watched_today", 0)
+    paid_episodes_today = user.get("paid_episodes_watched_today", 0)
     
     if last_watch_date != today:
         episodes_watched_today = 0
+        free_episodes_today = 0
+        paid_episodes_today = 0
     
     watch_requirement_met = episodes_watched_today >= 1
+    
+    # Calculate potential reward
+    potential_reward = (free_episodes_today * FREE_EPISODE_REWARD) + (paid_episodes_today * PAID_EPISODE_REWARD)
+    potential_reward = min(potential_reward, 15)  # Cap at 15
     
     if not last_claim:
         return {
             "can_claim": watch_requirement_met, 
             "hours_until_next": 0, 
-            "reward_amount": DAILY_REWARD_COINS,
+            "reward_amount": potential_reward if potential_reward > 0 else FREE_EPISODE_REWARD,
             "watch_requirement_met": watch_requirement_met,
             "episodes_watched_today": episodes_watched_today,
-            "episodes_required": 1
+            "free_episodes_today": free_episodes_today,
+            "paid_episodes_today": paid_episodes_today,
+            "episodes_required": 1,
+            "reward_info": {
+                "free_episode_reward": FREE_EPISODE_REWARD,
+                "paid_episode_reward": PAID_EPISODE_REWARD,
+                "max_daily_reward": 15
+            }
         }
     
     last_claim_dt = datetime.fromisoformat(last_claim.replace('Z', '+00:00'))
@@ -154,10 +199,17 @@ async def get_reward_status(user: dict = Depends(get_current_user)):
     return {
         "can_claim": can_claim, 
         "hours_until_next": hours_until_next, 
-        "reward_amount": DAILY_REWARD_COINS,
+        "reward_amount": potential_reward if potential_reward > 0 else FREE_EPISODE_REWARD,
         "watch_requirement_met": watch_requirement_met,
         "episodes_watched_today": episodes_watched_today,
-        "episodes_required": 1
+        "free_episodes_today": free_episodes_today,
+        "paid_episodes_today": paid_episodes_today,
+        "episodes_required": 1,
+        "reward_info": {
+            "free_episode_reward": FREE_EPISODE_REWARD,
+            "paid_episode_reward": PAID_EPISODE_REWARD,
+            "max_daily_reward": 15
+        }
     }
 
 # ============ SPIN WHEEL ============
