@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { Check, Copy, Share2, Users, ChevronLeft, Loader2, Trophy, Lock, Film, Crown, Coins, Settings, Bell, Globe, Award } from "lucide-react";
+import { Check, Copy, Share2, Users, ChevronLeft, Loader2, Trophy, Lock, Film, Crown, Coins, Settings, Bell, Globe, Award, Download } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationSettings } from "@/components/NotificationSettings";
 import { AchievementBadges } from "@/components/AchievementBadges";
 import { LogoutConfirmModal, ClaimRewardModal } from "@/components/AnimatedModals";
+import { InstallButton } from "@/components/InstallPrompt";
 
 export const ProfilePage = ({ onLogout }) => {
   const { t } = useTranslation();
