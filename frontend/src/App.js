@@ -24,6 +24,7 @@ import {
 } from "@/components";
 import DesktopHeader from "@/components/DesktopHeader";
 import { SplashScreen } from "@/components/SplashScreen";
+import { InstallPrompt } from "@/components/InstallPrompt";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
