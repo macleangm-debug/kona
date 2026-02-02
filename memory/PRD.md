@@ -568,9 +568,48 @@ Savings: 60-70%
 
 ### Files Created
 - `/app/backend/routes/streaming.py` - New streaming API routes
+- `/app/backend/tests/test_streaming.py` - Pytest tests for streaming APIs
+
+### Testing Results
+- ✅ Backend: 17/17 tests passed (100%)
+- ✅ Frontend: All UI components verified working
+- ✅ Test report: `/app/test_reports/iteration_14.json`
 
 ### Remaining Bunny.net Configuration (Manual in Dashboard)
 - ☐ Enable token authentication to prevent hotlinking
 - ☐ Set Africa as primary edge region
 - ☐ Convert thumbnails to WebP format
 - ☐ Compress all videos before upload with FFmpeg presets
+
+---
+
+## Prioritized Backlog
+
+### P0 - Launch Critical
+- **Payment Gateway Integration** - Flutterwave for M-Pesa/mobile money (Tanzania)
+  - Status: NOT STARTED
+  - Blocked: Need Flutterwave API keys from user
+
+### P1 - First Month
+- User-facing promo video
+  - Status: BLOCKED (Universal Key budget exhausted)
+- PDF/CSV export for Investment Calculator
+- Social features (Watch Party invitations)
+
+### P2 - Scale to 10M
+- Automated creator payouts with real APIs
+- Full i18n (Swahili, French translations)
+- Enhanced referral leaderboard gamification
+
+---
+
+## Test Credentials
+- **Demo User:** `demo@kona.com` / `Demo123!`
+- **Super Admin:** `superadmin@kona.com` / `SuperAdmin2025!`
+
+## Mocked Integrations
+- Payment Gateways (Stripe, Flutterwave)
+- Video Hosting (Bunny.net)
+- Push Notifications (Firebase)
+- Email Service
+- Redis Caching
