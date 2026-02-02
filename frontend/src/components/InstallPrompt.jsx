@@ -5,20 +5,19 @@ import { Button } from "@/components/ui/button";
 export const InstallPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
+  
+  // Compute these values directly instead of using state
+  const isIOS = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isStandalone = typeof window !== 'undefined' && (
+    window.matchMedia("(display-mode: standalone)").matches 
+    || window.navigator.standalone 
+    || document.referrer.includes("android-app://")
+  );
 
   useEffect(() => {
-    // Check if already installed (standalone mode)
-    const standalone = window.matchMedia("(display-mode: standalone)").matches 
-      || window.navigator.standalone 
-      || document.referrer.includes("android-app://");
-    setIsStandalone(standalone);
-
-    // Check if iOS
-    const ios = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    setIsIOS(ios);
+    // Don't run on server or if already installed
+    if (typeof window === 'undefined' || isStandalone) return;
 
     // Check if user dismissed the prompt recently (within 7 days)
     const dismissed = localStorage.getItem("pwa-install-dismissed");
@@ -37,25 +36,27 @@ export const InstallPrompt = () => {
       
       // Show prompt after a delay (let user browse first)
       setTimeout(() => {
-        if (!standalone) {
-          setShowPrompt(true);
-        }
+        setShowPrompt(true);
       }, 5000); // Show after 5 seconds
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
     // For iOS, show after delay if not standalone
-    if (ios && !standalone) {
-      setTimeout(() => {
+    if (isIOS) {
+      const timer = setTimeout(() => {
         setShowPrompt(true);
       }, 10000); // Show after 10 seconds for iOS
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
+      };
     }
 
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
     };
-  }, []);
+  }, [isIOS, isStandalone]);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
