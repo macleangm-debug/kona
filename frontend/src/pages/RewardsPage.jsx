@@ -57,13 +57,17 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining 
       setRotation(newRotation);
     });
     
-    // Calculate prize after animation completes (5 seconds)
+    // Calculate prize after animation completes (5.2 seconds for settling)
     setTimeout(() => {
       const normalizedRotation = newRotation % 360;
-      const prizeIndex = Math.floor((360 - normalizedRotation + 22.5) / 45) % 8;
+      // SVG segments start from top (-90°), going clockwise
+      // Segment 0 is at top, segment 1 is 45° clockwise, etc.
+      // When wheel rotates R degrees clockwise, segment that was R degrees counter-clockwise is now at top
+      // Formula: (8 - floor((R + 22.5) / 45)) % 8
+      const prizeIndex = (8 - Math.floor((normalizedRotation + 22.5) / 45) % 8) % 8;
       setIsAnimating(false);
       onSpin(parseInt(prizes[prizeIndex].label));
-    }, 5000);
+    }, 5200);
   };
 
   return (
