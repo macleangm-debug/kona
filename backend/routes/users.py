@@ -250,7 +250,7 @@ async def spin_wheel(user: dict = Depends(get_current_user)):
     
     # Check if user has spins remaining
     if spins_today >= MAX_SPINS_PER_DAY:
-        raise HTTPException(status_code=400, detail=f"No spins remaining today. Come back tomorrow!")
+        raise HTTPException(status_code=400, detail="No spins remaining today. Come back tomorrow!")
     
     # Select prize based on weights (heavily favor lower prizes)
     prize = random.choices(SPIN_PRIZES, weights=SPIN_WEIGHTS, k=1)[0]
