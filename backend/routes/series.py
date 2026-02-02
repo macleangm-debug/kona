@@ -190,16 +190,33 @@ async def save_episode_progress(data: EpisodeProgressRequest, user: dict = Depen
     last_watch_date = user.get("last_watch_date", "")
     episodes_watched_today = user.get("episodes_watched_today", 0)
     watched_episodes_today_list = user.get("watched_episodes_today_list", [])
+    free_episodes_today = user.get("free_episodes_watched_today", 0)
+    paid_episodes_today = user.get("paid_episodes_watched_today", 0)
     
     # Reset if new day
     if last_watch_date != today:
         episodes_watched_today = 0
         watched_episodes_today_list = []
+        free_episodes_today = 0
+        paid_episodes_today = 0
     
     # Count as watched if progress >= 10% and not already counted today
-    if data.progress >= 10 and data.episode_id not in watched_episodes_today_list:
+    episode_is_new_today = data.episode_id not in watched_episodes_today_list
+    if data.progress >= 10 and episode_is_new_today:
         episodes_watched_today += 1
         watched_episodes_today_list.append(data.episode_id)
+        
+        # Check if this is a free or paid episode
+        episode = await db.episodes.find_one({"id": data.episode_id}, {"_id": 0, "is_free": 1, "episode_number": 1})
+        is_free = episode.get("is_free", False) if episode else False
+        # Episode 1 is always free
+        if episode and episode.get("episode_number") == 1:
+            is_free = True
+        
+        if is_free:
+            free_episodes_today += 1
+        else:
+            paid_episodes_today += 1
     
     await db.users.update_one(
         {"id": user["id"]},
@@ -207,7 +224,9 @@ async def save_episode_progress(data: EpisodeProgressRequest, user: dict = Depen
             "watch_progress": watch_progress,
             "last_watch_date": today,
             "episodes_watched_today": episodes_watched_today,
-            "watched_episodes_today_list": watched_episodes_today_list
+            "watched_episodes_today_list": watched_episodes_today_list,
+            "free_episodes_watched_today": free_episodes_today,
+            "paid_episodes_watched_today": paid_episodes_today
         }}
     )
     
@@ -215,5 +234,7 @@ async def save_episode_progress(data: EpisodeProgressRequest, user: dict = Depen
         "message": "Progress saved", 
         "progress": data.progress, 
         "saved": True,
-        "episodes_watched_today": episodes_watched_today
+        "episodes_watched_today": episodes_watched_today,
+        "free_episodes_today": free_episodes_today,
+        "paid_episodes_today": paid_episodes_today
     }
