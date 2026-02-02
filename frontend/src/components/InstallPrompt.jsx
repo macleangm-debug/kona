@@ -216,18 +216,18 @@ export const InstallPrompt = () => {
 export const InstallButton = ({ className = "" }) => {
   const [canInstall, setCanInstall] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
+  
+  // Compute these values directly
+  const isIOS = typeof window !== 'undefined' && /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+  const isStandalone = typeof window !== 'undefined' && (
+    window.matchMedia("(display-mode: standalone)").matches 
+    || window.navigator.standalone
+  );
 
   useEffect(() => {
-    const standalone = window.matchMedia("(display-mode: standalone)").matches 
-      || window.navigator.standalone;
-    setIsStandalone(standalone);
-
-    const ios = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
-    setIsIOS(ios);
-
-    if (ios && !standalone) {
+    if (typeof window === 'undefined') return;
+    
+    if (isIOS && !isStandalone) {
       setCanInstall(true);
     }
 
@@ -242,7 +242,7 @@ export const InstallButton = ({ className = "" }) => {
     return () => {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstall);
     };
-  }, []);
+  }, [isIOS, isStandalone]);
 
   const handleInstall = async () => {
     if (deferredPrompt) {
