@@ -489,6 +489,18 @@ Use my referral code: *${user?.referral_code}*
           {t("profile.settings")}
         </h3>
         
+        {/* Install App */}
+        <div className="flex items-center justify-between py-3 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <Download className="w-5 h-5 text-green-400" />
+            <div>
+              <p className="font-medium text-sm">Install App</p>
+              <p className="text-xs text-muted-foreground">Add Kona to your home screen</p>
+            </div>
+          </div>
+          <InstallButton />
+        </div>
+        
         {/* Language Setting */}
         <div className="flex items-center justify-between py-3 border-b border-white/10">
           <div className="flex items-center gap-3">
