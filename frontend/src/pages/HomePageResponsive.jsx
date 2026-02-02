@@ -382,7 +382,7 @@ const HeroBillboard = ({ series, onPlay, onMoreInfo, inMyList, onAddToList }) =>
 const MobileHeroCarousel = ({ series, onCardClick }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
-  const swiperRef = React.useRef(null);
+  const swiperRef = useRef(null);
 
   // Force autoplay to start/restart when component mounts or series changes
   useEffect(() => {
