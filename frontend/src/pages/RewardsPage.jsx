@@ -89,28 +89,54 @@ const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining 
           boxShadow: 'inset 0 0 20px rgba(0,0,0,0.5)'
         }}
       >
-        {prizes.map((prize, i) => (
-          <div
-            key={i}
-            className="absolute w-full h-full"
-            style={{
-              transform: `rotate(${i * 45}deg)`,
-              clipPath: 'polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%)',
-              backgroundColor: prize.color
-            }}
-          >
-            <span 
-              className="absolute text-white font-bold text-lg"
-              style={{
-                top: '20%',
-                left: '70%',
-                transform: 'rotate(22.5deg)'
-              }}
-            >
-              {prize.label}
-            </span>
-          </div>
-        ))}
+        {/* SVG-based wheel for perfect segment rendering */}
+        <svg viewBox="0 0 200 200" className="w-full h-full">
+          {prizes.map((prize, i) => {
+            const startAngle = i * 45 - 90; // Start from top
+            const endAngle = startAngle + 45;
+            const startRad = (startAngle * Math.PI) / 180;
+            const endRad = (endAngle * Math.PI) / 180;
+            const midRad = ((startAngle + 22.5) * Math.PI) / 180;
+            
+            // Calculate path for pie segment
+            const x1 = 100 + 100 * Math.cos(startRad);
+            const y1 = 100 + 100 * Math.sin(startRad);
+            const x2 = 100 + 100 * Math.cos(endRad);
+            const y2 = 100 + 100 * Math.sin(endRad);
+            
+            // Calculate text position (60% from center)
+            const textX = 100 + 60 * Math.cos(midRad);
+            const textY = 100 + 60 * Math.sin(midRad);
+            
+            return (
+              <g key={i}>
+                <path
+                  d={`M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`}
+                  fill={prize.color}
+                  stroke="#000"
+                  strokeWidth="0.5"
+                />
+                <text
+                  x={textX}
+                  y={textY}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  fill="white"
+                  fontSize="24"
+                  fontWeight="bold"
+                  style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
+                >
+                  {prize.label}
+                </text>
+              </g>
+            );
+          })}
+          {/* Center circle */}
+          <circle cx="100" cy="100" r="20" fill="#1f2937" stroke="#fbbf24" strokeWidth="3" />
+          <text x="100" y="100" textAnchor="middle" dominantBaseline="central" fill="#fbbf24" fontSize="10" fontWeight="bold">
+            SPIN
+          </text>
+        </svg>
       </div>
       
       {/* Center button */}
