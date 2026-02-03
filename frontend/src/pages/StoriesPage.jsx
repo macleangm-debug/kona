@@ -303,7 +303,7 @@ const StoryCard = ({
       </div>
       
       {/* Bottom info */}
-      <div className="absolute bottom-0 left-0 right-20 p-4 bg-gradient-to-t from-black via-black/60 to-transparent">
+      <div className="absolute bottom-0 left-0 right-20 p-4 bg-gradient-to-t from-black via-black/60 to-transparent z-20">
         {/* Series info - clickable to view series */}
         <button 
           onClick={onViewSeries}
@@ -325,15 +325,6 @@ const StoryCard = ({
         <p className="text-white/80 text-sm line-clamp-2">
           {story.episode?.title || story.series?.description}
         </p>
-      </div>
-      
-      {/* Swipe hint (shows briefly) */}
-      <div className="absolute top-1/2 left-4 transform -translate-y-1/2 opacity-30 pointer-events-none">
-        <div className="flex flex-col items-center gap-2 animate-pulse">
-          <ChevronUp className="w-6 h-6 text-white" />
-          <span className="text-white text-xs">Swipe</span>
-          <ChevronDown className="w-6 h-6 text-white" />
-        </div>
       </div>
     </div>
   );
