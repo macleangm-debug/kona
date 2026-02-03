@@ -128,6 +128,7 @@ const AppContent = () => {
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/subscriptions" element={<SubscriptionPage />} />
         <Route path="/category/:category" element={<CategoryPage onAuthClick={() => handleAuthClick()} />} />
+        <Route path="/stories" element={<StoriesPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/creator" element={<CreatorPortal />} />
         <Route path="/creator/login" element={<CreatorLoginPage />} />
         <Route path="/admin" element={<AdminDashboard />} />
