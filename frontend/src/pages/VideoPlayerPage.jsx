@@ -539,7 +539,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         
         // Fetch like status
         try {
-          const likeRes = await axios.get(`${API}/user/episodes/${id}/like-status`, { headers });
+          const likeRes = await axios.get(`${API}/episodes/${id}/like-status`, { headers });
           setIsLiked(likeRes.data.liked);
           setLikesCount(likeRes.data.likes);
         } catch (e) {
@@ -833,7 +833,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     setLikesCount(prev => wasLiked ? Math.max(0, prev - 1) : prev + 1);
     
     try {
-      const endpoint = wasLiked ? '/user/episodes/unlike' : '/user/episodes/like';
+      const endpoint = wasLiked ? '/episodes/unlike' : '/episodes/like';
       const res = await axios.post(`${API}${endpoint}`, 
         { episode_id: id },
         { headers: { Authorization: `Bearer ${token}` }}
