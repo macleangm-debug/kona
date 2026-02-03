@@ -536,6 +536,16 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         // Fetch all episodes for the series
         const allEpsRes = await axios.get(`${API}/series/${epRes.data.series_id}/episodes`);
         setAllEpisodes(allEpsRes.data);
+        
+        // Fetch like status
+        try {
+          const likeRes = await axios.get(`${API}/user/episodes/${id}/like-status`, { headers });
+          setIsLiked(likeRes.data.liked);
+          setLikesCount(likeRes.data.likes);
+        } catch (e) {
+          // Default to 0 likes if fetch fails
+          setLikesCount(epRes.data.likes || 0);
+        }
       } catch (e) {
         console.error("Error loading episode:", e);
       }
