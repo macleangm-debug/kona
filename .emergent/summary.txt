@@ -11,71 +11,74 @@
 -   An admin panel with analytics for management.
 -   Subscription plans.
 -   The first episode of each series is free.
--   The application should be an installable PWA with push notifications.
+-   An installable PWA with push notifications.
 -   A promotional popup.
 -   An automated system for content creators to partner, upload content, and earn revenue, with local payout options.
 -   Multi-language support (English, Swahili, French).
 -   New navigation tabs: Discover and Rewards.
 -   An Investment Calculator for financial projections.
 -   An Infrastructure Calculator to estimate technical requirements based on user load.
+-   Advertising system (pre-roll, mid-roll, post-roll, overlays) with rules based on user subscription tier.
+-   Skip Intro and Swipe Down to Mini-Player video player features.
 
 **User's preferred language**: English
 
 **what currently exists?**
 A full-stack, mobile-first, and responsive-desktop mini-series web application named Kona (React/FastAPI/MongoDB). The application features a rich, Netflix-style UI with a 3D rotating hero carousel.
--   **Backend:** A scalable FastAPI application with JWT authentication, a robust and profit-focused gamification system, a Super Admin role, and a comprehensive revenue distribution model. It includes APIs for an Infrastructure Calculator, creator payouts, and anti-abuse safeguards.
--   **Frontend:** A React application featuring a comprehensive Admin Dashboard with tabs for Revenue Management, an Investment Calculator, and a functional Infrastructure Calculator. A Creator Portal now includes earnings/tier progress, and a separate Creator Showcase page with a downloadable AI-generated promo video has been created.
+-   **Backend:** A scalable FastAPI application with JWT authentication, a robust and profit-focused gamification system, a Super Admin role, and a comprehensive revenue distribution model. It includes APIs for an Infrastructure Calculator, creator payouts, and anti-abuse safeguards. The backend now includes extensive CDN optimization logic, a mocked advertising system, and tiered daily rewards.
+-   **Frontend:** A React application featuring a comprehensive Admin Dashboard with tabs for Revenue Management, an Investment Calculator, and a functional Infrastructure Calculator. The video player has been significantly enhanced with CDN optimization features (quality selector, data saver), a mocked advertising system, a Skip Intro button, and a swipe-down to minimize feature. The app is also an installable PWA with a custom install prompt.
 -   **Users:** Two stable test users exist:  for general use and  for accessing the admin panel.
 
 **Last working item**:
--   **Last item agent was working:** The agent was providing a consultative response to the user's question about how to optimize the application for lower CDN costs, in preparation for a large-scale deployment. The agent detailed several strategies, including video compression, Adaptive Bitrate Streaming (ABR), and specific Bunny.net configurations.
--   **Status:** NONE (It was a consultative response, not an implementation task. Awaiting user decision.)
--   **Agent Testing Done:** N/A
--   **Which testing method agent to use?** N/A
--   **User Testing Done:** N/A
+-   **Last item agent was working:** The user reported that the 3D Hero Banner on the desktop web view has a distracting background image, ruining the aesthetic and making it inconsistent with the clean mobile view. The agent started editing  to remove the background image and align the desktop styles with the mobile version.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** screenshot tool
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
--   There are no known pending bugs or technical issues.
+-   **Issue 1: Fix Desktop Hero Banner (P0)**
+    -   **Description:** The desktop version of the 3D hero carousel has a full-width background image that the user finds distracting and inconsistent with the mobile view. The goal is to make the desktop carousel look exactly like the mobile one.
+    -   **Status:** IN PROGRESS
+-   **Issue 2: Verify Spin Wheel Prize Fix (P1)**
+    -   **Description:** The user reported that the spin wheel awarded the wrong number of points (e.g., landed on 3 but gave 2 points). The agent adjusted the prize calculation formula in .
+    -   **Status:** USER VERIFICATION PENDING
+-   **Issue 3: Verify Video Player Play Button Fix (P2)**
+    -   **Description:** The user reported that the play button was not working. The agent identified this was due to mock ad videos failing to load, which blocked the main video from playing. The agent implemented a fallback to skip ads on failure.
+    -   **Status:** USER VERIFICATION PENDING
 
 **In progress Task List**:
--   **Task 1: CDN Cost Optimization**
-    -   **Where to resume:** The user has received a detailed list of CDN cost optimization strategies. The next step is to ask the user which strategies they approve for implementation (e.g., setting a default video quality, implementing Adaptive Bitrate Streaming).
-    -   **What will be achieved with this?** A significant reduction in monthly operational costs, making the business model more viable at scale.
-    -   **Status:** NOT STARTED
+-   **Task 1: Flutterwave Payment Gateway Integration (P1)**
+    -   **Where to resume:** The agent has the integration playbook and has added the basic routes to . The implementation is blocked pending Flutterwave API keys from the user. The next step is to re-engage the user for the Public Key and Secret Key to activate the integration for M-Pesa payments.
+    -   **What will be achieved with this?** Allows users in the target Tanzanian market to purchase coins using mobile money (M-Pesa), a critical feature for monetization.
+    -   **Status:** BLOCKED
     -   **Should Test frontend/backend/both after fix?** Both
-    -   **Blocked on something:** User decision on which optimization strategy to pursue.
+    -   **Blocked on something:** User to provide Flutterwave API keys.
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   (P0) **Implement Real Payment Gateways:** Based on the last conversation, the priority is to integrate Flutterwave to support mobile money payments (M-Pesa, Tigo Pesa) for the Tanzanian market, while keeping Stripe for international card payments.
-    -   (P1) **Create User-Facing Promo Video:** The agent was blocked by the Universal Key budget. This task can be resumed once the user adds a balance to their key.
+    -   (P0) **Finalize and Test New Video Player Features:** The Skip Intro, Mini-Player, and Advertising features were implemented quickly. They require thorough testing and user verification to ensure they are stable and function as expected, especially the swipe gestures and ad logic.
+    -   (P1) **Create User-Facing Promo Video:** This task was blocked by the Universal Key budget. It can be resumed once the user adds a balance to their key.
 -   **Future Tasks:**
-    -   (P2) Add a PDF/CSV export option for the Investment Calculator results.
-    -   (P2) Implement social features like Watch Party invitations via push notifications.
-    -   (P2) Enhance the Creator Portal with fully automated payouts using real APIs.
-    -   (P2) Further gamify the referral leaderboard.
-    -   (P2) Implement full internationalization with Swahili and French translations.
+    -   Add PDF/CSV export option for the Investment Calculator results.
+    -   Implement social features like Watch Party invitations via push notifications.
+    -   Enhance the Creator Portal with fully automated payouts using real APIs (currently mocked).
+    -   Further gamify the referral leaderboard.
+    -   Implement full internationalization with Swahili and French translations.
 
 **Completed work in this session**
--   **Infrastructure Calculator:** Made the calculator fully functional by creating a backend API and connecting the frontend component.
--   **Code Cleanup:** Removed two redundant page components (, ) and their routes.
--   **Critical Bug Fixes:**
-    -   Resolved an infinite loading loop caused by the splash screen.
-    -   Drastically improved the splash screen load time from ~2.5s to ~600ms.
--   **Gamification Overhaul (Profit-Focused):**
-    -   Implemented 5 new gamification features: Watch Streaks, Daily Scratch Card, Episode Trivia, Viewer Level System, and Prediction Games, all with low rewards to incentivize coin purchases.
--   **Anti-Abuse Safeguards:**
-    -   Reduced the daily login reward from 10 to 3 coins.
-    -   Implemented coin expiry, diminishing returns for non-paying users, a daily free coin cap, and gated premium games behind the user's first purchase.
--   **Revenue Distribution System:**
-    -   Created a Revenue tab in the Admin Dashboard with editable settings for system expenses and creator revenue share tiers.
-    -   Added a Revenue Calculator and a section for managing creator payouts.
--   **Creator Portal & Assets:**
-    -   Enhanced the Creator Portal to show earnings and tier progress.
-    -   Created a static Creator Showcase HTML page.
-    -   Generated a downloadable AI promo video for content creators.
--   **UI/UX Enhancements:**
-    -   Implemented a dynamic, auto-rotating 3D hero carousel on the homepage for both desktop and mobile, with a 25° tilt effect as requested by the user.
+-   **CDN Cost Optimization:** Implemented ABR, a data-saver mode, a quality selector with bandwidth info, and tier-based quality restrictions in the video player. Created a new backend endpoint () to support this. Verified with .
+-   **PWA Install Prompt:** Added a custom Install App banner and a button in the profile settings to encourage users to install the PWA on their home screens, with specific instructions for iOS.
+-   **Tiered Daily Rewards:** Modified the daily reward system. Users now get 1 coin for watching a free episode and 3 coins for watching a paid episode, incentivizing coin spending.
+-   **Video Player Feature Suite:**
+    -   **Swipe-Down Mini-Player:** Implemented logic to shrink the video player to a floating mini-player when the user swipes down or clicks a minimize icon.
+    -   **Skip Intro:** Added a Skip Intro button that appears during the first 30 seconds of an episode.
+    -   **Creator-Defined Intro:** Implemented a feature allowing creators to set a custom intro duration for each episode via the Creator Portal. Updated backend models and created a  endpoint.
+    -   **Mocked Advertising System:** Built a complete ad system (pre-roll, mid-roll, post-roll, overlay) with logic based on user subscription tiers (Free users see all ads, Premium is ad-free).
+-   **Bug Fixes:**
+    -   **Hero Banner Autoplay:** Fixed an issue where the 3D hero carousel was static after a user logged in.
+    -   **Spin Wheel UI:** Corrected the alignment of numbers on the spin wheel using an SVG-based approach.
+    -   **Video Player Play Button:** Fixed a bug where the video wouldn't play if the mocked pre-roll ad failed to load.
 
 **Earlier issues found/mentioned but not fixed**
 -   None.
@@ -87,78 +90,80 @@ A full-stack, mobile-first, and responsive-desktop mini-series web application n
 
 
 **Key Technical Concepts**
--   **Frontend:** React.js, TailwindCSS, Swiper.js (for 3D carousel), Framer Motion, PWA.
--   **Backend:** FastAPI, Python, MongoDB.
--   **Architecture:** API-driven, component-based UI, Super Admin role, service-oriented backend routes, profit-driven gamification logic.
--   **Integrations:** Sora 2 (via ) for AI video generation.
+-   **Frontend:** React.js, TailwindCSS, Framer Motion, PWA (Progressive Web App), Service Workers, React-use-gesture (for swipe controls).
+-   **Backend:** FastAPI, Python, MongoDB, In-memory caching (as Redis was unavailable).
+-   **Video Streaming:** CDN cost optimization, Adaptive Bitrate Streaming (ABR) concepts, HLS, dynamic quality selection.
+-   **Monetization:** Tiered advertising logic (pre/mid/post-roll), tiered daily rewards.
 
 **key DB schema**
--   **users:** Significantly updated to support the new gamification and safeguard features, likely including fields for , , , , , and .
+-   **episodes:** Added  (Integer) to store the length of the intro in seconds for each episode.
+-   **users:** Modified to track daily watch activity for tiered rewards, likely with fields like  (Boolean) and  (Boolean).
 
 **changes in tech stack**
--    was installed and used for AI video generation.
+-   No new technologies were added, but  was implemented for the swipe-to-minimize feature.
 
 **All files of reference**
--   **/app/frontend/src/pages/AdminDashboard.jsx**: Heavily modified to add the functional Infrastructure Calculator and the new Revenue Management tab.
--   **/app/frontend/src/pages/HomePageResponsive.jsx**: Heavily modified to implement the 3D rotating hero carousel.
--   **/app/frontend/src/pages/RewardsPage.jsx**: Updated to display all new gamification components and anti-abuse warnings.
--   **/app/backend/routes/infrastructure.py**: New file for the Infrastructure Calculator API.
--   **/app/backend/routes/gamification.py**: New file for the new gamification feature APIs.
--   **/app/backend/routes/revenue.py**: New file for the revenue/payout management APIs.
--   **/app/backend/routes/safeguards.py**: New file for the anti-abuse safeguard APIs.
--   **/app/frontend/src/components/SplashScreen.jsx**: Modified to significantly reduce load time.
--   **/app/frontend/public/creator-showcase.html**: New static promotional page for creators.
--   **/app/frontend/public/kona_promo.mp4**: New AI-generated video for creators.
+-   **/app/frontend/src/pages/VideoPlayerPage.jsx**: Massively rewritten to include CDN optimizations, swipe-to-minimize, skip intro, and the ad system.
+-   **/app/frontend/src/pages/HomePageResponsive.jsx**: Modified to fix a carousel autoplay bug and is currently being edited to fix the desktop hero banner's background.
+-   **/app/frontend/src/pages/CreatorPortal.jsx**: Modified to add a dialog for editing an episode's intro duration.
+-   **/app/backend/routes/streaming.py**: New file to handle CDN configuration and bandwidth estimation APIs.
+-   **/app/backend/routes/creator.py**: Modified to add an endpoint for updating episode details like .
+-   **/app/backend/routes/users.py**: Modified to implement the tiered daily reward logic.
+-   **/app/backend/routes/series.py**: Modified to track if a watched episode was free or paid.
+-   **/app/backend/server.py**: The  function was updated to include a default  for all new episodes.
+-   **/app/frontend/src/components/InstallPrompt.jsx**: New component for the PWA install banner.
+-   **/app/frontend/src/App.js**: Modified to include the  logic.
 
 **Areas that need refactoring**:
--   None. All previously identified refactoring tasks were completed.
+-   **VideoPlayerPage.jsx**: This file now exceeds 1,200 lines and contains complex logic for the player UI, state management, ad playback, gestures, and CDN settings. It should be broken down into smaller, manageable components (e.g., , , , , ).
 
 **key api endpoints**
--   : Calculates infrastructure recommendations.
--   : Performs a daily scratch card action.
--   : Gets trivia for an episode.
--   : Makes a prediction.
--   : Updates revenue distribution settings.
--   : Gets a user's economic status (e.g., freeloader warnings).
+-   : Gets user-tier-specific streaming quality settings.
+-   : (New, Mocked) Creates a Flutterwave payment session.
+-   : (New, Mocked) Handles payment confirmation from Flutterwave.
+-   : (New) Updates episode metadata, such as .
+-   : Endpoint for claiming daily rewards, now with tiered logic.
+-   : Updated to track if the watched episode was free or paid.
 
 **Critical Info for New Agent**
--   The application is functionally rich but still relies on mocked integrations for core services like payments (Stripe, Flutterwave) and video hosting (Bunny.net). The user's questions about deployment costs and payment methods indicate a shift towards production readiness.
--   The immediate priority is to get the user's decision on **CDN cost optimization strategies**. The agent has already provided a detailed plan.
--   The second priority is **Payment Gateway Integration**. The agent has advised that Flutterwave is essential for the target Tanzanian market due to the prevalence of mobile money.
--   The **Emergent Universal Key budget has been exceeded**. This blocks any further use of AI generation tools (like Sora 2) until the user adds more balance.
+-   **Priority 1:** The user's most recent request is to fix the styling of the desktop hero banner. This is the immediate task.
+-   **Database & Caching:** The application uses MongoDB with the database name  (defined in ). Redis is not active, so the backend falls back to an in-memory cache that is cleared upon backend: stopped
+backend: started. Be aware that data might seem persistent due to this cache until the service is restarted.
+-   **User-Driven Pivots:** The user frequently provides new feature requests or bug reports in rapid succession. Be prepared to address the user's immediate feedback before returning to longer-term tasks like the Flutterwave integration.
+-   **Verification Needed:** Several complex features (Spin Wheel fix, Play Button fix, new Video Player features) were implemented quickly and require user verification to be considered DONE.
 
 **documents and test reports created in this job**
--   /app/test_reports/iteration_13.json
--   /app/frontend/public/kona_promo.mp4
--   /app/frontend/public/creator-showcase.html
+-   /app/test_reports/iteration_14.json
+-   /app/memory/PRD.md (updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asked how to optimize for lower CDN costs. (COMPLETED - Agent provided detailed strategies).
-2.  **User:** Asked if people in Tanzania can pay with Stripe. (COMPLETED - Agent explained Stripe's limitations and recommended Flutterwave for mobile money).
-3.  **User:** Asked if the app is ready for deployment to 500k users. (COMPLETED - Agent provided a readiness check, cost estimate, and pre-launch checklist).
-4.  **User:** Asked for another promo video, this time for users. (BLOCKED - Agent attempted but hit the Universal Key budget limit).
-5.  **User:** Asked for a suggested revenue distribution model between Kona and creators. (COMPLETED - Agent provided a detailed model and implemented it as an editable feature in the admin panel).
-6.  **User:** Requested a short downloadable video to show how the app works. (COMPLETED - Agent created a Creator Showcase page and an AI-generated promo video).
-7.  **User:** Noted the splash screen was too long and could lose subscribers. (COMPLETED - Agent drastically reduced the splash screen duration).
-8.  **User:** Requested fixes for the 3D hero banner on both web and mobile. (COMPLETED - Agent implemented the requested 25-degree tilt and auto-rotation).
-9.  **User:** Asked for the rewards (Scratch Card, Watch Streak) location. (COMPLETED - Agent clarified they are on the Rewards page).
-10. **User:** Approved the profit-focused gamification strategy with low rewards. (COMPLETED - Agent implemented the full suite of features).
+1.  **User:** Requested to swipe down video player, add skip intro, and integrate advertisers. (IN PROGRESS)
+2.  **User:** Approved the plan for the new video player features. (COMPLETED)
+3.  **User:** Reported nothing happens when pressing the play button on the video player. (COMPLETED - Fix implemented, pending verification).
+4.  **User:** Agreed that creators should be able to set their own intro length. (IN PROGRESS - Feature implemented, pending final testing).
+5.  **User:** Provided Web URL and Login Credentials to test the new features. (COMPLETED)
+6.  **User:** Complained that the 3D Hero Banner on the web view looks bad due to the background image and should match the mobile view. (IN PROGRESS - Agent started the fix).
+7.  **User:** Asked for the web URL and login credentials to test. (COMPLETED)
+8.  **User:** Tested the spin wheel and reported it stopped on '3' but awarded '2' points, asking for a fix. (COMPLETED - Fix implemented, pending verification).
+9.  **User:** Noted the number alignment on the spin wheel was off. (COMPLETED - UI fixed).
+10. **User:** Asked if a free or paid episode watch is required for the daily reward. (COMPLETED - Agent clarified and then implemented a tiered reward system based on user's choice).
 
 **Project Health Check:**
 -   **Broken:** None.
--   **Mocked:** Payment Gateways (Stripe, Flutterwave), Video Hosting (Bunny.net), Push Notifications (Firebase), Email Service, Redis Caching.
+-   **Mocked:** Payment Gateways (Stripe, Flutterwave), Video Hosting/Streaming (Bunny.net), Push Notifications (Firebase), Email Service, Advertising Content.
 
 **3rd Party Integrations**
--   **Sora 2 (via ):** Used for video generation. Uses Emergent LLM Key. (Budget is currently exhausted).
+-   **Sora 2 (via ):** Used for video generation. Uses Emergent LLM Key. (Budget is exhausted).
 -   **Stripe:** International payments (mocked). Requires User API Key.
--   **Flutterwave:** African local payments/payouts (mocked). Requires User API Key.
--   **Bunny.net Stream:** Video hosting (mocked). Requires User API Key.
+-   **Flutterwave:** African local payments/payouts (mocked, implementation in progress). Requires User API Key.
+-   **Bunny.net Stream:** Video hosting (configured with user's keys, but content is mocked).
 -   **Recharts:** Frontend library for charts.
 -   **i18next / react-i18next:** For multi-language support.
 -   **Swiper.js:** For 3D hero carousel.
+-   **react-use-gesture:** For swipe controls on the video player.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (to verify the new gamification features).
+-   **Testing agent used after significant changes:** YES (for CDN Optimization features).
 -   **Troubleshoot agent used after agent stuck in loop:** NO
 -   **Test files created:** None.
 -   **Known regressions:** None.
@@ -170,4 +175,4 @@ A full-stack, mobile-first, and responsive-desktop mini-series web application n
 -   **Password (Super Admin):** 
 
 **What agent forgot to execute**
--   The agent was unable to create the second (user-facing) AI promo video because the Universal Key budget was exhausted. The task remains pending user action.</analysis>
+-   The agent did not perform a full regression test after adding the three major video player features (mini-player, skip intro, ads). The features were implemented, but testing was minimal and interrupted by subsequent bug reports and feature requests from the user. A dedicated testing session for these features is needed.</analysis>
