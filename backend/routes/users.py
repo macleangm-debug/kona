@@ -4,6 +4,7 @@ User-related routes (rewards, lists, progress, unlock)
 import random
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
 
 from models.schemas import MyListRequest, UnlockEpisodeRequest, WatchProgressUpdate
 from services import db, get_current_user, get_optional_user
