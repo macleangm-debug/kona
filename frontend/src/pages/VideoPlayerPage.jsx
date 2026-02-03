@@ -2,13 +2,179 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import { ChevronLeft, Play, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check } from "lucide-react";
+import { ChevronLeft, ChevronDown, Play, Pause, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check, X, SkipForward, Volume2, VolumeX, Maximize2, Minimize2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
+
+// ============ AD CONFIGURATION ============
+const AD_CONFIG = {
+  // Mock ad videos (replace with real ad network later)
+  mockAds: [
+    { id: "ad1", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", duration: 15, advertiser: "TechCorp", skipAfter: 5 },
+    { id: "ad2", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", duration: 15, advertiser: "FoodBrand", skipAfter: 5 },
+    { id: "ad3", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", duration: 10, advertiser: "TravelCo", skipAfter: 5 },
+  ],
+  // Ad placement by user tier
+  adsByTier: {
+    free: { preRoll: true, midRoll: true, postRoll: true, overlay: true },
+    basic: { preRoll: true, midRoll: false, postRoll: false, overlay: false },
+    premium: { preRoll: false, midRoll: false, postRoll: false, overlay: false },
+    vip: { preRoll: false, midRoll: false, postRoll: false, overlay: false }
+  },
+  // Mid-roll ad intervals (percentage of video)
+  midRollPoints: [25, 50, 75], // Show mid-roll at 25%, 50%, 75%
+  overlayDuration: 8, // seconds
+  defaultIntroDuration: 30, // seconds
+};
+
+// ============ AD COMPONENT ============
+const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown }) => {
+  const adVideoRef = useRef(null);
+  const [adProgress, setAdProgress] = useState(0);
+  
+  return (
+    <div className="absolute inset-0 bg-black z-50" data-testid="ad-player">
+      <video
+        ref={adVideoRef}
+        src={ad.url}
+        autoPlay
+        playsInline
+        onTimeUpdate={(e) => setAdProgress((e.target.currentTime / ad.duration) * 100)}
+        onEnded={onAdComplete}
+        className="w-full h-full object-contain"
+      />
+      
+      {/* Ad badge */}
+      <div className="absolute top-4 left-4 flex items-center gap-2">
+        <span className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">AD</span>
+        <span className="text-white/70 text-xs">{ad.advertiser}</span>
+      </div>
+      
+      {/* Skip button */}
+      <div className="absolute bottom-20 right-4">
+        {canSkip ? (
+          <button
+            onClick={onSkip}
+            className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors"
+            data-testid="skip-ad-btn"
+          >
+            Skip Ad <SkipForward className="w-4 h-4" />
+          </button>
+        ) : (
+          <div className="bg-black/50 backdrop-blur-sm text-white/70 px-4 py-2 rounded-lg text-sm">
+            Skip in {skipCountdown}s
+          </div>
+        )}
+      </div>
+      
+      {/* Progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-white/20">
+        <div 
+          className="h-full bg-yellow-500 transition-all duration-300"
+          style={{ width: `${adProgress}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// ============ OVERLAY AD COMPONENT ============
+const OverlayAd = ({ onClose, advertiser = "Sponsor" }) => (
+  <div className="absolute bottom-24 left-4 right-4 bg-gradient-to-r from-gray-900/95 to-gray-800/95 backdrop-blur-sm rounded-lg p-3 border border-white/10 animate-in slide-in-from-bottom duration-300" data-testid="overlay-ad">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-sm">AD</span>
+        </div>
+        <div>
+          <p className="text-white text-sm font-medium">{advertiser}</p>
+          <p className="text-white/50 text-xs">Sponsored</p>
+        </div>
+      </div>
+      <button 
+        onClick={onClose}
+        className="p-1 hover:bg-white/10 rounded-full transition-colors"
+      >
+        <X className="w-4 h-4 text-white/50" />
+      </button>
+    </div>
+  </div>
+);
+
+// ============ SKIP INTRO BUTTON ============
+const SkipIntroButton = ({ onClick, visible }) => {
+  if (!visible) return null;
+  
+  return (
+    <button
+      onClick={onClick}
+      className="absolute bottom-32 right-4 bg-white/20 hover:bg-white/30 backdrop-blur-md text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all hover:scale-105 border border-white/20 animate-in fade-in slide-in-from-right duration-300"
+      data-testid="skip-intro-btn"
+    >
+      Skip Intro <SkipForward className="w-4 h-4" />
+    </button>
+  );
+};
+
+// ============ MINI PLAYER COMPONENT ============
+const MiniPlayer = ({ episode, series, currentTime, duration, isPlaying, onExpand, onClose, onPlayPause, videoRef }) => {
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  
+  return createPortal(
+    <div 
+      className="fixed bottom-20 right-4 left-4 sm:left-auto sm:w-80 bg-gray-900/95 backdrop-blur-lg rounded-xl overflow-hidden shadow-2xl border border-white/10 z-50 animate-in slide-in-from-bottom duration-300"
+      data-testid="mini-player"
+    >
+      <div className="flex">
+        {/* Video thumbnail/preview */}
+        <div className="relative w-32 h-20 flex-shrink-0 bg-black" onClick={onExpand}>
+          <video
+            ref={videoRef}
+            src={episode?.video_url}
+            className="w-full h-full object-cover"
+            muted
+          />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            {isPlaying ? (
+              <Pause className="w-6 h-6 text-white" />
+            ) : (
+              <Play className="w-6 h-6 text-white" />
+            )}
+          </div>
+        </div>
+        
+        {/* Info */}
+        <div className="flex-1 p-2 min-w-0">
+          <p className="text-white text-sm font-medium truncate">{series?.title}</p>
+          <p className="text-white/50 text-xs truncate">E{episode?.episode_number}: {episode?.title}</p>
+          
+          {/* Controls */}
+          <div className="flex items-center gap-2 mt-1">
+            <button onClick={onPlayPause} className="p-1 hover:bg-white/10 rounded">
+              {isPlaying ? <Pause className="w-4 h-4 text-white" /> : <Play className="w-4 h-4 text-white" />}
+            </button>
+            <button onClick={onExpand} className="p-1 hover:bg-white/10 rounded">
+              <Maximize2 className="w-4 h-4 text-white" />
+            </button>
+            <button onClick={onClose} className="p-1 hover:bg-white/10 rounded ml-auto">
+              <X className="w-4 h-4 text-white/50" />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {/* Progress bar */}
+      <div className="h-0.5 bg-white/10">
+        <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+      </div>
+    </div>,
+    document.body
+  );
+};
 
 export const VideoPlayerPage = ({ onAuthClick }) => {
   const { id } = useParams();
@@ -21,12 +187,12 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [showEpisodes, setShowEpisodes] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const [videoQuality, setVideoQuality] = useState("480p"); // Default to 480p for Africa market
+  const [videoQuality, setVideoQuality] = useState("480p");
   const [showControls, setShowControls] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [showSignUpPrompt, setShowSignUpPrompt] = useState(false);
-  const [signUpPromptType, setSignUpPromptType] = useState(""); // "midway", "end", "next_episode"
+  const [signUpPromptType, setSignUpPromptType] = useState("");
   const lastSavedProgress = useRef(0);
   const hasShownMidwayPrompt = useRef(false);
   
@@ -35,9 +201,32 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [autoQuality, setAutoQuality] = useState(true);
   const [dataSaver, setDataSaver] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-  const [networkStatus, setNetworkStatus] = useState("good"); // "good", "slow", "offline"
+  const [networkStatus, setNetworkStatus] = useState("good");
   const [bufferingCount, setBufferingCount] = useState(0);
   const videoRef = useRef(null);
+  
+  // Mini-player states
+  const [isMiniPlayer, setIsMiniPlayer] = useState(false);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [swipeDistance, setSwipeDistance] = useState(0);
+  const miniVideoRef = useRef(null);
+  
+  // Skip Intro states
+  const [showSkipIntro, setShowSkipIntro] = useState(false);
+  const [introDuration, setIntroDuration] = useState(AD_CONFIG.defaultIntroDuration);
+  const [introSkipped, setIntroSkipped] = useState(false);
+  
+  // Ad states
+  const [userTier, setUserTier] = useState("free");
+  const [isPlayingAd, setIsPlayingAd] = useState(false);
+  const [currentAd, setCurrentAd] = useState(null);
+  const [adType, setAdType] = useState(null); // "preRoll", "midRoll", "postRoll"
+  const [canSkipAd, setCanSkipAd] = useState(false);
+  const [skipCountdown, setSkipCountdown] = useState(5);
+  const [showOverlayAd, setShowOverlayAd] = useState(false);
+  const [shownMidRollPoints, setShownMidRollPoints] = useState([]);
+  const [preRollComplete, setPreRollComplete] = useState(false);
+  const adTimerRef = useRef(null);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
