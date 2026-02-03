@@ -348,6 +348,7 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
         "thumbnail": None,
         "is_free": data.is_free,
         "coins_required": 0 if data.is_free else data.coins_required,
+        "intro_duration": data.intro_duration,  # Skip Intro duration in seconds
         "views": 0,
         "earnings": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
