@@ -560,6 +560,102 @@ export const CreatorPortal = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Episode Editor Dialog */}
+      <Dialog open={showEpisodeEditor} onOpenChange={setShowEpisodeEditor}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Edit Episode</DialogTitle>
+            <DialogDescription>
+              Update episode settings including Skip Intro timing
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Episode Title</label>
+              <Input 
+                value={episodeForm.title}
+                onChange={(e) => setEpisodeForm({...episodeForm, title: e.target.value})}
+                placeholder="Episode title"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-muted-foreground flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Intro Duration (seconds)
+              </label>
+              <p className="text-xs text-muted-foreground mb-2">
+                Set when the "Skip Intro" button should skip to
+              </p>
+              <div className="flex items-center gap-3">
+                <Input 
+                  type="number"
+                  min={0}
+                  max={120}
+                  value={episodeForm.intro_duration}
+                  onChange={(e) => setEpisodeForm({...episodeForm, intro_duration: parseInt(e.target.value) || 0})}
+                  className="w-24"
+                />
+                <span className="text-sm text-muted-foreground">seconds</span>
+              </div>
+              <div className="flex gap-2 mt-2">
+                {[10, 15, 30, 45, 60].map(sec => (
+                  <button
+                    key={sec}
+                    onClick={() => setEpisodeForm({...episodeForm, intro_duration: sec})}
+                    className={`px-2 py-1 text-xs rounded-md border transition-colors ${
+                      episodeForm.intro_duration === sec 
+                        ? 'bg-primary text-white border-primary' 
+                        : 'border-white/20 hover:border-primary'
+                    }`}
+                  >
+                    {sec}s
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-white/10">
+              <div>
+                <p className="text-sm font-medium">Free Episode</p>
+                <p className="text-xs text-muted-foreground">No coins required</p>
+              </div>
+              <button
+                onClick={() => setEpisodeForm({...episodeForm, is_free: !episodeForm.is_free})}
+                className={`w-12 h-6 rounded-full transition-colors ${episodeForm.is_free ? 'bg-green-500' : 'bg-white/20'}`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${episodeForm.is_free ? 'translate-x-6' : 'translate-x-0.5'}`} />
+              </button>
+            </div>
+            
+            {!episodeForm.is_free && (
+              <div>
+                <label className="text-sm text-muted-foreground flex items-center gap-2">
+                  <Coins className="w-4 h-4" />
+                  Coins Required
+                </label>
+                <Input 
+                  type="number"
+                  min={1}
+                  max={50}
+                  value={episodeForm.coins_required}
+                  onChange={(e) => setEpisodeForm({...episodeForm, coins_required: parseInt(e.target.value) || 5})}
+                  className="w-24"
+                />
+              </div>
+            )}
+            
+            <Button 
+              onClick={handleUpdateEpisode} 
+              className="w-full"
+              data-testid="save-episode-btn"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
