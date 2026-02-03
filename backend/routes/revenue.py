@@ -15,20 +15,24 @@ from services import db, get_current_user
 router = APIRouter(prefix="/revenue", tags=["Revenue Management"])
 
 # ============ DEFAULT SETTINGS ============
+# Revenue Model: 
+# 1. 30% deducted for expenses FIRST
+# 2. Remaining 70% split between Kona & Creator
+# 3. Creator gets 40-60% of post-expense revenue based on tier
 DEFAULT_SETTINGS = {
     "expenses": {
-        "payment_gateway": 4.0,      # 4%
-        "cdn_hosting": 8.0,          # 8%
-        "content_moderation": 3.0,   # 3%
-        "total": 15.0                # 15% total
+        "payment_gateway": 5.0,       # 5%
+        "cdn_hosting": 12.0,          # 12%
+        "content_moderation": 5.0,    # 5%
+        "operations": 8.0,            # 8%
+        "total": 30.0                 # 30% total expenses
     },
     "creator_tiers": [
-        {"name": "New Creator", "min_views": 0, "max_views": 10000, "share": 65},
-        {"name": "Rising Star", "min_views": 10001, "max_views": 100000, "share": 68},
-        {"name": "Verified Creator", "min_views": 100001, "max_views": 1000000, "share": 70},
-        {"name": "Premium Partner", "min_views": 1000001, "max_views": None, "share": 75}
+        {"name": "New Creator", "min_views": 0, "max_views": 50000, "share": 40},
+        {"name": "Verified Creator", "min_views": 50001, "max_views": 500000, "share": 50},
+        {"name": "Premium Partner", "min_views": 500001, "max_views": None, "share": 60}
     ],
-    "platform_share": 30,  # Default platform share (before tier adjustments)
+    "platform_share": 70,  # Platform keeps 70% of post-expense (at 40% creator tier)
     "free_coins_payout": False,  # Free/reward coins don't count for payouts
     "min_payout_threshold": 10.0,  # Minimum $10 to request payout
     "payout_cycle_days": 7  # Weekly payouts
