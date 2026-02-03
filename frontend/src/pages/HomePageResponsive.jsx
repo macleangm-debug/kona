@@ -298,52 +298,47 @@ const DesktopHeroCarousel = ({ seriesList, allSeries, onPlay, onMoreInfo, myList
           </Swiper>
         </div>
         
-        {/* Active Series Info - Below Carousel */}
-        <div className="text-center mt-6 max-w-2xl mx-auto">
-          <h2 className="font-heading text-3xl lg:text-4xl font-bold mb-3 drop-shadow-lg">
-            {activeSeries?.title}
-          </h2>
-          
-          <div className="flex items-center justify-center gap-4 mb-4 text-sm text-gray-300">
-            <span className="text-green-500 font-semibold">98% Match</span>
-            <span>{activeSeries?.total_episodes} Episodes</span>
-            <span className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              {activeSeries?.rating}
-            </span>
-            <span className="px-2 py-0.5 border border-gray-500 text-xs">HD</span>
-          </div>
-          
-          <p className="text-gray-400 text-sm mb-5 line-clamp-2">
-            {activeSeries?.description || "An incredible story that will keep you on the edge of your seat."}
-          </p>
-          
-          <div className="flex items-center justify-center gap-3">
-            <Button
-              onClick={() => onPlay(activeSeries)}
-              size="lg"
-              className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-11 text-base font-semibold"
+        {/* Right Panel - Top 10 This Week */}
+        <div className="col-span-3 flex flex-col justify-center">
+          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+            <h3 className="font-semibold text-sm text-gray-300 mb-3 flex items-center gap-2">
+              <span className="text-red-500">🔥</span> Top 10 This Week
+            </h3>
+            <div className="space-y-2">
+              {trendingSeries.slice(0, 5).map((s, idx) => (
+                <button
+                  key={s.id}
+                  onClick={() => navigate(`/series/${s.id}`)}
+                  className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors group"
+                >
+                  <span className="text-2xl font-bold text-gray-500 w-6 group-hover:text-white transition-colors">
+                    {idx + 1}
+                  </span>
+                  <img 
+                    src={s.thumbnail} 
+                    alt={s.title}
+                    className="w-12 h-16 object-cover rounded-md"
+                  />
+                  <div className="flex-1 text-left min-w-0">
+                    <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                      {s.title}
+                    </p>
+                    <p className="text-xs text-gray-500">{s.genre}</p>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+              ))}
+            </div>
+            
+            {/* Free Stories Button */}
+            <button
+              onClick={() => navigate('/stories')}
+              className="w-full mt-4 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
+              data-testid="free-stories-btn"
             >
-              <Play className="w-5 h-5 fill-black mr-2" />
-              Play
-            </Button>
-            <Button
-              onClick={() => onMoreInfo(activeSeries)}
-              size="lg"
-              variant="secondary"
-              className="bg-gray-700/70 hover:bg-gray-600/90 text-white rounded-full px-6 h-11"
-            >
-              <Info className="w-5 h-5 mr-2" />
-              More Info
-            </Button>
-            <Button
-              onClick={() => onAddToList(activeSeries?.id)}
-              size="icon"
-              variant="outline"
-              className="rounded-full w-11 h-11 border-gray-500 hover:border-white"
-            >
-              {inMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            </Button>
+              <Play className="w-4 h-4 fill-white" />
+              Watch Free Episodes
+            </button>
           </div>
         </div>
       </div>
