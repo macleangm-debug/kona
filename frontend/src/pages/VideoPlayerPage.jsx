@@ -819,6 +819,40 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     const video = document.getElementById('main-video');
     if (video) video.playbackRate = nextSpeed;
   };
+  
+  // ============ LIKE/UNLIKE HANDLERS ============
+  const handleLikeToggle = async () => {
+    if (!token) {
+      onAuthClick?.();
+      return;
+    }
+    
+    const wasLiked = isLiked;
+    // Optimistic update
+    setIsLiked(!wasLiked);
+    setLikesCount(prev => wasLiked ? Math.max(0, prev - 1) : prev + 1);
+    
+    try {
+      const endpoint = wasLiked ? '/user/episodes/unlike' : '/user/episodes/like';
+      const res = await axios.post(`${API}${endpoint}`, 
+        { episode_id: id },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      setLikesCount(res.data.likes);
+    } catch (e) {
+      // Revert on error
+      setIsLiked(wasLiked);
+      setLikesCount(prev => wasLiked ? prev + 1 : Math.max(0, prev - 1));
+      toast.error(e.response?.data?.detail || "Failed to update like");
+    }
+  };
+  
+  // Format like count for display
+  const formatLikeCount = (count) => {
+    if (count >= 1000000) return (count / 1000000).toFixed(1) + 'M';
+    if (count >= 1000) return (count / 1000).toFixed(1) + 'K';
+    return count.toString();
+  };
 
   if (loading || !episode) {
     return createPortal(
