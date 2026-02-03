@@ -276,6 +276,13 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             return prev - 1;
           });
         }, 1000);
+        
+        // Fallback: Auto-skip ad after 20 seconds if video doesn't load
+        setTimeout(() => {
+          if (!preRollComplete) {
+            handleAdComplete();
+          }
+        }, 20000);
       } else {
         setPreRollComplete(true);
       }
