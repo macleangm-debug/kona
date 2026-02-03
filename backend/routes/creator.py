@@ -302,6 +302,7 @@ async def publish_series_to_main(series_id: str, creator_id: str):
                 "bunny_video_id": ep.get("bunny_video_id"),
                 "is_free": ep.get("is_free", False),
                 "coins_required": ep.get("coins_required", 5),
+                "intro_duration": ep.get("intro_duration", 30),  # Default 30 seconds
                 "creator_id": creator_id
             }
             
