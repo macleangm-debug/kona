@@ -576,10 +576,67 @@ Savings: 60-70%
 - ✅ Test report: `/app/test_reports/iteration_14.json`
 
 ### Remaining Bunny.net Configuration (Manual in Dashboard)
-- ☐ Enable token authentication to prevent hotlinking
+- ✅ Enable token authentication to prevent hotlinking (DONE by user)
 - ☐ Set Africa as primary edge region
 - ☐ Convert thumbnails to WebP format
 - ☐ Compress all videos before upload with FFmpeg presets
+
+---
+
+## Session Update - February 3, 2026 (Video Player Enhancements)
+
+### ✅ Implemented New Video Player Features
+
+#### 1. Mini-Player (Swipe Down like YouTube)
+- **Swipe down gesture** to minimize player to bottom corner
+- **Mini-player widget** with play/pause, expand, and close controls
+- **Progress bar** showing video position
+- **Episode info** (series title, episode number)
+- **Minimize button** in player header
+
+#### 2. Skip Intro (like Netflix)
+- **Skip Intro button** appears 3 seconds into video
+- **Default intro duration**: 30 seconds (configurable per series)
+- Button auto-hides after intro section passes
+- Skips directly to main content
+
+#### 3. Advertisement System (MOCKED)
+- **Pre-roll ads**: Play before episode starts
+- **Mid-roll ads**: Play at 25%, 50%, 75% of video (free users only)
+- **Post-roll ads**: Play after episode ends
+- **Overlay ads**: Banner ads during playback
+
+**Ad Tiers by Subscription:**
+| Tier | Pre-roll | Mid-roll | Post-roll | Overlay |
+|------|----------|----------|-----------|---------|
+| Free | ✅ | ✅ | ✅ | ✅ |
+| Basic | ✅ | ❌ | ❌ | ❌ |
+| Premium | ❌ | ❌ | ❌ | ❌ |
+| VIP | ❌ | ❌ | ❌ | ❌ |
+
+**Ad Features:**
+- Skip button appears after 5 seconds
+- Yellow "AD" badge with advertiser name
+- Progress bar showing ad duration
+- Ad-Free badge for premium/VIP users
+
+### Files Modified
+- `/app/frontend/src/pages/VideoPlayerPage.jsx` - Complete rewrite with:
+  - AdPlayer component
+  - OverlayAd component
+  - SkipIntroButton component
+  - MiniPlayer component
+  - Swipe gesture detection
+  - Ad tier logic
+
+### Mocked Components
+- Ad videos use Google sample videos (placeholder)
+- When real ad network integrated, replace `AD_CONFIG.mockAds`
+
+### Integration Options for Real Ads
+1. **Google AdSense for Video** - Automatic ad placement
+2. **Direct Advertisers** - Sell ad slots to local businesses
+3. **Hybrid** - Mix of both
 
 ---
 
@@ -587,7 +644,7 @@ Savings: 60-70%
 
 ### P0 - Launch Critical
 - **Payment Gateway Integration** - Flutterwave for M-Pesa/mobile money (Tanzania)
-  - Status: NOT STARTED
+  - Status: Backend ready, needs API keys
   - Blocked: Need Flutterwave API keys from user
 
 ### P1 - First Month
