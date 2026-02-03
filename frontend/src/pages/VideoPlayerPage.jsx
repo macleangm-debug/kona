@@ -35,6 +35,24 @@ const AD_CONFIG = {
 const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown }) => {
   const adVideoRef = useRef(null);
   const [adProgress, setAdProgress] = useState(0);
+  const [adError, setAdError] = useState(false);
+  
+  // Auto-complete if ad fails to load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (adProgress === 0) {
+        // Ad didn't start playing, auto-skip
+        onAdComplete();
+      }
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [adProgress, onAdComplete]);
+  
+  if (adError) {
+    // If ad fails, skip it
+    onAdComplete();
+    return null;
+  }
   
   return (
     <div className="absolute inset-0 bg-black z-50" data-testid="ad-player">
@@ -43,8 +61,10 @@ const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown }) => {
         src={ad.url}
         autoPlay
         playsInline
+        muted
         onTimeUpdate={(e) => setAdProgress((e.target.currentTime / ad.duration) * 100)}
         onEnded={onAdComplete}
+        onError={() => setAdError(true)}
         className="w-full h-full object-contain"
       />
       
