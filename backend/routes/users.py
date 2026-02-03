@@ -1109,8 +1109,6 @@ async def track_creator_revenue(episode_id: str, series_id: str, creator_id: str
 class LikeRequest(BaseModel):
     episode_id: str
 
-from pydantic import BaseModel
-
 @router.post("/episodes/like")
 async def like_episode(req: LikeRequest, user: dict = Depends(get_current_user)):
     """Like an episode"""
