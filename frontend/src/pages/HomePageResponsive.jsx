@@ -289,31 +289,6 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
     </div>
   );
 };
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform">
-                        <Play className="w-8 h-8 text-black fill-black ml-1" />
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Bottom info */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
-                    <h3 className="font-bold text-base line-clamp-1 mb-1">{series.title}</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span>{series.genre}</span>
-                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                      <span>{series.rating}</span>
-                    </div>
-                  </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Legacy Desktop Hero Billboard (single series view)
 const HeroBillboard = ({ series, onPlay, onMoreInfo, inMyList, onAddToList }) => {
