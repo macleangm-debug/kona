@@ -255,6 +255,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [shownMidRollPoints, setShownMidRollPoints] = useState([]);
   const [preRollComplete, setPreRollComplete] = useState(false);
   const adTimerRef = useRef(null);
+  
+  // Like states
+  const [isLiked, setIsLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
