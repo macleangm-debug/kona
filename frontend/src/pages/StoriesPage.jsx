@@ -360,7 +360,30 @@ export const StoriesPage = ({ onAuthClick }) => {
     fetchStories();
   }, [token]);
   
-  // Handle swipe
+  // Navigate to next story
+  const goToNext = useCallback(() => {
+    if (currentIndex < stories.length - 1 && !isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex(prev => prev + 1);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
+  }, [currentIndex, stories.length, isTransitioning]);
+  
+  // Navigate to previous story
+  const goToPrevious = useCallback(() => {
+    if (currentIndex > 0 && !isTransitioning) {
+      setIsTransitioning(true);
+      setCurrentIndex(prev => prev - 1);
+      setTimeout(() => setIsTransitioning(false), 300);
+    }
+  }, [currentIndex, isTransitioning]);
+  
+  // Auto-advance when video ends
+  const handleVideoEnd = useCallback(() => {
+    goToNext();
+  }, [goToNext]);
+  
+  // Handle swipe - improved sensitivity
   const handleTouchStart = (e) => {
     if (isTransitioning) return;
     setTouchStartY(e.touches[0].clientY);
@@ -375,18 +398,12 @@ export const StoriesPage = ({ onAuthClick }) => {
   
   const handleTouchEnd = () => {
     if (isTransitioning) return;
-    const threshold = 100;
+    const threshold = 50; // Reduced from 100 for better sensitivity
     
-    if (swipeOffset > threshold && currentIndex < stories.length - 1) {
-      // Swipe up - next story
-      setIsTransitioning(true);
-      setCurrentIndex(prev => prev + 1);
-      setTimeout(() => setIsTransitioning(false), 300);
-    } else if (swipeOffset < -threshold && currentIndex > 0) {
-      // Swipe down - previous story
-      setIsTransitioning(true);
-      setCurrentIndex(prev => prev - 1);
-      setTimeout(() => setIsTransitioning(false), 300);
+    if (swipeOffset > threshold) {
+      goToNext();
+    } else if (swipeOffset < -threshold) {
+      goToPrevious();
     }
     
     setSwipeOffset(0);
@@ -395,10 +412,10 @@ export const StoriesPage = ({ onAuthClick }) => {
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'ArrowUp' && currentIndex < stories.length - 1) {
-        setCurrentIndex(prev => prev + 1);
-      } else if (e.key === 'ArrowDown' && currentIndex > 0) {
-        setCurrentIndex(prev => prev - 1);
+      if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+        goToNext();
+      } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+        goToPrevious();
       } else if (e.key === 'Escape') {
         navigate(-1);
       }
@@ -406,7 +423,7 @@ export const StoriesPage = ({ onAuthClick }) => {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, stories.length, navigate]);
+  }, [goToNext, goToPrevious, navigate]);
   
   // Like handler
   const handleLike = async (storyIndex) => {
