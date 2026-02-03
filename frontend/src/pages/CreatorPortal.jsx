@@ -115,6 +115,40 @@ export const CreatorPortal = () => {
     }
   };
 
+  const openEpisodeEditor = (episode) => {
+    setSelectedEpisode(episode);
+    setEpisodeForm({
+      title: episode.title || "",
+      intro_duration: episode.intro_duration || 30,
+      is_free: episode.is_free || false,
+      coins_required: episode.coins_required || 5
+    });
+    setShowEpisodeEditor(true);
+  };
+
+  const handleUpdateEpisode = async () => {
+    if (!selectedEpisode) return;
+    
+    try {
+      const params = new URLSearchParams();
+      if (episodeForm.title) params.append("title", episodeForm.title);
+      params.append("intro_duration", episodeForm.intro_duration);
+      params.append("is_free", episodeForm.is_free);
+      if (!episodeForm.is_free) params.append("coins_required", episodeForm.coins_required);
+      
+      await axios.patch(`${API}/creator/episodes/${selectedEpisode.id}?${params.toString()}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Episode updated!");
+      setShowEpisodeEditor(false);
+      setSelectedEpisode(null);
+      fetchCreatorData();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to update episode");
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
