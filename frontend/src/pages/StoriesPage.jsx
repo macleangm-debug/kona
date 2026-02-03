@@ -410,7 +410,7 @@ export const StoriesPage = ({ onAuthClick }) => {
     ));
     
     try {
-      const endpoint = isLiked ? '/user/episodes/unlike' : '/user/episodes/like';
+      const endpoint = isLiked ? '/episodes/unlike' : '/episodes/like';
       await axios.post(`${API}${endpoint}`, 
         { episode_id: story.episode.id },
         { headers: { Authorization: `Bearer ${token}` }}
