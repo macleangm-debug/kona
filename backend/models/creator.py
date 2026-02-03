@@ -63,6 +63,16 @@ class CreatorEpisodeCreate(BaseModel):
     description: Optional[str] = None
     is_free: bool = False
     coins_required: int = Field(default=5, ge=0, le=50)
+    intro_duration: int = Field(default=30, ge=0, le=120, description="Intro duration in seconds for Skip Intro feature")
+
+
+class EpisodeUpdate(BaseModel):
+    """Update episode settings"""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    is_free: Optional[bool] = None
+    coins_required: Optional[int] = Field(default=None, ge=0, le=50)
+    intro_duration: Optional[int] = Field(default=None, ge=0, le=120)
 
 class VideoUploadResponse(BaseModel):
     """Response after initiating video upload"""
