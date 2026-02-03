@@ -863,13 +863,20 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         id="main-video"
         ref={videoRef}
         src={episode.video_url}
-        autoPlay={preRollComplete}
+        autoPlay
         playsInline
-        preload="none"
+        preload="metadata"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnded}
         onWaiting={handleWaiting}
         onClick={handleVideoTap}
+        onLoadedData={() => {
+          // Start playing when video is loaded (after pre-roll if any)
+          if (preRollComplete && videoRef.current) {
+            videoRef.current.play().catch(() => {});
+            setIsPlaying(true);
+          }
+        }}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
       />
