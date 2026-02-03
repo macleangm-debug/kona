@@ -747,8 +747,9 @@ export const HomePageResponsive = ({ onAuthClick }) => {
       {isDesktop ? (
         <DesktopHeroCarousel 
           seriesList={heroSeries}
-          onPlay={(series) => navigate(`/watch/${series?.id}-ep1`)}
-          onMoreInfo={(series) => navigate(`/series/${series?.id}`)}
+          allSeries={series}
+          onPlay={(s) => navigate(`/watch/${s?.id}-ep1`)}
+          onMoreInfo={(s) => navigate(`/series/${s?.id}`)}
           myList={myList}
           onAddToList={handleAddToList}
         />
