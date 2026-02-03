@@ -73,7 +73,8 @@ async def seed_data():
                 "duration": f"{1 + (ep_num % 3)}:{str(30 + (ep_num * 7) % 30).zfill(2)}",
                 "video_url": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 "is_free": ep_num == 1,  # First episode is free
-                "coins_required": 0 if ep_num == 1 else 5
+                "coins_required": 0 if ep_num == 1 else 5,
+                "intro_duration": 30  # Default 30 seconds for Skip Intro
             })
     
     await db.episodes.insert_many(episodes)
