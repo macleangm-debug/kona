@@ -30,6 +30,7 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import HomePageResponsive from "@/pages/HomePageResponsive";
 import WatchPartyPage from "@/pages/WatchPartyPage";
 import DownloadsPage from "@/pages/DownloadsPage";
+import StoriesPage from "@/pages/StoriesPage";
 import {
   SeriesDetailPage,
   VideoPlayerPage,
