@@ -36,21 +36,29 @@ const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown }) => {
   const adVideoRef = useRef(null);
   const [adProgress, setAdProgress] = useState(0);
   const [adError, setAdError] = useState(false);
+  const errorHandled = useRef(false);
   
-  // Auto-complete if ad fails to load
+  // Auto-complete if ad fails to load or doesn't play
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (adProgress === 0) {
+      if (adProgress === 0 && !errorHandled.current) {
         // Ad didn't start playing, auto-skip
+        errorHandled.current = true;
         onAdComplete();
       }
     }, 5000);
     return () => clearTimeout(timer);
   }, [adProgress, onAdComplete]);
   
+  // Handle ad error
+  useEffect(() => {
+    if (adError && !errorHandled.current) {
+      errorHandled.current = true;
+      onAdComplete();
+    }
+  }, [adError, onAdComplete]);
+  
   if (adError) {
-    // If ad fails, skip it
-    onAdComplete();
     return null;
   }
   
