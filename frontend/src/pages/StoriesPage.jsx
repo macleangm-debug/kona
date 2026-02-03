@@ -430,7 +430,7 @@ export const StoriesPage = ({ onAuthClick }) => {
   const handleShare = async (platform) => {
     const story = stories[currentIndex];
     try {
-      await axios.post(`${API}/user/episodes/share`, 
+      await axios.post(`${API}/episodes/share`, 
         { episode_id: story.episode.id, platform },
         { headers: token ? { Authorization: `Bearer ${token}` } : {} }
       );
