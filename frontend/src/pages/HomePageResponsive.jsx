@@ -627,7 +627,9 @@ export const HomePageResponsive = ({ onAuthClick }) => {
             setCanClaimReward(true);
             setShowReward(true);
           }
-        } catch (e) {}
+        } catch (e) {
+          // Silent fail for reward check
+        }
       }
     };
     checkReward();
