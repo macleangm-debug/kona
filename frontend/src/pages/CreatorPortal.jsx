@@ -449,18 +449,22 @@ export const CreatorPortal = () => {
             <DollarSign className="w-5 h-5 text-green-400" />
             <h3 className="font-bold">Your Earnings Rate</h3>
           </div>
-          <div className="grid grid-cols-2 gap-4 text-center">
-            <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
-              <div className="text-2xl font-bold text-green-400">
-                ${earnings?.rate_example?.per_100_gross || ((100 - 15) * 0.65).toFixed(0)}
-              </div>
-              <div className="text-xs text-gray-400">You earn per $100 gross</div>
+          <div className="space-y-2 text-sm">
+            <div className="flex justify-between p-2 rounded bg-white/5">
+              <span className="text-gray-400">Gross Revenue</span>
+              <span className="font-semibold">$100.00</span>
             </div>
-            <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
-              <div className="text-2xl font-bold text-red-400">
-                -${earnings?.rate_example?.expense_deduction || 15}
-              </div>
-              <div className="text-xs text-gray-400">System expenses</div>
+            <div className="flex justify-between p-2 rounded bg-red-500/10">
+              <span className="text-red-400">Platform Expenses (30%)</span>
+              <span className="font-semibold text-red-400">-$30.00</span>
+            </div>
+            <div className="flex justify-between p-2 rounded bg-white/5">
+              <span className="text-gray-400">Net Revenue</span>
+              <span className="font-semibold">$70.00</span>
+            </div>
+            <div className="flex justify-between p-2 rounded bg-green-500/10 border border-green-500/30">
+              <span className="text-green-400">Your Share ({(stats?.revenue_share || 0.40) * 100}%)</span>
+              <span className="font-bold text-green-400">${(70 * (stats?.revenue_share || 0.40)).toFixed(2)}</span>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-3 text-center">
