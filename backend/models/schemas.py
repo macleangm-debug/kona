@@ -54,6 +54,7 @@ class EpisodeResponse(BaseModel):
     video_url: str
     is_free: bool = False
     coins_required: int = 5
+    intro_duration: int = 30  # Skip Intro duration in seconds
 
 class UnlockEpisodeRequest(BaseModel):
     episode_id: str
