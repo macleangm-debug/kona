@@ -779,14 +779,64 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     );
   }
 
+  // Show mini-player if minimized
+  if (isMiniPlayer) {
+    return (
+      <MiniPlayer
+        episode={episode}
+        series={series}
+        currentTime={currentTime}
+        duration={duration}
+        isPlaying={isPlaying}
+        onExpand={handleExpandMiniPlayer}
+        onClose={handleCloseMiniPlayer}
+        onPlayPause={handleMiniPlayerPlayPause}
+        videoRef={miniVideoRef}
+      />
+    );
+  }
+
+  // Show ad player if playing ad
+  if (isPlayingAd && currentAd) {
+    return createPortal(
+      <AdPlayer
+        ad={currentAd}
+        onAdComplete={handleAdComplete}
+        onSkip={handleSkipAd}
+        canSkip={canSkipAd}
+        skipCountdown={skipCountdown}
+      />,
+      document.body
+    );
+  }
+
   const playerContent = (
-    <div className="fixed inset-0 bg-black z-[9999]" data-testid="video-player-page">
+    <div 
+      className="fixed inset-0 bg-black z-[9999]" 
+      data-testid="video-player-page"
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{
+        transform: swipeDistance > 0 ? `translateY(${Math.min(swipeDistance, 150)}px) scale(${1 - swipeDistance / 1000})` : 'none',
+        opacity: swipeDistance > 0 ? 1 - swipeDistance / 300 : 1,
+        transition: swipeDistance === 0 ? 'transform 0.3s, opacity 0.3s' : 'none'
+      }}
+    >
+      {/* Swipe down indicator */}
+      {swipeDistance > 50 && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center animate-pulse">
+          <ChevronDown className="w-6 h-6 text-white" />
+          <span className="text-white/70 text-xs">Release to minimize</span>
+        </div>
+      )}
+      
       {/* Full-screen vertical video with lazy loading */}
       <video
         id="main-video"
         ref={videoRef}
         src={episode.video_url}
-        autoPlay
+        autoPlay={preRollComplete}
         playsInline
         preload="none"
         onTimeUpdate={handleTimeUpdate}
@@ -796,6 +846,25 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
       />
+      
+      {/* Skip Intro Button */}
+      <SkipIntroButton visible={showSkipIntro && !isPlayingAd} onClick={handleSkipIntro} />
+      
+      {/* Overlay Ad */}
+      {showOverlayAd && (
+        <OverlayAd 
+          advertiser={AD_CONFIG.mockAds[0].advertiser}
+          onClose={() => setShowOverlayAd(false)}
+        />
+      )}
+      
+      {/* Ad-free badge for premium users */}
+      {(userTier === "premium" || userTier === "vip") && showControls && (
+        <div className="absolute top-16 right-4 z-30 flex items-center gap-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-2 py-1 rounded-full border border-yellow-500/30">
+          <Crown className="w-3 h-3 text-yellow-500" />
+          <span className="text-yellow-500 text-[10px] font-medium">Ad-Free</span>
+        </div>
+      )}
       
       {/* Network/Quality indicator */}
       <div className={`absolute top-16 left-3 z-30 flex items-center gap-2 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0'}`}>
