@@ -1122,19 +1122,21 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         onClick={handleVideoTap}
       >
         {!isPlaying && (
-          <div className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center">
+          <button
+            onClick={(e) => { e.stopPropagation(); togglePlayPause(); }}
+            className="w-16 h-16 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center"
+            data-testid="center-play-btn"
+          >
             <Play className="w-8 h-8 text-white ml-1" fill="white" />
-          </div>
+          </button>
         )}
         {isPlaying && showControls && (
           <button 
             onClick={(e) => { e.stopPropagation(); togglePlayPause(); }}
             className="w-16 h-16 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center"
+            data-testid="center-pause-btn"
           >
-            <svg className="w-8 h-8 text-white" fill="white" viewBox="0 0 24 24">
-              <rect x="6" y="4" width="4" height="16" rx="1"/>
-              <rect x="14" y="4" width="4" height="16" rx="1"/>
-            </svg>
+            <Pause className="w-8 h-8 text-white" fill="white" />
           </button>
         )}
       </div>
