@@ -215,15 +215,20 @@ const StoryCard = ({
         ref={videoRef}
         src={story.episode?.video_url}
         className="w-full h-full object-contain"
-        loop
         playsInline
         muted={isMuted}
         onTimeUpdate={handleTimeUpdate}
-        onClick={handleTap}
+        onEnded={handleVideoEnded}
+      />
+      
+      {/* Tap zones overlay */}
+      <div 
+        className="absolute inset-0 z-10"
+        onClick={handleTapZone}
       />
       
       {/* Progress bar at top */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-white/20">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-white/20 z-20">
         <div 
           className="h-full bg-white transition-all duration-100"
           style={{ width: `${progress}%` }}
@@ -232,14 +237,14 @@ const StoryCard = ({
       
       {/* Double tap heart animation */}
       {showDoubleTapHeart && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30">
           <Heart className="w-24 h-24 text-red-500 fill-red-500 animate-ping" />
         </div>
       )}
       
       {/* Play/Pause indicator */}
       {!isPlaying && isActive && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
           <div className="w-20 h-20 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
             <Play className="w-10 h-10 text-white fill-white ml-1" />
           </div>
@@ -247,7 +252,7 @@ const StoryCard = ({
       )}
       
       {/* Right side actions */}
-      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6">
+      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20">
         {/* Like */}
         <button 
           onClick={onLike}
