@@ -333,7 +333,7 @@ export const StoriesPage = ({ onAuthClick }) => {
     const fetchStories = async () => {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await axios.get(`${API}/user/stories/feed`, { headers });
+        const res = await axios.get(`${API}/stories/feed`, { headers });
         setStories(res.data);
       } catch (e) {
         console.error("Failed to fetch stories", e);
