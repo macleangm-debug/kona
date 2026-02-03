@@ -111,7 +111,10 @@ const StoryCard = ({
   onViewSeries, 
   onViewEpisodes,
   isMuted,
-  onToggleMute 
+  onToggleMute,
+  onNext,
+  onPrevious,
+  onVideoEnd
 }) => {
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -139,8 +142,26 @@ const StoryCard = ({
     }
   }, [isActive]);
   
-  // Handle double tap to like
-  const handleTap = useCallback((e) => {
+  // Handle tap zones (left = prev, right = next, center = play/pause or double-tap like)
+  const handleTapZone = useCallback((e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    const tapZone = x / width;
+    
+    // Left 25% = previous
+    if (tapZone < 0.25) {
+      onPrevious?.();
+      return;
+    }
+    
+    // Right 25% = next
+    if (tapZone > 0.75) {
+      onNext?.();
+      return;
+    }
+    
+    // Center = play/pause or double-tap like
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
     
@@ -167,13 +188,18 @@ const StoryCard = ({
       }, DOUBLE_TAP_DELAY);
     }
     lastTapRef.current = now;
-  }, [story.liked, onLike]);
+  }, [story.liked, onLike, onNext, onPrevious]);
   
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       const pct = (videoRef.current.currentTime / videoRef.current.duration) * 100;
       setProgress(pct);
     }
+  };
+  
+  // Handle video ended - auto advance
+  const handleVideoEnded = () => {
+    onVideoEnd?.();
   };
   
   const formatCount = (num) => {
