@@ -381,17 +381,17 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   useEffect(() => {
     if (introSkipped || isPlayingAd) return;
     
-    // Get intro duration from series config or use default
-    const seriesIntroDuration = series?.intro_duration || AD_CONFIG.defaultIntroDuration;
-    setIntroDuration(seriesIntroDuration);
+    // Get intro duration from episode or use default
+    const episodeIntroDuration = episode?.intro_duration || AD_CONFIG.defaultIntroDuration;
+    setIntroDuration(episodeIntroDuration);
     
-    // Show skip intro button when in intro section
-    if (currentTime >= 3 && currentTime < seriesIntroDuration) {
+    // Show skip intro button when in intro section (after 3 seconds)
+    if (currentTime >= 3 && currentTime < episodeIntroDuration) {
       setShowSkipIntro(true);
     } else {
       setShowSkipIntro(false);
     }
-  }, [currentTime, series, introSkipped, isPlayingAd]);
+  }, [currentTime, episode, introSkipped, isPlayingAd]);
 
   const handleSkipIntro = () => {
     const video = videoRef.current;
