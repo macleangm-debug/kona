@@ -209,8 +209,8 @@ export const CreatorPortal = () => {
                       <Coins className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-sm">60-70% Revenue Share</p>
-                      <p className="text-xs text-muted-foreground">Earn from every episode view</p>
+                      <p className="font-semibold text-sm">40-60% Revenue Share</p>
+                      <p className="text-xs text-muted-foreground">Of net revenue (after expenses)</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -228,9 +228,21 @@ export const CreatorPortal = () => {
                     </div>
                     <div>
                       <p className="font-semibold text-sm">Milestone Bonuses</p>
-                      <p className="text-xs text-muted-foreground">Earn extra at 10K, 50K, 100K views</p>
+                      <p className="text-xs text-muted-foreground">Earn extra at 50K, 500K, 1M views</p>
                     </div>
                   </div>
+                </div>
+              </Card>
+
+              {/* Revenue Model Explanation */}
+              <Card className="p-4 mb-4 bg-white/5">
+                <h3 className="font-semibold mb-2 text-sm">How Revenue Works</h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  30% is deducted for platform expenses (hosting, payments, moderation). 
+                  Your share is calculated from the remaining 70%.
+                </p>
+                <div className="text-xs text-muted-foreground">
+                  Example: $100 revenue → $70 after expenses → You earn $28-$42
                 </div>
               </Card>
 
@@ -240,15 +252,15 @@ export const CreatorPortal = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center p-2 rounded bg-secondary/30">
                     <span className="text-sm">🆕 New Creator</span>
-                    <span className="text-xs text-muted-foreground">60% share</span>
+                    <span className="text-xs text-muted-foreground">40% of net</span>
                   </div>
                   <div className="flex justify-between items-center p-2 rounded bg-secondary/30">
-                    <span className="text-sm">✅ Verified (10K+ views)</span>
-                    <span className="text-xs text-muted-foreground">65% share + Auto-publish</span>
+                    <span className="text-sm">✅ Verified (50K+ views)</span>
+                    <span className="text-xs text-muted-foreground">50% of net + Auto-publish</span>
                   </div>
                   <div className="flex justify-between items-center p-2 rounded bg-secondary/30">
-                    <span className="text-sm">⭐ Partner (100K+ views)</span>
-                    <span className="text-xs text-muted-foreground">70% share + Priority featuring</span>
+                    <span className="text-sm">⭐ Partner (500K+ views)</span>
+                    <span className="text-xs text-muted-foreground">60% of net + Priority featuring</span>
                   </div>
                 </div>
               </Card>
