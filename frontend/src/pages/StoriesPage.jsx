@@ -273,8 +273,12 @@ const StoryCard = ({
       
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-20 p-4 bg-gradient-to-t from-black via-black/60 to-transparent">
-        {/* Series info */}
-        <div className="flex items-center gap-3 mb-3">
+        {/* Series info - clickable to view series */}
+        <button 
+          onClick={onViewSeries}
+          className="flex items-center gap-3 mb-2 w-full text-left"
+          data-testid="story-series-info-btn"
+        >
           <img 
             src={story.series?.thumbnail} 
             alt={story.series?.title}
@@ -284,22 +288,13 @@ const StoryCard = ({
             <h3 className="font-bold text-white">{story.series?.title}</h3>
             <p className="text-gray-300 text-sm">Episode 1 • Free</p>
           </div>
-        </div>
+          <ChevronRight className="w-5 h-5 text-white/70" />
+        </button>
         
         {/* Episode title */}
-        <p className="text-white text-sm mb-3 line-clamp-2">
+        <p className="text-white/80 text-sm line-clamp-2">
           {story.episode?.title || story.series?.description}
         </p>
-        
-        {/* CTA Button */}
-        <button
-          onClick={onViewSeries}
-          className="w-full py-3 bg-gradient-to-r from-primary to-purple-600 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 transition-opacity"
-          data-testid="story-watch-series-btn"
-        >
-          Watch Full Series
-          <ChevronRight className="w-5 h-5" />
-        </button>
       </div>
       
       {/* Swipe hint (shows briefly) */}
