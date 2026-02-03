@@ -553,22 +553,10 @@ export const StoriesPage = ({ onAuthClick }) => {
           onViewEpisodes={() => handleViewEpisodes(currentStory.series?.id)}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
+          onNext={goToNext}
+          onPrevious={goToPrevious}
+          onVideoEnd={handleVideoEnd}
         />
-      </div>
-      
-      {/* Navigation indicators */}
-      <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1.5 z-50">
-        {stories.map((_, idx) => (
-          <button
-            key={idx}
-            onClick={() => setCurrentIndex(idx)}
-            className={`w-1.5 rounded-full transition-all ${
-              idx === currentIndex 
-                ? 'h-6 bg-white' 
-                : 'h-1.5 bg-white/30 hover:bg-white/50'
-            }`}
-          />
-        ))}
       </div>
       
       {/* Share Modal */}
