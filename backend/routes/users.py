@@ -1103,3 +1103,126 @@ async def track_creator_revenue(episode_id: str, series_id: str, creator_id: str
         {"$inc": {"total_views": 1, "total_earnings": creator_share}}
     )
 
+
+
+# ============ EPISODE LIKES ============
+class LikeRequest(BaseModel):
+    episode_id: str
+
+from pydantic import BaseModel
+
+@router.post("/episodes/like")
+async def like_episode(req: LikeRequest, user: dict = Depends(get_current_user)):
+    """Like an episode"""
+    episode_id = req.episode_id
+    user_id = user["id"]
+    
+    # Check if already liked
+    existing = await db.episode_likes.find_one({"user_id": user_id, "episode_id": episode_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Already liked")
+    
+    # Add like
+    await db.episode_likes.insert_one({
+        "user_id": user_id,
+        "episode_id": episode_id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    # Increment like count on episode
+    await db.episodes.update_one({"id": episode_id}, {"$inc": {"likes": 1}})
+    
+    # Get new count
+    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1})
+    likes = episode.get("likes", 1) if episode else 1
+    
+    return {"liked": True, "likes": likes}
+
+@router.post("/episodes/unlike")
+async def unlike_episode(req: LikeRequest, user: dict = Depends(get_current_user)):
+    """Unlike an episode"""
+    episode_id = req.episode_id
+    user_id = user["id"]
+    
+    # Remove like
+    result = await db.episode_likes.delete_one({"user_id": user_id, "episode_id": episode_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Not liked")
+    
+    # Decrement like count on episode
+    await db.episodes.update_one({"id": episode_id}, {"$inc": {"likes": -1}})
+    
+    # Get new count (ensure non-negative)
+    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1})
+    likes = max(0, episode.get("likes", 0)) if episode else 0
+    
+    return {"liked": False, "likes": likes}
+
+@router.get("/episodes/{episode_id}/like-status")
+async def get_like_status(episode_id: str, user: dict = Depends(get_optional_user)):
+    """Get like status for an episode"""
+    # Get episode likes count
+    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1})
+    likes = episode.get("likes", 0) if episode else 0
+    
+    # Check if user liked
+    liked = False
+    if user:
+        existing = await db.episode_likes.find_one({"user_id": user["id"], "episode_id": episode_id})
+        liked = existing is not None
+    
+    return {"liked": liked, "likes": likes}
+
+# ============ SHARE TRACKING ============
+class ShareRequest(BaseModel):
+    episode_id: str
+    platform: str  # 'whatsapp', 'twitter', 'facebook', 'copy_link'
+
+@router.post("/episodes/share")
+async def track_share(req: ShareRequest, user: dict = Depends(get_optional_user)):
+    """Track episode shares"""
+    # Record share
+    share_record = {
+        "episode_id": req.episode_id,
+        "platform": req.platform,
+        "user_id": user["id"] if user else None,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.episode_shares.insert_one(share_record)
+    
+    # Increment share count
+    await db.episodes.update_one({"id": req.episode_id}, {"$inc": {"shares": 1}})
+    
+    return {"shared": True, "platform": req.platform}
+
+# ============ FREE EPISODES (STORIES) ============
+@router.get("/stories/feed")
+async def get_stories_feed(user: dict = Depends(get_optional_user)):
+    """Get all free first episodes for stories mode"""
+    # Get all series with their first episode
+    series_list = await db.series.find({}, {"_id": 0}).to_list(100)
+    
+    stories = []
+    for s in series_list:
+        # Get first episode (episode_number = 1)
+        episode = await db.episodes.find_one(
+            {"series_id": s["id"], "episode_number": 1},
+            {"_id": 0}
+        )
+        if episode:
+            # Check if user liked this episode
+            liked = False
+            if user:
+                existing = await db.episode_likes.find_one({"user_id": user["id"], "episode_id": episode["id"]})
+                liked = existing is not None
+            
+            stories.append({
+                "series": s,
+                "episode": episode,
+                "liked": liked,
+                "likes": episode.get("likes", 0),
+                "shares": episode.get("shares", 0)
+            })
+    
+    return stories
+
