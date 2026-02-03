@@ -107,10 +107,21 @@ const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveF
   );
 };
 
-// Desktop Hero Carousel with 3D Rotation Effect
+// Desktop Hero Carousel with 3D Rotation Effect - Same as Mobile
 const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToList }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
+  const swiperRef = useRef(null);
+  
+  // Force autoplay to start/restart when component mounts or series changes
+  useEffect(() => {
+    if (swiperRef.current && swiperRef.current.swiper) {
+      const swiper = swiperRef.current.swiper;
+      if (swiper.autoplay) {
+        swiper.autoplay.start();
+      }
+    }
+  }, [seriesList]);
   
   if (!seriesList || seriesList.length === 0) return null;
   
@@ -118,112 +129,63 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
   const inMyList = myList?.includes(activeSeries?.id);
 
   return (
-    <div className="relative w-full mb-8">
-      {/* Background - Active Series */}
-      <div className="absolute inset-0 h-[75vh]">
-        <img 
-          src={activeSeries?.thumbnail} 
-          alt={activeSeries?.title}
-          className="w-full h-full object-cover transition-opacity duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/30" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/30" />
-        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent" />
-      </div>
+    <div className="relative w-full mb-8 py-8">
+      {/* Clean dark background - no distracting image */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/50 to-background" />
+      
+      {/* Subtle glow effect behind carousel */}
+      <div 
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-30"
+        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)' }}
+      />
 
-      {/* Content Layout */}
-      <div className="relative h-[75vh] flex items-center">
-        {/* Left Side - Series Info */}
-        <div className="w-1/2 px-12 z-10">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="px-3 py-1 bg-red-600 text-white text-sm font-bold rounded">
-              TOP 10
-            </span>
-            <span className="text-gray-300 text-sm">#{activeIndex + 1} in Series Today</span>
-          </div>
-
-          <h1 className="font-heading text-5xl lg:text-6xl font-bold mb-4 drop-shadow-lg">
-            {activeSeries?.title}
-          </h1>
-
-          <div className="flex items-center gap-4 mb-4 text-sm lg:text-base text-gray-300">
-            <span className="text-green-500 font-semibold">98% Match</span>
-            <span>{activeSeries?.total_episodes} Episodes</span>
-            <span className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              {activeSeries?.rating}
-            </span>
-            <span className="px-2 py-0.5 border border-gray-500 text-xs">HD</span>
-          </div>
-
-          <p className="text-gray-300 text-base mb-6 max-w-xl line-clamp-3">
-            {activeSeries?.description || "An incredible story that will keep you on the edge of your seat."}
-          </p>
-
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => onPlay(activeSeries)}
-              size="lg"
-              className="bg-white text-black hover:bg-white/90 rounded-md px-8 h-12 text-base font-semibold"
-            >
-              <Play className="w-6 h-6 fill-black mr-2" />
-              Play
-            </Button>
-            <Button
-              onClick={() => onMoreInfo(activeSeries)}
-              size="lg"
-              variant="secondary"
-              className="bg-gray-500/70 hover:bg-gray-500/90 text-white rounded-md px-6 h-12"
-            >
-              <Info className="w-5 h-5 mr-2" />
-              More Info
-            </Button>
-            <Button
-              onClick={() => onAddToList(activeSeries?.id)}
-              size="icon"
-              variant="outline"
-              className="rounded-full w-12 h-12 border-gray-400 hover:border-white"
-            >
-              {inMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            </Button>
-          </div>
-        </div>
-
-        {/* Right Side - 3D Carousel */}
-        <div className="w-1/2 h-full flex items-center justify-center pr-12">
+      {/* Content Layout - Centered */}
+      <div className="relative flex flex-col items-center justify-center px-12">
+        {/* 3D Carousel - Full Width Centered */}
+        <div className="w-full max-w-5xl mx-auto" data-testid="desktop-hero-carousel">
           <Swiper
-            modules={[EffectCoverflow, Autoplay, Navigation]}
+            ref={swiperRef}
+            key={`desktop-hero-${seriesList.length}`}
+            modules={[EffectCoverflow, Autoplay, Pagination]}
             effect="coverflow"
             grabCursor={true}
             centeredSlides={true}
-            slidesPerView={2.2}
-            loop={seriesList.length > 3}
+            slidesPerView="auto"
+            loop={seriesList.length > 2}
             autoplay={{
-              delay: 4000,
+              delay: 3500,
               disableOnInteraction: false,
               pauseOnMouseEnter: true
             }}
             coverflowEffect={{
-              rotate: 25,             // 25 degree rotation (same as mobile)
-              stretch: 80,            // More stretch for card spacing
-              depth: 300,             // Good depth for 3D effect
+              rotate: 25,
+              stretch: 0,
+              depth: 250,
               modifier: 1,
               slideShadows: true,
             }}
-            navigation={true}
+            pagination={{
+              clickable: true,
+              bulletClass: 'swiper-pagination-bullet hero-bullet',
+              bulletActiveClass: 'swiper-pagination-bullet-active hero-bullet-active',
+            }}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            className="w-full desktop-hero-swiper"
-            style={{ perspective: '1200px' }}
+            onSwiper={(swiper) => {
+              if (swiper.autoplay) {
+                swiper.autoplay.start();
+              }
+            }}
+            className="desktop-hero-swiper"
+            style={{ paddingBottom: '50px', perspective: '1200px' }}
           >
             {seriesList.map((series, index) => (
-              <SwiperSlide key={series.id}>
+              <SwiperSlide key={series.id} className="hero-slide" style={{ width: '280px' }}>
                 <div 
-                  className={`relative aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 mx-auto ${
+                  className={`relative aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${
                     index === activeIndex 
-                      ? 'ring-4 ring-primary shadow-[0_0_50px_rgba(139,92,246,0.6)] scale-100' 
-                      : 'opacity-60 scale-95 hover:opacity-80'
+                      ? 'ring-4 ring-primary shadow-[0_0_60px_rgba(139,92,246,0.5)] scale-105' 
+                      : 'opacity-50 scale-90 hover:opacity-70'
                   }`}
-                  style={{ maxWidth: '280px' }}
                   onClick={() => navigate(`/series/${series.id}`)}
                 >
                   <img 
@@ -233,10 +195,10 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                   
-                  {/* Ranking badge */}
+                  {/* TOP badge */}
                   <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-500 text-white text-sm font-bold rounded-lg shadow-lg">
-                      #{index + 1}
+                    <span className="px-2.5 py-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-lg shadow-lg">
+                      TOP {index + 1}
                     </span>
                   </div>
                   
@@ -245,8 +207,88 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
                     {series.total_episodes} EP
                   </div>
                   
+                  {/* Title and info at bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="font-bold text-lg mb-1 drop-shadow-lg line-clamp-1">{series.title}</h3>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                      <span className="flex items-center gap-1">
+                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                        {series.rating}
+                      </span>
+                      <span>•</span>
+                      <span>{series.genre}</span>
+                    </div>
+                  </div>
+                  
                   {/* Play button overlay on active */}
                   {index === activeIndex && (
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/30">
+                      <button 
+                        className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
+                        onClick={(e) => { e.stopPropagation(); onPlay(series); }}
+                      >
+                        <Play className="w-8 h-8 text-white fill-white ml-1" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+        
+        {/* Active Series Info - Below Carousel */}
+        <div className="text-center mt-6 max-w-2xl mx-auto">
+          <h2 className="font-heading text-3xl lg:text-4xl font-bold mb-3 drop-shadow-lg">
+            {activeSeries?.title}
+          </h2>
+          
+          <div className="flex items-center justify-center gap-4 mb-4 text-sm text-gray-300">
+            <span className="text-green-500 font-semibold">98% Match</span>
+            <span>{activeSeries?.total_episodes} Episodes</span>
+            <span className="flex items-center gap-1">
+              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              {activeSeries?.rating}
+            </span>
+            <span className="px-2 py-0.5 border border-gray-500 text-xs">HD</span>
+          </div>
+          
+          <p className="text-gray-400 text-sm mb-5 line-clamp-2">
+            {activeSeries?.description || "An incredible story that will keep you on the edge of your seat."}
+          </p>
+          
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              onClick={() => onPlay(activeSeries)}
+              size="lg"
+              className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-11 text-base font-semibold"
+            >
+              <Play className="w-5 h-5 fill-black mr-2" />
+              Play
+            </Button>
+            <Button
+              onClick={() => onMoreInfo(activeSeries)}
+              size="lg"
+              variant="secondary"
+              className="bg-gray-700/70 hover:bg-gray-600/90 text-white rounded-full px-6 h-11"
+            >
+              <Info className="w-5 h-5 mr-2" />
+              More Info
+            </Button>
+            <Button
+              onClick={() => onAddToList(activeSeries?.id)}
+              size="icon"
+              variant="outline"
+              className="rounded-full w-11 h-11 border-gray-500 hover:border-white"
+            >
+              {inMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-2xl transform hover:scale-110 transition-transform">
                         <Play className="w-8 h-8 text-black fill-black ml-1" />
