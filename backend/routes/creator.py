@@ -460,6 +460,54 @@ async def get_episode_status(episode_id: str, user: dict = Depends(get_current_u
     return {"episode_id": episode_id, "status": episode.get("encoding_status", "unknown")}
 
 
+@router.patch("/episodes/{episode_id}")
+async def update_episode(episode_id: str, user: dict = Depends(get_current_user), title: str = None, description: str = None, is_free: bool = None, coins_required: int = None, intro_duration: int = None):
+    """Update episode settings including intro duration for Skip Intro feature"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    episode = await db.creator_episodes.find_one({"id": episode_id, "creator_id": creator["id"]})
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    # Build update dict with only provided fields
+    update_data = {}
+    if title is not None:
+        update_data["title"] = title
+    if description is not None:
+        update_data["description"] = description
+    if is_free is not None:
+        update_data["is_free"] = is_free
+        if is_free:
+            update_data["coins_required"] = 0
+    if coins_required is not None and not update_data.get("is_free"):
+        update_data["coins_required"] = max(0, min(50, coins_required))
+    if intro_duration is not None:
+        update_data["intro_duration"] = max(0, min(120, intro_duration))
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$set": update_data}
+    )
+    
+    # Also update main episodes collection if published
+    await db.episodes.update_one(
+        {"id": episode_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "message": "Episode updated successfully",
+        "episode_id": episode_id,
+        "updated_fields": list(update_data.keys())
+    }
+
+
 # ============ REVENUE TRACKING ============
 @router.get("/earnings")
 async def get_earnings_history(user: dict = Depends(get_current_user), limit: int = 50):
