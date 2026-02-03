@@ -530,13 +530,6 @@ export const StoriesPage = ({ onAuthClick }) => {
         <X className="w-5 h-5 text-white" />
       </button>
       
-      {/* Story counter */}
-      <div className="absolute top-4 right-4 z-50 px-3 py-1 bg-black/50 backdrop-blur-sm rounded-full">
-        <span className="text-white text-sm font-medium">
-          {currentIndex + 1} / {stories.length}
-        </span>
-      </div>
-      
       {/* Stories container with swipe animation */}
       <div 
         className="w-full h-full transition-transform duration-300 ease-out"
