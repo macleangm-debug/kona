@@ -122,13 +122,17 @@ const StoryCard = ({
   
   // Handle video playback based on active state
   useEffect(() => {
-    if (videoRef.current) {
+    const video = videoRef.current;
+    if (video) {
       if (isActive) {
-        videoRef.current.play().catch(() => {});
-        setIsPlaying(true);
+        video.play().then(() => {
+          setIsPlaying(true);
+        }).catch(() => {
+          setIsPlaying(false);
+        });
       } else {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+        video.pause();
+        video.currentTime = 0;
         setIsPlaying(false);
         setProgress(0);
       }
