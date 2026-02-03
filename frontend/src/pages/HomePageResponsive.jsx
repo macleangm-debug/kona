@@ -107,8 +107,8 @@ const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveF
   );
 };
 
-// Desktop Hero Carousel with 3D Rotation Effect - Same as Mobile
-const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToList }) => {
+// Desktop Hero Carousel with 3D Rotation Effect + Side Panels
+const DesktopHeroCarousel = ({ seriesList, allSeries, onPlay, onMoreInfo, myList, onAddToList }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
   const swiperRef = useRef(null);
@@ -127,22 +127,83 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
   
   const activeSeries = seriesList[activeIndex];
   const inMyList = myList?.includes(activeSeries?.id);
+  
+  // Get top 5 trending series for side panel (exclude featured)
+  const trendingSeries = (allSeries || seriesList).slice(0, 5);
 
   return (
-    <div className="relative w-full mb-8 py-8">
-      {/* Clean dark background - no distracting image */}
+    <div className="relative w-full mb-8 py-6">
+      {/* Clean dark background */}
       <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/50 to-background" />
       
       {/* Subtle glow effect behind carousel */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-30"
-        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%)' }}
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full blur-3xl opacity-20"
+        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 70%)' }}
       />
 
-      {/* Content Layout - Centered */}
-      <div className="relative flex flex-col items-center justify-center px-12">
-        {/* 3D Carousel - Full Width Centered */}
-        <div className="w-full max-w-5xl mx-auto" data-testid="desktop-hero-carousel">
+      {/* Main Content Layout - 3 Column Grid */}
+      <div className="relative grid grid-cols-12 gap-6 px-8 max-w-[1600px] mx-auto">
+        
+        {/* Left Panel - Active Series Info */}
+        <div className="col-span-3 flex flex-col justify-center">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-lg">
+                TOP {activeIndex + 1}
+              </span>
+              <span className="text-green-500 text-sm font-semibold">98% Match</span>
+            </div>
+            
+            <h2 className="font-heading text-3xl xl:text-4xl font-bold leading-tight">
+              {activeSeries?.title}
+            </h2>
+            
+            <div className="flex items-center gap-3 text-sm text-gray-400">
+              <span className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                {activeSeries?.rating}
+              </span>
+              <span>•</span>
+              <span>{activeSeries?.total_episodes} Episodes</span>
+              <span>•</span>
+              <span className="px-2 py-0.5 border border-gray-500 text-xs rounded">HD</span>
+            </div>
+            
+            <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
+              {activeSeries?.description || "An incredible story that will keep you on the edge of your seat."}
+            </p>
+            
+            <div className="flex items-center gap-3 pt-2">
+              <Button
+                onClick={() => onPlay(activeSeries)}
+                className="bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 font-semibold"
+              >
+                <Play className="w-4 h-4 fill-black mr-2" />
+                Play Now
+              </Button>
+              <Button
+                onClick={() => onMoreInfo(activeSeries)}
+                variant="secondary"
+                className="bg-gray-700/70 hover:bg-gray-600/90 text-white rounded-full px-5 h-10"
+              >
+                <Info className="w-4 h-4 mr-2" />
+                Details
+              </Button>
+              <Button
+                onClick={() => onAddToList(activeSeries?.id)}
+                size="icon"
+                variant="outline"
+                className="rounded-full w-10 h-10 border-gray-500 hover:border-white"
+              >
+                {inMyList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Center - 3D Carousel (Larger Cards) */}
+        <div className="col-span-6" data-testid="desktop-hero-carousel">
           <Swiper
             ref={swiperRef}
             key={`desktop-hero-${seriesList.length}`}
@@ -158,9 +219,9 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
               pauseOnMouseEnter: true
             }}
             coverflowEffect={{
-              rotate: 25,
+              rotate: 20,
               stretch: 0,
-              depth: 250,
+              depth: 200,
               modifier: 1,
               slideShadows: true,
             }}
@@ -176,7 +237,7 @@ const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToLi
               }
             }}
             className="desktop-hero-swiper"
-            style={{ paddingBottom: '50px', perspective: '1200px' }}
+            style={{ paddingBottom: '40px', perspective: '1200px' }}
           >
             {seriesList.map((series, index) => (
               <SwiperSlide key={series.id} className="hero-slide" style={{ width: '280px' }}>
