@@ -17,18 +17,20 @@ from services.bunny import bunny_service
 router = APIRouter(prefix="/creator", tags=["Creator"])
 
 # ============ CREATOR TIER CONFIG ============
+# Revenue Model: Creator share is % of POST-EXPENSE revenue (after 30% expense deduction)
+# Example: $100 gross → $70 after expenses → Creator gets 40-60% of $70
 CREATOR_TIERS = {
-    "new": {"revenue_share": 0.60, "min_views": 0, "auto_publish": False},
-    "verified": {"revenue_share": 0.65, "min_views": 10000, "auto_publish": True},
-    "partner": {"revenue_share": 0.70, "min_views": 100000, "auto_publish": True}
+    "new": {"revenue_share": 0.40, "min_views": 0, "auto_publish": False},
+    "verified": {"revenue_share": 0.50, "min_views": 50000, "auto_publish": True},
+    "partner": {"revenue_share": 0.60, "min_views": 500000, "auto_publish": True}
 }
 
 MILESTONE_BONUSES = [
-    {"views": 10000, "bonus_coins": 500},
-    {"views": 50000, "bonus_coins": 2500},
-    {"views": 100000, "bonus_coins": 10000},
-    {"views": 500000, "bonus_coins": 50000},
-    {"views": 1000000, "bonus_coins": 150000}
+    {"views": 50000, "bonus_coins": 500},
+    {"views": 100000, "bonus_coins": 2500},
+    {"views": 500000, "bonus_coins": 10000},
+    {"views": 1000000, "bonus_coins": 50000},
+    {"views": 5000000, "bonus_coins": 250000}
 ]
 
 
