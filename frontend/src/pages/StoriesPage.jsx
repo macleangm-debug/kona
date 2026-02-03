@@ -288,7 +288,6 @@ const StoryCard = ({
             <h3 className="font-bold text-white">{story.series?.title}</h3>
             <p className="text-gray-300 text-sm">Episode 1 • Free</p>
           </div>
-          <ChevronRight className="w-5 h-5 text-white/70" />
         </button>
         
         {/* Episode title */}
