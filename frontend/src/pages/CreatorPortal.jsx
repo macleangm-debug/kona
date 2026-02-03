@@ -40,6 +40,16 @@ export const CreatorPortal = () => {
     genre: "Romance"
   });
 
+  // Episode edit state
+  const [showEpisodeEditor, setShowEpisodeEditor] = useState(false);
+  const [selectedEpisode, setSelectedEpisode] = useState(null);
+  const [episodeForm, setEpisodeForm] = useState({
+    title: "",
+    intro_duration: 30,
+    is_free: false,
+    coins_required: 5
+  });
+
   useEffect(() => {
     fetchCreatorData();
   }, [token]);
