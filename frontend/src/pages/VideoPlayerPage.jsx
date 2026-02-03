@@ -1070,13 +1070,23 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             {series?.title} <span className="text-white/70">EP.{episode.episode_number}</span>
           </p>
         </div>
-        <button className="p-2">
-          <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="5" r="2"/>
-            <circle cx="12" cy="12" r="2"/>
-            <circle cx="12" cy="19" r="2"/>
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Minimize to mini-player */}
+          <button 
+            onClick={() => setIsMiniPlayer(true)}
+            className="p-2"
+            data-testid="minimize-player-btn"
+          >
+            <Minimize2 className="w-5 h-5 text-white" />
+          </button>
+          <button className="p-2">
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="12" cy="5" r="2"/>
+              <circle cx="12" cy="12" r="2"/>
+              <circle cx="12" cy="19" r="2"/>
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Center play/pause button - shows when paused or controls visible */}
