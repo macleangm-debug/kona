@@ -236,6 +236,214 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // ============ DETERMINE USER TIER FOR ADS ============
+  useEffect(() => {
+    if (user) {
+      const subscription = user.subscription;
+      if (subscription?.active) {
+        setUserTier(subscription.plan || "basic");
+      } else if (user.has_made_purchase) {
+        setUserTier("basic");
+      } else {
+        setUserTier("free");
+      }
+    } else {
+      setUserTier("free");
+    }
+  }, [user]);
+
+  // ============ PRE-ROLL AD LOGIC ============
+  useEffect(() => {
+    // Show pre-roll ad when video loads (if applicable)
+    if (episode && !preRollComplete && !loading) {
+      const adConfig = AD_CONFIG.adsByTier[userTier];
+      if (adConfig?.preRoll) {
+        const randomAd = AD_CONFIG.mockAds[Math.floor(Math.random() * AD_CONFIG.mockAds.length)];
+        setCurrentAd(randomAd);
+        setAdType("preRoll");
+        setIsPlayingAd(true);
+        setCanSkipAd(false);
+        setSkipCountdown(randomAd.skipAfter);
+        
+        // Start countdown for skip button
+        adTimerRef.current = setInterval(() => {
+          setSkipCountdown(prev => {
+            if (prev <= 1) {
+              setCanSkipAd(true);
+              clearInterval(adTimerRef.current);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+      } else {
+        setPreRollComplete(true);
+      }
+    }
+    
+    return () => {
+      if (adTimerRef.current) clearInterval(adTimerRef.current);
+    };
+  }, [episode, loading, userTier, preRollComplete]);
+
+  // ============ MID-ROLL AD LOGIC ============
+  useEffect(() => {
+    if (!duration || isPlayingAd || !preRollComplete) return;
+    
+    const adConfig = AD_CONFIG.adsByTier[userTier];
+    if (!adConfig?.midRoll) return;
+    
+    const progressPercent = (currentTime / duration) * 100;
+    
+    for (const point of AD_CONFIG.midRollPoints) {
+      if (progressPercent >= point && !shownMidRollPoints.includes(point)) {
+        // Pause video and show mid-roll ad
+        const video = videoRef.current;
+        if (video) video.pause();
+        
+        const randomAd = AD_CONFIG.mockAds[Math.floor(Math.random() * AD_CONFIG.mockAds.length)];
+        setCurrentAd(randomAd);
+        setAdType("midRoll");
+        setIsPlayingAd(true);
+        setCanSkipAd(false);
+        setSkipCountdown(randomAd.skipAfter);
+        setShownMidRollPoints(prev => [...prev, point]);
+        
+        adTimerRef.current = setInterval(() => {
+          setSkipCountdown(prev => {
+            if (prev <= 1) {
+              setCanSkipAd(true);
+              clearInterval(adTimerRef.current);
+              return 0;
+            }
+            return prev - 1;
+          });
+        }, 1000);
+        
+        break;
+      }
+    }
+  }, [currentTime, duration, userTier, isPlayingAd, preRollComplete, shownMidRollPoints]);
+
+  // ============ OVERLAY AD LOGIC ============
+  useEffect(() => {
+    const adConfig = AD_CONFIG.adsByTier[userTier];
+    if (!adConfig?.overlay || !preRollComplete || isPlayingAd) return;
+    
+    // Show overlay ad at random intervals (between 20-40 seconds after start)
+    const showOverlayTimer = setTimeout(() => {
+      if (!isMiniPlayer) {
+        setShowOverlayAd(true);
+        // Auto-hide after duration
+        setTimeout(() => setShowOverlayAd(false), AD_CONFIG.overlayDuration * 1000);
+      }
+    }, (20 + Math.random() * 20) * 1000);
+    
+    return () => clearTimeout(showOverlayTimer);
+  }, [preRollComplete, userTier, isPlayingAd, isMiniPlayer]);
+
+  // ============ SKIP INTRO LOGIC ============
+  useEffect(() => {
+    if (introSkipped || isPlayingAd) return;
+    
+    // Get intro duration from series config or use default
+    const seriesIntroDuration = series?.intro_duration || AD_CONFIG.defaultIntroDuration;
+    setIntroDuration(seriesIntroDuration);
+    
+    // Show skip intro button when in intro section
+    if (currentTime >= 3 && currentTime < seriesIntroDuration) {
+      setShowSkipIntro(true);
+    } else {
+      setShowSkipIntro(false);
+    }
+  }, [currentTime, series, introSkipped, isPlayingAd]);
+
+  const handleSkipIntro = () => {
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = introDuration;
+      setIntroSkipped(true);
+      setShowSkipIntro(false);
+    }
+  };
+
+  // ============ AD HANDLERS ============
+  const handleAdComplete = () => {
+    setIsPlayingAd(false);
+    setCurrentAd(null);
+    if (adTimerRef.current) clearInterval(adTimerRef.current);
+    
+    if (adType === "preRoll") {
+      setPreRollComplete(true);
+    }
+    
+    // Resume video after mid-roll
+    if (adType === "midRoll") {
+      const video = videoRef.current;
+      if (video) video.play();
+    }
+    
+    setAdType(null);
+  };
+
+  const handleSkipAd = () => {
+    if (canSkipAd) {
+      handleAdComplete();
+    }
+  };
+
+  // ============ SWIPE DOWN / MINI-PLAYER LOGIC ============
+  const handleTouchStart = (e) => {
+    if (isMiniPlayer) return;
+    setTouchStartY(e.touches[0].clientY);
+  };
+
+  const handleTouchMove = (e) => {
+    if (isMiniPlayer || touchStartY === 0) return;
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - touchStartY;
+    
+    // Only track downward swipes
+    if (distance > 0) {
+      setSwipeDistance(distance);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    // If swiped down more than 100px, minimize to mini-player
+    if (swipeDistance > 100) {
+      setIsMiniPlayer(true);
+      // Pause main video, sync to mini player
+      const video = videoRef.current;
+      if (video) {
+        video.pause();
+      }
+    }
+    setTouchStartY(0);
+    setSwipeDistance(0);
+  };
+
+  const handleExpandMiniPlayer = () => {
+    setIsMiniPlayer(false);
+  };
+
+  const handleCloseMiniPlayer = () => {
+    setIsMiniPlayer(false);
+    navigate(-1); // Go back
+  };
+
+  const handleMiniPlayerPlayPause = () => {
+    const video = videoRef.current;
+    if (video) {
+      if (isPlaying) {
+        video.pause();
+      } else {
+        video.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   // Show sign-up prompt at 50% of video for guests
   useEffect(() => {
     if (!user && duration > 0 && currentTime > duration * 0.5 && !hasShownMidwayPrompt.current) {
