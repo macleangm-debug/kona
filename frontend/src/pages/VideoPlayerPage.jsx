@@ -268,6 +268,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
+  
+  // Subtitle states
+  const [subtitles, setSubtitles] = useState({}); // { en: "url", sw: "url", fr: "url" }
+  const [activeSubtitle, setActiveSubtitle] = useState("off");
+  const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
