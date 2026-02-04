@@ -2,13 +2,21 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import axios from "axios";
-import { ChevronLeft, ChevronDown, Play, Pause, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check, X, SkipForward, Volume2, VolumeX, Maximize2, Minimize2 } from "lucide-react";
+import { ChevronLeft, ChevronDown, Play, Pause, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check, X, SkipForward, Volume2, VolumeX, Maximize2, Minimize2, Subtitles } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
+
+// ============ SUBTITLE LANGUAGES ============
+const SUBTITLE_LANGUAGES = [
+  { code: "off", label: "Off", flag: "🚫" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "sw", label: "Kiswahili", flag: "🇰🇪" },
+  { code: "fr", label: "Français", flag: "🇫🇷" }
+];
 
 // ============ AD CONFIGURATION ============
 const AD_CONFIG = {
