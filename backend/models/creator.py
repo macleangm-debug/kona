@@ -131,31 +131,82 @@ class CreatorSeries(BaseModel):
     description: str
     genre: str
     thumbnail: str
-    status: str = "draft"  # draft, pending_review, published, rejected
+    target_audience: Optional[str] = None
+    content_rating: str = "PG-13"
+    language: str = "en"
+    status: str = "pending_review"  # pending_review, under_review, approved, rejected, published
+    rejection_reason: Optional[str] = None
+    total_seasons: int = 1
     total_episodes: int = 0
     total_views: int = 0
     total_earnings: int = 0
     created_at: str
+    reviewed_at: Optional[str] = None
+    reviewed_by: Optional[str] = None
     published_at: Optional[str] = None
+
+class Season(BaseModel):
+    """Season within a series"""
+    id: str
+    series_id: str
+    creator_id: str
+    season_number: int
+    title: Optional[str] = None
+    description: Optional[str] = None
+    total_episodes: int = 0
+    status: str = "active"  # active, completed
+    created_at: str
 
 class CreatorEpisode(BaseModel):
     """Episode in a creator's series"""
     id: str
     series_id: str
+    season_id: str
     creator_id: str
+    season_number: int
     episode_number: int
+    episode_code: str  # e.g., "S01E03"
     title: str
     description: Optional[str]
+    video_url: Optional[str] = None
     bunny_video_id: Optional[str] = None
     encoding_status: str = "pending"  # pending, uploading, encoding, ready, failed
     duration: Optional[int] = None
     thumbnail: Optional[str] = None
     is_free: bool = False
+    is_pilot: bool = False
     coins_required: int = 5
+    intro_duration: int = 30
     views: int = 0
     earnings: int = 0
     created_at: str
     published_at: Optional[str] = None
+
+# ============ ADMIN REVIEW MODELS ============
+class SubmissionReview(BaseModel):
+    """Admin review of a series submission"""
+    submission_id: str
+    decision: str = Field(..., description="approved, rejected, request_changes")
+    feedback: str = Field(..., min_length=10, max_length=1000)
+    content_quality_score: int = Field(default=0, ge=0, le=10)
+    market_fit_score: int = Field(default=0, ge=0, le=10)
+    technical_quality_score: int = Field(default=0, ge=0, le=10)
+
+class SubmissionStatus(BaseModel):
+    """Status of a series submission"""
+    submission_id: str
+    series_title: str
+    creator_name: str
+    creator_email: str
+    status: str
+    submitted_at: str
+    pilot_video_url: str
+    genre: str
+    planned_seasons: int
+    episodes_per_season: int
+    feedback: Optional[str] = None
+    reviewed_at: Optional[str] = None
+    reviewed_by: Optional[str] = None
 
 # ============ REVENUE MODELS ============
 class ViewRecord(BaseModel):
