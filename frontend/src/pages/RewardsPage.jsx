@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 import { 
   Gift, Coins, Trophy, Target, CheckCircle2, Lock,
   Loader2, Sparkles, Calendar, Users, Play, Star
