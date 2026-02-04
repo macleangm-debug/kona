@@ -558,6 +558,7 @@ const MobileHeroCarousel = ({ series, onCardClick }) => {
 
 // Main HomePage Component
 export const HomePageResponsive = ({ onAuthClick }) => {
+  const { t } = useTranslation();
   const [series, setSeries] = useState([]);
   const [featured, setFeatured] = useState([]);
   const [continueWatching, setContinueWatching] = useState([]);
