@@ -463,8 +463,8 @@ export const CreatorPortal = () => {
               <span className="font-semibold">$70.00</span>
             </div>
             <div className="flex justify-between p-2 rounded bg-green-500/10 border border-green-500/30">
-              <span className="text-green-400">Your Share ({(stats?.revenue_share || 0.40) * 100}%)</span>
-              <span className="font-bold text-green-400">${(70 * (stats?.revenue_share || 0.40)).toFixed(2)}</span>
+              <span className="text-green-400">Your Share ({(stats?.revenue_share || 0.30) * 100}%)</span>
+              <span className="font-bold text-green-400">${(70 * (stats?.revenue_share || 0.30)).toFixed(2)}</span>
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-3 text-center">
