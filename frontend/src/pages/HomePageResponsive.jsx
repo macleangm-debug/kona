@@ -769,7 +769,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
         {/* Continue Watching */}
         {user && continueWatching.length > 0 && (
           <ContentRow
-            title="Continue Watching"
+            title={t('home.continueWatching')}
             series={continueWatching.map(item => item.series)}
             onCardClick={(id) => navigate(`/series/${id}`)}
             myList={myList}
@@ -780,7 +780,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
 
         {/* Trending Now */}
         <ContentRow
-          title="Trending Now 🔥"
+          title={`${t('home.trending')} 🔥`}
           series={series}
           onCardClick={(id) => navigate(`/series/${id}`)}
           myList={myList}
@@ -792,7 +792,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
         {/* My List */}
         {user && myList.length > 0 && (
           <ContentRow
-            title="My List"
+            title={t('nav.myList')}
             series={series.filter(s => myList.includes(s.id))}
             onCardClick={(id) => navigate(`/series/${id}`)}
             myList={myList}
@@ -844,7 +844,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
 
         {/* Top 10 */}
         <ContentRow
-          title="Top 10 This Week"
+          title={t('home.top10')}
           series={series.slice(0, 10)}
           onCardClick={(id) => navigate(`/series/${id}`)}
           myList={myList}
@@ -856,7 +856,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
         {/* Coming Soon */}
         {comingSoon.length > 0 && (
           <ContentRow
-            title="Coming Soon 🔜"
+            title={`${t('nav.comingSoon')} 🔜`}
             series={comingSoon}
             onCardClick={(id) => navigate(`/series/${id}`)}
             myList={myList}
@@ -867,7 +867,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
 
         {/* New Releases */}
         <ContentRow
-          title="New Releases ✨"
+          title={`${t('home.newReleases')} ✨`}
           series={series.slice(-10)}
           onCardClick={(id) => navigate(`/series/${id}`)}
           myList={myList}
