@@ -217,11 +217,6 @@ const SubmissionsReviewTab = ({ token }) => {
     technical_quality: 5
   });
 
-  useEffect(() => {
-    fetchSubmissions();
-    fetchStats();
-  }, [filter]);
-
   const fetchSubmissions = async () => {
     setLoading(true);
     try {
@@ -245,6 +240,12 @@ const SubmissionsReviewTab = ({ token }) => {
       console.error("Failed to fetch stats");
     }
   };
+
+  useEffect(() => {
+    fetchSubmissions();
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
 
   const startReview = async (submission) => {
     try {
