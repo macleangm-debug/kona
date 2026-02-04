@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink } from "lucide-react";
+import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink, FileVideo, CheckCircle, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
+import { SeriesSubmissionForm } from "@/components/SeriesSubmissionForm";
 
 export const CreatorPortal = () => {
   const navigate = useNavigate();
