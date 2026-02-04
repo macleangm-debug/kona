@@ -15,10 +15,11 @@ from services import db, get_current_user
 router = APIRouter(prefix="/revenue", tags=["Revenue Management"])
 
 # ============ DEFAULT SETTINGS ============
-# Revenue Model: 
+# Revenue Model (Aligned with ReelShort): 
 # 1. 30% deducted for expenses FIRST
 # 2. Remaining 70% split between Kona & Creator
-# 3. Creator gets 40-60% of post-expense revenue based on tier
+# 3. Creator gets 30-50% of post-expense revenue based on tier
+# This gives Kona 65-79% of gross revenue (sustainable margins)
 DEFAULT_SETTINGS = {
     "expenses": {
         "payment_gateway": 5.0,       # 5%
@@ -28,11 +29,11 @@ DEFAULT_SETTINGS = {
         "total": 30.0                 # 30% total expenses
     },
     "creator_tiers": [
-        {"name": "New Creator", "min_views": 0, "max_views": 50000, "share": 40},
-        {"name": "Verified Creator", "min_views": 50001, "max_views": 500000, "share": 50},
-        {"name": "Premium Partner", "min_views": 500001, "max_views": None, "share": 60}
+        {"name": "New Creator", "min_views": 0, "max_views": 50000, "share": 30},
+        {"name": "Verified Creator", "min_views": 50001, "max_views": 500000, "share": 40},
+        {"name": "Premium Partner", "min_views": 500001, "max_views": None, "share": 50}
     ],
-    "platform_share": 70,  # Platform keeps 70% of post-expense (at 40% creator tier)
+    "platform_share": 70,  # Platform keeps 70% of post-expense (at 30% creator tier)
     "free_coins_payout": False,  # Free/reward coins don't count for payouts
     "min_payout_threshold": 10.0,  # Minimum $10 to request payout
     "payout_cycle_days": 7  # Weekly payouts
