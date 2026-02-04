@@ -112,7 +112,7 @@ export const SeriesSubmissionForm = ({ open, onClose, token, onSuccess }) => {
             </div>
             <h2 className="text-xl font-bold mb-2">Submission Received!</h2>
             <p className="text-muted-foreground mb-4">
-              Your series "{form.title}" has been submitted for review. Our team will review your pilot episode and get back to you within 3-5 business days.
+              Your series &quot;{form.title}&quot; has been submitted for review. Our team will review your pilot episode and get back to you within 3-5 business days.
             </p>
             <p className="text-sm text-muted-foreground mb-6">
               Submission ID: <span className="font-mono">{submissionId}</span>
