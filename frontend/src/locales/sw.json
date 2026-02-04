@@ -19,7 +19,17 @@
     "copied": "Imenakiliwa!",
     "seeAll": "Tazama Zote",
     "viewMore": "Tazama Zaidi",
-    "comingSoon": "Inakuja Hivi Karibuni"
+    "comingSoon": "Inakuja Hivi Karibuni",
+    "free": "Bure",
+    "coins": "sarafu",
+    "play": "Cheza",
+    "pause": "Simamisha",
+    "like": "Penda",
+    "liked": "Umependa",
+    "download": "Pakua",
+    "episodes": "Vipindi",
+    "season": "Msimu",
+    "episode": "Kipindi"
   },
   "nav": {
     "home": "Nyumbani",
@@ -29,7 +39,8 @@
     "profile": "Wasifu",
     "myList": "Orodha Yangu",
     "comingSoon": "Inakuja Hivi Karibuni",
-    "search": "Tafuta"
+    "search": "Tafuta",
+    "stories": "Hadithi"
   },
   "auth": {
     "signIn": "Ingia",
@@ -58,7 +69,12 @@
     "watchNow": "Tazama Sasa",
     "moreInfo": "Maelezo Zaidi",
     "addToList": "Ongeza kwenye Orodha",
-    "removeFromList": "Ondoa kwenye Orodha"
+    "removeFromList": "Ondoa kwenye Orodha",
+    "freeEpisodes": "Vipindi Bure",
+    "top10": "10 Bora Wiki Hii",
+    "watchFree": "Tazama Vipindi Bure",
+    "playNow": "Cheza Sasa",
+    "details": "Maelezo"
   },
   "discover": {
     "title": "Gundua",
@@ -149,7 +165,8 @@
     "adminPanel": "Paneli ya Msimamizi",
     "helpSupport": "Msaada na Usaidizi",
     "privacyPolicy": "Sera ya Faragha",
-    "termsOfService": "Masharti ya Huduma"
+    "termsOfService": "Masharti ya Huduma",
+    "installApp": "Sakinisha Programu"
   },
   "notifications": {
     "title": "Arifa",
@@ -178,7 +195,55 @@
     "speed": "Kasi",
     "autoPlay": "Cheza ijayo moja kwa moja",
     "previousEpisode": "Kipindi Kilichotangulia",
-    "nextEpisode": "Kipindi Kifuatacho"
+    "nextEpisode": "Kipindi Kifuatacho",
+    "skipIntro": "Ruka Utangulizi",
+    "dataSaver": "Okoa Data",
+    "pip": "PiP"
+  },
+  "stories": {
+    "title": "Hadithi",
+    "freeEpisodes": "Vipindi Bure",
+    "watchFullSeries": "Tazama Mfululizo Mzima",
+    "episode1Free": "Kipindi 1 - Bure",
+    "swipeNext": "Telezesha kwa kifuatacho",
+    "tapToLike": "Gonga mara mbili kupenda"
+  },
+  "creator": {
+    "title": "Studio ya Waundaji",
+    "becomeCreator": "Kuwa Muundaji",
+    "partnerWithKona": "Shirikiana na Kona",
+    "revenueShare": "Mgawanyo wa Mapato",
+    "ofNetRevenue": "ya mapato halisi (baada ya gharama)",
+    "realTimeAnalytics": "Takwimu za Moja kwa Moja",
+    "trackViews": "Fuatilia maoni, mapato na hadhira",
+    "milestoneBonuses": "Bonasi za Malengo",
+    "earnExtra": "Pata zaidi kwenye malengo",
+    "howRevenueWorks": "Jinsi Mapato Yanavyofanya Kazi",
+    "expenseDeduction": "inakatwa kwa gharama za jukwaa",
+    "yourShareCalculated": "Sehemu yako inakokotolewa kutoka iliyobaki",
+    "example": "Mfano",
+    "youEarn": "Unapata",
+    "creatorTiers": "Viwango vya Waundaji",
+    "newCreator": "Muundaji Mpya",
+    "verifiedCreator": "Muundaji Aliyethibitishwa",
+    "premiumPartner": "Mshirika wa Premium",
+    "ofNet": "ya mapato halisi",
+    "autoPublish": "Chapisha moja kwa moja",
+    "priorityFeaturing": "Upendeleo wa kuonekana",
+    "applyNow": "Omba Kuwa Muundaji",
+    "submitSeries": "Wasilisha Mfululizo",
+    "pendingSubmissions": "Maombi Yanayosubiri",
+    "mySeries": "Mifululizo Yangu",
+    "totalEarnings": "Jumla ya Mapato",
+    "totalViews": "Jumla ya Maoni",
+    "thisMonth": "Mwezi Huu",
+    "pendingPayout": "Malipo Yanayosubiri",
+    "yourEarningsRate": "Kiwango Chako cha Mapato",
+    "grossRevenue": "Mapato Ghafi",
+    "platformExpenses": "Gharama za Jukwaa",
+    "netRevenue": "Mapato Halisi",
+    "yourShare": "Sehemu Yako",
+    "onlyPurchasedCoins": "Sarafu zilizonunuliwa tu zinazalisha mapato. Zawadi bure hazihesabiki."
   },
   "errors": {
     "networkError": "Hitilafu ya mtandao. Tafadhali angalia muunganisho wako.",
@@ -191,6 +256,37 @@
     "addedToList": "Imeongezwa kwenye Orodha Yangu",
     "removedFromList": "Imeondolewa kwenye Orodha Yangu",
     "rewardClaimed": "Zawadi imechukuliwa!",
-    "settingsSaved": "Mipangilio imehifadhiwa"
+    "settingsSaved": "Mipangilio imehifadhiwa",
+    "badgeEarned": "Beji Imepatikana!"
+  },
+  "badges": {
+    "title": "Beji za Mafanikio",
+    "earned": "Zilizopatikana",
+    "inProgress": "Zinaendelea",
+    "featured": "Beji Zilizoangaziwa",
+    "featuredDesc": "Onyesha hadi 3 kwenye wasifu wako",
+    "checkNew": "Angalia Beji Mpya",
+    "noNewBadges": "Bado haujapata beji mpya. Endelea!",
+    "howToEarn": "Jinsi ya Kupata Beji",
+    "firstSteps": "Hatua za Kwanza",
+    "firstStepsDesc": "Tazama kipindi chako cha kwanza",
+    "marathonMaster": "Bingwa wa Marathon",
+    "marathonMasterDesc": "Tazama vipindi 10+ kwa siku moja",
+    "earlyAdopter": "Mtumiaji wa Mapema",
+    "earlyAdopterDesc": "Ulijiunga miezi 3 ya kwanza",
+    "superReferrer": "Maliikaji Mkuu",
+    "superReferrerDesc": "Alika marafiki 10+",
+    "seriesSlayer": "Mumalizi wa Mfululizo",
+    "seriesSlayerDesc": "Maliza mifululizo 5 kamili",
+    "vipMember": "Mwanachama VIP",
+    "vipMemberDesc": "Jiandikishe mpango wowote wa VIP",
+    "missionAce": "Bingwa wa Misheni",
+    "missionAceDesc": "Kamilisha misheni 50 ya kila siku",
+    "nightOwl": "Bundi wa Usiku",
+    "nightOwlDesc": "Tazama vipindi 5+ baada ya usiku wa manane",
+    "bigSpender": "Mtumizi Mkubwa",
+    "bigSpenderDesc": "Nunua sarafu 1000+ jumla",
+    "loyalViewer": "Mtazamaji Mwaminifu",
+    "loyalViewerDesc": "Dumisha mfuatano wa kuingia siku 30"
   }
 }
