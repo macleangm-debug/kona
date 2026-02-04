@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
 import { Search, Gift, Star, Play, Info, Plus, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from 'swiper/react';
