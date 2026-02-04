@@ -3,7 +3,7 @@
     "appName": "Kona",
     "tagline": "Votre coin pour les meilleures mini-séries",
     "loading": "Chargement...",
-    "error": "Une erreur s'est produite",
+    "error": "Une erreur est survenue",
     "retry": "Réessayer",
     "cancel": "Annuler",
     "save": "Enregistrer",
@@ -19,7 +19,17 @@
     "copied": "Copié !",
     "seeAll": "Voir Tout",
     "viewMore": "Voir Plus",
-    "comingSoon": "Bientôt Disponible"
+    "comingSoon": "Bientôt Disponible",
+    "free": "Gratuit",
+    "coins": "pièces",
+    "play": "Lecture",
+    "pause": "Pause",
+    "like": "Aimer",
+    "liked": "Aimé",
+    "download": "Télécharger",
+    "episodes": "Épisodes",
+    "season": "Saison",
+    "episode": "Épisode"
   },
   "nav": {
     "home": "Accueil",
@@ -29,7 +39,8 @@
     "profile": "Profil",
     "myList": "Ma Liste",
     "comingSoon": "Bientôt Disponible",
-    "search": "Rechercher"
+    "search": "Rechercher",
+    "stories": "Stories"
   },
   "auth": {
     "signIn": "Connexion",
@@ -58,7 +69,12 @@
     "watchNow": "Regarder",
     "moreInfo": "Plus d'Infos",
     "addToList": "Ajouter à Ma Liste",
-    "removeFromList": "Retirer de la Liste"
+    "removeFromList": "Retirer de la Liste",
+    "freeEpisodes": "Épisodes Gratuits",
+    "top10": "Top 10 de la Semaine",
+    "watchFree": "Regarder les Épisodes Gratuits",
+    "playNow": "Lecture",
+    "details": "Détails"
   },
   "discover": {
     "title": "Découvrir",
@@ -149,7 +165,8 @@
     "adminPanel": "Panneau Admin",
     "helpSupport": "Aide et Support",
     "privacyPolicy": "Politique de Confidentialité",
-    "termsOfService": "Conditions d'Utilisation"
+    "termsOfService": "Conditions d'Utilisation",
+    "installApp": "Installer l'Application"
   },
   "notifications": {
     "title": "Notifications",
@@ -178,19 +195,98 @@
     "speed": "Vitesse",
     "autoPlay": "Lecture auto suivant",
     "previousEpisode": "Épisode Précédent",
-    "nextEpisode": "Épisode Suivant"
+    "nextEpisode": "Épisode Suivant",
+    "skipIntro": "Passer l'Intro",
+    "dataSaver": "Économie de Données",
+    "pip": "PiP"
+  },
+  "stories": {
+    "title": "Stories",
+    "freeEpisodes": "Épisodes Gratuits",
+    "watchFullSeries": "Regarder la Série Complète",
+    "episode1Free": "Épisode 1 - Gratuit",
+    "swipeNext": "Glisser pour suivant",
+    "tapToLike": "Double-tap pour aimer"
+  },
+  "creator": {
+    "title": "Studio Créateur",
+    "becomeCreator": "Devenir Créateur",
+    "partnerWithKona": "Partenariat avec Kona",
+    "revenueShare": "Partage des Revenus",
+    "ofNetRevenue": "des revenus nets (après frais)",
+    "realTimeAnalytics": "Analyses en Temps Réel",
+    "trackViews": "Suivez les vues, gains et audience",
+    "milestoneBonuses": "Bonus d'Objectifs",
+    "earnExtra": "Gagnez plus aux objectifs",
+    "howRevenueWorks": "Comment Fonctionnent les Revenus",
+    "expenseDeduction": "sont déduits pour les frais de plateforme",
+    "yourShareCalculated": "Votre part est calculée sur le reste",
+    "example": "Exemple",
+    "youEarn": "Vous gagnez",
+    "creatorTiers": "Niveaux Créateur",
+    "newCreator": "Nouveau Créateur",
+    "verifiedCreator": "Créateur Vérifié",
+    "premiumPartner": "Partenaire Premium",
+    "ofNet": "du net",
+    "autoPublish": "Publication auto",
+    "priorityFeaturing": "Mise en avant prioritaire",
+    "applyNow": "Postuler pour Devenir Créateur",
+    "submitSeries": "Soumettre une Série",
+    "pendingSubmissions": "Soumissions en Attente",
+    "mySeries": "Mes Séries",
+    "totalEarnings": "Gains Totaux",
+    "totalViews": "Vues Totales",
+    "thisMonth": "Ce Mois",
+    "pendingPayout": "Paiement en Attente",
+    "yourEarningsRate": "Votre Taux de Gains",
+    "grossRevenue": "Revenu Brut",
+    "platformExpenses": "Frais de Plateforme",
+    "netRevenue": "Revenu Net",
+    "yourShare": "Votre Part",
+    "onlyPurchasedCoins": "Seules les pièces achetées génèrent des revenus. Les récompenses gratuites ne comptent pas."
   },
   "errors": {
     "networkError": "Erreur réseau. Vérifiez votre connexion.",
     "unauthorized": "Veuillez vous connecter pour continuer",
     "notEnoughCoins": "Pas assez de pièces",
-    "somethingWrong": "Une erreur s'est produite. Veuillez réessayer."
+    "somethingWrong": "Une erreur est survenue. Veuillez réessayer."
   },
   "success": {
     "episodeUnlocked": "Épisode débloqué !",
     "addedToList": "Ajouté à Ma Liste",
     "removedFromList": "Retiré de Ma Liste",
     "rewardClaimed": "Récompense réclamée !",
-    "settingsSaved": "Paramètres enregistrés"
+    "settingsSaved": "Paramètres enregistrés",
+    "badgeEarned": "Badge Obtenu !"
+  },
+  "badges": {
+    "title": "Badges de Succès",
+    "earned": "Obtenus",
+    "inProgress": "En Cours",
+    "featured": "Badges en Vedette",
+    "featuredDesc": "Affichez jusqu'à 3 sur votre profil",
+    "checkNew": "Vérifier les Nouveaux Badges",
+    "noNewBadges": "Pas encore de nouveau badge. Continuez !",
+    "howToEarn": "Comment Obtenir des Badges",
+    "firstSteps": "Premiers Pas",
+    "firstStepsDesc": "Regardez votre premier épisode",
+    "marathonMaster": "Maître du Marathon",
+    "marathonMasterDesc": "Regardez 10+ épisodes en une journée",
+    "earlyAdopter": "Adopteur Précoce",
+    "earlyAdopterDesc": "Inscrit dans les 3 premiers mois",
+    "superReferrer": "Super Parrain",
+    "superReferrerDesc": "Parrainez 10+ amis",
+    "seriesSlayer": "Tueur de Séries",
+    "seriesSlayerDesc": "Terminez 5 séries complètes",
+    "vipMember": "Membre VIP",
+    "vipMemberDesc": "Abonnez-vous à un plan VIP",
+    "missionAce": "As des Missions",
+    "missionAceDesc": "Terminez 50 missions quotidiennes",
+    "nightOwl": "Oiseau de Nuit",
+    "nightOwlDesc": "Regardez 5+ épisodes après minuit",
+    "bigSpender": "Gros Dépensier",
+    "bigSpenderDesc": "Achetez 1000+ pièces au total",
+    "loyalViewer": "Spectateur Fidèle",
+    "loyalViewerDesc": "Maintenez une série de 30 jours de connexion"
   }
 }
