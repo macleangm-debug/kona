@@ -17,12 +17,13 @@ from services.bunny import bunny_service
 router = APIRouter(prefix="/creator", tags=["Creator"])
 
 # ============ CREATOR TIER CONFIG ============
-# Revenue Model: Creator share is % of POST-EXPENSE revenue (after 30% expense deduction)
-# Example: $100 gross → $70 after expenses → Creator gets 40-60% of $70
+# Revenue Model (Aligned with ReelShort): Creator share is % of POST-EXPENSE revenue
+# Example: $100 gross → $70 after 30% expenses → Creator gets 30-50% of $70
+# Kona keeps 65-79% of gross revenue (sustainable margins for growth)
 CREATOR_TIERS = {
-    "new": {"revenue_share": 0.40, "min_views": 0, "auto_publish": False},
-    "verified": {"revenue_share": 0.50, "min_views": 50000, "auto_publish": True},
-    "partner": {"revenue_share": 0.60, "min_views": 500000, "auto_publish": True}
+    "new": {"revenue_share": 0.30, "min_views": 0, "auto_publish": False},
+    "verified": {"revenue_share": 0.40, "min_views": 50000, "auto_publish": True},
+    "partner": {"revenue_share": 0.50, "min_views": 500000, "auto_publish": True}
 }
 
 MILESTONE_BONUSES = [
