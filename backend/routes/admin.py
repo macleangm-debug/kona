@@ -497,3 +497,239 @@ async def toggle_checklist_item(item_id: str, user: dict = Depends(require_super
     return {"item_id": item_id, "action": action, "completed_items": completed}
 
 
+
+# ============ CONTENT SUBMISSION REVIEW ============
+
+@router.get("/submissions")
+async def get_pending_submissions(
+    status: str = "pending_review",
+    user: dict = Depends(require_admin)
+):
+    """Get all series submissions for review"""
+    query = {}
+    if status != "all":
+        query["status"] = status
+    
+    submissions = await db.series_submissions.find(
+        query,
+        {"_id": 0}
+    ).sort("submitted_at", -1).to_list(100)
+    
+    return submissions
+
+
+@router.get("/submissions/{submission_id}")
+async def get_submission_detail(submission_id: str, user: dict = Depends(require_admin)):
+    """Get detailed submission with pilot video for review"""
+    submission = await db.series_submissions.find_one(
+        {"id": submission_id},
+        {"_id": 0}
+    )
+    
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    
+    # Get creator info
+    creator = await db.creators.find_one(
+        {"id": submission["creator_id"]},
+        {"_id": 0}
+    )
+    
+    # Get pilot episode if exists
+    pilot = await db.creator_episodes.find_one(
+        {"id": submission.get("pilot_episode_id")},
+        {"_id": 0}
+    )
+    
+    return {
+        **submission,
+        "creator": creator,
+        "pilot_episode": pilot
+    }
+
+
+@router.post("/submissions/{submission_id}/review")
+async def review_submission(
+    submission_id: str,
+    decision: str,  # approved, rejected, request_changes
+    feedback: str,
+    content_quality_score: int = 0,
+    market_fit_score: int = 0,
+    technical_quality_score: int = 0,
+    user: dict = Depends(require_admin)
+):
+    """Review and approve/reject a series submission"""
+    submission = await db.series_submissions.find_one({"id": submission_id})
+    
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    
+    if submission["status"] not in ["pending_review", "under_review"]:
+        raise HTTPException(status_code=400, detail="Submission already processed")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Update submission
+    update_data = {
+        "status": decision,
+        "feedback": feedback,
+        "review_scores": {
+            "content_quality": content_quality_score,
+            "market_fit": market_fit_score,
+            "technical_quality": technical_quality_score,
+            "total": content_quality_score + market_fit_score + technical_quality_score
+        },
+        "reviewed_at": now,
+        "reviewed_by": user["id"]
+    }
+    
+    await db.series_submissions.update_one(
+        {"id": submission_id},
+        {"$set": update_data}
+    )
+    
+    # Update series status
+    series_status = "approved" if decision == "approved" else ("rejected" if decision == "rejected" else "pending_review")
+    
+    series_update = {
+        "status": series_status,
+        "reviewed_at": now,
+        "reviewed_by": user["id"]
+    }
+    
+    if decision == "rejected":
+        series_update["rejection_reason"] = feedback
+    
+    await db.creator_series.update_one(
+        {"id": submission["series_id"]},
+        {"$set": series_update}
+    )
+    
+    # If approved, publish the series and pilot to main content
+    if decision == "approved":
+        await _publish_approved_series(submission)
+    
+    # Notify creator (in production, send email/push notification)
+    notification = {
+        "id": f"notif-{uuid.uuid4().hex[:8]}",
+        "user_id": submission["creator_id"],
+        "type": "submission_review",
+        "title": f"Series {'Approved' if decision == 'approved' else 'Reviewed'}",
+        "message": f"Your series '{submission['title']}' has been {decision}. {feedback}",
+        "read": False,
+        "created_at": now
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "message": f"Submission {decision}",
+        "submission_id": submission_id,
+        "series_id": submission["series_id"],
+        "decision": decision
+    }
+
+
+async def _publish_approved_series(submission: dict):
+    """Publish an approved series to the main content library"""
+    series_id = submission["series_id"]
+    
+    # Get creator series
+    creator_series = await db.creator_series.find_one({"id": series_id}, {"_id": 0})
+    if not creator_series:
+        return
+    
+    # Create in main series collection
+    main_series = {
+        "id": series_id,
+        "title": submission["title"],
+        "description": submission["description"],
+        "genre": submission["genre"],
+        "thumbnail": submission.get("thumbnail_url") or "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "rating": 4.5,
+        "total_episodes": 1,
+        "total_seasons": 1,
+        "views": 0,
+        "featured": False,
+        "content_rating": submission.get("content_rating", "PG-13"),
+        "language": submission.get("language", "en"),
+        "creator_id": submission["creator_id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.series.update_one(
+        {"id": series_id},
+        {"$set": main_series},
+        upsert=True
+    )
+    
+    # Publish pilot episode
+    pilot = await db.creator_episodes.find_one(
+        {"id": submission.get("pilot_episode_id")},
+        {"_id": 0}
+    )
+    
+    if pilot:
+        main_episode = {
+            "id": pilot["id"],
+            "series_id": series_id,
+            "season_number": 1,
+            "episode_number": 1,
+            "episode_code": "S01E01",
+            "title": pilot["title"],
+            "description": pilot.get("description"),
+            "thumbnail": pilot.get("thumbnail") or main_series["thumbnail"],
+            "duration": f"{(pilot.get('duration', 120) // 60)}:{str(pilot.get('duration', 0) % 60).zfill(2)}" if pilot.get('duration') else "2:00",
+            "video_url": pilot.get("video_url", ""),
+            "is_free": True,
+            "is_pilot": True,
+            "coins_required": 0,
+            "intro_duration": pilot.get("intro_duration", 30),
+            "creator_id": submission["creator_id"],
+            "views": 0,
+            "likes": 0,
+            "shares": 0
+        }
+        
+        await db.episodes.update_one(
+            {"id": pilot["id"]},
+            {"$set": main_episode},
+            upsert=True
+        )
+    
+    # Update creator series status to published
+    await db.creator_series.update_one(
+        {"id": series_id},
+        {"$set": {"status": "published", "published_at": datetime.now(timezone.utc).isoformat()}}
+    )
+
+
+@router.post("/submissions/{submission_id}/start-review")
+async def start_review(submission_id: str, user: dict = Depends(require_admin)):
+    """Mark a submission as under review (to prevent duplicate reviews)"""
+    result = await db.series_submissions.update_one(
+        {"id": submission_id, "status": "pending_review"},
+        {"$set": {"status": "under_review", "reviewing_by": user["id"]}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=400, detail="Submission not available for review")
+    
+    return {"message": "Review started", "submission_id": submission_id}
+
+
+@router.get("/submissions/stats")
+async def get_submission_stats(user: dict = Depends(require_admin)):
+    """Get submission statistics"""
+    pending = await db.series_submissions.count_documents({"status": "pending_review"})
+    under_review = await db.series_submissions.count_documents({"status": "under_review"})
+    approved = await db.series_submissions.count_documents({"status": "approved"})
+    rejected = await db.series_submissions.count_documents({"status": "rejected"})
+    
+    return {
+        "pending_review": pending,
+        "under_review": under_review,
+        "approved": approved,
+        "rejected": rejected,
+        "total": pending + under_review + approved + rejected
+    }
+
