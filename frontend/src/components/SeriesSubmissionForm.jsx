@@ -277,7 +277,7 @@ export const SeriesSubmissionForm = ({ open, onClose, token, onSuccess }) => {
                 placeholder="https://..."
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Provide a link to your pilot episode video. After approval, you'll upload directly to our platform.
+                Provide a link to your pilot episode video. After approval, you can upload directly to our platform.
               </p>
             </div>
 
