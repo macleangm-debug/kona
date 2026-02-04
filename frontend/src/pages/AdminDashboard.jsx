@@ -200,6 +200,471 @@ const LaunchChecklistTab = ({ token }) => {
   );
 };
 
+// ============ SUBMISSIONS REVIEW TAB ============
+const SubmissionsReviewTab = ({ token }) => {
+  const [submissions, setSubmissions] = useState([]);
+  const [selectedSubmission, setSelectedSubmission] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reviewing, setReviewing] = useState(false);
+  const [stats, setStats] = useState(null);
+  const [filter, setFilter] = useState("pending_review");
+  
+  // Review form state
+  const [feedback, setFeedback] = useState("");
+  const [scores, setScores] = useState({
+    content_quality: 5,
+    market_fit: 5,
+    technical_quality: 5
+  });
+
+  useEffect(() => {
+    fetchSubmissions();
+    fetchStats();
+  }, [filter]);
+
+  const fetchSubmissions = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/admin/submissions?status=${filter}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSubmissions(res.data);
+    } catch (e) {
+      toast.error("Failed to fetch submissions");
+    }
+    setLoading(false);
+  };
+
+  const fetchStats = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/submissions/stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStats(res.data);
+    } catch (e) {
+      console.error("Failed to fetch stats");
+    }
+  };
+
+  const startReview = async (submission) => {
+    try {
+      await axios.post(`${API}/admin/submissions/${submission.id}/start-review`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSelectedSubmission({ ...submission, status: "under_review" });
+    } catch (e) {
+      // Already under review or processed
+      setSelectedSubmission(submission);
+    }
+  };
+
+  const submitReview = async (decision) => {
+    if (!feedback.trim()) {
+      toast.error("Please provide feedback");
+      return;
+    }
+    
+    setReviewing(true);
+    try {
+      await axios.post(
+        `${API}/admin/submissions/${selectedSubmission.id}/review?decision=${decision}&feedback=${encodeURIComponent(feedback)}&content_quality_score=${scores.content_quality}&market_fit_score=${scores.market_fit}&technical_quality_score=${scores.technical_quality}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      
+      toast.success(`Series ${decision === 'approved' ? 'approved' : 'rejected'}!`);
+      setSelectedSubmission(null);
+      setFeedback("");
+      setScores({ content_quality: 5, market_fit: 5, technical_quality: 5 });
+      fetchSubmissions();
+      fetchStats();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to submit review");
+    }
+    setReviewing(false);
+  };
+
+  const totalScore = scores.content_quality + scores.market_fit + scores.technical_quality;
+
+  // Detail View / Review Panel
+  if (selectedSubmission) {
+    return (
+      <div className="space-y-6">
+        {/* Back button */}
+        <button
+          onClick={() => setSelectedSubmission(null)}
+          className="flex items-center gap-2 text-muted-foreground hover:text-white transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          Back to Submissions
+        </button>
+
+        {/* Series Info Header */}
+        <Card className="p-6 bg-gradient-to-br from-primary/20 to-purple-500/10 border-primary/20">
+          <div className="flex items-start justify-between">
+            <div>
+              <Badge className="mb-2">{selectedSubmission.genre}</Badge>
+              <h2 className="text-2xl font-bold mb-1">{selectedSubmission.title}</h2>
+              <p className="text-muted-foreground text-sm">
+                by {selectedSubmission.creator_name} ({selectedSubmission.creator_email})
+              </p>
+            </div>
+            <Badge variant={selectedSubmission.status === "pending_review" ? "secondary" : "default"}>
+              {selectedSubmission.status === "pending_review" ? "Pending" : "Under Review"}
+            </Badge>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left: Pilot Video & Details */}
+          <div className="space-y-4">
+            {/* Pilot Video Player */}
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3 flex items-center gap-2">
+                <Film className="w-4 h-4 text-primary" />
+                Pilot Episode: {selectedSubmission.pilot_title}
+              </h3>
+              
+              {selectedSubmission.pilot_video_url ? (
+                <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                  {selectedSubmission.pilot_video_url.includes("youtube") || 
+                   selectedSubmission.pilot_video_url.includes("youtu.be") ? (
+                    <iframe
+                      src={selectedSubmission.pilot_video_url.replace("watch?v=", "embed/").replace("youtu.be/", "youtube.com/embed/")}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Pilot Episode"
+                    />
+                  ) : selectedSubmission.pilot_video_url.includes("vimeo") ? (
+                    <iframe
+                      src={selectedSubmission.pilot_video_url.replace("vimeo.com", "player.vimeo.com/video")}
+                      className="w-full h-full"
+                      allowFullScreen
+                      title="Pilot Episode"
+                    />
+                  ) : (
+                    <video
+                      src={selectedSubmission.pilot_video_url}
+                      controls
+                      className="w-full h-full"
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="aspect-video bg-gray-800 rounded-lg flex items-center justify-center">
+                  <p className="text-muted-foreground">No video URL provided</p>
+                </div>
+              )}
+              
+              <p className="text-sm text-muted-foreground mt-3">
+                {selectedSubmission.pilot_description}
+              </p>
+            </Card>
+
+            {/* Series Details */}
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3">Series Details</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Target Audience</span>
+                  <span>{selectedSubmission.target_audience}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Content Rating</span>
+                  <Badge variant="outline">{selectedSubmission.content_rating}</Badge>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Language</span>
+                  <span>{selectedSubmission.language?.toUpperCase()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Planned Seasons</span>
+                  <span>{selectedSubmission.planned_seasons}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Episodes per Season</span>
+                  <span>{selectedSubmission.episodes_per_season}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Release Schedule</span>
+                  <span className="capitalize">{selectedSubmission.release_schedule}</span>
+                </div>
+              </div>
+            </Card>
+
+            {/* Description */}
+            <Card className="p-4">
+              <h3 className="font-semibold mb-2">Description</h3>
+              <p className="text-sm text-muted-foreground">{selectedSubmission.description}</p>
+            </Card>
+
+            {/* Unique Selling Point */}
+            <Card className="p-4 bg-yellow-500/10 border-yellow-500/20">
+              <h3 className="font-semibold mb-2 flex items-center gap-2">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                Unique Selling Point
+              </h3>
+              <p className="text-sm">{selectedSubmission.unique_selling_point}</p>
+            </Card>
+          </div>
+
+          {/* Right: Review Form */}
+          <div className="space-y-4">
+            <Card className="p-4">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-primary" />
+                Review Scores
+              </h3>
+
+              {/* Content Quality */}
+              <div className="mb-4">
+                <div className="flex justify-between mb-2">
+                  <label className="text-sm">Content Quality</label>
+                  <span className="text-sm font-bold text-primary">{scores.content_quality}/10</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={scores.content_quality}
+                  onChange={(e) => setScores(s => ({ ...s, content_quality: parseInt(e.target.value) }))}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Video/audio quality, storytelling, production value</p>
+              </div>
+
+              {/* Market Fit */}
+              <div className="mb-4">
+                <div className="flex justify-between mb-2">
+                  <label className="text-sm">Market Fit</label>
+                  <span className="text-sm font-bold text-primary">{scores.market_fit}/10</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={scores.market_fit}
+                  onChange={(e) => setScores(s => ({ ...s, market_fit: parseInt(e.target.value) }))}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Target audience appeal, genre demand, uniqueness</p>
+              </div>
+
+              {/* Technical Quality */}
+              <div className="mb-4">
+                <div className="flex justify-between mb-2">
+                  <label className="text-sm">Technical Quality</label>
+                  <span className="text-sm font-bold text-primary">{scores.technical_quality}/10</span>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={scores.technical_quality}
+                  onChange={(e) => setScores(s => ({ ...s, technical_quality: parseInt(e.target.value) }))}
+                  className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer"
+                />
+                <p className="text-xs text-muted-foreground mt-1">Resolution, audio clarity, mobile compatibility</p>
+              </div>
+
+              {/* Total Score */}
+              <div className="p-3 rounded-lg bg-white/5 border border-white/10 text-center">
+                <p className="text-sm text-muted-foreground">Total Score</p>
+                <p className={`text-3xl font-bold ${totalScore >= 20 ? 'text-green-400' : totalScore >= 15 ? 'text-yellow-400' : 'text-red-400'}`}>
+                  {totalScore}/30
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {totalScore >= 20 ? 'Recommended for approval' : totalScore >= 15 ? 'Borderline - review carefully' : 'Below standards'}
+                </p>
+              </div>
+            </Card>
+
+            {/* Feedback */}
+            <Card className="p-4">
+              <h3 className="font-semibold mb-3">Feedback for Creator</h3>
+              <textarea
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+                placeholder="Provide detailed feedback for the creator..."
+                className="w-full h-32 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm resize-none focus:outline-none focus:border-primary"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                This feedback will be sent to the creator
+              </p>
+            </Card>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Button
+                variant="destructive"
+                className="flex-1"
+                onClick={() => submitReview("rejected")}
+                disabled={reviewing}
+              >
+                {reviewing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <X className="w-4 h-4 mr-2" />}
+                Reject
+              </Button>
+              <Button
+                className="flex-1 bg-green-600 hover:bg-green-700"
+                onClick={() => submitReview("approved")}
+                disabled={reviewing}
+              >
+                {reviewing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+                Approve
+              </Button>
+            </div>
+
+            {/* Quick Actions */}
+            <Card className="p-3 bg-blue-500/10 border-blue-500/20">
+              <p className="text-xs text-blue-400">
+                <strong>Tip:</strong> Approved series will be published to the main content library with the pilot episode available for free viewing.
+              </p>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // List View
+  return (
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="p-4 bg-yellow-500/10 border-yellow-500/20">
+            <div className="flex items-center gap-3">
+              <Clock className="w-8 h-8 text-yellow-400" />
+              <div>
+                <p className="text-2xl font-bold">{stats.pending_review}</p>
+                <p className="text-xs text-muted-foreground">Pending Review</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-blue-500/10 border-blue-500/20">
+            <div className="flex items-center gap-3">
+              <Eye className="w-8 h-8 text-blue-400" />
+              <div>
+                <p className="text-2xl font-bold">{stats.under_review}</p>
+                <p className="text-xs text-muted-foreground">Under Review</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-green-500/10 border-green-500/20">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-8 h-8 text-green-400" />
+              <div>
+                <p className="text-2xl font-bold">{stats.approved}</p>
+                <p className="text-xs text-muted-foreground">Approved</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-red-500/10 border-red-500/20">
+            <div className="flex items-center gap-3">
+              <X className="w-8 h-8 text-red-400" />
+              <div>
+                <p className="text-2xl font-bold">{stats.rejected}</p>
+                <p className="text-xs text-muted-foreground">Rejected</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Filter Tabs */}
+      <div className="flex gap-2">
+        {["pending_review", "under_review", "approved", "rejected", "all"].map(status => (
+          <button
+            key={status}
+            onClick={() => setFilter(status)}
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              filter === status 
+                ? 'bg-primary text-white' 
+                : 'bg-white/5 hover:bg-white/10 text-muted-foreground'
+            }`}
+          >
+            {status === "pending_review" ? "Pending" : 
+             status === "under_review" ? "In Review" :
+             status.charAt(0).toUpperCase() + status.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {/* Submissions List */}
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      ) : submissions.length === 0 ? (
+        <Card className="p-8 text-center">
+          <Film className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-muted-foreground">No submissions found</p>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {submissions.map(sub => (
+            <Card 
+              key={sub.id} 
+              className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
+              onClick={() => startReview(sub)}
+            >
+              <div className="flex items-center gap-4">
+                {/* Thumbnail */}
+                <div className="w-20 h-28 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
+                  {sub.thumbnail_url ? (
+                    <img src={sub.thumbnail_url} alt={sub.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <Film className="w-8 h-8 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold truncate">{sub.title}</h3>
+                    <Badge variant="outline" className="flex-shrink-0">{sub.genre}</Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    by {sub.creator_name} • Pilot: {sub.pilot_title}
+                  </p>
+                  <p className="text-xs text-muted-foreground line-clamp-2">
+                    {sub.description}
+                  </p>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                    <span>{sub.planned_seasons} season(s)</span>
+                    <span>{sub.episodes_per_season} eps/season</span>
+                    <span className="capitalize">{sub.release_schedule}</span>
+                  </div>
+                </div>
+
+                {/* Status & Action */}
+                <div className="text-right flex-shrink-0">
+                  <Badge variant={
+                    sub.status === "pending_review" ? "secondary" :
+                    sub.status === "under_review" ? "default" :
+                    sub.status === "approved" ? "default" : "destructive"
+                  } className={sub.status === "approved" ? "bg-green-600" : ""}>
+                    {sub.status === "pending_review" ? "Pending" :
+                     sub.status === "under_review" ? "In Review" :
+                     sub.status.charAt(0).toUpperCase() + sub.status.slice(1)}
+                  </Badge>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {new Date(sub.submitted_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+
 // Investment Calculator Tab Component (Embedded)
 const InvestmentCalculatorTab = ({ token }) => {
   const [loading, setLoading] = useState(false);
