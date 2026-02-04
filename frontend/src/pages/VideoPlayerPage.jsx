@@ -559,6 +559,22 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           // Default to 0 likes if fetch fails
           setLikesCount(epRes.data.likes || 0);
         }
+        
+        // Load subtitles if available
+        if (epRes.data.subtitles) {
+          setSubtitles(epRes.data.subtitles);
+          // Auto-enable subtitles if available (first available language)
+          const availableLangs = Object.keys(epRes.data.subtitles);
+          if (availableLangs.length > 0) {
+            // Check user preference in localStorage
+            const preferredLang = localStorage.getItem('kona_subtitle_lang') || availableLangs[0];
+            if (epRes.data.subtitles[preferredLang]) {
+              setActiveSubtitle(preferredLang);
+            } else {
+              setActiveSubtitle(availableLangs[0]);
+            }
+          }
+        }
       } catch (e) {
         console.error("Error loading episode:", e);
       }
