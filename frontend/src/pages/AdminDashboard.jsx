@@ -1651,6 +1651,7 @@ export const AdminDashboard = () => {
     { id: "overview", label: "Overview", icon: BarChart3 },
     { id: "users", label: "Users", icon: Users },
     { id: "content", label: "Content", icon: Film },
+    { id: "submissions", label: "Submissions", icon: FileText },
     { id: "revenue", label: "Revenue", icon: DollarSign },
     { id: "creators", label: "Creators", icon: Crown },
     ...(user?.is_super_admin ? [
