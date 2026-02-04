@@ -66,12 +66,14 @@ export const CreatorPortal = () => {
       setCreatorStatus(statusRes.data);
 
       if (statusRes.data.is_creator) {
-        const [dashboardRes, seriesRes] = await Promise.all([
+        const [dashboardRes, seriesRes, submissionsRes] = await Promise.all([
           axios.get(`${API}/creator/dashboard`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API}/creator/series`, { headers: { Authorization: `Bearer ${token}` } })
+          axios.get(`${API}/creator/series`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API}/creator/submissions`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: [] }))
         ]);
         setDashboard(dashboardRes.data);
         setSeries(seriesRes.data);
+        setSubmissions(submissionsRes.data);
         
         // Fetch earnings and tier info
         try {
