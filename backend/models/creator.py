@@ -107,6 +107,14 @@ class CreatorEpisodeCreate(BaseModel):
     is_free: bool = False
     coins_required: int = Field(default=5, ge=0, le=50)
     intro_duration: int = Field(default=30, ge=0, le=120, description="Intro duration in seconds for Skip Intro feature")
+    subtitles: Optional[dict] = Field(default=None, description="Subtitle URLs: {en: 'url', sw: 'url', fr: 'url'}")
+
+
+class SubtitleUpload(BaseModel):
+    """Upload subtitles for an episode"""
+    episode_id: str
+    language: str = Field(..., description="Language code: en, sw, fr")
+    subtitle_url: str = Field(..., description="URL to .vtt subtitle file")
 
 
 class EpisodeUpdate(BaseModel):
@@ -116,6 +124,7 @@ class EpisodeUpdate(BaseModel):
     is_free: Optional[bool] = None
     coins_required: Optional[int] = Field(default=None, ge=0, le=50)
     intro_duration: Optional[int] = Field(default=None, ge=0, le=120)
+    subtitles: Optional[dict] = Field(default=None, description="Subtitle URLs")
 
 class VideoUploadResponse(BaseModel):
     """Response after initiating video upload"""
