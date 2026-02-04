@@ -195,13 +195,13 @@ export const CreatorPortal = () => {
             <Card className="p-6 text-center" data-testid="creator-pending">
               <Clock className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
               <h2 className="font-heading text-xl font-bold mb-2">Application Pending</h2>
-              <p className="text-sm text-muted-foreground">We're reviewing your application. You'll hear from us within 24-48 hours.</p>
+              <p className="text-sm text-muted-foreground">We are reviewing your application. You will hear from us within 24-48 hours.</p>
             </Card>
           ) : creatorStatus?.status === "rejected" ? (
             <Card className="p-6 text-center">
               <X className="w-12 h-12 mx-auto mb-4 text-red-400" />
               <h2 className="font-heading text-xl font-bold mb-2">Application Not Approved</h2>
-              <p className="text-sm text-muted-foreground mb-4">Unfortunately, your application wasn't approved at this time.</p>
+              <p className="text-sm text-muted-foreground mb-4">Unfortunately, your application was not approved at this time.</p>
               <Button variant="outline" onClick={() => setShowApplyForm(true)}>Apply Again</Button>
             </Card>
           ) : (
