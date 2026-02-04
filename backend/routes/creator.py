@@ -581,40 +581,90 @@ async def publish_series_to_main(series_id: str, creator_id: str):
 # ============ EPISODE MANAGEMENT ============
 @router.post("/episodes")
 async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_current_user)):
-    """Create a new episode and get upload URL"""
+    """Create a new episode with season support (S01E03 format)"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
         raise HTTPException(status_code=403, detail="Not an approved creator")
     
-    # Verify series ownership
+    # Verify series ownership and approval status
     series = await db.creator_series.find_one({"id": data.series_id, "creator_id": creator["id"]})
     if not series:
         raise HTTPException(status_code=404, detail="Series not found")
     
-    # Create video in Bunny.net
-    video_title = f"{series['title']} - Episode {data.episode_number}: {data.title}"
-    bunny_result = await bunny_service.create_video(video_title)
+    if series["status"] not in ["approved", "published"]:
+        raise HTTPException(status_code=400, detail="Series must be approved before adding episodes")
     
-    if not bunny_result["success"]:
-        raise HTTPException(status_code=500, detail="Failed to initialize video upload")
+    # Get or create season
+    season = await db.seasons.find_one({
+        "series_id": data.series_id,
+        "season_number": data.season_number
+    })
     
-    episode_id = f"{data.series_id}-ep{data.episode_number}"
+    if not season:
+        # Create new season
+        season_id = f"season-{uuid.uuid4().hex[:8]}"
+        season = {
+            "id": season_id,
+            "series_id": data.series_id,
+            "creator_id": creator["id"],
+            "season_number": data.season_number,
+            "title": f"Season {data.season_number}",
+            "description": None,
+            "total_episodes": 0,
+            "status": "active",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.seasons.insert_one(season)
+        
+        # Update series total seasons
+        await db.creator_series.update_one(
+            {"id": data.series_id},
+            {"$inc": {"total_seasons": 1}}
+        )
+    
+    season_id = season["id"]
+    
+    # Generate episode code (S01E03 format)
+    episode_code = f"S{str(data.season_number).zfill(2)}E{str(data.episode_number).zfill(2)}"
+    episode_id = f"{data.series_id}-{episode_code.lower()}"
+    
+    # Check if episode already exists
+    existing = await db.creator_episodes.find_one({"id": episode_id})
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Episode {episode_code} already exists")
+    
+    # Create video in Bunny.net (if no direct URL provided)
+    bunny_video_id = None
+    upload_url = None
+    
+    if not data.video_url:
+        video_title = f"{series['title']} - {episode_code}: {data.title}"
+        bunny_result = await bunny_service.create_video(video_title)
+        
+        if bunny_result["success"]:
+            bunny_video_id = bunny_result["video_id"]
+            upload_url = await bunny_service.get_upload_url(bunny_video_id)
     
     episode = {
         "id": episode_id,
         "series_id": data.series_id,
+        "season_id": season_id,
         "creator_id": creator["id"],
+        "season_number": data.season_number,
         "episode_number": data.episode_number,
+        "episode_code": episode_code,
         "title": data.title,
         "description": data.description,
-        "bunny_video_id": bunny_result["video_id"],
-        "encoding_status": "pending",
+        "video_url": data.video_url,
+        "bunny_video_id": bunny_video_id,
+        "encoding_status": "ready" if data.video_url else "pending",
         "duration": None,
         "thumbnail": None,
-        "is_free": data.is_free,
-        "coins_required": 0 if data.is_free else data.coins_required,
-        "intro_duration": data.intro_duration,  # Skip Intro duration in seconds
+        "is_free": data.is_free or (data.season_number == 1 and data.episode_number == 1),  # S01E01 is always free
+        "is_pilot": data.season_number == 1 and data.episode_number == 1,
+        "coins_required": 0 if (data.is_free or (data.season_number == 1 and data.episode_number == 1)) else data.coins_required,
+        "intro_duration": data.intro_duration,
         "views": 0,
         "earnings": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -623,24 +673,32 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
     
     await db.creator_episodes.insert_one(episode)
     
+    # Update season episode count
+    await db.seasons.update_one(
+        {"id": season_id},
+        {"$inc": {"total_episodes": 1}}
+    )
+    
     # Update series episode count
     await db.creator_series.update_one(
         {"id": data.series_id},
         {"$inc": {"total_episodes": 1}}
     )
     
-    # Get upload URL
-    upload_url = await bunny_service.get_upload_url(bunny_result["video_id"])
-    
-    return {
-        "message": "Episode created. Upload your video file.",
+    response = {
+        "message": f"Episode {episode_code} created successfully",
         "episode_id": episode_id,
-        "video_id": bunny_result["video_id"],
-        "upload_url": upload_url,
-        "upload_headers": {
-            "AccessKey": bunny_service.api_key
-        }
+        "episode_code": episode_code,
+        "season_number": data.season_number,
+        "episode_number": data.episode_number
     }
+    
+    if upload_url:
+        response["upload_url"] = upload_url
+        response["video_id"] = bunny_video_id
+        response["upload_headers"] = {"AccessKey": bunny_service.api_key}
+    
+    return response
 
 
 @router.post("/episodes/{episode_id}/upload")
