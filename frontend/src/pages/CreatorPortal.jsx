@@ -358,11 +358,46 @@ export const CreatorPortal = () => {
               </p>
             </div>
           </div>
-          <Button size="sm" onClick={() => setShowCreateSeries(true)} data-testid="create-series-btn">
-            <Plus className="w-4 h-4 mr-1" /> New Series
+          <Button size="sm" onClick={() => setShowSubmitSeries(true)} data-testid="submit-series-btn">
+            <Plus className="w-4 h-4 mr-1" /> Submit Series
           </Button>
         </div>
       </div>
+
+      {/* Pending Submissions */}
+      {submissions.filter(s => s.status !== 'approved').length > 0 && (
+        <div className="px-4 mb-4">
+          <h3 className="font-semibold mb-2 flex items-center gap-2">
+            <Clock className="w-4 h-4" /> Pending Submissions
+          </h3>
+          <div className="space-y-2">
+            {submissions.filter(s => s.status !== 'approved').map(sub => (
+              <Card key={sub.id} className="p-3 bg-white/5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-sm">{sub.title}</p>
+                    <p className="text-xs text-muted-foreground">{sub.genre} • S01E01: {sub.pilot_title}</p>
+                  </div>
+                  <Badge variant={
+                    sub.status === 'pending_review' ? 'secondary' : 
+                    sub.status === 'under_review' ? 'default' :
+                    sub.status === 'rejected' ? 'destructive' : 'outline'
+                  }>
+                    {sub.status === 'pending_review' ? '⏳ Pending' : 
+                     sub.status === 'under_review' ? '👀 Under Review' :
+                     sub.status === 'rejected' ? '❌ Rejected' : sub.status}
+                  </Badge>
+                </div>
+                {sub.feedback && sub.status === 'rejected' && (
+                  <p className="text-xs text-red-400 mt-2 p-2 bg-red-500/10 rounded">
+                    Feedback: {sub.feedback}
+                  </p>
+                )}
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Stats Overview */}
       <div className="p-4">
