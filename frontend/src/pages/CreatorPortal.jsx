@@ -712,6 +712,14 @@ export const CreatorPortal = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Series Submission Form */}
+      <SeriesSubmissionForm
+        open={showSubmitSeries}
+        onClose={() => setShowSubmitSeries(false)}
+        token={token}
+        onSuccess={fetchCreatorData}
+      />
     </div>
   );
 };
