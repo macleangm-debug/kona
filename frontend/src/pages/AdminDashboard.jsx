@@ -1942,6 +1942,11 @@ export const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Submissions Tab */}
+        {activeTab === "submissions" && (
+          <SubmissionsReviewTab token={token} />
+        )}
+
         {/* Revenue Tab */}
         {activeTab === "revenue" && (
           <div className="space-y-6">
