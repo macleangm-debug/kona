@@ -952,6 +952,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         autoPlay
         playsInline
         preload="metadata"
+        crossOrigin="anonymous"
         onTimeUpdate={handleTimeUpdate}
         onEnded={handleVideoEnded}
         onWaiting={handleWaiting}
@@ -965,7 +966,36 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         }}
         className="absolute inset-0 w-full h-full object-cover"
         data-testid="video-element"
-      />
+      >
+        {/* Subtitle tracks */}
+        {subtitles.en && (
+          <track 
+            kind="subtitles" 
+            src={subtitles.en} 
+            srcLang="en" 
+            label="English"
+            default={activeSubtitle === "en"}
+          />
+        )}
+        {subtitles.sw && (
+          <track 
+            kind="subtitles" 
+            src={subtitles.sw} 
+            srcLang="sw" 
+            label="Kiswahili"
+            default={activeSubtitle === "sw"}
+          />
+        )}
+        {subtitles.fr && (
+          <track 
+            kind="subtitles" 
+            src={subtitles.fr} 
+            srcLang="fr" 
+            label="Français"
+            default={activeSubtitle === "fr"}
+          />
+        )}
+      </video>
       
       {/* Skip Intro Button */}
       <SkipIntroButton visible={showSkipIntro && !isPlayingAd} onClick={handleSkipIntro} />
