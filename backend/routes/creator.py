@@ -941,3 +941,164 @@ async def bunny_webhook(request: dict):
     )
     
     return {"success": True, "status": new_status}
+
+
+
+# ============ SUBTITLE MANAGEMENT ============
+
+@router.post("/episodes/{episode_id}/subtitles")
+async def upload_subtitle(
+    episode_id: str,
+    data: SubtitleUpload,
+    user: dict = Depends(get_current_user)
+):
+    """Add or update subtitles for an episode"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Verify episode ownership
+    episode = await db.creator_episodes.find_one({
+        "id": episode_id,
+        "creator_id": creator["id"]
+    })
+    
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    # Validate language code
+    valid_languages = ["en", "sw", "fr"]
+    if data.language not in valid_languages:
+        raise HTTPException(status_code=400, detail=f"Invalid language. Must be one of: {valid_languages}")
+    
+    # Get existing subtitles or create new dict
+    subtitles = episode.get("subtitles", {}) or {}
+    subtitles[data.language] = data.subtitle_url
+    
+    # Update episode with subtitles
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$set": {"subtitles": subtitles}}
+    )
+    
+    # Also update main episodes collection if published
+    await db.episodes.update_one(
+        {"id": episode_id},
+        {"$set": {"subtitles": subtitles}}
+    )
+    
+    return {
+        "message": f"Subtitles for {data.language} uploaded successfully",
+        "subtitles": subtitles
+    }
+
+
+@router.delete("/episodes/{episode_id}/subtitles/{language}")
+async def delete_subtitle(
+    episode_id: str,
+    language: str,
+    user: dict = Depends(get_current_user)
+):
+    """Remove subtitles for a specific language"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    episode = await db.creator_episodes.find_one({
+        "id": episode_id,
+        "creator_id": creator["id"]
+    })
+    
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    subtitles = episode.get("subtitles", {}) or {}
+    if language in subtitles:
+        del subtitles[language]
+    
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$set": {"subtitles": subtitles}}
+    )
+    
+    await db.episodes.update_one(
+        {"id": episode_id},
+        {"$set": {"subtitles": subtitles}}
+    )
+    
+    return {"message": f"Subtitles for {language} removed", "subtitles": subtitles}
+
+
+@router.get("/episodes/{episode_id}/subtitles")
+async def get_episode_subtitles(
+    episode_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Get all subtitles for an episode"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    episode = await db.creator_episodes.find_one(
+        {"id": episode_id, "creator_id": creator["id"]},
+        {"_id": 0, "subtitles": 1}
+    )
+    
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    return {
+        "episode_id": episode_id,
+        "subtitles": episode.get("subtitles", {}),
+        "available_languages": list((episode.get("subtitles", {}) or {}).keys())
+    }
+
+
+# ============ SUBTITLE TEMPLATE ============
+
+VTT_TEMPLATE = """WEBVTT
+
+NOTE
+This is a subtitle template for Kona mini-series.
+Replace the sample text with your actual dialogue.
+Timestamps format: HH:MM:SS.mmm --> HH:MM:SS.mmm
+
+1
+00:00:00.000 --> 00:00:03.000
+[Opening scene description]
+
+2
+00:00:03.500 --> 00:00:06.000
+Character 1: Hello, how are you?
+
+3
+00:00:06.500 --> 00:00:09.000
+Character 2: I'm doing well, thank you!
+
+4
+00:00:10.000 --> 00:00:13.500
+[Add more subtitles following this format]
+
+NOTE TIPS FOR CREATORS:
+- Keep each subtitle under 2 lines
+- Each line should be under 42 characters
+- Show subtitles for 1-7 seconds
+- Sync with audio carefully
+- Use [] for sound effects: [door slams], [music plays]
+- Save file as .vtt (WebVTT format)
+"""
+
+@router.get("/subtitle-template", response_class=PlainTextResponse)
+async def download_subtitle_template():
+    """Download a VTT subtitle template file"""
+    return PlainTextResponse(
+        content=VTT_TEMPLATE,
+        media_type="text/vtt",
+        headers={
+            "Content-Disposition": "attachment; filename=subtitle_template.vtt"
+        }
+    )
+
