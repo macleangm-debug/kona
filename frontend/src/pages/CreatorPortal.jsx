@@ -643,7 +643,7 @@ export const CreatorPortal = () => {
                 Intro Duration (seconds)
               </label>
               <p className="text-xs text-muted-foreground mb-2">
-                Set when the "Skip Intro" button should skip to
+                Set when the Skip Intro button should skip to
               </p>
               <div className="flex items-center gap-3">
                 <Input 
