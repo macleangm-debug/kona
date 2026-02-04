@@ -144,10 +144,255 @@ async def get_creator_dashboard(user: dict = Depends(get_current_user)):
     }
 
 
-# ============ SERIES MANAGEMENT ============
+# ============ SERIES SUBMISSION & APPROVAL WORKFLOW ============
+
+@router.post("/series/submit", response_model=SeriesSubmissionResponse)
+async def submit_series_for_approval(data: SeriesSubmission, user: dict = Depends(get_current_user)):
+    """Submit a new series with pilot episode for approval"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    submission_id = f"sub-{uuid.uuid4().hex[:12]}"
+    series_id = f"cs-{uuid.uuid4().hex[:10]}"
+    season_id = f"season-{uuid.uuid4().hex[:8]}"
+    pilot_id = f"ep-{uuid.uuid4().hex[:10]}"
+    
+    # Create submission record
+    submission = {
+        "id": submission_id,
+        "series_id": series_id,
+        "creator_id": creator["id"],
+        "creator_name": creator["name"],
+        "creator_email": creator["email"],
+        "status": "pending_review",
+        
+        # Series Info
+        "title": data.title,
+        "description": data.description,
+        "genre": data.genre,
+        "target_audience": data.target_audience,
+        "content_rating": data.content_rating,
+        "language": data.language,
+        "thumbnail_url": data.thumbnail_url,
+        
+        # Pilot Info
+        "pilot_title": data.pilot_title,
+        "pilot_description": data.pilot_description,
+        "pilot_video_url": data.pilot_video_url,
+        "pilot_duration": data.pilot_duration,
+        "pilot_episode_id": pilot_id,
+        
+        # Series Plan
+        "planned_seasons": data.planned_seasons,
+        "episodes_per_season": data.episodes_per_season,
+        "release_schedule": data.release_schedule,
+        "unique_selling_point": data.unique_selling_point,
+        
+        # Review
+        "feedback": None,
+        "review_scores": None,
+        "reviewed_at": None,
+        "reviewed_by": None,
+        
+        "submitted_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.series_submissions.insert_one(submission)
+    
+    # Create the series in draft/pending state
+    series = {
+        "id": series_id,
+        "creator_id": creator["id"],
+        "submission_id": submission_id,
+        "title": data.title,
+        "description": data.description,
+        "genre": data.genre,
+        "target_audience": data.target_audience,
+        "content_rating": data.content_rating,
+        "language": data.language,
+        "thumbnail": data.thumbnail_url or "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
+        "status": "pending_review",
+        "rejection_reason": None,
+        "total_seasons": 1,
+        "total_episodes": 1,
+        "total_views": 0,
+        "total_earnings": 0,
+        "rating": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "reviewed_at": None,
+        "reviewed_by": None,
+        "published_at": None
+    }
+    
+    await db.creator_series.insert_one(series)
+    
+    # Create Season 1
+    season = {
+        "id": season_id,
+        "series_id": series_id,
+        "creator_id": creator["id"],
+        "season_number": 1,
+        "title": "Season 1",
+        "description": None,
+        "total_episodes": 1,
+        "status": "active",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.seasons.insert_one(season)
+    
+    # Create pilot episode (S01E01)
+    pilot_episode = {
+        "id": pilot_id,
+        "series_id": series_id,
+        "season_id": season_id,
+        "creator_id": creator["id"],
+        "season_number": 1,
+        "episode_number": 1,
+        "episode_code": "S01E01",
+        "title": data.pilot_title,
+        "description": data.pilot_description,
+        "video_url": data.pilot_video_url,
+        "bunny_video_id": None,
+        "encoding_status": "ready",  # Assuming URL is already hosted
+        "duration": data.pilot_duration,
+        "thumbnail": data.thumbnail_url,
+        "is_free": True,  # Pilot is always free
+        "is_pilot": True,
+        "coins_required": 0,
+        "intro_duration": 30,
+        "views": 0,
+        "earnings": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "published_at": None
+    }
+    
+    await db.creator_episodes.insert_one(pilot_episode)
+    
+    return SeriesSubmissionResponse(
+        submission_id=submission_id,
+        status="pending_review",
+        message="Your series has been submitted for review. Our team will review your pilot episode and get back to you within 3-5 business days.",
+        estimated_review_time="3-5 business days"
+    )
+
+
+@router.get("/submissions")
+async def get_my_submissions(user: dict = Depends(get_current_user)):
+    """Get all submissions by the creator"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    submissions = await db.series_submissions.find(
+        {"creator_id": creator["id"]},
+        {"_id": 0}
+    ).sort("submitted_at", -1).to_list(50)
+    
+    return submissions
+
+
+@router.get("/submissions/{submission_id}")
+async def get_submission_status(submission_id: str, user: dict = Depends(get_current_user)):
+    """Get status of a specific submission"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    submission = await db.series_submissions.find_one(
+        {"id": submission_id, "creator_id": creator["id"]},
+        {"_id": 0}
+    )
+    
+    if not submission:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    
+    return submission
+
+
+# ============ SEASON MANAGEMENT ============
+
+@router.post("/series/{series_id}/seasons")
+async def create_season(series_id: str, data: SeasonCreate, user: dict = Depends(get_current_user)):
+    """Create a new season for an approved series"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Check series exists and is approved
+    series = await db.creator_series.find_one(
+        {"id": series_id, "creator_id": creator["id"]},
+        {"_id": 0}
+    )
+    
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    if series["status"] != "approved" and series["status"] != "published":
+        raise HTTPException(status_code=400, detail="Series must be approved before adding seasons")
+    
+    # Check if season already exists
+    existing = await db.seasons.find_one(
+        {"series_id": series_id, "season_number": data.season_number}
+    )
+    
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Season {data.season_number} already exists")
+    
+    season_id = f"season-{uuid.uuid4().hex[:8]}"
+    
+    season = {
+        "id": season_id,
+        "series_id": series_id,
+        "creator_id": creator["id"],
+        "season_number": data.season_number,
+        "title": data.title or f"Season {data.season_number}",
+        "description": data.description,
+        "total_episodes": 0,
+        "status": "active",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.seasons.insert_one(season)
+    
+    # Update series total seasons
+    await db.creator_series.update_one(
+        {"id": series_id},
+        {"$inc": {"total_seasons": 1}}
+    )
+    
+    return {
+        "message": f"Season {data.season_number} created successfully",
+        "season_id": season_id
+    }
+
+
+@router.get("/series/{series_id}/seasons")
+async def get_series_seasons(series_id: str, user: dict = Depends(get_current_user)):
+    """Get all seasons for a series"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    seasons = await db.seasons.find(
+        {"series_id": series_id, "creator_id": creator["id"]},
+        {"_id": 0}
+    ).sort("season_number", 1).to_list(20)
+    
+    return seasons
+
+
+# ============ LEGACY SERIES MANAGEMENT (for backward compatibility) ============
+
 @router.post("/series")
 async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_current_user)):
-    """Create a new series"""
+    """Create a new series (legacy - use /series/submit for new submissions)"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
@@ -162,7 +407,8 @@ async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_curr
         "description": data.description,
         "genre": data.genre,
         "thumbnail": data.thumbnail_url or "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
-        "status": "draft",
+        "status": "pending_review",  # Changed from draft to pending_review
+        "total_seasons": 1,
         "total_episodes": 0,
         "total_views": 0,
         "total_earnings": 0,
@@ -173,6 +419,21 @@ async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_curr
     
     await db.creator_series.insert_one(series)
     
+    # Create Season 1 by default
+    season_id = f"season-{uuid.uuid4().hex[:8]}"
+    season = {
+        "id": season_id,
+        "series_id": series_id,
+        "creator_id": creator["id"],
+        "season_number": 1,
+        "title": "Season 1",
+        "description": None,
+        "total_episodes": 0,
+        "status": "active",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.seasons.insert_one(season)
+    
     # Update creator series count
     await db.creators.update_one(
         {"id": creator["id"]},
@@ -180,9 +441,9 @@ async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_curr
     )
     
     return {
-        "message": "Series created successfully",
+        "message": "Series created. Please submit with pilot episode for approval.",
         "series_id": series_id,
-        "status": "draft"
+        "status": "pending_review"
     }
 
 
