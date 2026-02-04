@@ -19,7 +19,17 @@
     "copied": "Copied!",
     "seeAll": "See All",
     "viewMore": "View More",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "free": "Free",
+    "coins": "coins",
+    "play": "Play",
+    "pause": "Pause",
+    "like": "Like",
+    "liked": "Liked",
+    "download": "Download",
+    "episodes": "Episodes",
+    "season": "Season",
+    "episode": "Episode"
   },
   "nav": {
     "home": "Home",
@@ -29,7 +39,8 @@
     "profile": "Profile",
     "myList": "My List",
     "comingSoon": "Coming Soon",
-    "search": "Search"
+    "search": "Search",
+    "stories": "Stories"
   },
   "auth": {
     "signIn": "Sign In",
@@ -39,7 +50,7 @@
     "password": "Password",
     "name": "Name",
     "forgotPassword": "Forgot Password?",
-    "noAccount": "Don't have an account?",
+    "noAccount": "Do not have an account?",
     "hasAccount": "Already have an account?",
     "referralCode": "Referral Code (Optional)",
     "welcomeBack": "Welcome back!",
@@ -58,7 +69,12 @@
     "watchNow": "Watch Now",
     "moreInfo": "More Info",
     "addToList": "Add to My List",
-    "removeFromList": "Remove from List"
+    "removeFromList": "Remove from List",
+    "freeEpisodes": "Free Episodes",
+    "top10": "Top 10 This Week",
+    "watchFree": "Watch Free Episodes",
+    "playNow": "Play Now",
+    "details": "Details"
   },
   "discover": {
     "title": "Discover",
@@ -149,7 +165,8 @@
     "adminPanel": "Admin Panel",
     "helpSupport": "Help & Support",
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "installApp": "Install App"
   },
   "notifications": {
     "title": "Notifications",
@@ -178,7 +195,55 @@
     "speed": "Speed",
     "autoPlay": "Auto-play next",
     "previousEpisode": "Previous Episode",
-    "nextEpisode": "Next Episode"
+    "nextEpisode": "Next Episode",
+    "skipIntro": "Skip Intro",
+    "dataSaver": "Data Saver",
+    "pip": "PiP"
+  },
+  "stories": {
+    "title": "Stories",
+    "freeEpisodes": "Free Episodes",
+    "watchFullSeries": "Watch Full Series",
+    "episode1Free": "Episode 1 - Free",
+    "swipeNext": "Swipe for next",
+    "tapToLike": "Double-tap to like"
+  },
+  "creator": {
+    "title": "Creator Studio",
+    "becomeCreator": "Become a Creator",
+    "partnerWithKona": "Partner with Kona",
+    "revenueShare": "Revenue Share",
+    "ofNetRevenue": "of net revenue (after expenses)",
+    "realTimeAnalytics": "Real-time Analytics",
+    "trackViews": "Track views, earnings & audience",
+    "milestoneBonuses": "Milestone Bonuses",
+    "earnExtra": "Earn extra at milestones",
+    "howRevenueWorks": "How Revenue Works",
+    "expenseDeduction": "is deducted for platform expenses",
+    "yourShareCalculated": "Your share is calculated from the remaining",
+    "example": "Example",
+    "youEarn": "You earn",
+    "creatorTiers": "Creator Tiers",
+    "newCreator": "New Creator",
+    "verifiedCreator": "Verified Creator",
+    "premiumPartner": "Premium Partner",
+    "ofNet": "of net",
+    "autoPublish": "Auto-publish",
+    "priorityFeaturing": "Priority featuring",
+    "applyNow": "Apply to Become a Creator",
+    "submitSeries": "Submit Series",
+    "pendingSubmissions": "Pending Submissions",
+    "mySeries": "My Series",
+    "totalEarnings": "Total Earnings",
+    "totalViews": "Total Views",
+    "thisMonth": "This Month",
+    "pendingPayout": "Pending Payout",
+    "yourEarningsRate": "Your Earnings Rate",
+    "grossRevenue": "Gross Revenue",
+    "platformExpenses": "Platform Expenses",
+    "netRevenue": "Net Revenue",
+    "yourShare": "Your Share",
+    "onlyPurchasedCoins": "Only purchased coins generate revenue. Free rewards do not count."
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",
