@@ -5,12 +5,14 @@ import uuid
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi.responses import PlainTextResponse
 
 from models.creator import (
     CreatorApplication, CreatorProfile, CreatorDashboardStats,
     CreatorSeriesCreate, CreatorEpisodeCreate, VideoUploadResponse,
     CreatorSeries, CreatorEpisode, PayoutRequest, SeriesSubmission,
-    SeriesSubmissionResponse, SeasonCreate, SubmissionReview, Season
+    SeriesSubmissionResponse, SeasonCreate, SubmissionReview, Season,
+    SubtitleUpload
 )
 from services import db, get_current_user
 from services.bunny import bunny_service
