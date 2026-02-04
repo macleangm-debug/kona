@@ -52,6 +52,10 @@ export const CreatorPortal = () => {
     is_free: false,
     coins_required: 5
   });
+  
+  // Subtitle upload state
+  const [subtitleUploading, setSubtitleUploading] = useState(false);
+  const [episodeSubtitles, setEpisodeSubtitles] = useState({});
 
   const fetchCreatorData = async () => {
     if (!token) return;
