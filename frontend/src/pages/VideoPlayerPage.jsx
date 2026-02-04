@@ -1296,6 +1296,69 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           </button>
         )}
 
+        {/* Subtitles */}
+        <div className="relative">
+          <button 
+            onClick={() => setShowSubtitleMenu(!showSubtitleMenu)}
+            className="flex flex-col items-center gap-1"
+            data-testid="subtitle-btn"
+          >
+            <div className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center ${activeSubtitle !== 'off' ? 'bg-primary/50' : 'bg-black/30'}`}>
+              <Subtitles className="w-5 h-5 text-white" />
+            </div>
+            <span className="text-white text-xs">
+              {activeSubtitle === 'off' ? 'CC' : activeSubtitle.toUpperCase()}
+            </span>
+          </button>
+          
+          {/* Subtitle dropdown menu */}
+          {showSubtitleMenu && (
+            <div className="absolute bottom-full right-0 mb-2 bg-black/90 backdrop-blur-sm rounded-lg border border-white/10 overflow-hidden min-w-[140px]">
+              {SUBTITLE_LANGUAGES.map((lang) => {
+                const isAvailable = lang.code === 'off' || subtitles[lang.code];
+                const isActive = activeSubtitle === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    onClick={() => {
+                      if (isAvailable) {
+                        setActiveSubtitle(lang.code);
+                        localStorage.setItem('kona_subtitle_lang', lang.code);
+                        // Update video tracks
+                        const video = document.getElementById('main-video');
+                        if (video) {
+                          for (let i = 0; i < video.textTracks.length; i++) {
+                            video.textTracks[i].mode = video.textTracks[i].language === lang.code ? 'showing' : 'hidden';
+                          }
+                          if (lang.code === 'off') {
+                            for (let i = 0; i < video.textTracks.length; i++) {
+                              video.textTracks[i].mode = 'hidden';
+                            }
+                          }
+                        }
+                        setShowSubtitleMenu(false);
+                      }
+                    }}
+                    disabled={!isAvailable}
+                    className={`w-full flex items-center gap-2 px-3 py-2 text-left text-sm transition-colors ${
+                      isActive ? 'bg-primary/30 text-white' : 
+                      isAvailable ? 'text-white hover:bg-white/10' : 
+                      'text-white/30 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>{lang.flag}</span>
+                    <span className="flex-1">{lang.label}</span>
+                    {isActive && <Check className="w-4 h-4 text-primary" />}
+                    {!isAvailable && lang.code !== 'off' && (
+                      <span className="text-[10px] text-white/40">N/A</span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         {/* Episodes */}
         <button 
           onClick={() => setShowEpisodes(true)}
