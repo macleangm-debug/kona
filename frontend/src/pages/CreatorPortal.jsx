@@ -53,10 +53,6 @@ export const CreatorPortal = () => {
     coins_required: 5
   });
 
-  useEffect(() => {
-    fetchCreatorData();
-  }, [token]);
-
   const fetchCreatorData = async () => {
     if (!token) return;
     try {
@@ -92,6 +88,11 @@ export const CreatorPortal = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchCreatorData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const handleApply = async () => {
     try {
