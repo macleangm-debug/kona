@@ -133,6 +133,7 @@ export const CreatorPortal = () => {
       is_free: episode.is_free || false,
       coins_required: episode.coins_required || 5
     });
+    setEpisodeSubtitles(episode.subtitles || {});
     setShowEpisodeEditor(true);
   };
 
@@ -156,6 +157,76 @@ export const CreatorPortal = () => {
       fetchCreatorData();
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to update episode");
+    }
+  };
+  
+  // Handle subtitle file upload
+  const handleSubtitleUpload = async (language, file) => {
+    if (!selectedEpisode || !file) return;
+    
+    // Validate file type
+    if (!file.name.endsWith('.vtt')) {
+      toast.error("Please upload a .vtt file");
+      return;
+    }
+    
+    setSubtitleUploading(true);
+    
+    try {
+      // Read file content and create a data URL (for demo - in production use file upload service)
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const content = e.target.result;
+        
+        // For demo: create a blob URL (in production, upload to CDN/storage)
+        const blob = new Blob([content], { type: 'text/vtt' });
+        const subtitleUrl = URL.createObjectURL(blob);
+        
+        // In production, you would upload to a CDN and get a permanent URL
+        // For now, we'll store it directly
+        try {
+          await axios.post(
+            `${API}/creator/episodes/${selectedEpisode.id}/subtitles`,
+            { 
+              episode_id: selectedEpisode.id,
+              language: language,
+              subtitle_url: subtitleUrl
+            },
+            { headers: { Authorization: `Bearer ${token}` }}
+          );
+          
+          setEpisodeSubtitles(prev => ({...prev, [language]: subtitleUrl}));
+          toast.success(`${language.toUpperCase()} subtitles uploaded!`);
+        } catch (err) {
+          toast.error(err.response?.data?.detail || "Failed to save subtitles");
+        }
+        setSubtitleUploading(false);
+      };
+      reader.readAsText(file);
+    } catch (e) {
+      toast.error("Failed to read subtitle file");
+      setSubtitleUploading(false);
+    }
+  };
+  
+  // Handle subtitle removal
+  const handleRemoveSubtitle = async (language) => {
+    if (!selectedEpisode) return;
+    
+    try {
+      await axios.delete(
+        `${API}/creator/episodes/${selectedEpisode.id}/subtitles/${language}`,
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      
+      setEpisodeSubtitles(prev => {
+        const updated = {...prev};
+        delete updated[language];
+        return updated;
+      });
+      toast.success(`${language.toUpperCase()} subtitles removed`);
+    } catch (e) {
+      toast.error("Failed to remove subtitles");
     }
   };
 
