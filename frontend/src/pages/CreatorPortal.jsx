@@ -531,6 +531,30 @@ export const CreatorPortal = () => {
           </div>
         </Card>
 
+        {/* Subtitle Template Download */}
+        <Card className="p-4 mb-4 bg-blue-500/10 border-blue-500/20">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold mb-1 flex items-center gap-2">
+                <FileVideo className="w-4 h-4 text-blue-400" />
+                Subtitle Template
+              </h3>
+              <p className="text-xs text-gray-400">Download VTT template for adding subtitles</p>
+            </div>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => window.open(`${API}/creator/subtitle-template`, '_blank')}
+              data-testid="download-subtitle-template"
+            >
+              Download .vtt
+            </Button>
+          </div>
+          <p className="text-xs text-blue-400 mt-2">
+            Tip: Adding subtitles (English, Swahili, French) increases your reach by 40%!
+          </p>
+        </Card>
+
         {/* My Series */}
         <h3 className="font-heading font-semibold mb-3">My Series ({series.length})</h3>
         {series.length === 0 ? (
