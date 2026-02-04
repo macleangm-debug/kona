@@ -48,6 +48,47 @@ class CreatorDashboardStats(BaseModel):
     revenue_share: float
 
 # ============ CREATOR CONTENT MODELS ============
+
+# Series Submission for Approval
+class SeriesSubmission(BaseModel):
+    """Submit a new series for approval with pilot episode"""
+    # Series Info
+    title: str = Field(..., min_length=2, max_length=100)
+    description: str = Field(..., min_length=50, max_length=2000)
+    genre: str
+    target_audience: str = Field(..., description="e.g., 18-35 female, family-friendly")
+    content_rating: str = Field(default="PG-13", description="G, PG, PG-13, R")
+    language: str = Field(default="en")
+    thumbnail_url: Optional[str] = None
+    
+    # Pilot Episode Info
+    pilot_title: str = Field(..., min_length=2, max_length=100)
+    pilot_description: str = Field(..., min_length=20, max_length=500)
+    pilot_video_url: str = Field(..., description="URL to pilot episode video")
+    pilot_duration: Optional[int] = Field(default=None, description="Duration in seconds")
+    
+    # Series Plan
+    planned_seasons: int = Field(default=1, ge=1, le=10)
+    episodes_per_season: int = Field(default=10, ge=5, le=50)
+    release_schedule: str = Field(default="weekly", description="daily, weekly, biweekly")
+    
+    # Additional Info
+    unique_selling_point: str = Field(..., min_length=20, max_length=500, description="What makes this series special?")
+
+class SeriesSubmissionResponse(BaseModel):
+    """Response after submitting series for approval"""
+    submission_id: str
+    status: str  # pending_review, under_review, approved, rejected
+    message: str
+    estimated_review_time: str
+
+class SeasonCreate(BaseModel):
+    """Create a new season for an approved series"""
+    series_id: str
+    season_number: int = Field(..., ge=1, le=20)
+    title: Optional[str] = Field(default=None, description="e.g., 'The Beginning'")
+    description: Optional[str] = None
+
 class CreatorSeriesCreate(BaseModel):
     """Create a new series as a creator"""
     title: str = Field(..., min_length=2, max_length=100)
@@ -58,9 +99,11 @@ class CreatorSeriesCreate(BaseModel):
 class CreatorEpisodeCreate(BaseModel):
     """Create a new episode as a creator"""
     series_id: str
+    season_number: int = Field(default=1, ge=1, le=20)
     episode_number: int = Field(..., ge=1)
     title: str = Field(..., min_length=2, max_length=100)
     description: Optional[str] = None
+    video_url: Optional[str] = None
     is_free: bool = False
     coins_required: int = Field(default=5, ge=0, le=50)
     intro_duration: int = Field(default=30, ge=0, le=120, description="Intro duration in seconds for Skip Intro feature")
