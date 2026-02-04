@@ -19,9 +19,11 @@ export const CreatorPortal = () => {
   const [creatorStatus, setCreatorStatus] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [series, setSeries] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showApplyForm, setShowApplyForm] = useState(false);
   const [showCreateSeries, setShowCreateSeries] = useState(false);
+  const [showSubmitSeries, setShowSubmitSeries] = useState(false);
   const [earnings, setEarnings] = useState(null);
   const [revenueTiers, setRevenueTiers] = useState(null);
 
