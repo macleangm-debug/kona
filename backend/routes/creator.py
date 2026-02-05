@@ -734,6 +734,60 @@ async def get_series_detail(series_id: str, user: dict = Depends(get_current_use
     }
 
 
+@router.patch("/series/{series_id}")
+async def update_series(
+    series_id: str,
+    user: dict = Depends(get_current_user),
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    thumbnail_url: Optional[str] = None,
+    genre: Optional[str] = None
+):
+    """Update series information including thumbnail"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    series = await db.creator_series.find_one({"id": series_id, "creator_id": creator["id"]})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Build update dict
+    update_data = {}
+    if title is not None:
+        update_data["title"] = title
+    if description is not None:
+        update_data["description"] = description
+    if thumbnail_url is not None:
+        # Validate URL format
+        if not thumbnail_url.startswith(("http://", "https://", "data:")):
+            raise HTTPException(status_code=400, detail="Invalid thumbnail URL format")
+        update_data["thumbnail"] = thumbnail_url
+    if genre is not None:
+        update_data["genre"] = genre
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    await db.creator_series.update_one(
+        {"id": series_id},
+        {"$set": update_data}
+    )
+    
+    # Also update main series collection if published
+    await db.series.update_one(
+        {"id": series_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "message": "Series updated successfully",
+        "series_id": series_id,
+        "updated_fields": list(update_data.keys())
+    }
+
+
 @router.post("/series/{series_id}/submit")
 async def submit_series_for_review(series_id: str, user: dict = Depends(get_current_user)):
     """Submit series for admin review"""
