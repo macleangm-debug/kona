@@ -185,12 +185,10 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 ## Future/Backlog
 
 1. Auto-generated subtitles (Whisper integration)
-2. Creator Payout History & Notification System
-3. Refactor CreatorPortal.jsx into smaller components
-4. Desktop responsive improvements for Creator Portal
-5. PDF/CSV export for Investment Calculator
-6. Watch Party push notifications
-7. Real video hosting integration (Bunny.net configured but content mocked)
+2. Desktop responsive improvements for Creator Portal
+3. PDF/CSV export for Investment Calculator
+4. Watch Party push notifications
+5. Real video hosting integration (Bunny.net configured but content mocked)
 
 ---
 
