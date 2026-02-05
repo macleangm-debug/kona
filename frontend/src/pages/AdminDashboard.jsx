@@ -2524,6 +2524,11 @@ export const AdminDashboard = () => {
           <LaunchChecklistTab token={token} />
         )}
 
+        {/* Engagement Seeding Tab (Super Admin Only) */}
+        {activeTab === "seeding" && user?.is_super_admin && (
+          <EngagementSeedingTab token={token} />
+        )}
+
         {/* Revenue Settings Tab (Super Admin Only) */}
         {activeTab === "revenue-settings" && user?.is_super_admin && (
           <RevenueSettingsTab token={token} />
