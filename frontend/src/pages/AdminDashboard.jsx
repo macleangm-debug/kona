@@ -2159,6 +2159,7 @@ export const AdminDashboard = () => {
                 {activeTab === "revenue" && "Revenue tracking and reports"}
                 {activeTab === "creators" && "Manage creator applications"}
                 {activeTab === "checklist" && "Pre-launch verification checklist"}
+                {activeTab === "seeding" && "Boost engagement for launch traction"}
                 {activeTab === "revenue-settings" && "Configure revenue distribution"}
                 {activeTab === "investment" && "Financial projections and ROI"}
                 {activeTab === "infrastructure" && "Server and hosting requirements"}
