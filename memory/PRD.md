@@ -67,6 +67,25 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
   - Separate tracking for `purchased_coin_earnings`
   - Note displayed in earnings dashboard: "Only purchased coins count"
 
+#### 4. Video & Thumbnail Upload UI for Creators (COMPLETED - P1)
+- **Series Editor Dialog:** Added thumbnail URL field with live preview
+- **Episode Editor Dialog:** Added thumbnail URL and video URL fields
+- URL-based input (industry standard - creators paste from Imgur, Cloudinary, Bunny.net)
+- Preview images render when valid URL is entered
+- Backend PATCH endpoints support `thumbnail_url` and `video_url` parameters
+
+#### 5. Enhanced Creator Analytics (COMPLETED - P2)
+- **Tab Navigation:** Dashboard and Analytics tabs in Creator Portal
+- **Time Periods:** 7 Days, 30 Days, 90 Days, All Time, Custom date range
+- **Custom Date Range:** Date picker with Apply button
+- **Summary Cards with Trends:** Views, Earnings, Likes, Shares (with growth % indicators)
+- **Additional Metrics:** Avg Daily Views, Avg Daily Earnings, Unique Viewers, Engagement Rate
+- **Charts:** Views Over Time (Area Chart), Earnings Over Time (Area Chart)
+- **Top Episodes:** Ranked list with views, earnings, likes, engagement rate
+- **Series Performance:** Views and earnings breakdown by series
+- **Peak Performance:** Best day highlight card
+- **Growth Comparison API:** Compare current vs previous period with trends
+
 ### Previous Session (February 3-4, 2026)
 
 #### Content Approval Workflow (COMPLETED)
