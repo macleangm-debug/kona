@@ -240,7 +240,7 @@ export const CreatorPortal = () => {
 
   // Creator Dashboard
   return (
-    <div className="min-h-screen pb-20" data-testid="creator-dashboard">
+    <div className="min-h-screen" data-testid="creator-dashboard">
       <CreatorHeader
         dashboard={dashboard}
         activeTab={activeTab}
@@ -249,34 +249,76 @@ export const CreatorPortal = () => {
         unreadNotifications={unreadNotifications}
       />
 
-      {/* Tab Content */}
-      <div className="p-4">
-        {activeTab === "dashboard" && (
-          <div className="space-y-6">
-            <CreatorPendingSubmissions submissions={submissions} />
-            <CreatorStats dashboard={dashboard} />
-            <CreatorSeriesList 
-              series={series} 
-              onCreateSeries={() => setShowCreateSeries(true)}
-            />
+      {/* Main Content - with sidebar offset on desktop */}
+      <main className="lg:ml-64 min-h-screen">
+        {/* Desktop Header */}
+        <div className="hidden lg:flex items-center justify-between p-6 border-b border-white/10">
+          <div>
+            <h2 className="font-heading text-2xl font-bold capitalize">{activeTab}</h2>
+            <p className="text-sm text-muted-foreground">
+              {activeTab === "dashboard" && "Overview of your creator account"}
+              {activeTab === "analytics" && "Track your performance and growth"}
+              {activeTab === "payouts" && "Manage your earnings and payouts"}
+              {activeTab === "notifications" && "Stay updated with your account activity"}
+            </p>
           </div>
-        )}
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Total Earnings</p>
+              <p className="font-heading text-xl font-bold text-yellow-400">{dashboard?.total_earnings?.toLocaleString() || 0} coins</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-muted-foreground">Total Views</p>
+              <p className="font-heading text-xl font-bold text-blue-400">{dashboard?.total_views?.toLocaleString() || 0}</p>
+            </div>
+          </div>
+        </div>
 
-        {activeTab === "analytics" && (
-          <CreatorAnalytics token={token} />
-        )}
+        {/* Tab Content */}
+        <div className="p-4 lg:p-8">
+          {activeTab === "dashboard" && (
+            <div className="space-y-6 lg:space-y-8">
+              {/* Desktop: Two column layout */}
+              <div className="lg:grid lg:grid-cols-3 lg:gap-8">
+                {/* Left Column - Stats and Tier */}
+                <div className="lg:col-span-2 space-y-6">
+                  <CreatorPendingSubmissions submissions={submissions} />
+                  <CreatorStats dashboard={dashboard} />
+                </div>
+                
+                {/* Right Column - Series */}
+                <div className="mt-6 lg:mt-0">
+                  <CreatorSeriesList 
+                    series={series} 
+                    onCreateSeries={() => setShowCreateSeries(true)}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
 
-        {activeTab === "payouts" && (
-          <PayoutHistory token={token} />
-        )}
+          {activeTab === "analytics" && (
+            <div className="max-w-7xl">
+              <CreatorAnalytics token={token} />
+            </div>
+          )}
 
-        {activeTab === "notifications" && (
-          <CreatorNotifications 
-            token={token} 
-            onUnreadCountChange={setUnreadNotifications}
-          />
-        )}
-      </div>
+          {activeTab === "payouts" && (
+            <div className="max-w-7xl">
+              <PayoutHistory token={token} />
+            </div>
+          )}
+
+          {activeTab === "notifications" && (
+            <div className="max-w-4xl">
+              <CreatorNotifications 
+                token={token} 
+                onUnreadCountChange={setUnreadNotifications}
+              />
+            </div>
+          )}
+        </div>
+      </main>
 
       {/* Create Series Dialog */}
       <Dialog open={showCreateSeries} onOpenChange={setShowCreateSeries}>
