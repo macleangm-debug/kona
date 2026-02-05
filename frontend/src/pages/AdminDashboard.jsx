@@ -2035,6 +2035,7 @@ export const AdminDashboard = () => {
     { id: "creators", label: "Creators", icon: Crown },
     ...(user?.is_super_admin ? [
       { id: "checklist", label: "Launch Checklist", icon: Check },
+      { id: "seeding", label: "Engagement Seeding", icon: Sparkles },
       { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard },
       { id: "investment", label: "Investment Calculator", icon: Calculator },
       { id: "infrastructure", label: "Infrastructure Calculator", icon: Server },
