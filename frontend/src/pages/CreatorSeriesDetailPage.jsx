@@ -440,6 +440,58 @@ export const CreatorSeriesDetailPage = () => {
               </div>
             )}
             
+            {/* Thumbnail URL Section */}
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <label className="text-sm font-medium flex items-center gap-2 mb-2">
+                <Image className="w-4 h-4 text-purple-400" />
+                Episode Thumbnail
+              </label>
+              <Input 
+                value={episodeForm.thumbnail_url}
+                onChange={(e) => setEpisodeForm({...episodeForm, thumbnail_url: e.target.value})}
+                placeholder="https://example.com/thumbnail.jpg"
+                data-testid="episode-thumbnail-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Paste image URL from Imgur, Cloudinary, or any image hosting service
+              </p>
+              {episodeForm.thumbnail_url && (
+                <div className="mt-2 relative w-24 h-24 rounded-lg overflow-hidden bg-secondary/50">
+                  <img 
+                    src={episodeForm.thumbnail_url} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              )}
+            </div>
+            
+            {/* Video URL Section */}
+            <div>
+              <label className="text-sm font-medium flex items-center gap-2 mb-2">
+                <Video className="w-4 h-4 text-green-400" />
+                Video URL
+              </label>
+              <Input 
+                value={episodeForm.video_url}
+                onChange={(e) => setEpisodeForm({...episodeForm, video_url: e.target.value})}
+                placeholder="https://example.com/video.mp4 or Bunny.net URL"
+                data-testid="episode-video-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Direct video URL (MP4, HLS) or Bunny.net streaming URL
+              </p>
+              {selectedEpisode?.bunny_video_id && (
+                <div className="mt-2 p-2 bg-green-500/10 rounded border border-green-500/20">
+                  <p className="text-xs text-green-400 flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    Bunny.net Video ID: {selectedEpisode.bunny_video_id}
+                  </p>
+                </div>
+              )}
+            </div>
+            
             {/* Subtitle Upload Section */}
             <div className="border-t border-white/10 pt-4 mt-4">
               <label className="text-sm font-medium flex items-center gap-2 mb-3">
