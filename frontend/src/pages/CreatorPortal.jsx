@@ -731,6 +731,8 @@ export const CreatorPortal = () => {
           </div>
         )}
       </div>
+      </>
+      )}
 
       {/* Create Series Dialog */}
       <Dialog open={showCreateSeries} onOpenChange={setShowCreateSeries}>
