@@ -169,6 +169,15 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Functional in video player and stories page
 - Backend sync with optimistic UI
 
+#### Admin Like Seeding for Launch Traction (COMPLETED - Feb 5, 2026)
+- **Purpose:** Artificially boost like counts on videos for platform launch
+- **Endpoint:** `POST /api/admin/seed/likes` (Super Admin only)
+- **Parameters:** `min_likes` (default 500), `max_likes` (default 5000), `episode_ids` (optional)
+- **Implementation:** Adds `base_likes` field to episodes, displayed with real likes
+- **Status Check:** `GET /api/admin/seed/status` shows seeding coverage
+- **Clear Seeding:** `DELETE /api/admin/seed/clear` removes all seeded data
+- **Current State:** 299 episodes seeded with 500-5000 base likes each
+
 #### Stories Page (COMPLETED)
 - TikTok-style vertical video viewer
 - Swipe navigation for free episodes
