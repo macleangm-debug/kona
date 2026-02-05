@@ -109,11 +109,10 @@ const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveF
 };
 
 // Cinematic Desktop Hero - Netflix-style full-width immersive hero
-const DesktopHeroCarousel = ({ seriesList, allSeries, onPlay, onMoreInfo, myList, onAddToList }) => {
+const DesktopHeroCarousel = ({ seriesList, onPlay, onMoreInfo, myList, onAddToList }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const navigate = useNavigate();
   
   // Auto-rotate featured content
   useEffect(() => {
