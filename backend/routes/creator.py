@@ -1264,19 +1264,59 @@ async def request_payout(data: PayoutRequest, user: dict = Depends(get_current_u
 
 
 @router.get("/payouts")
-async def get_payout_history(user: dict = Depends(get_current_user)):
-    """Get payout history"""
+async def get_payout_history(
+    user: dict = Depends(get_current_user),
+    status: str = None,
+    limit: int = 50
+):
+    """Get payout history with optional status filter"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
         raise HTTPException(status_code=403, detail="Not an approved creator")
     
-    payouts = await db.payouts.find(
-        {"creator_id": creator["id"]},
-        {"_id": 0}
-    ).sort("created_at", -1).to_list(50)
+    query = {"creator_id": creator["id"]}
+    if status:
+        query["status"] = status
     
-    return payouts
+    payouts = await db.payouts.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(limit)
+    
+    # Calculate totals
+    total_requested = sum(p.get("amount", 0) for p in payouts)
+    total_completed = sum(p.get("amount", 0) for p in payouts if p.get("status") == "completed")
+    total_pending = sum(p.get("amount", 0) for p in payouts if p.get("status") == "pending")
+    
+    return {
+        "payouts": payouts,
+        "summary": {
+            "total_requested": total_requested,
+            "total_completed": total_completed,
+            "total_pending": total_pending,
+            "available_balance": creator["pending_payout"]
+        }
+    }
+
+
+@router.get("/payouts/{payout_id}")
+async def get_payout_detail(payout_id: str, user: dict = Depends(get_current_user)):
+    """Get details of a specific payout"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    payout = await db.payouts.find_one(
+        {"id": payout_id, "creator_id": creator["id"]},
+        {"_id": 0}
+    )
+    
+    if not payout:
+        raise HTTPException(status_code=404, detail="Payout not found")
+    
+    return payout
 
 
 # ============ WEBHOOK FOR ENCODING ============
