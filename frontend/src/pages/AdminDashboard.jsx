@@ -1489,10 +1489,6 @@ const EngagementSeedingTab = ({ token }) => {
   const [seriesViewsRange, setSeriesViewsRange] = useState({ min: 5000, max: 250000 });
   const [ratingRange, setRatingRange] = useState({ min: 4.0, max: 4.9 });
 
-  useEffect(() => {
-    fetchStatus();
-  }, [token]);
-
   const fetchStatus = async () => {
     setLoading(true);
     try {
@@ -1505,6 +1501,11 @@ const EngagementSeedingTab = ({ token }) => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchStatus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const seedLikes = async () => {
     setSeeding(true);
