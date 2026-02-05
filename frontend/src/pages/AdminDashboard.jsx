@@ -1923,42 +1923,6 @@ export const AdminDashboard = () => {
     { id: "creator_payout_schedule", name: "Creator Payouts", icon: "💳", category: "P2 - Scale", color: "green" },
   ];
 
-  useEffect(() => {
-    if (!user?.is_admin) {
-      navigate("/admin/login");
-      return;
-    }
-    fetchDashboardData();
-  }, [user, navigate, timeRange]);
-
-  const fetchDashboardData = async () => {
-    try {
-      const headers = { Authorization: `Bearer ${token}` };
-      
-      // Fetch all dashboard data in parallel
-      const [statsRes, usersRes, seriesRes, transRes, creatorsRes] = await Promise.all([
-        axios.get(`${API}/admin/stats`, { headers }),
-        axios.get(`${API}/admin/users?limit=10`, { headers }),
-        axios.get(`${API}/admin/series`, { headers }),
-        axios.get(`${API}/admin/transactions?limit=20`, { headers }),
-        axios.get(`${API}/admin/creator-applications`, { headers }).catch(() => ({ data: { applications: [] } }))
-      ]);
-      
-      setStats(statsRes.data);
-      setRecentUsers(usersRes.data.users || []);
-      setTopContent(seriesRes.data.slice(0, 10) || []);
-      setCreatorApplications(creatorsRes.data.applications || []);
-      
-      // Generate mock chart data (in production, fetch from API)
-      generateChartData(statsRes.data);
-      
-    } catch (e) {
-      console.error("Error fetching dashboard data:", e);
-      toast.error("Failed to load dashboard");
-    }
-    setLoading(false);
-  };
-
   const generateChartData = (stats) => {
     // Revenue data (last 7/30 days)
     const days = timeRange === "7d" ? 7 : 30;
