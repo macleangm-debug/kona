@@ -82,7 +82,7 @@ export const CreatorStats = ({ dashboard }) => {
             </>
           )}
           {!nextTier && (
-            <p className="text-xs text-green-400">You've reached the highest tier!</p>
+            <p className="text-xs text-green-400">You have reached the highest tier!</p>
           )}
         </div>
 
