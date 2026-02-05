@@ -511,11 +511,6 @@ export const CreatorSeriesDetailPage = () => {
           )}
         </div>
       </main>
-              </Card>
-            ))}
-          </div>
-        )}
-      </div>
 
       {/* Episode Editor Dialog */}
       <Dialog open={showEpisodeEditor} onOpenChange={setShowEpisodeEditor}>
