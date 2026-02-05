@@ -178,6 +178,16 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - **Clear Seeding:** `DELETE /api/admin/seed/clear` removes all seeded data
 - **Current State:** 299 episodes seeded with 500-5000 base likes each
 
+#### Admin Engagement Seeding UI (COMPLETED - Feb 5, 2026)
+- **New Tab:** "Engagement Seeding" in Admin Dashboard (Super Admin only)
+- **Features:**
+  - Status overview cards showing total episodes, episodes with base likes/views, series with stats
+  - Seed Episode Likes: Configurable min/max range (100-20,000), one-click seeding
+  - Seed Episode Views: Configurable min/max range (500-100,000), one-click seeding  
+  - Seed Series Stats: Configurable views (1K-500K) and ratings (3.0-5.0)
+  - Clear All Seeds: One-click removal of all seeded data
+- **File:** `/app/frontend/src/pages/AdminDashboard.jsx` - EngagementSeedingTab component
+
 #### Stories Page (COMPLETED)
 - TikTok-style vertical video viewer
 - Swipe navigation for free episodes
