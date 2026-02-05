@@ -62,10 +62,6 @@ const LaunchChecklistTab = ({ token }) => {
   const [loading, setLoading] = useState(true);
   const [toggling, setToggling] = useState(null);
 
-  useEffect(() => {
-    fetchChecklist();
-  }, [token]);
-
   const fetchChecklist = async () => {
     try {
       const res = await axios.get(`${API}/admin/checklist`, {
@@ -77,6 +73,11 @@ const LaunchChecklistTab = ({ token }) => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchChecklist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const toggleItem = async (itemId) => {
     setToggling(itemId);
