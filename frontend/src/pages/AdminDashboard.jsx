@@ -1666,59 +1666,143 @@ export const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white" data-testid="admin-dashboard">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-gray-950/95 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button 
-                onClick={() => navigate("/")} 
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h1 className="text-xl font-bold">Admin Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Kona Platform Management</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value)}
-                className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm"
-              >
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-              </select>
-            </div>
-          </div>
+      {/* Desktop Sidebar */}
+      <aside className="hidden xl:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-gray-950 border-r border-white/10 z-50">
+        <div className="p-6 border-b border-white/10">
+          <h1 className="font-heading text-xl font-bold">Admin Dashboard</h1>
+          <p className="text-xs text-muted-foreground">Kona Platform Management</p>
         </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="max-w-7xl mx-auto px-4 py-4">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+        
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
                 activeTab === tab.id 
-                  ? "bg-primary text-white" 
-                  : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                  ? "bg-primary/20 text-primary border border-primary/30" 
+                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               }`}
               data-testid={`admin-tab-${tab.id}`}
             >
-              <tab.icon className="w-4 h-4" />
+              <tab.icon className="w-5 h-5" />
               {tab.label}
             </button>
           ))}
+        </nav>
+        
+        <div className="p-4 border-t border-white/10">
+          <select
+            value={timeRange}
+            onChange={(e) => setTimeRange(e.target.value)}
+            className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm"
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+          </select>
         </div>
-      </div>
+        
+        <div className="p-4 border-t border-white/10">
+          <button 
+            onClick={() => navigate("/")} 
+            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Kona
+          </button>
+        </div>
+      </aside>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-8">
+      {/* Main Content Area */}
+      <div className="xl:ml-64">
+        {/* Mobile Header */}
+        <div className="xl:hidden sticky top-0 z-50 bg-gray-950/95 backdrop-blur-sm border-b border-white/10">
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => navigate("/")} 
+                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <div>
+                  <h1 className="text-xl font-bold">Admin Dashboard</h1>
+                  <p className="text-xs text-muted-foreground">Kona Platform Management</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={timeRange}
+                  onChange={(e) => setTimeRange(e.target.value)}
+                  className="bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d">Last 30 days</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Tabs */}
+        <div className="xl:hidden px-4 py-4">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
+                  activeTab === tab.id 
+                    ? "bg-primary text-white" 
+                    : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Desktop Header */}
+        <div className="hidden xl:block border-b border-white/10 px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-heading text-2xl font-bold capitalize">
+                {tabs.find(t => t.id === activeTab)?.label || activeTab}
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                {activeTab === "overview" && "Platform analytics and key metrics"}
+                {activeTab === "users" && "Manage user accounts and activity"}
+                {activeTab === "content" && "Content management and moderation"}
+                {activeTab === "submissions" && "Review creator submissions"}
+                {activeTab === "revenue" && "Revenue tracking and reports"}
+                {activeTab === "creators" && "Manage creator applications"}
+                {activeTab === "checklist" && "Pre-launch verification checklist"}
+                {activeTab === "revenue-settings" && "Configure revenue distribution"}
+                {activeTab === "investment" && "Financial projections and ROI"}
+                {activeTab === "infrastructure" && "Server and hosting requirements"}
+                {activeTab === "docs" && "Platform documentation and guides"}
+              </p>
+            </div>
+            {stats && (
+              <div className="flex items-center gap-6">
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Total Users</p>
+                  <p className="font-heading text-xl font-bold text-blue-400">{stats.total_users?.toLocaleString() || 0}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-muted-foreground">Total Revenue</p>
+                  <p className="font-heading text-xl font-bold text-green-400">${stats.total_revenue?.toLocaleString() || 0}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="px-4 xl:px-8 pb-8 pt-4 xl:pt-8">
         {/* Overview Tab */}
         {activeTab === "overview" && (
           <div className="space-y-6">
