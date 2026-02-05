@@ -90,6 +90,40 @@ export const CreatorSeriesDetailPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, seriesId]);
 
+  const openSeriesEditor = () => {
+    if (series) {
+      setSeriesForm({
+        title: series.title || "",
+        description: series.description || "",
+        thumbnail_url: series.thumbnail || "",
+        genre: series.genre || ""
+      });
+      setShowSeriesEditor(true);
+    }
+  };
+
+  const handleUpdateSeries = async () => {
+    if (!series) return;
+    
+    try {
+      const params = new URLSearchParams();
+      if (seriesForm.title) params.append("title", seriesForm.title);
+      if (seriesForm.description) params.append("description", seriesForm.description);
+      if (seriesForm.thumbnail_url) params.append("thumbnail_url", seriesForm.thumbnail_url);
+      if (seriesForm.genre) params.append("genre", seriesForm.genre);
+      
+      await axios.patch(`${API}/creator/series/${seriesId}?${params.toString()}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Series updated!");
+      setShowSeriesEditor(false);
+      fetchSeriesDetail();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to update series");
+    }
+  };
+
   const openEpisodeEditor = async (episode) => {
     setSelectedEpisode(episode);
     setEpisodeForm({
