@@ -6,7 +6,8 @@ import {
   DollarSign, Eye, Crown, Check, X, Clock, Loader2,
   BarChart3, PieChart, ArrowUpRight, ArrowDownRight,
   FileText, Server, Shield, Database, Calculator, Cpu, 
-  HardDrive, Wifi, Globe, Zap, AlertTriangle, CheckCircle
+  HardDrive, Wifi, Globe, Zap, AlertTriangle, CheckCircle,
+  Heart, Sparkles, Trash2, Play
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
