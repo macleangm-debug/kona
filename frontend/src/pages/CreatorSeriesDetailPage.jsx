@@ -4,7 +4,7 @@ import axios from "axios";
 import { 
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
-  Languages, CheckCircle, AlertCircle
+  Languages, CheckCircle, AlertCircle, Image, Link, Video
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +32,15 @@ export const CreatorSeriesDetailPage = () => {
   const [episodes, setEpisodes] = useState([]);
   const [seasons, setSeasons] = useState([]);
   
+  // Series editor state
+  const [showSeriesEditor, setShowSeriesEditor] = useState(false);
+  const [seriesForm, setSeriesForm] = useState({
+    title: "",
+    description: "",
+    thumbnail_url: "",
+    genre: ""
+  });
+  
   // Episode editor state
   const [showEpisodeEditor, setShowEpisodeEditor] = useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState(null);
@@ -39,7 +48,9 @@ export const CreatorSeriesDetailPage = () => {
     title: "",
     intro_duration: 30,
     is_free: false,
-    coins_required: 5
+    coins_required: 5,
+    thumbnail_url: "",
+    video_url: ""
   });
   
   // Subtitle upload state
