@@ -210,7 +210,7 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Payment Gateways (Stripe, Flutterwave)
 - Video Hosting/Streaming (Bunny.net)
 - Push Notifications (Firebase)
-- Email Service
+- Email Service (SendGrid/SES - queue system ready)
 - Advertising Content
 - Video upload for creators (using URL input instead)
 
