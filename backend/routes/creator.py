@@ -201,7 +201,7 @@ async def get_creator_analytics(
     for record in view_records:
         try:
             record_date = datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00")).strftime("%Y-%m-%d")
-        except:
+        except (ValueError, KeyError, AttributeError):
             continue
             
         if record_date not in daily_views:
