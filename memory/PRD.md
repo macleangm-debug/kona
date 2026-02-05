@@ -24,104 +24,118 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Infrastructure Calculator for technical requirements
 - Advertising system (pre-roll, mid-roll, post-roll, overlays)
 - "Skip Intro" and "Swipe Down to Mini-Player" video player features
+- Content Approval Workflow for creators
+- Subtitle support for videos (English, Swahili, French)
 
 ## Tech Stack
-- **Frontend:** React.js, TailwindCSS, Framer Motion, PWA, Service Workers, Swiper.js, react-use-gesture
+- **Frontend:** React.js, TailwindCSS, Framer Motion, PWA, Service Workers, Swiper.js, react-use-gesture, i18next/react-i18next
 - **Backend:** FastAPI, Python, MongoDB
-- **Video:** CDN optimization, ABR concepts, HLS, dynamic quality selection
-- **Libraries:** Recharts, i18next/react-i18next
+- **Video:** CDN optimization, ABR concepts, HLS, dynamic quality selection, VTT subtitles
+- **Libraries:** Recharts
 
 ## Test Credentials
-- **Demo User:** demo@kona.com / Demo123!
+- **Demo User / Creator:** demo@kona.com / Demo123!
 - **Super Admin:** superadmin@kona.com / SuperAdmin2025!
 
 ---
 
 ## What's Been Implemented
 
-### Session: February 3, 2026
+### Session: February 5, 2026
 
-#### 1. Desktop Hero Banner Enhancement (COMPLETED)
-- Redesigned desktop 3D carousel with 3-column layout
-- **Left Panel:** Active series info (title, rating, description, Play/Details buttons)
-- **Center:** Larger 3D carousel cards with coverflow effect
-- **Right Panel:** "Top 10 This Week" list with clickable series, "Watch Free Episodes" button
-- Removed blank space, better utilization of screen real estate
+#### 1. Subtitle Upload UI for Creators (COMPLETED)
+- Full subtitle upload interface in Creator Portal's episode editor
+- Support for 3 languages: English, Swahili, French
+- File picker for .vtt subtitle files
+- Display of uploaded subtitles with delete functionality
+- Language selector dropdown with (Replace) indicator for existing subtitles
+- Helpful tip text about 40% reach increase with subtitles
+- Backend endpoints already existed; UI was the final piece
 
-#### 2. Video Player Like/Heart Feature (COMPLETED)
-- Functional Heart button with like count
-- Optimistic UI updates with backend sync
-- Visual feedback (red fill, scale animation when liked)
-- API Endpoints:
-  - POST /api/episodes/like
-  - POST /api/episodes/unlike
-  - GET /api/episodes/{id}/like-status
+#### 2. Creator Series Detail Page (COMPLETED)
+- New route `/creator/series/:id` for viewing series details
+- Episode list with edit functionality
+- Series stats (views, earnings)
+- Episode badges showing FREE, subtitle count (CC)
+- Clickable episodes to open episode editor dialog
 
-#### 3. Stories Page - TikTok-Style Free Episodes (COMPLETED)
-- Full-screen vertical video viewer at /stories route
-- Swipe up/down navigation between 25 free first episodes
-- UI Components:
-  - Close button (X)
-  - Story counter (1/25)
-  - Heart/Like button with count
-  - Share button with modal (WhatsApp, Twitter, Facebook, Copy Link)
-  - Episodes button (navigate to series)
-  - Mute toggle
-  - Series info at bottom
-  - "Watch Full Series" CTA button
-  - Navigation dots (right side)
-- Double-tap to like feature
-- Share tracking API: POST /api/episodes/share
+#### 3. Revenue from Rewarded Coins - Clarification (DOCUMENTED)
+- **Policy:** Views paid for with rewarded/free coins do NOT generate creator revenue
+- **Reason:** Only purchased coins represent actual revenue
+- **Implementation:** Already coded in `/app/backend/routes/revenue.py`:
+  - `free_coins_payout: False` setting
+  - Separate tracking for `purchased_coin_earnings`
+  - Note displayed in earnings dashboard: "Only purchased coins count"
 
-#### 4. Mobile Floating "Free Episodes" Button (COMPLETED)
-- Animated floating button at bottom-right on mobile
-- Pink-to-purple gradient with pulse animation
-- Navigates to /stories page
+### Previous Session (February 3-4, 2026)
 
-### Previous Session Completed Work
-- **CDN Cost Optimization:** ABR, data-saver mode, quality selector, tier-based restrictions
-- **PWA Install Prompt:** Custom "Install App" banner and profile settings option
-- **Tiered Daily Rewards:** 1 coin for free episode, 3 coins for paid episode
-- **Video Player Feature Suite:**
-  - Swipe-Down Mini-Player
-  - Skip Intro button
-  - Creator-defined intro duration
-  - Mocked Advertising System (pre/mid/post-roll, overlays)
-- **Bug Fixes:** Hero banner autoplay, Spin wheel UI, Video player play button
+#### Content Approval Workflow (COMPLETED)
+- Creators submit series with pilot episode for review
+- Admin Review Panel with video preview
+- Scoring system (content, market fit, technical)
+- Approve/Reject/Request Changes functionality
+- Email notification placeholders
+
+#### Internationalization i18n (COMPLETED)
+- i18next integration with react-i18next
+- Language switcher in header
+- Translation files for EN, SW, FR
+- Key UI components translated
+
+#### Subtitle System Foundation (COMPLETED)
+- CC button in video player
+- Subtitle track rendering
+- Downloadable .vtt template for creators
+- Backend endpoints for upload/get/delete subtitles
+
+#### Desktop Hero Banner (COMPLETED)
+- 3-column layout (info, carousel, top 10)
+- Better screen real estate utilization
+
+#### Like/Heart Feature (COMPLETED)
+- Functional in video player and stories page
+- Backend sync with optimistic UI
+
+#### Stories Page (COMPLETED)
+- TikTok-style vertical video viewer
+- Swipe navigation for free episodes
 
 ---
 
 ## Pending/Blocked Tasks
 
 ### P1: Flutterwave Payment Integration (BLOCKED)
-- Basic routes added to /app/backend/routes/payments.py
 - **BLOCKED:** Awaiting Flutterwave API keys from user
-- Will enable M-Pesa mobile money payments for Tanzania market
-
-### P1: User Verification Pending
-- Spin Wheel prize calculation fix (landed on 3, gave 2 points)
-- Video Player play button fix (ad fallback implemented)
+- Will enable M-Pesa mobile money payments
 
 ---
 
 ## Upcoming Tasks
 
-### P0: Full Regression Test of Video Player Features
-- Mini-Player, Skip Intro, and Ads features need thorough testing
+### P1: Video & Thumbnail Upload UI for Creators
+- Creator portal lacks file upload for video content
+- Need to add upload interface for series thumbnails and episode videos
 
-### P1: Promo Video Creation
-- Blocked by Universal Key budget for video generation
+### P2: Enhanced Creator Analytics
+- Charts and trend data for views
+- Earnings over time visualization
+- Audience demographics
+
+### P2: Fix Mock Video URLs
+- Some mock videos fail to load
+- Replace with working stock video URLs for testing
 
 ---
 
 ## Future/Backlog
 
-1. PDF/CSV export for Investment Calculator results
-2. Watch Party invitations via push notifications
-3. Creator Portal with fully automated payouts (currently mocked)
-4. Further gamify referral leaderboard
-5. Full internationalization with Swahili and French translations
-6. Real video hosting integration (Bunny.net configured but content mocked)
+1. Auto-generated subtitles (Whisper integration)
+2. Creator Payout History & Notification System
+3. Refactor CreatorPortal.jsx into smaller components
+4. Desktop responsive improvements for Creator Portal
+5. PDF/CSV export for Investment Calculator
+6. Watch Party push notifications
+7. Real video hosting integration (Bunny.net configured but content mocked)
 
 ---
 
@@ -132,10 +146,12 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Desktop and Mobile responsive layouts
 - Authentication (JWT)
 - Coin economy
-- Admin dashboard
-- Creator portal
+- Admin dashboard with submission review
+- Creator portal with subtitle upload
 - Stories/Free episodes viewer
 - Like/Share functionality
+- Internationalization (EN/SW/FR)
+- Subtitle display in video player
 
 ### Mocked (Needs Real Implementation)
 - Payment Gateways (Stripe, Flutterwave)
@@ -143,6 +159,29 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Push Notifications (Firebase)
 - Email Service
 - Advertising Content
+- Video upload for creators (using URL input instead)
+
+---
+
+## Key API Endpoints
+
+### Creator Portal
+- `GET /api/creator/subtitle-template` - Download VTT template
+- `POST /api/creator/episodes/{id}/subtitles` - Upload subtitle
+- `GET /api/creator/episodes/{id}/subtitles` - Get subtitles
+- `DELETE /api/creator/episodes/{id}/subtitles/{lang}` - Remove subtitle
+- `POST /api/creator/series/submit` - Submit series for approval
+- `GET /api/creator/submissions` - Get creator's submissions
+
+### Admin Panel
+- `GET /api/admin/submissions` - List pending submissions
+- `POST /api/admin/submissions/{id}/review` - Approve/reject submission
+
+### Stories & Social
+- `GET /api/stories/feed` - Free first episodes
+- `POST /api/episodes/like` - Like episode
+- `GET /api/episodes/{id}/like-status` - Get like status
+- `POST /api/episodes/share` - Track shares
 
 ---
 
@@ -150,25 +189,22 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 ```
 /app
 ├── backend/
-│   ├── routes/
-│   │   ├── users.py (likes, shares, stories endpoints)
-│   │   ├── streaming.py (CDN config)
-│   │   └── creator.py (intro duration)
-│   └── server.py (seed data)
+│   └── routes/
+│       ├── creator.py (subtitle endpoints, series submission)
+│       ├── admin.py (submission review)
+│       ├── revenue.py (earnings, tier calculation)
+│       └── users.py (likes, shares)
 ├── frontend/
 │   └── src/
 │       ├── pages/
-│       │   ├── HomePageResponsive.jsx (desktop hero, mobile floating btn)
-│       │   ├── VideoPlayerPage.jsx (like feature, ads, mini-player)
-│       │   └── StoriesPage.jsx (NEW - TikTok-style viewer)
-│       └── App.js (routes)
+│       │   ├── CreatorPortal.jsx (dashboard, submission form)
+│       │   ├── CreatorSeriesDetailPage.jsx (NEW - episode list, subtitle upload)
+│       │   ├── AdminDashboard.jsx (submission review panel)
+│       │   ├── VideoPlayerPage.jsx (subtitle display, likes)
+│       │   └── StoriesPage.jsx (vertical video viewer)
+│       └── App.js (routes including /creator/series/:id)
+├── public/
+│   └── locales/ (en, sw, fr translation JSON files)
 └── memory/
     └── PRD.md
 ```
-
-## API Endpoints (New)
-- `GET /api/stories/feed` - All free first episodes for stories mode
-- `POST /api/episodes/like` - Like an episode
-- `POST /api/episodes/unlike` - Unlike an episode
-- `GET /api/episodes/{id}/like-status` - Get like status
-- `POST /api/episodes/share` - Track episode shares
