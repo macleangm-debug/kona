@@ -134,7 +134,7 @@ export const CreatorPortal = () => {
     }
   };
 
-  const openEpisodeEditor = (episode) => {
+  const openEpisodeEditor = async (episode) => {
     setSelectedEpisode(episode);
     setEpisodeForm({
       title: episode.title || "",
@@ -143,7 +143,19 @@ export const CreatorPortal = () => {
       coins_required: episode.coins_required || 5
     });
     setEpisodeSubtitles(episode.subtitles || {});
+    setSelectedSubtitleLanguage("en");
     setShowEpisodeEditor(true);
+    
+    // Fetch latest subtitles from backend
+    try {
+      const res = await axios.get(
+        `${API}/creator/episodes/${episode.id}/subtitles`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setEpisodeSubtitles(res.data.subtitles || {});
+    } catch (e) {
+      console.error("Failed to fetch subtitles:", e);
+    }
   };
 
   const handleUpdateEpisode = async () => {
