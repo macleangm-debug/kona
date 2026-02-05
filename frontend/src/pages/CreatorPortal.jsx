@@ -747,11 +747,11 @@ export const CreatorPortal = () => {
 
       {/* Episode Editor Dialog */}
       <Dialog open={showEpisodeEditor} onOpenChange={setShowEpisodeEditor}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Episode</DialogTitle>
             <DialogDescription>
-              Update episode settings including Skip Intro timing
+              Update episode settings including Skip Intro timing and subtitles
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 mt-4">
