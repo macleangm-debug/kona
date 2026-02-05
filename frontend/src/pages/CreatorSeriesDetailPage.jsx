@@ -639,6 +639,90 @@ export const CreatorSeriesDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Series Editor Dialog */}
+      <Dialog open={showSeriesEditor} onOpenChange={setShowSeriesEditor}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Series</DialogTitle>
+            <DialogDescription>
+              Update series information and thumbnail
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <label className="text-sm text-muted-foreground">Series Title</label>
+              <Input 
+                value={seriesForm.title}
+                onChange={(e) => setSeriesForm({...seriesForm, title: e.target.value})}
+                placeholder="Series title"
+                data-testid="series-title-input"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-muted-foreground">Description</label>
+              <textarea 
+                className="w-full p-3 rounded-lg bg-secondary/50 border border-white/10 text-sm resize-none"
+                rows={3}
+                value={seriesForm.description}
+                onChange={(e) => setSeriesForm({...seriesForm, description: e.target.value})}
+                placeholder="Series description..."
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm text-muted-foreground">Genre</label>
+              <select 
+                className="w-full p-3 rounded-lg bg-secondary/50 border border-white/10 text-sm"
+                value={seriesForm.genre}
+                onChange={(e) => setSeriesForm({...seriesForm, genre: e.target.value})}
+              >
+                <option value="Romance">Romance</option>
+                <option value="Drama">Drama</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Action">Action</option>
+                <option value="Comedy">Comedy</option>
+              </select>
+            </div>
+            
+            <div className="border-t border-white/10 pt-4">
+              <label className="text-sm font-medium flex items-center gap-2 mb-2">
+                <Image className="w-4 h-4 text-purple-400" />
+                Series Thumbnail
+              </label>
+              <Input 
+                value={seriesForm.thumbnail_url}
+                onChange={(e) => setSeriesForm({...seriesForm, thumbnail_url: e.target.value})}
+                placeholder="https://example.com/thumbnail.jpg"
+                data-testid="series-thumbnail-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Paste image URL from Imgur, Cloudinary, or any image hosting service
+              </p>
+              {seriesForm.thumbnail_url && (
+                <div className="mt-2 relative w-24 h-32 rounded-lg overflow-hidden bg-secondary/50">
+                  <img 
+                    src={seriesForm.thumbnail_url} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                </div>
+              )}
+            </div>
+            
+            <Button 
+              onClick={handleUpdateSeries} 
+              className="w-full"
+              data-testid="save-series-btn"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
