@@ -1159,10 +1159,12 @@ async def unlike_episode(req: LikeRequest, user: dict = Depends(get_current_user
 
 @router.get("/episodes/{episode_id}/like-status")
 async def get_like_status(episode_id: str, user: dict = Depends(get_optional_user)):
-    """Get like status for an episode"""
+    """Get like status for an episode (includes base_likes for traction)"""
     # Get episode likes count
-    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1})
-    likes = episode.get("likes", 0) if episode else 0
+    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1, "base_likes": 1})
+    real_likes = episode.get("likes", 0) if episode else 0
+    base_likes = episode.get("base_likes", 0) if episode else 0
+    total_likes = real_likes + base_likes
     
     # Check if user liked
     liked = False
@@ -1170,7 +1172,7 @@ async def get_like_status(episode_id: str, user: dict = Depends(get_optional_use
         existing = await db.episode_likes.find_one({"user_id": user["id"], "episode_id": episode_id})
         liked = existing is not None
     
-    return {"liked": liked, "likes": likes}
+    return {"liked": liked, "likes": total_likes}
 
 # ============ SHARE TRACKING ============
 class ShareRequest(BaseModel):
