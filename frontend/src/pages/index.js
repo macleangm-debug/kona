@@ -8,6 +8,7 @@ export { ProfilePage } from './ProfilePage';
 export { SubscriptionPage } from './SubscriptionPage';
 export { CategoryPage } from './CategoryPage';
 export { CreatorPortal } from './CreatorPortal';
+export { CreatorSeriesDetailPage } from './CreatorSeriesDetailPage';
 export { CreatorLoginPage } from './CreatorLoginPage';
 export { AdminPage } from './AdminPage';
 export { AdminLoginPage } from './AdminLoginPage';
