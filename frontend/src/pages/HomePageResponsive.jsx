@@ -135,7 +135,6 @@ const DesktopHeroCarousel = ({ seriesList, allSeries, onPlay, onMoreInfo, myList
   
   const activeSeries = seriesList[activeIndex];
   const inMyList = myList?.includes(activeSeries?.id);
-  const trendingSeries = (allSeries || seriesList).slice(0, 5);
 
   return (
     <div 
