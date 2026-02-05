@@ -102,7 +102,7 @@ const AppContent = () => {
   };
 
   // Pages that should have their own layout (no header/nav)
-  const fullScreenPages = ["/watch", "/admin", "/creator", "/admin/login"];
+  const fullScreenPages = ["/watch", "/admin", "/admin/login"];
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page));
 
   return (
