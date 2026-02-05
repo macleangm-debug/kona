@@ -150,7 +150,7 @@ export const CreatorPortal = () => {
             <Star className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
             <h1 className="font-heading text-2xl font-bold mb-2">Become a Creator</h1>
             <p className="text-muted-foreground">
-              Join Kona's creator program and earn money from your content
+              Join Kona creator program and earn money from your content
             </p>
           </div>
 
@@ -159,7 +159,7 @@ export const CreatorPortal = () => {
               <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
               <h3 className="font-semibold mb-2">Application Under Review</h3>
               <p className="text-sm text-muted-foreground">
-                We're reviewing your application. You'll be notified once approved.
+                We are reviewing your application. You will be notified once approved.
               </p>
             </Card>
           ) : (
