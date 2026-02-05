@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink, FileVideo, CheckCircle, AlertCircle } from "lucide-react";
+import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink, FileVideo, CheckCircle, AlertCircle, Upload, Trash2, Globe, Languages } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
