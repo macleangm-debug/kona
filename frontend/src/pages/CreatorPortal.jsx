@@ -460,7 +460,7 @@ export const CreatorPortal = () => {
             <div>
               <h1 className="font-heading text-lg font-bold">Creator Studio</h1>
               <p className="text-xs text-muted-foreground">
-                {dashboard?.tier === "partner" ? "⭐ Partner" : dashboard?.tier === "verified" ? "✅ Verified" : "🆕 New"} • {Math.round(dashboard?.revenue_share * 100)}% share
+                {dashboard?.tier === "partner" ? "Premium Partner" : dashboard?.tier === "verified" ? "Verified" : "New"} • {Math.round(dashboard?.revenue_share * 100)}% share
               </p>
             </div>
           </div>
@@ -468,8 +468,46 @@ export const CreatorPortal = () => {
             <Plus className="w-4 h-4 mr-1" /> Submit Series
           </Button>
         </div>
+        
+        {/* Tab Navigation */}
+        <div className="flex border-t border-white/5">
+          <button
+            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+              activeTab === "dashboard" 
+                ? "text-primary border-b-2 border-primary" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveTab("dashboard")}
+            data-testid="tab-dashboard"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Dashboard
+          </button>
+          <button
+            className={`flex-1 py-3 text-sm font-medium flex items-center justify-center gap-2 transition-colors ${
+              activeTab === "analytics" 
+                ? "text-primary border-b-2 border-primary" 
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+            onClick={() => setActiveTab("analytics")}
+            data-testid="tab-analytics"
+          >
+            <LineChart className="w-4 h-4" />
+            Analytics
+          </button>
+        </div>
       </div>
 
+      {/* Analytics Tab Content */}
+      {activeTab === "analytics" && (
+        <div className="p-4">
+          <CreatorAnalytics token={token} />
+        </div>
+      )}
+
+      {/* Dashboard Tab Content */}
+      {activeTab === "dashboard" && (
+        <>
       {/* Pending Submissions */}
       {submissions.filter(s => s.status !== 'approved').length > 0 && (
         <div className="px-4 mb-4">
