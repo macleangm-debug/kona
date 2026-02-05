@@ -733,3 +733,169 @@ async def get_submission_stats(user: dict = Depends(require_admin)):
         "total": pending + under_review + approved + rejected
     }
 
+
+
+# ============ ENGAGEMENT SEEDING (LAUNCH TRACTION) ============
+
+@router.post("/seed/likes")
+async def seed_likes_for_episodes(
+    user: dict = Depends(require_super_admin),
+    min_likes: int = 500,
+    max_likes: int = 5000,
+    episode_ids: List[str] = None
+):
+    """
+    Seed episodes with base like counts for launch traction.
+    This sets a 'base_likes' field that gets added to real user likes.
+    Only Super Admin can use this feature.
+    """
+    import random
+    
+    # Get all episodes if no specific IDs provided
+    if episode_ids:
+        episodes = await db.episodes.find({"id": {"$in": episode_ids}}, {"_id": 0}).to_list(1000)
+    else:
+        episodes = await db.episodes.find({}, {"_id": 0}).to_list(1000)
+    
+    if not episodes:
+        raise HTTPException(status_code=404, detail="No episodes found")
+    
+    seeded_count = 0
+    for ep in episodes:
+        # Generate random base likes within range
+        base_likes = random.randint(min_likes, max_likes)
+        
+        # Update episode with base_likes
+        await db.episodes.update_one(
+            {"id": ep["id"]},
+            {"$set": {"base_likes": base_likes}}
+        )
+        seeded_count += 1
+    
+    return {
+        "message": f"Seeded {seeded_count} episodes with base likes",
+        "range": {"min": min_likes, "max": max_likes},
+        "episodes_affected": seeded_count
+    }
+
+
+@router.post("/seed/views")
+async def seed_views_for_episodes(
+    user: dict = Depends(require_super_admin),
+    min_views: int = 1000,
+    max_views: int = 50000,
+    episode_ids: List[str] = None
+):
+    """
+    Seed episodes with base view counts for launch traction.
+    This sets a 'base_views' field that gets added to real user views.
+    """
+    import random
+    
+    if episode_ids:
+        episodes = await db.episodes.find({"id": {"$in": episode_ids}}, {"_id": 0}).to_list(1000)
+    else:
+        episodes = await db.episodes.find({}, {"_id": 0}).to_list(1000)
+    
+    if not episodes:
+        raise HTTPException(status_code=404, detail="No episodes found")
+    
+    seeded_count = 0
+    for ep in episodes:
+        base_views = random.randint(min_views, max_views)
+        
+        await db.episodes.update_one(
+            {"id": ep["id"]},
+            {"$set": {"base_views": base_views}}
+        )
+        seeded_count += 1
+    
+    return {
+        "message": f"Seeded {seeded_count} episodes with base views",
+        "range": {"min": min_views, "max": max_views},
+        "episodes_affected": seeded_count
+    }
+
+
+@router.post("/seed/series-stats")
+async def seed_series_stats(
+    user: dict = Depends(require_super_admin),
+    min_views: int = 5000,
+    max_views: int = 250000,
+    min_rating: float = 4.0,
+    max_rating: float = 4.9
+):
+    """
+    Seed all series with base view counts and ratings for launch.
+    """
+    import random
+    
+    series_list = await db.series.find({}, {"_id": 0}).to_list(100)
+    
+    seeded_count = 0
+    for s in series_list:
+        base_views = random.randint(min_views, max_views)
+        base_rating = round(random.uniform(min_rating, max_rating), 1)
+        
+        await db.series.update_one(
+            {"id": s["id"]},
+            {"$set": {
+                "base_views": base_views,
+                "base_rating": base_rating,
+                "rating": base_rating  # Set visible rating
+            }}
+        )
+        seeded_count += 1
+    
+    return {
+        "message": f"Seeded {seeded_count} series with base stats",
+        "view_range": {"min": min_views, "max": max_views},
+        "rating_range": {"min": min_rating, "max": max_rating}
+    }
+
+
+@router.get("/seed/status")
+async def get_seed_status(user: dict = Depends(require_admin)):
+    """Check current seeding status across content"""
+    
+    # Episodes with base likes
+    episodes_with_base_likes = await db.episodes.count_documents({"base_likes": {"$exists": True, "$gt": 0}})
+    episodes_with_base_views = await db.episodes.count_documents({"base_views": {"$exists": True, "$gt": 0}})
+    
+    # Series with base stats
+    series_with_base_views = await db.series.count_documents({"base_views": {"$exists": True, "$gt": 0}})
+    
+    # Get totals
+    total_episodes = await db.episodes.count_documents({})
+    total_series = await db.series.count_documents({})
+    
+    return {
+        "episodes": {
+            "total": total_episodes,
+            "with_base_likes": episodes_with_base_likes,
+            "with_base_views": episodes_with_base_views
+        },
+        "series": {
+            "total": total_series,
+            "with_base_views": series_with_base_views
+        }
+    }
+
+
+@router.delete("/seed/clear")
+async def clear_all_seeds(user: dict = Depends(require_super_admin)):
+    """Clear all seeded data (reset to organic only)"""
+    
+    # Remove base fields from episodes
+    await db.episodes.update_many(
+        {},
+        {"$unset": {"base_likes": "", "base_views": ""}}
+    )
+    
+    # Remove base fields from series
+    await db.series.update_many(
+        {},
+        {"$unset": {"base_views": "", "base_rating": ""}}
+    )
+    
+    return {"message": "All seeded data cleared"}
