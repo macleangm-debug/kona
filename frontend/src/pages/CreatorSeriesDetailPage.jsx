@@ -216,7 +216,7 @@ export const CreatorSeriesDetailPage = () => {
         <Card className="p-6 text-center max-w-sm">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 text-red-400" />
           <h2 className="font-heading text-xl font-bold mb-2">Series Not Found</h2>
-          <p className="text-sm text-muted-foreground mb-4">This series doesn't exist or you don't have access.</p>
+          <p className="text-sm text-muted-foreground mb-4">This series does not exist or you do not have access.</p>
           <Button onClick={() => navigate("/creator")} className="w-full">Back to Creator Portal</Button>
         </Card>
       </div>
