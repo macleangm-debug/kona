@@ -273,9 +273,79 @@ export const CreatorSeriesDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen pb-20" data-testid="creator-series-detail">
-      {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-white/10">
+    <div className="min-h-screen" data-testid="creator-series-detail">
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-72 bg-card border-r border-white/10 z-50">
+        {/* Back Navigation */}
+        <div className="p-4 border-b border-white/10">
+          <button 
+            onClick={() => navigate("/creator")} 
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Back to Creator Portal
+          </button>
+        </div>
+
+        {/* Series Info */}
+        <div className="p-6 border-b border-white/10">
+          <div className="w-full aspect-[2/3] rounded-lg overflow-hidden bg-secondary/50 mb-4">
+            {series.thumbnail ? (
+              <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Film className="w-12 h-12 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+          <h1 className="font-heading text-xl font-bold mb-1">{series.title}</h1>
+          <p className="text-sm text-muted-foreground mb-3">{series.genre} • {series.total_episodes || episodes.length} episodes</p>
+          <Badge 
+            variant={series.status === "published" ? "default" : series.status === "approved" ? "outline" : "secondary"}
+            className="mb-3"
+          >
+            {series.status === "pending_review" ? "Under Review" : series.status}
+          </Badge>
+          <p className="text-xs text-muted-foreground line-clamp-4">{series.description || "No description"}</p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="p-4 border-b border-white/10 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground flex items-center gap-2">
+              <Eye className="w-4 h-4 text-blue-400" /> Views
+            </span>
+            <span className="font-bold">{series.total_views || 0}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground flex items-center gap-2">
+              <Coins className="w-4 h-4 text-yellow-400" /> Earnings
+            </span>
+            <span className="font-bold">{series.total_earnings || 0}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground flex items-center gap-2">
+              <Film className="w-4 h-4 text-purple-400" /> Episodes
+            </span>
+            <span className="font-bold">{episodes.length}</span>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="p-4 mt-auto space-y-2">
+          <Button className="w-full" variant="outline" onClick={openSeriesEditor}>
+            <Edit className="w-4 h-4 mr-2" /> Edit Series Info
+          </Button>
+          {(series.status === "approved" || series.status === "published") && (
+            <Button className="w-full" data-testid="add-episode-btn">
+              <Plus className="w-4 h-4 mr-2" /> Add Episode
+            </Button>
+          )}
+        </div>
+      </aside>
+
+      {/* Mobile Header */}
+      <div className="lg:hidden sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center gap-3 p-4">
           <button onClick={() => navigate("/creator")} className="p-2 hover:bg-secondary rounded-full">
             <ChevronLeft className="w-5 h-5" />
@@ -287,77 +357,158 @@ export const CreatorSeriesDetailPage = () => {
           <button 
             onClick={openSeriesEditor}
             className="p-2 hover:bg-secondary rounded-full"
-            data-testid="edit-series-btn"
+            data-testid="edit-series-btn-mobile"
           >
             <Edit className="w-4 h-4" />
           </button>
           <Badge variant={series.status === "published" ? "default" : series.status === "approved" ? "outline" : "secondary"}>
-            {series.status}
+            {series.status === "pending_review" ? "Review" : series.status}
           </Badge>
         </div>
       </div>
 
-      {/* Series Info Card with Thumbnail */}
-      <div className="p-4">
-        <Card className="p-4 mb-4 flex gap-4">
-          <div className="w-24 h-32 rounded-lg overflow-hidden bg-secondary/50 flex-shrink-0">
-            {series.thumbnail ? (
-              <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <Film className="w-8 h-8 text-muted-foreground" />
-              </div>
+      {/* Main Content */}
+      <main className="lg:ml-72">
+        {/* Desktop Header */}
+        <div className="hidden lg:block border-b border-white/10 px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-heading text-2xl font-bold">Episodes</h2>
+              <p className="text-sm text-muted-foreground">Manage episodes for {series.title}</p>
+            </div>
+            {(series.status === "approved" || series.status === "published") && (
+              <Button data-testid="add-episode-btn-desktop">
+                <Plus className="w-4 h-4 mr-2" /> Add New Episode
+              </Button>
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm text-muted-foreground line-clamp-3">{series.description || "No description"}</p>
-            <div className="mt-2 flex gap-2">
-              <Button size="sm" variant="outline" onClick={openSeriesEditor}>
-                <Edit className="w-3 h-3 mr-1" /> Edit Info
+        </div>
+
+        {/* Mobile Series Info */}
+        <div className="lg:hidden p-4">
+          <Card className="p-4 mb-4 flex gap-4">
+            <div className="w-20 h-28 rounded-lg overflow-hidden bg-secondary/50 flex-shrink-0">
+              {series.thumbnail ? (
+                <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Film className="w-6 h-6 text-muted-foreground" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-muted-foreground line-clamp-3">{series.description || "No description"}</p>
+              <Button size="sm" variant="outline" className="mt-2" onClick={openSeriesEditor}>
+                <Edit className="w-3 h-3 mr-1" /> Edit
               </Button>
             </div>
+          </Card>
+
+          {/* Mobile Stats */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <Card className="p-3 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 border-blue-500/30">
+              <p className="text-xs text-muted-foreground mb-1">Total Views</p>
+              <p className="font-heading text-xl font-bold flex items-center gap-1">
+                <Eye className="w-4 h-4 text-blue-400" />
+                {series.total_views || 0}
+              </p>
+            </Card>
+            <Card className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30">
+              <p className="text-xs text-muted-foreground mb-1">Earnings</p>
+              <p className="font-heading text-xl font-bold flex items-center gap-1">
+                <Coins className="w-4 h-4 text-yellow-400" />
+                {series.total_earnings || 0}
+              </p>
+            </Card>
           </div>
-        </Card>
-
-        {/* Series Stats */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Card className="p-3 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 border-blue-500/30">
-            <p className="text-xs text-muted-foreground mb-1">Total Views</p>
-            <p className="font-heading text-xl font-bold flex items-center gap-1">
-              <Eye className="w-4 h-4 text-blue-400" />
-              {series.total_views || 0}
-            </p>
-          </Card>
-          <Card className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30">
-            <p className="text-xs text-muted-foreground mb-1">Total Earnings</p>
-            <p className="font-heading text-xl font-bold flex items-center gap-1">
-              <Coins className="w-4 h-4 text-yellow-400" />
-              {series.total_earnings || 0}
-            </p>
-          </Card>
         </div>
 
-        {/* Episodes List */}
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-heading font-semibold">Episodes ({episodes.length})</h3>
-          {series.status === "approved" || series.status === "published" ? (
-            <Button size="sm" variant="outline" data-testid="add-episode-btn">
-              <Plus className="w-4 h-4 mr-1" /> Add Episode
-            </Button>
-          ) : null}
-        </div>
+        {/* Episodes Section */}
+        <div className="p-4 lg:p-8">
+          {/* Mobile Episodes Header */}
+          <div className="lg:hidden flex items-center justify-between mb-4">
+            <h3 className="font-heading font-semibold">Episodes ({episodes.length})</h3>
+            {(series.status === "approved" || series.status === "published") && (
+              <Button size="sm" variant="outline" data-testid="add-episode-btn-mobile">
+                <Plus className="w-4 h-4 mr-1" /> Add
+              </Button>
+            )}
+          </div>
 
-        {episodes.length === 0 ? (
-          <Card className="p-8 text-center">
-            <Film className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">No episodes yet</p>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {episodes.map((ep) => (
-              <Card 
-                key={ep.id} 
-                className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
+          {episodes.length === 0 ? (
+            <Card className="p-12 text-center">
+              <Film className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="font-heading text-lg font-semibold mb-2">No Episodes Yet</h3>
+              <p className="text-muted-foreground mb-4">
+                {series.status === "pending_review" 
+                  ? "Your series is under review. Once approved, you can add more episodes."
+                  : "Start adding episodes to your series."}
+              </p>
+              {(series.status === "approved" || series.status === "published") && (
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" /> Add First Episode
+                </Button>
+              )}
+            </Card>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+              {episodes.map((ep) => (
+                <Card 
+                  key={ep.id} 
+                  className="p-4 hover:bg-white/5 transition-colors cursor-pointer group"
+                  onClick={() => openEpisodeEditor(ep)}
+                  data-testid={`episode-${ep.id}`}
+                >
+                  <div className="flex gap-4">
+                    <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                      {ep.thumbnail ? (
+                        <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <Play className="w-8 h-8 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5">
+                          {ep.episode_code || `E${ep.episode_number}`}
+                        </Badge>
+                        {ep.is_free && (
+                          <Badge className="text-[10px] bg-green-500/20 text-green-400">FREE</Badge>
+                        )}
+                        {ep.subtitles && Object.keys(ep.subtitles).length > 0 && (
+                          <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
+                            CC ({Object.keys(ep.subtitles).length})
+                          </Badge>
+                        )}
+                      </div>
+                      <h4 className="font-medium text-sm lg:text-base line-clamp-1 mb-1">{ep.title}</h4>
+                      <div className="flex gap-4 text-xs text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Eye className="w-3 h-3" /> {ep.views || 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Coins className="w-3 h-3" /> {ep.earnings || 0}
+                        </span>
+                        {!ep.is_free && (
+                          <span>{ep.coins_required} coins</span>
+                        )}
+                      </div>
+                    </div>
+                    <button 
+                      className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-start"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openEpisodeEditor(ep);
+                      }}
+                      data-testid={`edit-episode-${ep.id}`}
+                    >
+                      <Edit className="w-4 h-4 text-muted-foreground" />
+                    </button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
                 onClick={() => openEpisodeEditor(ep)}
                 data-testid={`episode-${ep.id}`}
               >
