@@ -39,6 +39,7 @@ import {
   SubscriptionPage,
   CategoryPage,
   CreatorPortal,
+  CreatorSeriesDetailPage,
   CreatorLoginPage,
   AdminLoginPage,
   AdminDashboard,
