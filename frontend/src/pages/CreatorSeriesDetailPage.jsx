@@ -273,9 +273,9 @@ export const CreatorSeriesDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen" data-testid="creator-series-detail">
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-72 bg-card border-r border-white/10 z-50">
+    <div className="min-h-screen pt-16 lg:pt-16" data-testid="creator-series-detail">
+      {/* Desktop Sidebar - positioned below main header */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-72 bg-card border-r border-white/10 z-40">
         {/* Back Navigation */}
         <div className="p-4 border-b border-white/10">
           <button 
