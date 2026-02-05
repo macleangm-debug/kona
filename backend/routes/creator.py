@@ -1082,8 +1082,18 @@ async def get_episode_status(episode_id: str, user: dict = Depends(get_current_u
 
 
 @router.patch("/episodes/{episode_id}")
-async def update_episode(episode_id: str, user: dict = Depends(get_current_user), title: str = None, description: str = None, is_free: bool = None, coins_required: int = None, intro_duration: int = None):
-    """Update episode settings including intro duration for Skip Intro feature"""
+async def update_episode(
+    episode_id: str, 
+    user: dict = Depends(get_current_user), 
+    title: str = None, 
+    description: str = None, 
+    is_free: bool = None, 
+    coins_required: int = None, 
+    intro_duration: int = None,
+    thumbnail_url: str = None,
+    video_url: str = None
+):
+    """Update episode settings including intro duration, thumbnail, and video URL"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
@@ -1107,6 +1117,15 @@ async def update_episode(episode_id: str, user: dict = Depends(get_current_user)
         update_data["coins_required"] = max(0, min(50, coins_required))
     if intro_duration is not None:
         update_data["intro_duration"] = max(0, min(120, intro_duration))
+    if thumbnail_url is not None:
+        if not thumbnail_url.startswith(("http://", "https://", "data:")):
+            raise HTTPException(status_code=400, detail="Invalid thumbnail URL format")
+        update_data["thumbnail"] = thumbnail_url
+    if video_url is not None:
+        if not video_url.startswith(("http://", "https://")):
+            raise HTTPException(status_code=400, detail="Invalid video URL format")
+        update_data["video_url"] = video_url
+        update_data["encoding_status"] = "ready"
     
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -1126,6 +1145,57 @@ async def update_episode(episode_id: str, user: dict = Depends(get_current_user)
         "message": "Episode updated successfully",
         "episode_id": episode_id,
         "updated_fields": list(update_data.keys())
+    }
+
+
+@router.post("/episodes/{episode_id}/init-video")
+async def initialize_video_upload(episode_id: str, user: dict = Depends(get_current_user)):
+    """Initialize Bunny.net video for an episode (call this before uploading)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    episode = await db.creator_episodes.find_one({"id": episode_id, "creator_id": creator["id"]})
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    # Get series for title
+    series = await db.creator_series.find_one({"id": episode["series_id"]}, {"_id": 0})
+    series_title = series.get("title", "Series") if series else "Series"
+    
+    # Create video in Bunny.net
+    video_title = f"{series_title} - {episode.get('episode_code', 'EP')}: {episode.get('title', 'Episode')}"
+    bunny_result = await bunny_service.create_video(video_title)
+    
+    if not bunny_result["success"]:
+        raise HTTPException(status_code=500, detail="Failed to initialize video upload")
+    
+    bunny_video_id = bunny_result["video_id"]
+    upload_url = await bunny_service.get_upload_url(bunny_video_id)
+    
+    # Update episode with Bunny video ID
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$set": {
+            "bunny_video_id": bunny_video_id,
+            "encoding_status": "pending"
+        }}
+    )
+    
+    return {
+        "message": "Video upload initialized",
+        "episode_id": episode_id,
+        "bunny_video_id": bunny_video_id,
+        "upload_url": upload_url,
+        "upload_headers": {
+            "AccessKey": bunny_service.api_key,
+            "Content-Type": "application/octet-stream"
+        },
+        "instructions": {
+            "method": "PUT",
+            "note": "Upload video file directly to upload_url with the provided headers"
+        }
     }
 
 
