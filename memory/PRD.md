@@ -186,6 +186,12 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - `DELETE /api/creator/episodes/{id}/subtitles/{lang}` - Remove subtitle
 - `POST /api/creator/series/submit` - Submit series for approval
 - `GET /api/creator/submissions` - Get creator's submissions
+- `PATCH /api/creator/series/{id}` - Update series (title, description, thumbnail_url, genre)
+- `PATCH /api/creator/episodes/{id}` - Update episode (title, thumbnail_url, video_url, intro_duration, is_free, coins_required)
+
+### Creator Analytics
+- `GET /api/creator/analytics` - Get detailed analytics (period: 7d, 30d, 90d, all, custom)
+- `GET /api/creator/analytics/compare` - Compare current vs previous period growth
 
 ### Admin Panel
 - `GET /api/admin/submissions` - List pending submissions
