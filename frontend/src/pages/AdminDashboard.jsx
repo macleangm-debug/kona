@@ -2718,28 +2718,7 @@ export const AdminDashboard = () => {
                           </Badge>
                         </div>
                         <div className="prose prose-invert prose-sm max-w-none overflow-auto max-h-[600px] pr-4 markdown-content">
-                          <ReactMarkdown
-                            components={{
-                              h1: ({node, ...props}) => <h1 className="text-2xl font-bold text-white mt-6 mb-4" {...props} />,
-                              h2: ({node, ...props}) => <h2 className="text-xl font-bold text-white mt-5 mb-3 border-b border-white/10 pb-2" {...props} />,
-                              h3: ({node, ...props}) => <h3 className="text-lg font-semibold text-white mt-4 mb-2" {...props} />,
-                              p: ({node, ...props}) => <p className="text-gray-300 mb-3" {...props} />,
-                              ul: ({node, ...props}) => <ul className="list-disc list-inside text-gray-300 mb-3 space-y-1" {...props} />,
-                              ol: ({node, ...props}) => <ol className="list-decimal list-inside text-gray-300 mb-3 space-y-1" {...props} />,
-                              li: ({node, ...props}) => <li className="text-gray-300" {...props} />,
-                              table: ({node, ...props}) => <div className="overflow-x-auto mb-4"><table className="min-w-full border border-white/10" {...props} /></div>,
-                              thead: ({node, ...props}) => <thead className="bg-white/5" {...props} />,
-                              th: ({node, ...props}) => <th className="px-4 py-2 text-left text-sm font-semibold border border-white/10" {...props} />,
-                              td: ({node, ...props}) => <td className="px-4 py-2 text-sm border border-white/10" {...props} />,
-                              code: ({node, inline, ...props}) => 
-                                inline 
-                                  ? <code className="bg-white/10 px-1.5 py-0.5 rounded text-purple-300 text-sm" {...props} />
-                                  : <code className="block bg-black/30 p-4 rounded-lg overflow-x-auto text-sm text-green-300" {...props} />,
-                              pre: ({node, ...props}) => <pre className="bg-black/30 p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
-                              blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-purple-500 pl-4 italic text-gray-400 my-4" {...props} />,
-                              hr: ({node, ...props}) => <hr className="border-white/10 my-6" {...props} />,
-                            }}
-                          >
+                          <ReactMarkdown components={markdownComponents}>
                             {currentDoc?.content || "Select a document from the sidebar to view its contents."}
                           </ReactMarkdown>
                         </div>
