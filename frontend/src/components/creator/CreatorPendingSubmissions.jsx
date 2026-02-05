@@ -42,7 +42,7 @@ export const CreatorPendingSubmissions = ({ submissions }) => {
                 </p>
                 {sub.admin_notes && (
                   <p className="text-xs text-muted-foreground mt-2 italic">
-                    "{sub.admin_notes}"
+                    {sub.admin_notes}
                   </p>
                 )}
                 <p className="text-[10px] text-muted-foreground mt-2">
