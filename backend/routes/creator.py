@@ -146,6 +146,248 @@ async def get_creator_dashboard(user: dict = Depends(get_current_user)):
     }
 
 
+# ============ CREATOR ANALYTICS ============
+
+@router.get("/analytics")
+async def get_creator_analytics(
+    user: dict = Depends(get_current_user),
+    period: str = Query("30d", description="Time period: 7d, 30d, 90d, all, or custom"),
+    start_date: Optional[str] = Query(None, description="Start date for custom period (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description="End date for custom period (YYYY-MM-DD)")
+):
+    """Get detailed analytics for creator dashboard with time-series data"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Calculate date range
+    now = datetime.now(timezone.utc)
+    
+    if period == "custom" and start_date and end_date:
+        try:
+            start = datetime.fromisoformat(start_date).replace(tzinfo=timezone.utc)
+            end = datetime.fromisoformat(end_date).replace(hour=23, minute=59, second=59, tzinfo=timezone.utc)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD")
+    elif period == "7d":
+        start = now - timedelta(days=7)
+        end = now
+    elif period == "30d":
+        start = now - timedelta(days=30)
+        end = now
+    elif period == "90d":
+        start = now - timedelta(days=90)
+        end = now
+    elif period == "all":
+        start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        end = now
+    else:
+        start = now - timedelta(days=30)
+        end = now
+    
+    creator_id = creator["id"]
+    
+    # Get view records for the period
+    view_records = await db.view_records.find({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": start.isoformat(), "$lte": end.isoformat()}
+    }).to_list(10000)
+    
+    # Aggregate views by day for chart
+    daily_views = {}
+    daily_earnings = {}
+    
+    for record in view_records:
+        try:
+            record_date = datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00")).strftime("%Y-%m-%d")
+        except:
+            continue
+            
+        if record_date not in daily_views:
+            daily_views[record_date] = 0
+            daily_earnings[record_date] = 0
+        
+        daily_views[record_date] += 1
+        daily_earnings[record_date] += record.get("creator_share", 0)
+    
+    # Sort and format for charts
+    sorted_dates = sorted(daily_views.keys())
+    views_chart_data = [{"date": d, "views": daily_views[d]} for d in sorted_dates]
+    earnings_chart_data = [{"date": d, "earnings": daily_earnings[d]} for d in sorted_dates]
+    
+    # Get top performing episodes
+    episode_stats = {}
+    for record in view_records:
+        ep_id = record.get("episode_id", "unknown")
+        if ep_id not in episode_stats:
+            episode_stats[ep_id] = {"views": 0, "earnings": 0, "likes": 0, "shares": 0}
+        episode_stats[ep_id]["views"] += 1
+        episode_stats[ep_id]["earnings"] += record.get("creator_share", 0)
+    
+    # Get episode details and sort by views
+    top_episodes = []
+    for ep_id, stats in sorted(episode_stats.items(), key=lambda x: x[1]["views"], reverse=True)[:10]:
+        episode = await db.creator_episodes.find_one({"id": ep_id}, {"_id": 0})
+        if episode:
+            # Get likes count
+            likes_count = await db.likes.count_documents({"episode_id": ep_id})
+            shares_count = await db.shares.count_documents({"episode_id": ep_id})
+            
+            top_episodes.append({
+                "episode_id": ep_id,
+                "title": episode.get("title", "Unknown"),
+                "episode_code": episode.get("episode_code", ""),
+                "series_id": episode.get("series_id", ""),
+                "views": stats["views"],
+                "earnings": round(stats["earnings"], 2),
+                "likes": likes_count,
+                "shares": shares_count,
+                "engagement_rate": round((likes_count + shares_count) / max(stats["views"], 1) * 100, 1)
+            })
+    
+    # Calculate period totals
+    period_views = sum(daily_views.values())
+    period_earnings = sum(daily_earnings.values())
+    
+    # Get engagement metrics
+    total_likes = await db.likes.count_documents({"creator_id": creator_id})
+    total_shares = await db.shares.count_documents({"creator_id": creator_id})
+    
+    # Calculate averages
+    days_in_period = max((end - start).days, 1)
+    avg_daily_views = round(period_views / days_in_period, 1)
+    avg_daily_earnings = round(period_earnings / days_in_period, 2)
+    
+    # Get series performance
+    series_list = await db.creator_series.find({"creator_id": creator_id}, {"_id": 0}).to_list(100)
+    series_performance = []
+    for s in series_list:
+        series_views = sum(1 for r in view_records if r.get("series_id") == s["id"])
+        series_earnings = sum(r.get("creator_share", 0) for r in view_records if r.get("series_id") == s["id"])
+        series_performance.append({
+            "series_id": s["id"],
+            "title": s["title"],
+            "views": series_views,
+            "earnings": round(series_earnings, 2),
+            "total_episodes": s.get("total_episodes", 0)
+        })
+    
+    series_performance.sort(key=lambda x: x["views"], reverse=True)
+    
+    return {
+        "period": {
+            "type": period,
+            "start": start.isoformat(),
+            "end": end.isoformat(),
+            "days": days_in_period
+        },
+        "summary": {
+            "total_views": period_views,
+            "total_earnings": round(period_earnings, 2),
+            "avg_daily_views": avg_daily_views,
+            "avg_daily_earnings": avg_daily_earnings,
+            "total_likes": total_likes,
+            "total_shares": total_shares,
+            "engagement_rate": round((total_likes + total_shares) / max(creator["total_views"], 1) * 100, 1)
+        },
+        "charts": {
+            "views": views_chart_data,
+            "earnings": earnings_chart_data
+        },
+        "top_episodes": top_episodes,
+        "series_performance": series_performance[:5],
+        "metrics": {
+            "watch_time_minutes": period_views * 3,  # Estimated 3 min avg per view
+            "unique_viewers": len(set(r.get("user_id") for r in view_records if r.get("user_id"))),
+            "returning_viewers": 0,  # Would need more tracking
+            "peak_day": max(views_chart_data, key=lambda x: x["views"])["date"] if views_chart_data else None,
+            "peak_views": max(views_chart_data, key=lambda x: x["views"])["views"] if views_chart_data else 0
+        }
+    }
+
+
+@router.get("/analytics/compare")
+async def compare_analytics_periods(
+    user: dict = Depends(get_current_user),
+    period: str = Query("30d", description="Time period to compare: 7d, 30d, 90d")
+):
+    """Compare current period with previous period for growth metrics"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    now = datetime.now(timezone.utc)
+    
+    if period == "7d":
+        days = 7
+    elif period == "30d":
+        days = 30
+    elif period == "90d":
+        days = 90
+    else:
+        days = 30
+    
+    current_start = now - timedelta(days=days)
+    previous_start = current_start - timedelta(days=days)
+    previous_end = current_start
+    
+    creator_id = creator["id"]
+    
+    # Current period stats
+    current_views = await db.view_records.count_documents({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": current_start.isoformat()}
+    })
+    
+    current_earnings_cursor = db.view_records.aggregate([
+        {"$match": {"creator_id": creator_id, "timestamp": {"$gte": current_start.isoformat()}}},
+        {"$group": {"_id": None, "total": {"$sum": "$creator_share"}}}
+    ])
+    current_earnings_result = await current_earnings_cursor.to_list(1)
+    current_earnings = current_earnings_result[0]["total"] if current_earnings_result else 0
+    
+    # Previous period stats
+    previous_views = await db.view_records.count_documents({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": previous_start.isoformat(), "$lt": previous_end.isoformat()}
+    })
+    
+    previous_earnings_cursor = db.view_records.aggregate([
+        {"$match": {"creator_id": creator_id, "timestamp": {"$gte": previous_start.isoformat(), "$lt": previous_end.isoformat()}}},
+        {"$group": {"_id": None, "total": {"$sum": "$creator_share"}}}
+    ])
+    previous_earnings_result = await previous_earnings_cursor.to_list(1)
+    previous_earnings = previous_earnings_result[0]["total"] if previous_earnings_result else 0
+    
+    # Calculate growth percentages
+    views_growth = ((current_views - previous_views) / max(previous_views, 1)) * 100
+    earnings_growth = ((current_earnings - previous_earnings) / max(previous_earnings, 1)) * 100
+    
+    return {
+        "period": period,
+        "current": {
+            "views": current_views,
+            "earnings": round(current_earnings, 2),
+            "start": current_start.isoformat(),
+            "end": now.isoformat()
+        },
+        "previous": {
+            "views": previous_views,
+            "earnings": round(previous_earnings, 2),
+            "start": previous_start.isoformat(),
+            "end": previous_end.isoformat()
+        },
+        "growth": {
+            "views_percent": round(views_growth, 1),
+            "earnings_percent": round(earnings_growth, 1),
+            "views_trend": "up" if views_growth > 0 else "down" if views_growth < 0 else "flat",
+            "earnings_trend": "up" if earnings_growth > 0 else "down" if earnings_growth < 0 else "flat"
+        }
+    }
+
+
 # ============ SERIES SUBMISSION & APPROVAL WORKFLOW ============
 
 @router.post("/series/submit", response_model=SeriesSubmissionResponse)
