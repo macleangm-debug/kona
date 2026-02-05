@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink, FileVideo, CheckCircle, AlertCircle, Upload, Trash2, Globe, Languages } from "lucide-react";
+import { ChevronLeft, Clock, X, Plus, Film, Eye, Coins, BarChart3, Trophy, Loader2, TrendingUp, Crown, Star, DollarSign, Target, ExternalLink, FileVideo, CheckCircle, AlertCircle, Upload, Trash2, Globe, Languages, LayoutDashboard, LineChart } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,10 +12,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { SeriesSubmissionForm } from "@/components/SeriesSubmissionForm";
+import { CreatorAnalytics } from "@/components/CreatorAnalytics";
 
 export const CreatorPortal = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [creatorStatus, setCreatorStatus] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [series, setSeries] = useState([]);
