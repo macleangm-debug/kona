@@ -23,8 +23,8 @@ export const CreatorHeader = ({
 
   return (
     <>
-      {/* Desktop Sidebar - Hidden on mobile */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-white/10 z-50">
+      {/* Desktop Sidebar - Hidden on mobile, positioned below main header */}
+      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-card border-r border-white/10 z-40">
         {/* Logo/Brand */}
         <div className="p-6 border-b border-white/10">
           <h1 className="font-heading text-xl font-bold">Creator Studio</h1>
