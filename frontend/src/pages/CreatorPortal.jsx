@@ -182,7 +182,7 @@ export const CreatorPortal = () => {
   };
   
   // Handle subtitle file upload
-  const handleSubtitleUpload = async (language, file) => {
+  const handleSubtitleUpload = async (file) => {
     if (!selectedEpisode || !file) return;
     
     // Validate file type
@@ -194,39 +194,46 @@ export const CreatorPortal = () => {
     setSubtitleUploading(true);
     
     try {
-      // Read file content and create a data URL (for demo - in production use file upload service)
       const reader = new FileReader();
       reader.onload = async (e) => {
         const content = e.target.result;
         
-        // For demo: create a blob URL (in production, upload to CDN/storage)
-        const blob = new Blob([content], { type: 'text/vtt' });
-        const subtitleUrl = URL.createObjectURL(blob);
+        // Convert the content to base64 data URL for storage
+        // In production, this would be uploaded to a CDN
+        const base64Content = btoa(unescape(encodeURIComponent(content)));
+        const subtitleDataUrl = `data:text/vtt;base64,${base64Content}`;
         
-        // In production, you would upload to a CDN and get a permanent URL
-        // For now, we'll store it directly
         try {
           await axios.post(
             `${API}/creator/episodes/${selectedEpisode.id}/subtitles`,
             { 
               episode_id: selectedEpisode.id,
-              language: language,
-              subtitle_url: subtitleUrl
+              language: selectedSubtitleLanguage,
+              subtitle_url: subtitleDataUrl
             },
             { headers: { Authorization: `Bearer ${token}` }}
           );
           
-          setEpisodeSubtitles(prev => ({...prev, [language]: subtitleUrl}));
-          toast.success(`${language.toUpperCase()} subtitles uploaded!`);
+          setEpisodeSubtitles(prev => ({...prev, [selectedSubtitleLanguage]: subtitleDataUrl}));
+          toast.success(`${SUBTITLE_LANGUAGES.find(l => l.code === selectedSubtitleLanguage)?.name || selectedSubtitleLanguage.toUpperCase()} subtitles uploaded!`);
         } catch (err) {
           toast.error(err.response?.data?.detail || "Failed to save subtitles");
         }
         setSubtitleUploading(false);
       };
+      reader.onerror = () => {
+        toast.error("Failed to read subtitle file");
+        setSubtitleUploading(false);
+      };
       reader.readAsText(file);
     } catch (e) {
-      toast.error("Failed to read subtitle file");
+      toast.error("Failed to process subtitle file");
       setSubtitleUploading(false);
+    }
+    
+    // Reset file input
+    if (subtitleFileInputRef.current) {
+      subtitleFileInputRef.current.value = "";
     }
   };
   
