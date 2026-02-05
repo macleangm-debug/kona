@@ -56,6 +56,15 @@ export const CreatorPortal = () => {
   // Subtitle upload state
   const [subtitleUploading, setSubtitleUploading] = useState(false);
   const [episodeSubtitles, setEpisodeSubtitles] = useState({});
+  const [selectedSubtitleLanguage, setSelectedSubtitleLanguage] = useState("en");
+  const subtitleFileInputRef = useRef(null);
+
+  // Supported subtitle languages
+  const SUBTITLE_LANGUAGES = [
+    { code: "en", name: "English" },
+    { code: "sw", name: "Swahili" },
+    { code: "fr", name: "French" }
+  ];
 
   const fetchCreatorData = async () => {
     if (!token) return;
