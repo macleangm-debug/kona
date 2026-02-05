@@ -1990,6 +1990,15 @@ export const AdminDashboard = () => {
     ]);
   };
 
+  useEffect(() => {
+    if (!user?.is_admin) {
+      navigate("/admin/login");
+      return;
+    }
+    fetchDashboardData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, navigate, timeRange]);
+
   const handleApproveCreator = async (creatorId) => {
     try {
       await axios.post(`${API}/admin/creator-applications/${creatorId}/approve`, {}, {
