@@ -108,240 +108,250 @@ const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveF
   );
 };
 
-// Desktop Hero Carousel with 3D Rotation Effect + Side Panels
+// Cinematic Desktop Hero - Netflix-style full-width immersive hero
 const DesktopHeroCarousel = ({ seriesList, allSeries, onPlay, onMoreInfo, myList, onAddToList }) => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isHovering, setIsHovering] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const navigate = useNavigate();
-  const swiperRef = useRef(null);
   
-  // Force autoplay to start/restart when component mounts or series changes
+  // Auto-rotate featured content
   useEffect(() => {
-    if (swiperRef.current && swiperRef.current.swiper) {
-      const swiper = swiperRef.current.swiper;
-      if (swiper.autoplay) {
-        swiper.autoplay.start();
-      }
-    }
-  }, [seriesList]);
+    if (isHovering || !seriesList || seriesList.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % seriesList.length);
+    }, 6000);
+    
+    return () => clearInterval(interval);
+  }, [isHovering, seriesList]);
+  
+  // Reset image loaded state when active index changes
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [activeIndex]);
   
   if (!seriesList || seriesList.length === 0) return null;
   
   const activeSeries = seriesList[activeIndex];
   const inMyList = myList?.includes(activeSeries?.id);
-  
-  // Get top 5 trending series for side panel (exclude featured)
   const trendingSeries = (allSeries || seriesList).slice(0, 5);
 
   return (
-    <div className="relative w-full mb-8 py-6">
-      {/* Clean dark background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/50 to-background" />
+    <div 
+      className="relative w-full h-[75vh] lg:h-[85vh] mb-8 overflow-hidden"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+      data-testid="cinematic-hero"
+    >
+      {/* Background Image with Ken Burns Effect */}
+      <div className="absolute inset-0">
+        {seriesList.map((series, index) => (
+          <div
+            key={series.id}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === activeIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img
+              src={series.thumbnail}
+              alt={series.title}
+              className={`w-full h-full object-cover transition-transform duration-[8000ms] ease-out ${
+                index === activeIndex && imageLoaded ? 'scale-110' : 'scale-100'
+              }`}
+              onLoad={() => index === activeIndex && setImageLoaded(true)}
+            />
+          </div>
+        ))}
+      </div>
       
-      {/* Subtle glow effect behind carousel */}
+      {/* Gradient Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-black/30" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      
+      {/* Animated Spotlight Effect */}
       <div 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[500px] rounded-full blur-3xl opacity-20"
-        style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.5) 0%, transparent 70%)' }}
+        className="absolute top-1/4 right-1/4 w-[600px] h-[600px] rounded-full opacity-20 blur-3xl pointer-events-none transition-all duration-1000"
+        style={{ 
+          background: `radial-gradient(circle, ${activeSeries?.genre === 'Romance' ? 'rgba(236,72,153,0.4)' : activeSeries?.genre === 'Thriller' ? 'rgba(239,68,68,0.4)' : 'rgba(139,92,246,0.4)'} 0%, transparent 70%)`,
+        }}
       />
 
-      {/* Main Content Layout - 3 Column Grid */}
-      <div className="relative grid grid-cols-12 gap-6 px-8 max-w-[1600px] mx-auto">
-        
-        {/* Left Panel - Active Series Info */}
-        <div className="col-span-3 flex flex-col justify-center">
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-lg">
+      {/* Main Content */}
+      <div className="relative h-full max-w-[1600px] mx-auto px-8 lg:px-12 flex items-center">
+        <div className="grid grid-cols-12 gap-8 w-full">
+          
+          {/* Left Panel - Featured Series Info */}
+          <div className="col-span-12 lg:col-span-6 xl:col-span-5 flex flex-col justify-center space-y-6">
+            {/* Badges */}
+            <div className="flex items-center gap-3 animate-fade-in">
+              <span className="px-3 py-1.5 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-red-500/30">
                 TOP {activeIndex + 1}
               </span>
-              <span className="text-green-500 text-sm font-semibold">98% Match</span>
+              <span className="text-emerald-400 text-sm font-semibold">98% Match</span>
+              {activeSeries?.featured && (
+                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs font-semibold rounded border border-yellow-500/30">
+                  FEATURED
+                </span>
+              )}
             </div>
             
-            <h2 className="font-heading text-3xl xl:text-4xl font-bold leading-tight">
+            {/* Title with animated reveal */}
+            <h1 
+              className="font-heading text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight"
+              style={{
+                textShadow: '0 4px 30px rgba(0,0,0,0.8)',
+              }}
+            >
               {activeSeries?.title}
-            </h2>
+            </h1>
             
-            <div className="flex items-center gap-3 text-sm text-gray-400">
-              <span className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+            {/* Meta info */}
+            <div className="flex items-center gap-4 text-sm">
+              <span className="flex items-center gap-1.5 text-yellow-400 font-semibold">
+                <Star className="w-5 h-5 fill-yellow-400" />
                 {activeSeries?.rating}
               </span>
-              <span>•</span>
-              <span>{activeSeries?.total_episodes} Episodes</span>
-              <span>•</span>
-              <span className="px-2 py-0.5 border border-gray-500 text-xs rounded">HD</span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-300">{activeSeries?.total_episodes} Episodes</span>
+              <span className="text-gray-400">•</span>
+              <span className="px-2 py-0.5 border border-gray-500 text-xs rounded font-medium">HD</span>
+              <span className="text-gray-400">•</span>
+              <span className="text-gray-300">{activeSeries?.genre}</span>
             </div>
             
-            <p className="text-gray-400 text-sm line-clamp-3 leading-relaxed">
-              {activeSeries?.description || "An incredible story that will keep you on the edge of your seat."}
+            {/* Description */}
+            <p className="text-gray-300 text-base lg:text-lg leading-relaxed line-clamp-3 max-w-xl">
+              {activeSeries?.description || "An incredible story that will keep you on the edge of your seat. Experience drama, romance, and unforgettable moments."}
             </p>
             
-            <div className="flex items-center gap-3 pt-2">
+            {/* Action Buttons */}
+            <div className="flex items-center gap-4 pt-2">
               <Button
                 onClick={() => onPlay(activeSeries)}
-                className="bg-white text-black hover:bg-white/90 rounded-full px-6 h-10 font-semibold"
+                size="lg"
+                className="bg-white text-black hover:bg-white/90 rounded-lg px-8 h-12 font-bold text-base shadow-xl hover:shadow-white/20 hover:scale-105 transition-all duration-300"
+                data-testid="hero-play-btn"
               >
-                <Play className="w-4 h-4 fill-black mr-2" />
+                <Play className="w-5 h-5 fill-black mr-2" />
                 Play Now
               </Button>
               <Button
                 onClick={() => onMoreInfo(activeSeries)}
                 variant="secondary"
-                className="bg-gray-700/70 hover:bg-gray-600/90 text-white rounded-full px-5 h-10"
+                size="lg"
+                className="bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white rounded-lg px-6 h-12 border border-white/20"
+                data-testid="hero-details-btn"
               >
-                <Info className="w-4 h-4 mr-2" />
-                Details
+                <Info className="w-5 h-5 mr-2" />
+                More Info
               </Button>
               <Button
                 onClick={() => onAddToList(activeSeries?.id)}
                 size="icon"
                 variant="outline"
-                className="rounded-full w-10 h-10 border-gray-500 hover:border-white"
+                className="rounded-full w-12 h-12 border-white/30 hover:border-white hover:bg-white/10 transition-all"
+                data-testid="hero-add-list-btn"
               >
-                {inMyList ? <Check className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+                {inMyList ? <Check className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
               </Button>
             </div>
-          </div>
-        </div>
-        
-        {/* Center - 3D Carousel (Larger Cards) */}
-        <div className="col-span-6" data-testid="desktop-hero-carousel">
-          <Swiper
-            ref={swiperRef}
-            key={`desktop-hero-${seriesList.length}`}
-            modules={[EffectCoverflow, Autoplay, Pagination]}
-            effect="coverflow"
-            grabCursor={true}
-            centeredSlides={true}
-            slidesPerView="auto"
-            loop={seriesList.length > 2}
-            autoplay={{
-              delay: 3500,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true
-            }}
-            coverflowEffect={{
-              rotate: 20,
-              stretch: 0,
-              depth: 200,
-              modifier: 1,
-              slideShadows: true,
-            }}
-            pagination={{
-              clickable: true,
-              bulletClass: 'swiper-pagination-bullet hero-bullet',
-              bulletActiveClass: 'swiper-pagination-bullet-active hero-bullet-active',
-            }}
-            onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
-            onSwiper={(swiper) => {
-              if (swiper.autoplay) {
-                swiper.autoplay.start();
-              }
-            }}
-            className="desktop-hero-swiper"
-            style={{ paddingBottom: '40px', perspective: '1200px' }}
-          >
-            {seriesList.map((series, index) => (
-              <SwiperSlide key={series.id} className="hero-slide" style={{ width: '280px' }}>
-                <div 
-                  className={`relative aspect-[2/3] rounded-2xl overflow-hidden cursor-pointer transition-all duration-500 ${
-                    index === activeIndex 
-                      ? 'ring-4 ring-primary shadow-[0_0_60px_rgba(139,92,246,0.5)] scale-105' 
-                      : 'opacity-50 scale-90 hover:opacity-70'
-                  }`}
-                  onClick={() => navigate(`/series/${series.id}`)}
-                >
-                  <img 
-                    src={series.thumbnail} 
-                    alt={series.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-                  
-                  {/* TOP badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="px-2.5 py-1 bg-gradient-to-r from-red-600 to-red-500 text-white text-xs font-bold rounded-lg shadow-lg">
-                      TOP {index + 1}
-                    </span>
-                  </div>
-                  
-                  {/* Episode count */}
-                  <div className="absolute top-3 right-3 px-2 py-1 bg-black/70 backdrop-blur-sm rounded text-xs">
-                    {series.total_episodes} EP
-                  </div>
-                  
-                  {/* Title and info at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="font-bold text-lg mb-1 drop-shadow-lg line-clamp-1">{series.title}</h3>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <span className="flex items-center gap-1">
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                        {series.rating}
-                      </span>
-                      <span>•</span>
-                      <span>{series.genre}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Play button overlay on active */}
-                  {index === activeIndex && (
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity bg-black/30">
-                      <button 
-                        className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
-                        onClick={(e) => { e.stopPropagation(); onPlay(series); }}
-                      >
-                        <Play className="w-8 h-8 text-white fill-white ml-1" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        </div>
-        
-        {/* Right Panel - Top 10 This Week */}
-        <div className="col-span-3 flex flex-col justify-center">
-          <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-            <h3 className="font-semibold text-sm text-gray-300 mb-3 flex items-center gap-2">
-              <span className="text-red-500">🔥</span> Top 10 This Week
-            </h3>
-            <div className="space-y-2">
-              {trendingSeries.slice(0, 5).map((s, idx) => (
-                <button
-                  key={s.id}
-                  onClick={() => navigate(`/series/${s.id}`)}
-                  className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors group"
-                >
-                  <span className="text-2xl font-bold text-gray-500 w-6 group-hover:text-white transition-colors">
-                    {idx + 1}
-                  </span>
-                  <img 
-                    src={s.thumbnail} 
-                    alt={s.title}
-                    className="w-12 h-16 object-cover rounded-md"
-                  />
-                  <div className="flex-1 text-left min-w-0">
-                    <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
-                      {s.title}
-                    </p>
-                    <p className="text-xs text-gray-500">{s.genre}</p>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </button>
-              ))}
-            </div>
             
-            {/* Free Stories Button */}
-            <button
-              onClick={() => navigate('/stories')}
-              className="w-full mt-4 py-2.5 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition-all hover:scale-[1.02]"
-              data-testid="free-stories-btn"
-            >
-              <Play className="w-4 h-4 fill-white" />
-              Watch Free Episodes
-            </button>
+            {/* Series Indicator Dots */}
+            <div className="flex items-center gap-2 pt-4">
+              {seriesList.slice(0, 6).map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveIndex(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === activeIndex 
+                      ? 'w-8 h-2 bg-white' 
+                      : 'w-2 h-2 bg-white/40 hover:bg-white/60'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+              {seriesList.length > 6 && (
+                <span className="text-xs text-gray-500 ml-2">+{seriesList.length - 6} more</span>
+              )}
+            </div>
+          </div>
+          
+          {/* Right Panel - Top 10 Sidebar */}
+          <div className="hidden lg:flex col-span-4 xl:col-span-3 col-start-9 xl:col-start-10 flex-col justify-center">
+            <div className="bg-black/40 backdrop-blur-md rounded-2xl p-5 border border-white/10 shadow-2xl">
+              <h3 className="font-semibold text-sm text-gray-200 mb-4 flex items-center gap-2">
+                <span className="text-lg">🔥</span> Top 10 This Week
+              </h3>
+              <div className="space-y-2">
+                {trendingSeries.map((s, idx) => (
+                  <button
+                    key={s.id}
+                    onClick={() => navigate(`/series/${s.id}`)}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-xl transition-all duration-200 group ${
+                      s.id === activeSeries?.id 
+                        ? 'bg-white/15 border border-white/20' 
+                        : 'hover:bg-white/10'
+                    }`}
+                    data-testid={`top10-item-${idx}`}
+                  >
+                    <span className={`text-2xl font-bold w-6 transition-colors ${
+                      idx === 0 ? 'text-yellow-400' : idx === 1 ? 'text-gray-300' : idx === 2 ? 'text-amber-600' : 'text-gray-600'
+                    } group-hover:text-white`}>
+                      {idx + 1}
+                    </span>
+                    <img 
+                      src={s.thumbnail} 
+                      alt={s.title}
+                      className="w-11 h-14 object-cover rounded-lg shadow-md"
+                    />
+                    <div className="flex-1 text-left min-w-0">
+                      <p className="text-sm font-medium truncate group-hover:text-primary transition-colors">
+                        {s.title}
+                      </p>
+                      <p className="text-xs text-gray-500">{s.genre}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              
+              {/* CTA Button */}
+              <button
+                onClick={() => navigate('/stories')}
+                className="w-full mt-5 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all hover:scale-[1.02] shadow-lg shadow-purple-500/20"
+                data-testid="hero-free-stories-btn"
+              >
+                <Play className="w-4 h-4 fill-white" />
+                Watch Free Episodes
+              </button>
+            </div>
           </div>
         </div>
+      </div>
+      
+      {/* Thumbnail Preview Strip - Bottom */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden xl:flex items-center gap-3 px-4 py-3 bg-black/40 backdrop-blur-md rounded-2xl border border-white/10">
+        {seriesList.slice(0, 6).map((series, index) => (
+          <button
+            key={series.id}
+            onClick={() => setActiveIndex(index)}
+            className={`relative rounded-lg overflow-hidden transition-all duration-300 ${
+              index === activeIndex 
+                ? 'ring-2 ring-white scale-110 shadow-lg' 
+                : 'opacity-60 hover:opacity-100 hover:scale-105'
+            }`}
+          >
+            <img
+              src={series.thumbnail}
+              alt={series.title}
+              className="w-16 h-24 object-cover"
+            />
+            {index === activeIndex && (
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent" />
+            )}
+          </button>
+        ))}
       </div>
     </div>
   );
