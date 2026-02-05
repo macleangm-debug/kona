@@ -284,14 +284,42 @@ export const CreatorSeriesDetailPage = () => {
             <h1 className="font-heading text-lg font-bold line-clamp-1">{series.title}</h1>
             <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} episodes</p>
           </div>
+          <button 
+            onClick={openSeriesEditor}
+            className="p-2 hover:bg-secondary rounded-full"
+            data-testid="edit-series-btn"
+          >
+            <Edit className="w-4 h-4" />
+          </button>
           <Badge variant={series.status === "published" ? "default" : series.status === "approved" ? "outline" : "secondary"}>
             {series.status}
           </Badge>
         </div>
       </div>
 
-      {/* Series Stats */}
+      {/* Series Info Card with Thumbnail */}
       <div className="p-4">
+        <Card className="p-4 mb-4 flex gap-4">
+          <div className="w-24 h-32 rounded-lg overflow-hidden bg-secondary/50 flex-shrink-0">
+            {series.thumbnail ? (
+              <img src={series.thumbnail} alt={series.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Film className="w-8 h-8 text-muted-foreground" />
+              </div>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-muted-foreground line-clamp-3">{series.description || "No description"}</p>
+            <div className="mt-2 flex gap-2">
+              <Button size="sm" variant="outline" onClick={openSeriesEditor}>
+                <Edit className="w-3 h-3 mr-1" /> Edit Info
+              </Button>
+            </div>
+          </div>
+        </Card>
+
+        {/* Series Stats */}
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Card className="p-3 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 border-blue-500/30">
             <p className="text-xs text-muted-foreground mb-1">Total Views</p>
