@@ -131,14 +131,9 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 
 ## Upcoming Tasks
 
-### P1: Video & Thumbnail Upload UI for Creators
-- Creator portal lacks file upload for video content
-- Need to add upload interface for series thumbnails and episode videos
-
-### P2: Enhanced Creator Analytics
-- Charts and trend data for views
-- Earnings over time visualization
-- Audience demographics
+### P1: Flutterwave Payment Integration (BLOCKED)
+- **BLOCKED:** Awaiting Flutterwave API keys from user
+- Will enable M-Pesa mobile money payments
 
 ### P2: Fix Mock Video URLs
 - Some mock videos fail to load
