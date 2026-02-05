@@ -830,13 +830,6 @@ const RevenueSettingsTab = ({ token }) => {
   const [calcResult, setCalcResult] = useState(null);
   const [pendingPayouts, setPendingPayouts] = useState(null);
 
-  useEffect(() => {
-    if (token) {
-      fetchSettings();
-      fetchPendingPayouts();
-    }
-  }, [token]);
-
   const fetchSettings = async () => {
     try {
       const res = await axios.get(`${API}/revenue/settings`, {
@@ -871,6 +864,14 @@ const RevenueSettingsTab = ({ token }) => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      fetchSettings();
+      fetchPendingPayouts();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
 
   const handleSaveSettings = async () => {
     setSaving(true);
