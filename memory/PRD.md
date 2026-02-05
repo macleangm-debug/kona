@@ -176,6 +176,10 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
 - Some mock videos fail to load
 - Replace with working stock video URLs for testing
 
+### P3: Email Service Integration
+- Email queue system is ready (emails stored in `db.email_queue`)
+- Needs SendGrid or AWS SES API keys to activate sending
+
 ---
 
 ## Future/Backlog
