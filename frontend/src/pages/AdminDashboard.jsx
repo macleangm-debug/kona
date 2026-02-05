@@ -1136,7 +1136,7 @@ const RevenueSettingsTab = ({ token }) => {
             />
           </div>
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Creator's Total Views</label>
+            <label className="text-sm text-gray-400 mb-1 block">Creator&apos;s Total Views</label>
             <Input
               type="number"
               value={calcViews}
