@@ -188,6 +188,19 @@ Build a "mini-series app" called "Kona," where users purchase coins to watch ser
   - Clear All Seeds: One-click removal of all seeded data
 - **File:** `/app/frontend/src/pages/AdminDashboard.jsx` - EngagementSeedingTab component
 
+#### Cinematic Hero Banner Redesign (COMPLETED - Feb 5, 2026)
+- **Style:** Netflix-inspired full-width immersive hero
+- **Features:**
+  - Full-screen background image with Ken Burns zoom effect
+  - Smooth crossfade transitions between featured series (6-second auto-rotation)
+  - Gradient overlays (left-to-right dark gradient for text readability)
+  - Large prominent title with animated reveal
+  - Series badges (TOP #, Match %, FEATURED)
+  - Bottom thumbnail preview strip for quick navigation
+  - Glass-morphism Top 10 sidebar
+  - Pause on hover for better UX
+- **File:** `/app/frontend/src/pages/HomePageResponsive.jsx` - DesktopHeroCarousel component
+
 #### Stories Page (COMPLETED)
 - TikTok-style vertical video viewer
 - Swipe navigation for free episodes
