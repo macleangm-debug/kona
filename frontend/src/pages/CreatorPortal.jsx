@@ -830,6 +830,81 @@ export const CreatorPortal = () => {
               </div>
             )}
             
+            {/* Subtitle Upload Section */}
+            <div className="border-t border-white/10 pt-4 mt-4">
+              <label className="text-sm font-medium flex items-center gap-2 mb-3">
+                <Languages className="w-4 h-4 text-blue-400" />
+                Subtitles (Optional)
+              </label>
+              
+              {/* Current Subtitles */}
+              {Object.keys(episodeSubtitles).length > 0 && (
+                <div className="mb-3 space-y-2">
+                  <p className="text-xs text-muted-foreground">Uploaded subtitles:</p>
+                  {Object.entries(episodeSubtitles).map(([lang, url]) => (
+                    <div key={lang} className="flex items-center justify-between p-2 bg-green-500/10 rounded-md border border-green-500/20">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span className="text-sm font-medium">
+                          {SUBTITLE_LANGUAGES.find(l => l.code === lang)?.name || lang.toUpperCase()}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveSubtitle(lang)}
+                        className="p-1 hover:bg-red-500/20 rounded text-red-400"
+                        data-testid={`remove-subtitle-${lang}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Upload New Subtitle */}
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <select
+                    value={selectedSubtitleLanguage}
+                    onChange={(e) => setSelectedSubtitleLanguage(e.target.value)}
+                    className="flex-1 p-2 rounded-lg bg-secondary/50 border border-white/10 text-sm"
+                    data-testid="subtitle-language-select"
+                  >
+                    {SUBTITLE_LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code}>
+                        {lang.name} {episodeSubtitles[lang.code] ? '(Replace)' : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg cursor-pointer transition-colors">
+                    {subtitleUploading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4" />
+                    )}
+                    <span className="text-sm">Upload</span>
+                    <input
+                      ref={subtitleFileInputRef}
+                      type="file"
+                      accept=".vtt"
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          handleSubtitleUpload(e.target.files[0]);
+                        }
+                      }}
+                      disabled={subtitleUploading}
+                      data-testid="subtitle-file-input"
+                    />
+                  </label>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Upload .vtt subtitle files. Adding subtitles increases your reach by 40%!
+                </p>
+              </div>
+            </div>
+            
             <Button 
               onClick={handleUpdateEpisode} 
               className="w-full"
