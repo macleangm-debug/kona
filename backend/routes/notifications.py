@@ -16,13 +16,22 @@ VAPID_PUBLIC_KEY = "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckj
 
 # Notification types
 NOTIFICATION_TYPES = {
-    "new_episode": {"icon": "🎬", "color": "violet"},
-    "reward": {"icon": "🎁", "color": "yellow"},
-    "coins": {"icon": "🪙", "color": "orange"},
-    "achievement": {"icon": "🏆", "color": "amber"},
-    "referral": {"icon": "👥", "color": "green"},
-    "system": {"icon": "📢", "color": "blue"},
-    "reminder": {"icon": "⏰", "color": "pink"},
+    "new_episode": {"icon": "film", "color": "violet"},
+    "reward": {"icon": "gift", "color": "yellow"},
+    "coins": {"icon": "coins", "color": "orange"},
+    "achievement": {"icon": "trophy", "color": "amber"},
+    "referral": {"icon": "users", "color": "green"},
+    "system": {"icon": "info", "color": "blue"},
+    "reminder": {"icon": "clock", "color": "pink"},
+    # Creator-specific notification types
+    "series_approved": {"icon": "check-circle", "color": "green", "email_subject": "Your series has been approved!"},
+    "series_rejected": {"icon": "x-circle", "color": "red", "email_subject": "Update on your series submission"},
+    "payout_processed": {"icon": "dollar-sign", "color": "green", "email_subject": "Your payout has been processed"},
+    "payout_failed": {"icon": "alert-circle", "color": "red", "email_subject": "Issue with your payout request"},
+    "milestone_reached": {"icon": "award", "color": "purple", "email_subject": "Congratulations! You reached a milestone"},
+    "review_feedback": {"icon": "message-circle", "color": "blue", "email_subject": "New feedback on your submission"},
+    "tier_upgrade": {"icon": "trending-up", "color": "green", "email_subject": "You've been upgraded to a new tier!"},
+    "new_earnings": {"icon": "trending-up", "color": "green", "email_subject": "You have new earnings"},
 }
 
 @router.get("/vapid-key")
