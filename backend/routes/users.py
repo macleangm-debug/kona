@@ -1131,11 +1131,13 @@ async def like_episode(req: LikeRequest, user: dict = Depends(get_current_user))
     # Increment like count on episode
     await db.episodes.update_one({"id": episode_id}, {"$inc": {"likes": 1}})
     
-    # Get new count
-    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1})
-    likes = episode.get("likes", 1) if episode else 1
+    # Get new count (include base_likes for traction)
+    episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0, "likes": 1, "base_likes": 1})
+    real_likes = episode.get("likes", 1) if episode else 1
+    base_likes = episode.get("base_likes", 0) if episode else 0
+    total_likes = real_likes + base_likes
     
-    return {"liked": True, "likes": likes}
+    return {"liked": True, "likes": total_likes}
 
 @router.post("/episodes/unlike")
 async def unlike_episode(req: LikeRequest, user: dict = Depends(get_current_user)):
