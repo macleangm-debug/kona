@@ -509,55 +509,8 @@ export const CreatorSeriesDetailPage = () => {
               ))}
             </div>
           )}
-                onClick={() => openEpisodeEditor(ep)}
-                data-testid={`episode-${ep.id}`}
-              >
-                <div className="flex gap-3">
-                  <div className="w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0">
-                    {ep.thumbnail ? (
-                      <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover rounded-lg" />
-                    ) : (
-                      <Play className="w-6 h-6 text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="outline" className="text-[10px] px-1.5">
-                        {ep.episode_code || `E${ep.episode_number}`}
-                      </Badge>
-                      {ep.is_free && (
-                        <Badge className="text-[10px] bg-green-500/20 text-green-400">FREE</Badge>
-                      )}
-                      {ep.subtitles && Object.keys(ep.subtitles).length > 0 && (
-                        <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
-                          CC ({Object.keys(ep.subtitles).length})
-                        </Badge>
-                      )}
-                    </div>
-                    <h4 className="font-medium text-sm line-clamp-1">{ep.title}</h4>
-                    <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Eye className="w-3 h-3" /> {ep.views || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Coins className="w-3 h-3" /> {ep.earnings || 0}
-                      </span>
-                      {!ep.is_free && (
-                        <span>{ep.coins_required} coins</span>
-                      )}
-                    </div>
-                  </div>
-                  <button 
-                    className="p-2 hover:bg-secondary rounded-lg"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEpisodeEditor(ep);
-                    }}
-                    data-testid={`edit-episode-${ep.id}`}
-                  >
-                    <Edit className="w-4 h-4 text-muted-foreground" />
-                  </button>
-                </div>
+        </div>
+      </main>
               </Card>
             ))}
           </div>
