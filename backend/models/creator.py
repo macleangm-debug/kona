@@ -234,7 +234,7 @@ class PayoutRequest(BaseModel):
     """Creator payout request"""
     amount: int = Field(..., ge=100, description="Minimum 100 coins")
     payout_method: str = "mpesa"  # mpesa, bank, paypal
-    payout_details: dict  # phone number, bank account, etc.
+    payout_details: str  # phone number, bank account, etc.
 
 class PayoutRecord(BaseModel):
     """Record of a payout to creator"""
@@ -242,7 +242,7 @@ class PayoutRecord(BaseModel):
     creator_id: str
     amount: int
     payout_method: str
-    payout_details: dict
+    payout_details: str
     status: str = "pending"  # pending, processing, completed, failed
     created_at: str
     processed_at: Optional[str] = None
