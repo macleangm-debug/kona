@@ -1476,6 +1476,383 @@ const InfrastructureCalculatorTab = ({ token }) => {
   );
 };
 
+// Engagement Seeding Tab Component - Launch Traction
+const EngagementSeedingTab = ({ token }) => {
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [seeding, setSeeding] = useState(false);
+  const [clearing, setClearing] = useState(false);
+  
+  // Seeding parameters
+  const [likesRange, setLikesRange] = useState({ min: 500, max: 5000 });
+  const [viewsRange, setViewsRange] = useState({ min: 1000, max: 50000 });
+  const [seriesViewsRange, setSeriesViewsRange] = useState({ min: 5000, max: 250000 });
+  const [ratingRange, setRatingRange] = useState({ min: 4.0, max: 4.9 });
+
+  useEffect(() => {
+    fetchStatus();
+  }, [token]);
+
+  const fetchStatus = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(`${API}/admin/seed/status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStatus(res.data);
+    } catch (e) {
+      console.error("Failed to fetch seed status:", e);
+    }
+    setLoading(false);
+  };
+
+  const seedLikes = async () => {
+    setSeeding(true);
+    try {
+      const res = await axios.post(
+        `${API}/admin/seed/likes?min_likes=${likesRange.min}&max_likes=${likesRange.max}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchStatus();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to seed likes");
+    }
+    setSeeding(false);
+  };
+
+  const seedViews = async () => {
+    setSeeding(true);
+    try {
+      const res = await axios.post(
+        `${API}/admin/seed/views?min_views=${viewsRange.min}&max_views=${viewsRange.max}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchStatus();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to seed views");
+    }
+    setSeeding(false);
+  };
+
+  const seedSeriesStats = async () => {
+    setSeeding(true);
+    try {
+      const res = await axios.post(
+        `${API}/admin/seed/series-stats?min_views=${seriesViewsRange.min}&max_views=${seriesViewsRange.max}&min_rating=${ratingRange.min}&max_rating=${ratingRange.max}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchStatus();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to seed series stats");
+    }
+    setSeeding(false);
+  };
+
+  const clearAllSeeds = async () => {
+    if (!window.confirm("Are you sure you want to clear ALL seeded data? This will reset likes, views, and ratings to organic values only.")) {
+      return;
+    }
+    setClearing(true);
+    try {
+      const res = await axios.delete(`${API}/admin/seed/clear`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(res.data.message);
+      fetchStatus();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to clear seeds");
+    }
+    setClearing(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const episodesSeeded = status?.episodes?.with_base_likes > 0 || status?.episodes?.with_base_views > 0;
+  const seriesSeeded = status?.series?.with_base_views > 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <Card className="p-6 bg-gradient-to-br from-pink-500/20 to-purple-500/10 border-pink-500/20">
+        <div className="flex items-start justify-between">
+          <div>
+            <h2 className="text-2xl font-bold flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-pink-400" />
+              Launch Engagement Seeding
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Artificially boost likes, views, and ratings to create initial traction for platform launch
+            </p>
+          </div>
+          <Badge variant="outline" className={episodesSeeded || seriesSeeded ? "bg-green-500/20 text-green-400 border-green-500/30" : "bg-gray-500/20 text-gray-400"}>
+            {episodesSeeded || seriesSeeded ? "Seeding Active" : "Not Seeded"}
+          </Badge>
+        </div>
+      </Card>
+
+      {/* Current Status */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-4 bg-white/5 border-white/10">
+          <div className="flex items-center gap-3 mb-2">
+            <Film className="w-5 h-5 text-blue-400" />
+            <span className="text-sm text-muted-foreground">Total Episodes</span>
+          </div>
+          <p className="text-2xl font-bold">{status?.episodes?.total || 0}</p>
+        </Card>
+        <Card className="p-4 bg-pink-500/10 border-pink-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <Heart className="w-5 h-5 text-pink-400" />
+            <span className="text-sm text-muted-foreground">With Base Likes</span>
+          </div>
+          <p className="text-2xl font-bold text-pink-400">{status?.episodes?.with_base_likes || 0}</p>
+        </Card>
+        <Card className="p-4 bg-blue-500/10 border-blue-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <Eye className="w-5 h-5 text-blue-400" />
+            <span className="text-sm text-muted-foreground">With Base Views</span>
+          </div>
+          <p className="text-2xl font-bold text-blue-400">{status?.episodes?.with_base_views || 0}</p>
+        </Card>
+        <Card className="p-4 bg-purple-500/10 border-purple-500/20">
+          <div className="flex items-center gap-3 mb-2">
+            <Play className="w-5 h-5 text-purple-400" />
+            <span className="text-sm text-muted-foreground">Series with Stats</span>
+          </div>
+          <p className="text-2xl font-bold text-purple-400">{status?.series?.with_base_views || 0} / {status?.series?.total || 0}</p>
+        </Card>
+      </div>
+
+      {/* Seeding Controls */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Seed Episode Likes */}
+        <Card className="p-6 bg-white/5 border-white/10">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Heart className="w-5 h-5 text-pink-400" />
+            Seed Episode Likes
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Add base like counts to all episodes. These likes are added to real user likes in the UI.
+          </p>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Minimum Likes: {likesRange.min.toLocaleString()}
+              </label>
+              <Slider
+                value={[likesRange.min]}
+                min={100}
+                max={5000}
+                step={100}
+                onValueChange={([v]) => setLikesRange(prev => ({ ...prev, min: v }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Maximum Likes: {likesRange.max.toLocaleString()}
+              </label>
+              <Slider
+                value={[likesRange.max]}
+                min={1000}
+                max={20000}
+                step={500}
+                onValueChange={([v]) => setLikesRange(prev => ({ ...prev, max: v }))}
+              />
+            </div>
+            
+            <Button 
+              onClick={seedLikes} 
+              disabled={seeding}
+              className="w-full bg-pink-600 hover:bg-pink-700"
+              data-testid="seed-likes-btn"
+            >
+              {seeding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Heart className="w-4 h-4 mr-2" />}
+              Seed {status?.episodes?.total || 0} Episodes with Likes
+            </Button>
+          </div>
+        </Card>
+
+        {/* Seed Episode Views */}
+        <Card className="p-6 bg-white/5 border-white/10">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Eye className="w-5 h-5 text-blue-400" />
+            Seed Episode Views
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Add base view counts to all episodes for social proof.
+          </p>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Minimum Views: {viewsRange.min.toLocaleString()}
+              </label>
+              <Slider
+                value={[viewsRange.min]}
+                min={500}
+                max={25000}
+                step={500}
+                onValueChange={([v]) => setViewsRange(prev => ({ ...prev, min: v }))}
+              />
+            </div>
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">
+                Maximum Views: {viewsRange.max.toLocaleString()}
+              </label>
+              <Slider
+                value={[viewsRange.max]}
+                min={5000}
+                max={100000}
+                step={1000}
+                onValueChange={([v]) => setViewsRange(prev => ({ ...prev, max: v }))}
+              />
+            </div>
+            
+            <Button 
+              onClick={seedViews} 
+              disabled={seeding}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              data-testid="seed-views-btn"
+            >
+              {seeding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+              Seed {status?.episodes?.total || 0} Episodes with Views
+            </Button>
+          </div>
+        </Card>
+
+        {/* Seed Series Stats */}
+        <Card className="p-6 bg-white/5 border-white/10 lg:col-span-2">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Play className="w-5 h-5 text-purple-400" />
+            Seed Series Stats (Views & Ratings)
+          </h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Add base view counts and ratings to all series for credibility.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">
+                  Min Series Views: {seriesViewsRange.min.toLocaleString()}
+                </label>
+                <Slider
+                  value={[seriesViewsRange.min]}
+                  min={1000}
+                  max={100000}
+                  step={1000}
+                  onValueChange={([v]) => setSeriesViewsRange(prev => ({ ...prev, min: v }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">
+                  Max Series Views: {seriesViewsRange.max.toLocaleString()}
+                </label>
+                <Slider
+                  value={[seriesViewsRange.max]}
+                  min={50000}
+                  max={500000}
+                  step={10000}
+                  onValueChange={([v]) => setSeriesViewsRange(prev => ({ ...prev, max: v }))}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">
+                  Min Rating: {ratingRange.min.toFixed(1)}
+                </label>
+                <Slider
+                  value={[ratingRange.min * 10]}
+                  min={30}
+                  max={48}
+                  step={1}
+                  onValueChange={([v]) => setRatingRange(prev => ({ ...prev, min: v / 10 }))}
+                />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-2 block">
+                  Max Rating: {ratingRange.max.toFixed(1)}
+                </label>
+                <Slider
+                  value={[ratingRange.max * 10]}
+                  min={35}
+                  max={50}
+                  step={1}
+                  onValueChange={([v]) => setRatingRange(prev => ({ ...prev, max: v / 10 }))}
+                />
+              </div>
+            </div>
+          </div>
+          
+          <Button 
+            onClick={seedSeriesStats} 
+            disabled={seeding}
+            className="w-full mt-4 bg-purple-600 hover:bg-purple-700"
+            data-testid="seed-series-btn"
+          >
+            {seeding ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Play className="w-4 h-4 mr-2" />}
+            Seed {status?.series?.total || 0} Series with Stats
+          </Button>
+        </Card>
+      </div>
+
+      {/* Clear All Seeds */}
+      <Card className="p-6 bg-red-500/10 border-red-500/20">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-semibold flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-400" />
+              Clear All Seeded Data
+            </h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Remove all seeded likes, views, and ratings. Only organic engagement will remain.
+            </p>
+          </div>
+          <Button 
+            variant="destructive" 
+            onClick={clearAllSeeds}
+            disabled={clearing}
+            data-testid="clear-seeds-btn"
+          >
+            {clearing ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Trash2 className="w-4 h-4 mr-2" />}
+            Clear All Seeds
+          </Button>
+        </div>
+      </Card>
+
+      {/* Info Note */}
+      <Card className="p-4 bg-yellow-500/10 border-yellow-500/20">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-yellow-400">Important Notes</p>
+            <ul className="text-sm text-muted-foreground mt-1 list-disc list-inside space-y-1">
+              <li>Seeded numbers are added to real user engagement in the UI</li>
+              <li>Each episode/series gets a random value within the specified range</li>
+              <li>Re-seeding will update existing base values with new random numbers</li>
+              <li>Clearing seeds does not affect real user likes/views</li>
+            </ul>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
