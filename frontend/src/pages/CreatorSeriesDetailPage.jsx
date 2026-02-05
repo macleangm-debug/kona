@@ -96,7 +96,9 @@ export const CreatorSeriesDetailPage = () => {
       title: episode.title || "",
       intro_duration: episode.intro_duration || 30,
       is_free: episode.is_free || false,
-      coins_required: episode.coins_required || 5
+      coins_required: episode.coins_required || 5,
+      thumbnail_url: episode.thumbnail || "",
+      video_url: episode.video_url || ""
     });
     setEpisodeSubtitles(episode.subtitles || {});
     setSelectedSubtitleLanguage("en");
@@ -123,6 +125,8 @@ export const CreatorSeriesDetailPage = () => {
       params.append("intro_duration", episodeForm.intro_duration);
       params.append("is_free", episodeForm.is_free);
       if (!episodeForm.is_free) params.append("coins_required", episodeForm.coins_required);
+      if (episodeForm.thumbnail_url) params.append("thumbnail_url", episodeForm.thumbnail_url);
+      if (episodeForm.video_url) params.append("video_url", episodeForm.video_url);
       
       await axios.patch(`${API}/creator/episodes/${selectedEpisode.id}?${params.toString()}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
