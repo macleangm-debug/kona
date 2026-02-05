@@ -240,7 +240,7 @@ export const CreatorPortal = () => {
 
   // Creator Dashboard
   return (
-    <div className="min-h-screen" data-testid="creator-dashboard">
+    <div className="min-h-screen pt-16 lg:pt-16" data-testid="creator-dashboard">
       <CreatorHeader
         dashboard={dashboard}
         activeTab={activeTab}
