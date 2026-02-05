@@ -240,3 +240,188 @@ async def update_notification_settings(settings: NotificationSettings, user: dic
         {"$set": {"notification_settings": settings.dict()}}
     )
     return {"message": "Notification settings updated", "settings": settings.dict()}
+
+
+# ============ EMAIL PLACEHOLDER SERVICE ============
+
+async def queue_notification_email(user_id: str, notification_type: str, title: str, message: str, link: str = None):
+    """
+    Placeholder for email service integration.
+    When email service is configured, this will send emails via SendGrid/SES/etc.
+    """
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user or not user.get("email"):
+        return None
+    
+    type_info = NOTIFICATION_TYPES.get(notification_type, NOTIFICATION_TYPES["system"])
+    email_subject = type_info.get("email_subject", "Kona Notification")
+    
+    email_log = {
+        "id": f"email-{uuid.uuid4().hex[:12]}",
+        "to": user["email"],
+        "subject": email_subject,
+        "title": title,
+        "message": message,
+        "link": link,
+        "notification_type": notification_type,
+        "status": "queued",  # Would be "sent" when email service is integrated
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "sent_at": None
+    }
+    
+    await db.email_queue.insert_one(email_log)
+    
+    # TODO: Integrate with email service (SendGrid, AWS SES, etc.)
+    # Example:
+    # await sendgrid.send(
+    #     to=user["email"],
+    #     subject=email_subject,
+    #     template="creator_notification",
+    #     data={"title": title, "message": message, "link": link}
+    # )
+    
+    return email_log["id"]
+
+
+# ============ CREATOR NOTIFICATION HELPERS ============
+
+async def notify_series_approved(creator_user_id: str, series_title: str, series_id: str):
+    """Notify creator when their series is approved"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="series_approved",
+        title="Series Approved!",
+        message=f"Great news! '{series_title}' has been approved. You can now upload all episodes.",
+        action_url=f"/creator/series/{series_id}"
+    )
+    await queue_notification_email(
+        creator_user_id, "series_approved",
+        "Series Approved!",
+        f"Great news! '{series_title}' has been approved. You can now upload all episodes.",
+        f"/creator/series/{series_id}"
+    )
+
+
+async def notify_series_rejected(creator_user_id: str, series_title: str, feedback: str):
+    """Notify creator when their series is rejected"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="series_rejected",
+        title="Series Needs Revision",
+        message=f"'{series_title}' needs some changes: {feedback[:100]}...",
+        action_url="/creator"
+    )
+    await queue_notification_email(
+        creator_user_id, "series_rejected",
+        "Series Needs Revision",
+        f"'{series_title}' requires some changes before approval. Feedback: {feedback}",
+        "/creator"
+    )
+
+
+async def notify_payout_processed(creator_user_id: str, amount: float, payout_method: str, payout_id: str):
+    """Notify creator when payout is processed"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="payout_processed",
+        title="Payout Processed!",
+        message=f"Your payout of {amount} coins via {payout_method} has been processed.",
+        action_url="/creator",
+        metadata={"payout_id": payout_id, "amount": amount}
+    )
+    await queue_notification_email(
+        creator_user_id, "payout_processed",
+        "Payout Processed!",
+        f"Your payout of {amount} coins via {payout_method} has been processed successfully.",
+        "/creator"
+    )
+
+
+async def notify_payout_failed(creator_user_id: str, amount: float, reason: str, payout_id: str):
+    """Notify creator when payout fails"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="payout_failed",
+        title="Payout Issue",
+        message=f"There was an issue with your payout of {amount} coins: {reason}",
+        action_url="/creator",
+        metadata={"payout_id": payout_id, "amount": amount}
+    )
+    await queue_notification_email(
+        creator_user_id, "payout_failed",
+        "Payout Issue",
+        f"There was an issue with your payout of {amount} coins. Reason: {reason}",
+        "/creator"
+    )
+
+
+async def notify_milestone_reached(creator_user_id: str, milestone_name: str, bonus_coins: int):
+    """Notify creator when they reach a milestone"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="milestone_reached",
+        title="Milestone Reached!",
+        message=f"Congratulations! You reached '{milestone_name}' and earned {bonus_coins} bonus coins!",
+        action_url="/creator",
+        metadata={"milestone": milestone_name, "bonus": bonus_coins}
+    )
+    await queue_notification_email(
+        creator_user_id, "milestone_reached",
+        "Milestone Reached!",
+        f"Congratulations! You reached '{milestone_name}' and earned {bonus_coins} bonus coins!",
+        "/creator"
+    )
+
+
+async def notify_tier_upgrade(creator_user_id: str, new_tier: str, new_share: int):
+    """Notify creator when they upgrade to a new tier"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="tier_upgrade",
+        title="Tier Upgrade!",
+        message=f"You've been promoted to {new_tier}! Your new revenue share is {new_share}%.",
+        action_url="/creator"
+    )
+    await queue_notification_email(
+        creator_user_id, "tier_upgrade",
+        "Tier Upgrade!",
+        f"You've been promoted to {new_tier}! Your new revenue share is now {new_share}%.",
+        "/creator"
+    )
+
+
+async def notify_review_feedback(creator_user_id: str, series_title: str, feedback: str):
+    """Notify creator of new review feedback"""
+    await create_notification(
+        user_id=creator_user_id,
+        notification_type="review_feedback",
+        title="New Feedback",
+        message=f"You received feedback on '{series_title}': {feedback[:80]}...",
+        action_url="/creator"
+    )
+    await queue_notification_email(
+        creator_user_id, "review_feedback",
+        "New Feedback on Your Submission",
+        f"Feedback on '{series_title}': {feedback}",
+        "/creator"
+    )
+
+
+# ============ EMAIL QUEUE STATUS ============
+
+@router.get("/email-queue")
+async def get_email_queue(
+    user: dict = Depends(get_current_user),
+    limit: int = 20
+):
+    """Get email queue for user (shows pending emails)"""
+    emails = await db.email_queue.find(
+        {"to": user.get("email")},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return {
+        "emails": emails,
+        "note": "Email service integration pending - emails are queued but not yet sent"
+    }
+
