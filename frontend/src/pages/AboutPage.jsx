@@ -249,14 +249,14 @@ const AboutPage = () => {
               </div>
               <div className="text-4xl mb-2">⭐</div>
               <h3 className="text-lg font-semibold mb-2">350 Coins</h3>
-              <p className="text-muted-foreground text-sm mb-4">+50 bonus coins included</p>
+              <p className="text-muted-foreground text-sm mb-4">+15 bonus coins included</p>
               <div className="text-2xl font-bold text-primary">$4.99</div>
             </div>
             
             <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center">
               <div className="text-4xl mb-2">💎</div>
               <h3 className="text-lg font-semibold mb-2">800 Coins</h3>
-              <p className="text-muted-foreground text-sm mb-4">+150 bonus coins included</p>
+              <p className="text-muted-foreground text-sm mb-4">+30 bonus coins included</p>
               <div className="text-2xl font-bold text-primary">$9.99</div>
             </div>
           </div>
