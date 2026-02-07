@@ -46,7 +46,8 @@ import {
   AdminDashboard,
   DiscoverPage,
   RewardsPage,
-  LeaderboardPage
+  LeaderboardPage,
+  AboutPage
 } from "@/pages";
 
 // Swiper CSS
