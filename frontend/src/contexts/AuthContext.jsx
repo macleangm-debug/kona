@@ -29,21 +29,24 @@ export const AuthProvider = ({ children }) => {
     fetchUser();
   }, [token]);
 
-  const login = async (email, password) => {
-    const res = await axios.post(`${API}/auth/login`, { email, password });
+  const login = async (email, password, phone = null) => {
+    const payload = { password };
+    if (email) {
+      payload.email = email;
+    } else if (phone) {
+      payload.phone = phone;
+    }
+    const res = await axios.post(`${API}/auth/login`, payload);
     localStorage.setItem("token", res.data.token);
     setToken(res.data.token);
     setUser(res.data.user);
     return res.data;
   };
 
-  const register = async (email, password, name, referralCode = null) => {
-    const res = await axios.post(`${API}/auth/register`, { 
-      email, 
-      password, 
-      name,
-      referral_code: referralCode 
-    });
+  const register = async (data) => {
+    // data can be: { email, password, name, referral_code } 
+    // or: { phone, country_code, password, name, referral_code }
+    const res = await axios.post(`${API}/auth/register`, data);
     localStorage.setItem("token", res.data.token);
     setToken(res.data.token);
     setUser(res.data.user);
