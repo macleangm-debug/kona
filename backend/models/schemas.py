@@ -1,19 +1,56 @@
 """
 Pydantic models for request/response validation
 """
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List
+import re
 
 # ============ AUTH MODELS ============
 class UserCreate(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
+    country_code: Optional[str] = None
+    password: str
+    name: str
+    referral_code: Optional[str] = None
+    
+    @field_validator('phone')
+    @classmethod
+    def validate_phone(cls, v):
+        if v:
+            # Remove spaces and dashes
+            cleaned = re.sub(r'[\s\-]', '', v)
+            if not re.match(r'^\+?\d{9,15}$', cleaned):
+                raise ValueError('Invalid phone number format')
+            return cleaned
+        return v
+
+class UserCreatePhone(BaseModel):
+    phone: str
+    country_code: str
     password: str
     name: str
     referral_code: Optional[str] = None
 
 class UserLogin(BaseModel):
-    email: EmailStr
+    email: Optional[EmailStr] = None
+    phone: Optional[str] = None
     password: str
+
+class SendOTPRequest(BaseModel):
+    phone: str
+    country_code: str
+    verification_method: str = "whatsapp"  # whatsapp, flash_call, sms
+
+class VerifyOTPRequest(BaseModel):
+    phone: str
+    country_code: str
+    otp: str
+
+class OTPResponse(BaseModel):
+    success: bool
+    message: str
+    expires_in: int = 300  # 5 minutes
 
 class UserResponse(BaseModel):
     id: str
