@@ -241,13 +241,13 @@ async def login(data: UserLogin):
         )
         user["referral_code"] = referral_code
     
-    from datetime import datetime, timezone
-    
     return {
         "token": token,
         "user": {
             "id": user["id"],
-            "email": user["email"],
+            "email": user.get("email"),
+            "phone": user.get("phone"),
+            "country_code": user.get("country_code"),
             "name": user.get("name", user.get("username", "User")),
             "coins": user.get("coins", user.get("purchased_coins", 0) + user.get("free_coins_earned", 0)),
             "created_at": str(user.get("created_at", datetime.now(timezone.utc).isoformat())),
@@ -256,7 +256,9 @@ async def login(data: UserLogin):
             "referral_count": user.get("referral_count", 0),
             "referral_earnings": user.get("referral_earnings", 0),
             "is_admin": user.get("is_admin", False),
-            "is_super_admin": user.get("is_super_admin", False)
+            "is_super_admin": user.get("is_super_admin", False),
+            "phone_verified": user.get("phone_verified", False),
+            "email_verified": user.get("email_verified", False)
         }
     }
 
@@ -264,7 +266,9 @@ async def login(data: UserLogin):
 async def get_me(user: dict = Depends(get_current_user)):
     return {
         "id": user["id"],
-        "email": user["email"],
+        "email": user.get("email"),
+        "phone": user.get("phone"),
+        "country_code": user.get("country_code"),
         "name": user["name"],
         "coins": user["coins"],
         "created_at": user["created_at"],
@@ -273,5 +277,7 @@ async def get_me(user: dict = Depends(get_current_user)):
         "referral_count": user.get("referral_count", 0),
         "referral_earnings": user.get("referral_earnings", 0),
         "is_admin": user.get("is_admin", False),
-        "is_super_admin": user.get("is_super_admin", False)
+        "is_super_admin": user.get("is_super_admin", False),
+        "phone_verified": user.get("phone_verified", False),
+        "email_verified": user.get("email_verified", False)
     }
