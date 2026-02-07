@@ -124,9 +124,9 @@ async def login(data: UserLogin):
         "user": {
             "id": user["id"],
             "email": user["email"],
-            "name": user["name"],
-            "coins": user["coins"],
-            "created_at": user["created_at"],
+            "name": user.get("name", user.get("username", "User")),
+            "coins": user.get("coins", user.get("purchased_coins", 0) + user.get("free_coins_earned", 0)),
+            "created_at": user.get("created_at"),
             "last_daily_reward": user.get("last_daily_reward"),
             "referral_code": user.get("referral_code"),
             "referral_count": user.get("referral_count", 0),
