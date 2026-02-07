@@ -291,3 +291,11 @@ code {
   animation: fade-in 0.6s ease-out 0.3s both;
 }
 
+
+/* Hide Emergent badge */
+#emergent-badge {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
