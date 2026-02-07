@@ -19,3 +19,5 @@ export { LeaderboardPage } from './LeaderboardPage';
 export { default as AboutPage } from './AboutPage';
 export { default as TermsPage } from './TermsPage';
 export { default as PrivacyPage } from './PrivacyPage';
+export { default as AdvertisersPage } from './AdvertisersPage';
+export { default as CreatorsLandingPage } from './CreatorsLandingPage';
