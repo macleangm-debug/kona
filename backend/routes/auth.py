@@ -188,20 +188,40 @@ async def register(data: UserCreate):
         "token": token,
         "user": {
             "id": user["id"],
-            "email": user["email"],
+            "email": user.get("email"),
+            "phone": user.get("phone"),
+            "country_code": user.get("country_code"),
             "name": user["name"],
             "coins": user["coins"],
             "created_at": user["created_at"],
             "last_daily_reward": user["last_daily_reward"],
             "referral_code": user["referral_code"],
             "referral_count": user["referral_count"],
-            "referral_earnings": user["referral_earnings"]
+            "referral_earnings": user["referral_earnings"],
+            "phone_verified": user.get("phone_verified", False),
+            "email_verified": user.get("email_verified", False)
         }
     }
 
 @router.post("/login", response_model=TokenResponse)
 async def login(data: UserLogin):
-    user = await db.users.find_one({"email": data.email})
+    """Login with email or phone"""
+    user = None
+    
+    # Find user by email or phone
+    if data.email:
+        user = await db.users.find_one({"email": data.email})
+    elif data.phone:
+        # Try to find by phone - need to handle various formats
+        phone_clean = data.phone.lstrip('+').lstrip('0')
+        user = await db.users.find_one({
+            "$or": [
+                {"phone": data.phone},
+                {"phone": f"+{phone_clean}"},
+                {"phone": {"$regex": f"{phone_clean}$"}}
+            ]
+        })
+    
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
