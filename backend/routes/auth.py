@@ -2,21 +2,118 @@
 Authentication routes
 """
 import uuid
-from datetime import datetime, timezone
+import random
+from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends
 
-from models.schemas import UserCreate, UserLogin, UserResponse, TokenResponse
+from models.schemas import (
+    UserCreate, UserLogin, UserResponse, TokenResponse,
+    SendOTPRequest, VerifyOTPRequest, OTPResponse
+)
 from services import db, hash_password, verify_password, create_token, generate_referral_code, get_current_user
 from config.settings import REFERRAL_REWARD_REFERRER, REFERRAL_REWARD_REFEREE
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
+# In-memory OTP storage (use Redis in production)
+otp_store = {}
+
+def generate_otp():
+    """Generate a 6-digit OTP"""
+    return str(random.randint(100000, 999999))
+
+def format_phone(phone: str, country_code: str) -> str:
+    """Format phone number with country code"""
+    # Remove any existing + or leading zeros
+    phone = phone.lstrip('+').lstrip('0')
+    country_code = country_code.lstrip('+')
+    return f"+{country_code}{phone}"
+
+@router.post("/send-otp", response_model=OTPResponse)
+async def send_otp(data: SendOTPRequest):
+    """Send OTP via WhatsApp, Flash Call, or SMS"""
+    full_phone = format_phone(data.phone, data.country_code)
+    
+    # Generate OTP
+    otp = generate_otp()
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=5)
+    
+    # Store OTP
+    otp_store[full_phone] = {
+        "otp": otp,
+        "expires_at": expires_at,
+        "method": data.verification_method,
+        "attempts": 0
+    }
+    
+    # TODO: Integrate with actual SMS provider (Africa's Talking, Twilio, etc.)
+    # For now, we'll simulate sending OTP
+    # In production, this would call the SMS API
+    
+    if data.verification_method == "whatsapp":
+        # TODO: Send via WhatsApp Business API
+        print(f"[DEV] WhatsApp OTP to {full_phone}: {otp}")
+    elif data.verification_method == "flash_call":
+        # TODO: Initiate flash call where last 4 digits = OTP
+        print(f"[DEV] Flash Call OTP to {full_phone}: {otp}")
+    else:  # SMS
+        # TODO: Send via SMS
+        print(f"[DEV] SMS OTP to {full_phone}: {otp}")
+    
+    return {
+        "success": True,
+        "message": f"Verification code sent via {data.verification_method}",
+        "expires_in": 300
+    }
+
+@router.post("/verify-otp")
+async def verify_otp(data: VerifyOTPRequest):
+    """Verify OTP code"""
+    full_phone = format_phone(data.phone, data.country_code)
+    
+    stored = otp_store.get(full_phone)
+    if not stored:
+        raise HTTPException(status_code=400, detail="No OTP request found. Please request a new code.")
+    
+    # Check expiry
+    if datetime.now(timezone.utc) > stored["expires_at"]:
+        del otp_store[full_phone]
+        raise HTTPException(status_code=400, detail="OTP expired. Please request a new code.")
+    
+    # Check attempts
+    if stored["attempts"] >= 3:
+        del otp_store[full_phone]
+        raise HTTPException(status_code=400, detail="Too many attempts. Please request a new code.")
+    
+    # Verify OTP
+    if data.otp != stored["otp"]:
+        otp_store[full_phone]["attempts"] += 1
+        raise HTTPException(status_code=400, detail="Invalid code. Please try again.")
+    
+    # OTP verified - clean up
+    del otp_store[full_phone]
+    
+    return {"success": True, "message": "Phone number verified", "verified": True}
+
 @router.post("/register", response_model=TokenResponse)
 async def register(data: UserCreate):
+    """Register with email or phone"""
+    
+    # Validate that either email or phone is provided
+    if not data.email and not data.phone:
+        raise HTTPException(status_code=400, detail="Either email or phone is required")
+    
     # Check if user exists
-    existing = await db.users.find_one({"email": data.email})
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+    if data.email:
+        existing = await db.users.find_one({"email": data.email})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    if data.phone:
+        full_phone = format_phone(data.phone, data.country_code or "254")
+        existing = await db.users.find_one({"phone": full_phone})
+        if existing:
+            raise HTTPException(status_code=400, detail="Phone number already registered")
     
     user_id = str(uuid.uuid4())
     referral_code = generate_referral_code(user_id)
