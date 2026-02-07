@@ -22,6 +22,9 @@ router = APIRouter(tags=["Payments"])
 # Initialize Stripe
 stripe.api_key = STRIPE_API_KEY
 
+# Frontend URL for redirects (from environment)
+FRONTEND_URL = os.environ.get("APP_FRONTEND_URL", os.environ.get("REACT_APP_BACKEND_URL", "http://localhost:3000")).rstrip("/")
+
 # Flutterwave configuration
 FLUTTERWAVE_SECRET_KEY = os.environ.get("FLUTTERWAVE_SECRET_KEY", "")
 FLUTTERWAVE_PUBLIC_KEY = os.environ.get("FLUTTERWAVE_PUBLIC_KEY", "")
