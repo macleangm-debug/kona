@@ -192,13 +192,15 @@ const AppContent = () => {
 // Root App - wraps everything with providers
 const App = () => {
   return (
-    <Router>
-      <LanguageProvider>
-        <AuthProvider>
-          <AppContent />
-        </AuthProvider>
-      </LanguageProvider>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <LanguageProvider>
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
+        </LanguageProvider>
+      </Router>
+    </HelmetProvider>
   );
 };
 
