@@ -11,6 +11,7 @@ import axios from "axios";
 import { LoginSuccessModal, SignupSuccessModal } from "@/components/AnimatedModals";
 
 export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp = false }) => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(initialReferralCode || forceSignUp ? false : true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
