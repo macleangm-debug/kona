@@ -56,7 +56,31 @@ async def detect_geo(request: Request):
 
 @router.get("/geo/countries")
 async def get_countries():
-    """Get list of supported countries with payment methods"""
+    """Get list of supported countries with payment methods and phone prefixes"""
+    # Phone prefixes for each country
+    PHONE_PREFIXES = {
+        "KE": "+254",  # Kenya
+        "TZ": "+255",  # Tanzania
+        "UG": "+256",  # Uganda
+        "RW": "+250",  # Rwanda
+        "CD": "+243",  # DR Congo
+        "BI": "+257",  # Burundi
+        "SS": "+211",  # South Sudan
+        "GH": "+233",  # Ghana
+        "NG": "+234",  # Nigeria
+        "ZA": "+27",   # South Africa
+        "ET": "+251",  # Ethiopia
+        "MW": "+265",  # Malawi
+        "ZM": "+260",  # Zambia
+        "ZW": "+263",  # Zimbabwe
+        "MZ": "+258",  # Mozambique
+        "SN": "+221",  # Senegal
+        "CI": "+225",  # Ivory Coast
+        "CM": "+237",  # Cameroon
+        "AO": "+244",  # Angola
+        "MG": "+261",  # Madagascar
+    }
+    
     countries = []
     
     # Add African countries
@@ -65,6 +89,7 @@ async def get_countries():
             "code": code,
             "name": config["name"],
             "currency": config["currency"],
+            "phone_prefix": PHONE_PREFIXES.get(code, ""),
             "payment_methods": [
                 {"id": pm, "name": pm.replace("_", " ").title(), "type": "mobilemoney" if pm != "card" else "card"}
                 for pm in config["payment_methods"]
@@ -76,6 +101,7 @@ async def get_countries():
         "code": "INTL",
         "name": "International",
         "currency": "USD",
+        "phone_prefix": "",
         "payment_methods": [
             {"id": "card", "name": "Credit/Debit Card", "type": "card"}
         ]
