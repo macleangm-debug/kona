@@ -633,6 +633,14 @@ export const HomePageResponsive = ({ onAuthClick }) => {
 
   return (
     <div className="min-h-screen bg-background" data-testid="home-page">
+      {/* SEO Meta Tags */}
+      <SEO 
+        title="Stream Kona | Watch African Mini-Series & Drama Online"
+        description="Africa's premier mini-series streaming platform. Watch exclusive romance, drama, thriller & action series. New episodes daily. Start watching free today!"
+        url="https://www.streamkona.com"
+        keywords="African series, mini series, streaming, drama series, romance series, thriller series, watch online, African entertainment, Nollywood"
+      />
+      
       {/* Mobile Header - Only on mobile */}
       {!isDesktop && (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black via-black/90 to-transparent lg:hidden" data-testid="mobile-header">
