@@ -119,6 +119,8 @@ async def login(data: UserLogin):
         )
         user["referral_code"] = referral_code
     
+    from datetime import datetime, timezone
+    
     return {
         "token": token,
         "user": {
@@ -126,7 +128,7 @@ async def login(data: UserLogin):
             "email": user["email"],
             "name": user.get("name", user.get("username", "User")),
             "coins": user.get("coins", user.get("purchased_coins", 0) + user.get("free_coins_earned", 0)),
-            "created_at": user.get("created_at"),
+            "created_at": str(user.get("created_at", datetime.now(timezone.utc).isoformat())),
             "last_daily_reward": user.get("last_daily_reward"),
             "referral_code": user.get("referral_code"),
             "referral_count": user.get("referral_count", 0),
