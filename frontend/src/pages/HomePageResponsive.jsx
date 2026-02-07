@@ -19,6 +19,7 @@ import { CoinBalance, DailyRewardModal, ReminderSuccessModal, SearchModal, KonaL
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
 import SpinInviteModal from "@/components/SpinInviteModal";
 import SEO from "@/components/SEO";
+import Footer from "@/components/Footer";
 
 // Content Row Component - Horizontal Scrollable
 const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveFromList, badge }) => {
