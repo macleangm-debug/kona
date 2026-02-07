@@ -368,10 +368,10 @@ const AboutPage = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Creators</h4>
+              <h4 className="font-semibold mb-4">Partners</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><button onClick={() => navigate("/creator")} className="hover:text-white">Creator Portal</button></li>
-                <li><button onClick={() => navigate("/creator/login")} className="hover:text-white">Creator Login</button></li>
+                <li><button onClick={() => navigate("/creators")} className="hover:text-white">Creators</button></li>
+                <li><button onClick={() => navigate("/advertisers")} className="hover:text-white">Advertisers</button></li>
               </ul>
             </div>
           </div>
