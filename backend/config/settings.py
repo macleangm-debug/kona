@@ -124,7 +124,7 @@ INTERNATIONAL_CONFIG = {
 # Coin Packages
 COIN_PACKAGES = [
     {"id": "starter", "coins": 50, "price": 0.99, "bonus": 0, "popular": False},
-    {"id": "basic", "coins": 120, "price": 1.99, "bonus": 20, "popular": False},
-    {"id": "value", "coins": 350, "price": 4.99, "bonus": 50, "popular": True},
-    {"id": "premium", "coins": 800, "price": 9.99, "bonus": 150, "popular": False},
+    {"id": "basic", "coins": 120, "price": 1.99, "bonus": 5, "popular": False},
+    {"id": "value", "coins": 350, "price": 4.99, "bonus": 15, "popular": True},
+    {"id": "premium", "coins": 800, "price": 9.99, "bonus": 30, "popular": False},
 ]
