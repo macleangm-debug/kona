@@ -149,8 +149,8 @@ async def create_checkout(data: CheckoutRequest, user: dict = Depends(get_curren
                     "quantity": 1,
                 }],
                 mode="payment",
-                success_url="https://kona.app/success?session_id={CHECKOUT_SESSION_ID}",
-                cancel_url="https://kona.app/store",
+                success_url=f"{FRONTEND_URL}/success?session_id={{CHECKOUT_SESSION_ID}}",
+                cancel_url=f"{FRONTEND_URL}/store",
                 metadata={
                     "user_id": user["id"],
                     "package_id": package["id"],
@@ -185,7 +185,7 @@ async def create_checkout(data: CheckoutRequest, user: dict = Depends(get_curren
             "coins": package["coins"] + package["bonus"],
             "user_id": user["id"],
             "tx_ref": f"KONA-{user['id'][:8]}-{uuid.uuid4().hex[:8]}",
-            "redirect_url": "https://kona.app/payment/success"
+            "redirect_url": f"{FRONTEND_URL}/payment/success"
         }
     
     raise HTTPException(status_code=400, detail="Invalid payment method")
