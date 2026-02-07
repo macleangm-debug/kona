@@ -90,6 +90,25 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
 
   return (
     <div className="pb-20" data-testid="series-detail-page">
+      {/* SEO Meta Tags */}
+      {series && (
+        <>
+          <SEO 
+            title={`${series.title} | Watch on Stream Kona`}
+            description={series.description || `Watch ${series.title} - ${series.genre} series with ${series.total_episodes} episodes. Stream now on Kona!`}
+            image={series.thumbnail}
+            url={`https://www.streamkona.com/series/${id}`}
+            type="video.tv_show"
+            keywords={`${series.title}, ${series.genre}, African series, watch online, streaming`}
+          />
+          <Helmet>
+            <script type="application/ld+json">
+              {JSON.stringify(generateSeriesSchema(series))}
+            </script>
+          </Helmet>
+        </>
+      )}
+      
       {/* Spacer for fixed header */}
       <div className="h-16 lg:h-20" />
       
