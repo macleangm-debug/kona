@@ -36,7 +36,7 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
     { label: t("nav.home"), path: "/", icon: Home },
     { label: t("nav.discover"), path: "/discover", icon: Compass },
     { label: t("nav.rewards"), path: "/rewards", icon: Gift, highlight: true },
-    { label: "About", path: "/about", icon: null },
+    { label: "About", path: "/about", icon: Info },
   ];
 
   const handleLogout = () => {
