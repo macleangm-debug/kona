@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://www.streamkona.com/</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Discover/Browse Page -->
+  <url>
+    <loc>https://www.streamkona.com/discover</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Free Stories Page -->
+  <url>
+    <loc>https://www.streamkona.com/stories</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Rewards Page -->
+  <url>
+    <loc>https://www.streamkona.com/rewards</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Store Page -->
+  <url>
+    <loc>https://www.streamkona.com/store</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Search Page -->
+  <url>
+    <loc>https://www.streamkona.com/search</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Featured Series Pages -->
+  <url>
+    <loc>https://www.streamkona.com/series/series-1</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00</image:loc>
+      <image:title>Love in the City - Romance Series</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/series/series-2</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://images.unsplash.com/photo-1589156191108-c762ff4b96ab</image:loc>
+      <image:title>The Billionaire's Secret - Drama Series</image:title>
+    </image:image>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/series/series-3</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/series/series-4</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/series/series-5</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Genre Category Pages -->
+  <url>
+    <loc>https://www.streamkona.com/discover?genre=Romance</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/discover?genre=Drama</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/discover?genre=Thriller</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/discover?genre=Action</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <url>
+    <loc>https://www.streamkona.com/discover?genre=Fantasy</loc>
+    <lastmod>2025-02-07</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+</urlset>
