@@ -342,17 +342,48 @@ const AboutPage = () => {
       {/* Footer */}
       <footer className="py-12 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <KonaLogo2Full height={28} />
-            <div className="flex items-center gap-6 text-sm text-muted-foreground">
-              <button onClick={() => navigate("/")}>Home</button>
-              <button onClick={() => navigate("/discover")}>Discover</button>
-              <button onClick={() => navigate("/store")}>Store</button>
-              <button onClick={() => navigate("/rewards")}>Rewards</button>
+          {/* Footer Links Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <KonaLogo2Full height={28} />
+              <p className="text-muted-foreground text-sm mt-4">
+                Your corner for the best African mini-series.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground">
-              © 2025 Stream Kona. All rights reserved.
-            </p>
+            <div>
+              <h4 className="font-semibold mb-4">Browse</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><button onClick={() => navigate("/category/trending")} className="hover:text-white">Trending</button></li>
+                <li><button onClick={() => navigate("/category/romance")} className="hover:text-white">Romance</button></li>
+                <li><button onClick={() => navigate("/category/thriller")} className="hover:text-white">Thriller</button></li>
+                <li><button onClick={() => navigate("/category/drama")} className="hover:text-white">Drama</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Account</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><button onClick={() => navigate("/store")} className="hover:text-white">Get Coins</button></li>
+                <li><button onClick={() => navigate("/subscriptions")} className="hover:text-white">VIP Plans</button></li>
+                <li><button onClick={() => navigate("/profile")} className="hover:text-white">Profile</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Creators</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><button onClick={() => navigate("/creator")} className="hover:text-white">Creator Portal</button></li>
+                <li><button onClick={() => navigate("/creator/login")} className="hover:text-white">Creator Login</button></li>
+              </ul>
+            </div>
+          </div>
+          {/* Bottom Bar */}
+          <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <p>© 2026 Kona. All rights reserved.</p>
+            <div className="flex gap-6">
+              <button onClick={() => navigate("/about")} className="hover:text-white" data-testid="about-footer-about-link">About Us</button>
+              <button className="hover:text-white">Terms of Service</button>
+              <button className="hover:text-white">Privacy Policy</button>
+              <button className="hover:text-white">Contact Us</button>
+            </div>
           </div>
         </div>
       </footer>
