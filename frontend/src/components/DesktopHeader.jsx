@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy, Home, Compass, Gift, Clock } from "lucide-react";
+import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy, Home, Compass, Gift, Clock, Info } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance } from "@/components/CoinBalance";
