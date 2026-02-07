@@ -509,8 +509,8 @@ async def subscribe(data: SubscribeRequest, user: dict = Depends(get_current_use
                 "quantity": 1,
             }],
             mode="subscription",
-            success_url="https://kona.app/subscription/success?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url="https://kona.app/subscriptions",
+            success_url=f"{FRONTEND_URL}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{FRONTEND_URL}/subscriptions",
             metadata={
                 "user_id": user["id"],
                 "plan_id": plan["id"],
