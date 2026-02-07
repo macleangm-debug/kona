@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { BrowserRouter as Router, Routes, Route, useSearchParams, useLocation } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
+import { HelmetProvider } from "react-helmet-async";
 
 // i18n
 import "@/i18n";
