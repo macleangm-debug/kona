@@ -312,14 +312,30 @@ export const StorePage = () => {
               {selectedPaymentMethod?.type === "mobilemoney" && (
                 <div className="mb-4">
                   <p className="text-sm text-muted-foreground mb-2">Phone Number</p>
-                  <Input
-                    type="tel"
-                    placeholder="+254 700 123 456"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    className="bg-secondary/50 border-white/10"
-                    data-testid="phone-input"
-                  />
+                  <div className="flex gap-2">
+                    {/* Country Prefix - Read Only */}
+                    <div className="flex items-center px-3 bg-secondary/70 border border-white/10 rounded-lg text-sm font-medium min-w-[80px]">
+                      <span className="mr-1">{selectedCountry?.code === "KE" ? "🇰🇪" : selectedCountry?.code === "TZ" ? "🇹🇿" : selectedCountry?.code === "UG" ? "🇺🇬" : selectedCountry?.code === "GH" ? "🇬🇭" : selectedCountry?.code === "NG" ? "🇳🇬" : selectedCountry?.code === "ZA" ? "🇿🇦" : selectedCountry?.code === "RW" ? "🇷🇼" : "🌍"}</span>
+                      {selectedCountry?.phone_prefix || "+255"}
+                    </div>
+                    {/* Phone Number Input */}
+                    <Input
+                      type="tel"
+                      placeholder="712 345 678"
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        // Only allow numbers and remove any prefix if user types it
+                        const cleaned = e.target.value.replace(/[^\d]/g, '');
+                        setPhoneNumber(cleaned);
+                      }}
+                      className="bg-secondary/50 border-white/10 flex-1"
+                      data-testid="phone-input"
+                      maxLength={10}
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Enter your {selectedPaymentMethod?.name || "mobile money"} number without the country code
+                  </p>
                 </div>
               )}
 
