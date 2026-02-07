@@ -1264,8 +1264,8 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         )}
       </div>
 
-      {/* Right side action buttons - only visible when showControls is true */}
-      <div className={`absolute right-3 bottom-36 flex flex-col items-center gap-5 z-20 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      {/* Right side action buttons - ALWAYS visible (like TikTok style) */}
+      <div className="absolute right-3 bottom-36 flex flex-col items-center gap-5 z-20">
         {/* Likes */}
         <button 
           onClick={handleLikeToggle}
