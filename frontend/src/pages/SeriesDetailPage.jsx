@@ -9,6 +9,8 @@ import { API } from "@/config";
 import { toast } from "sonner";
 import { CoinBalance, UnlockSheet } from "@/components";
 import { WatchPartyModal } from "@/components/WatchPartyModal";
+import SEO, { generateSeriesSchema } from "@/components/SEO";
+import { Helmet } from "react-helmet-async";
 
 export const SeriesDetailPage = ({ onAuthClick }) => {
   const { id } = useParams();
