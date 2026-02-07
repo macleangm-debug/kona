@@ -156,6 +156,26 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
           >
             {loading ? <Loader2 className="animate-spin" /> : isLogin ? "Sign In" : "Create Account"}
           </Button>
+          {!isLogin && (
+            <p className="text-xs text-center text-muted-foreground">
+              By signing up, you agree to our{" "}
+              <button 
+                type="button" 
+                onClick={() => { onClose(); navigate("/terms"); }}
+                className="text-primary hover:underline"
+              >
+                Terms of Service
+              </button>{" "}
+              and{" "}
+              <button 
+                type="button" 
+                onClick={() => { onClose(); navigate("/privacy"); }}
+                className="text-primary hover:underline"
+              >
+                Privacy Policy
+              </button>
+            </p>
+          )}
         </form>
         <p className="text-center text-sm text-muted-foreground mt-4">
           {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
