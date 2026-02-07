@@ -861,8 +861,8 @@ export const HomePageResponsive = ({ onAuthClick }) => {
               <p>© 2026 Kona. All rights reserved.</p>
               <div className="flex gap-6">
                 <button onClick={() => navigate("/about")} className="hover:text-white" data-testid="footer-about-link">About Us</button>
-                <button className="hover:text-white">Terms of Service</button>
-                <button className="hover:text-white">Privacy Policy</button>
+                <button onClick={() => navigate("/terms")} className="hover:text-white" data-testid="footer-terms-link">Terms of Service</button>
+                <button onClick={() => navigate("/privacy")} className="hover:text-white" data-testid="footer-privacy-link">Privacy Policy</button>
                 <button className="hover:text-white">Contact Us</button>
               </div>
             </div>
