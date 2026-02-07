@@ -54,7 +54,9 @@ class OTPResponse(BaseModel):
 
 class UserResponse(BaseModel):
     id: str
-    email: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    country_code: Optional[str] = None
     name: str
     coins: int
     created_at: str
@@ -64,6 +66,8 @@ class UserResponse(BaseModel):
     referral_earnings: int = 0
     is_admin: bool = False
     is_super_admin: bool = False
+    phone_verified: bool = False
+    email_verified: bool = False
 
 class TokenResponse(BaseModel):
     token: str
