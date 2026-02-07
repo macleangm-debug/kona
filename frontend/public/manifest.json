@@ -1,12 +1,16 @@
 {
-  "name": "Kona - Mini Series",
-  "short_name": "Kona",
-  "description": "Your corner for the best mini-series. Watch exclusive drama series.",
+  "name": "Stream Kona - African Mini-Series",
+  "short_name": "Stream Kona",
+  "description": "Africa's premier mini-series streaming platform. Watch exclusive romance, drama, thriller & action series. New episodes daily!",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#7c3aed",
   "orientation": "portrait",
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "id": "streamkona",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -57,7 +61,7 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["entertainment", "video"],
+  "categories": ["entertainment", "video", "streaming"],
   "screenshots": [
     {
       "src": "/screenshots/home.png",
@@ -65,5 +69,30 @@
       "type": "image/png",
       "form_factor": "narrow"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Series",
+      "short_name": "Discover",
+      "description": "Browse all available series",
+      "url": "/discover",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Free Episodes",
+      "short_name": "Free",
+      "description": "Watch free episodes",
+      "url": "/stories",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Get Rewards",
+      "short_name": "Rewards",
+      "description": "Earn free coins",
+      "url": "/rewards",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }
