@@ -147,6 +147,7 @@ async def register(data: UserCreate):
                 "referrer_id": referrer_id,
                 "referee_id": user_id,
                 "referee_email": data.email,
+                "referee_phone": format_phone(data.phone, data.country_code) if data.phone else None,
                 "referrer_reward": REFERRAL_REWARD_REFERRER,
                 "referee_reward": REFERRAL_REWARD_REFEREE,
                 "created_at": datetime.now(timezone.utc).isoformat()
@@ -155,6 +156,8 @@ async def register(data: UserCreate):
     user = {
         "id": user_id,
         "email": data.email,
+        "phone": format_phone(data.phone, data.country_code) if data.phone else None,
+        "country_code": data.country_code,
         "name": data.name,
         "password": hash_password(data.password),
         "coins": coins,
@@ -169,7 +172,9 @@ async def register(data: UserCreate):
         "watch_progress": {},
         "reminders": [],
         "is_admin": False,
-        "claimed_milestones": []
+        "claimed_milestones": [],
+        "phone_verified": False,
+        "email_verified": False
     }
     
     await db.users.insert_one(user)
