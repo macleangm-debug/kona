@@ -122,13 +122,24 @@ export const StorePage = () => {
       return;
     }
     
+    // Validate phone number length for mobile money
+    if (selectedPaymentMethod.type === "mobilemoney" && phoneNumber.length < 9) {
+      toast.error("Please enter a valid phone number");
+      return;
+    }
+    
+    // Combine prefix with phone number for mobile money
+    const fullPhoneNumber = selectedPaymentMethod.type === "mobilemoney" 
+      ? `${selectedCountry.phone_prefix}${phoneNumber}`.replace(/\s/g, '')
+      : null;
+    
     try {
       const res = await axios.post(`${API}/store/checkout`, {
         package_id: selectedPackage.id,
         origin_url: window.location.origin,
         payment_method: selectedPaymentMethod.id,
         country_code: selectedCountry.code,
-        phone_number: phoneNumber || null
+        phone_number: fullPhoneNumber
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
