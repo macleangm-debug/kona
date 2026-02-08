@@ -1407,6 +1407,24 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
       {/* Right side action buttons - ALWAYS visible (like TikTok style) */}
       <div className="absolute right-3 bottom-36 flex flex-col items-center gap-5 z-20">
+        {/* Fullscreen toggle - for horizontal videos */}
+        {!isVerticalVideo && (
+          <button 
+            onClick={toggleFullscreen}
+            className="flex flex-col items-center gap-1"
+            data-testid="fullscreen-btn"
+          >
+            <div className={`w-10 h-10 rounded-full backdrop-blur-sm flex items-center justify-center ${isFullscreen ? 'bg-primary/50' : 'bg-black/30'}`}>
+              {isFullscreen ? (
+                <Minimize2 className="w-5 h-5 text-white" />
+              ) : (
+                <Maximize2 className="w-5 h-5 text-white" />
+              )}
+            </div>
+            <span className="text-white text-xs">{isFullscreen ? 'Exit' : 'Full'}</span>
+          </button>
+        )}
+
         {/* Likes */}
         <button 
           onClick={handleLikeToggle}
