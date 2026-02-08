@@ -75,7 +75,7 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - **Database**: MongoDB
 - **Authentication**: JWT tokens + OTP verification
 
-## What's Been Implemented (as of Feb 7, 2026)
+## What's Been Implemented (as of Feb 8, 2026)
 - Full-width cinematic hero banner on homepage
 - Multi-device login fix
 - SEO implementation (sitemap, robots.txt, meta tags, structured data)
@@ -88,6 +88,11 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - Phone/Email auth with OTP verification (MOCKED - needs SMS provider)
 - Like button always visible on video player (fixed)
 - Reduced coin package bonuses (Option B)
+- **Cinematic splash screen with sound** - Multi-stage animation with:
+  - Pre-splash screen with animated, clickable logo (pulsing rings)
+  - Main cinematic animation (logo zoom, particles, "KONA" text reveal)
+  - Signature "Magic Chime" sound (plays after user interaction to comply with browser autoplay policies)
+  - Smooth transition to home page after animation completes
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
