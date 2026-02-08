@@ -74,7 +74,11 @@ async def seed_data():
                 "video_url": "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
                 "is_free": ep_num == 1,  # First episode is free
                 "coins_required": 0 if ep_num == 1 else 5,
-                "intro_duration": 30  # Default 30 seconds for Skip Intro
+                "intro_duration": 30,  # Default 30 seconds for Skip Intro
+                # Episode 1 is always story content (vertical feed)
+                "is_story_content": ep_num == 1,
+                "requires_vertical": ep_num == 1,
+                "aspect_ratio": "9:16" if ep_num == 1 else "16:9"  # Mark expected format
             })
     
     await db.episodes.insert_many(episodes)
