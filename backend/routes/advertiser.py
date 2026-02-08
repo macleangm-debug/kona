@@ -11,8 +11,8 @@ from passlib.context import CryptContext
 import jwt
 import os
 
-from database import db
-from routes.auth import get_current_user, create_token
+from services import db
+from services.auth import get_current_user
 
 router = APIRouter(tags=["Advertiser"])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
