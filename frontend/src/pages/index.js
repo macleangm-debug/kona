@@ -21,3 +21,6 @@ export { default as TermsPage } from './TermsPage';
 export { default as PrivacyPage } from './PrivacyPage';
 export { default as AdvertisersPage } from './AdvertisersPage';
 export { default as CreatorsLandingPage } from './CreatorsLandingPage';
+export { default as BusinessAuthPage } from './BusinessAuthPage';
+export { default as BusinessDashboard } from './BusinessDashboard';
+export { default as CampaignCreatePage } from './CampaignCreatePage';
