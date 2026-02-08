@@ -191,7 +191,6 @@ async def login_advertiser(data: AdvertiserLogin):
 @router.get("/advertiser/me")
 async def get_advertiser_profile(request):
     """Get current advertiser profile"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     return advertiser
 
@@ -285,7 +284,6 @@ MIN_WALLET_BALANCE = 50.0
 @router.post("/advertiser/campaigns")
 async def create_campaign(data: CampaignCreate, request: "Request"):
     """Create a new ad campaign (PREPAY REQUIRED)"""
-    from fastapi import Request as FastAPIRequest
     advertiser = await require_advertiser(request)
     
     # PREPAY CHECK: Verify sufficient wallet balance
@@ -393,7 +391,6 @@ async def create_campaign(data: CampaignCreate, request: "Request"):
 @router.get("/advertiser/campaigns")
 async def get_advertiser_campaigns(request, status: Optional[str] = None):
     """Get all campaigns for current advertiser"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     query = {"advertiser_id": advertiser["id"]}
@@ -406,7 +403,6 @@ async def get_advertiser_campaigns(request, status: Optional[str] = None):
 @router.get("/advertiser/campaigns/{campaign_id}")
 async def get_campaign_detail(campaign_id: str, request):
     """Get detailed campaign info with analytics"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     campaign = await db.campaigns.find_one(
@@ -433,7 +429,6 @@ async def get_campaign_detail(campaign_id: str, request):
 @router.patch("/advertiser/campaigns/{campaign_id}")
 async def update_campaign(campaign_id: str, request):
     """Update campaign settings"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     body = await request.json()
     
@@ -463,7 +458,6 @@ async def update_campaign(campaign_id: str, request):
 @router.post("/advertiser/campaigns/{campaign_id}/ads")
 async def create_ad_creative(campaign_id: str, data: AdCreativeCreate, request):
     """Upload/create an ad creative for a campaign"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     # Verify campaign belongs to advertiser
@@ -505,7 +499,6 @@ async def create_ad_creative(campaign_id: str, data: AdCreativeCreate, request):
 @router.get("/advertiser/campaigns/{campaign_id}/ads")
 async def get_campaign_ads(campaign_id: str, request):
     """Get all ad creatives for a campaign"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     # Verify campaign belongs to advertiser
@@ -527,7 +520,6 @@ async def get_campaign_ads(campaign_id: str, request):
 @router.get("/advertiser/analytics/overview")
 async def get_analytics_overview(request):
     """Get overall analytics for advertiser"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     # Aggregate all campaign stats
@@ -558,7 +550,6 @@ async def get_analytics_overview(request):
 @router.get("/advertiser/analytics/daily")
 async def get_daily_analytics(request, days: int = 30):
     """Get daily analytics breakdown"""
-    from fastapi import Request
     await require_advertiser(request)  # Verify authentication
     
     # In a real implementation, this would query daily aggregated data
@@ -574,7 +565,6 @@ async def get_daily_analytics(request, days: int = 30):
 @router.post("/advertiser/billing/add-funds")
 async def add_funds(request):
     """Add funds to advertiser account"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     body = await request.json()
     
@@ -607,7 +597,6 @@ async def add_funds(request):
 @router.get("/advertiser/billing/transactions")
 async def get_transactions(request, limit: int = 50):
     """Get billing transaction history"""
-    from fastapi import Request
     advertiser = await require_advertiser(request)
     
     transactions = await db.ad_transactions.find(
@@ -666,7 +655,6 @@ async def reject_ad(ad_id: str, user: dict = Depends(get_current_user)):
     if user.get("role") not in ["admin", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    from fastapi import Request
     # Get rejection reason from body if provided
     
     result = await db.ad_creatives.update_one(
