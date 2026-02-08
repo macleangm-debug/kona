@@ -280,6 +280,16 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [screenOrientation, setScreenOrientation] = useState('portrait');
 
+  // Gesture Control states
+  const [lastTapTime, setLastTapTime] = useState(0);
+  const [doubleTapSide, setDoubleTapSide] = useState(null); // 'left' | 'right' | 'center'
+  const [showDoubleTapFeedback, setShowDoubleTapFeedback] = useState(false);
+  const [horizontalSwipeStart, setHorizontalSwipeStart] = useState(null);
+  const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right'
+  const [showSwipeFeedback, setShowSwipeFeedback] = useState(false);
+  const DOUBLE_TAP_DELAY = 300; // ms
+  const SWIPE_THRESHOLD = 80; // px
+
   // Format time as MM:SS
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return '00:00';
