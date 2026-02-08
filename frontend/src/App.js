@@ -109,7 +109,7 @@ const AppContent = () => {
   return (
     <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
       {/* Splash Screen - Netflix-style loading animation with Magic Chime sound */}
-      {showSplash && <SplashWithSound onComplete={handleSplashComplete} minDuration={3500} />}
+      {showSplash && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
 
       {/* Desktop Header - Only on desktop and not on full-screen pages */}
       {isDesktop && !isFullScreenPage && (
