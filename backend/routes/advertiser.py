@@ -238,17 +238,86 @@ async def get_pricing_tiers():
         }
     }
 
+# ============ AD PLACEMENT RULES (Platform-controlled) ============
+AD_PLACEMENT_RULES = {
+    "video_length_rules": {
+        "short": {  # < 3 minutes
+            "max_duration_seconds": 180,
+            "allowed_placements": ["pre_roll"],
+            "max_ads": 1
+        },
+        "medium": {  # 3-10 minutes
+            "max_duration_seconds": 600,
+            "allowed_placements": ["pre_roll", "mid_roll"],
+            "max_ads": 2,
+            "mid_roll_positions": [0.5]  # 50% through
+        },
+        "long": {  # 10+ minutes
+            "max_duration_seconds": float('inf'),
+            "allowed_placements": ["pre_roll", "mid_roll", "overlay"],
+            "max_ads": 3,
+            "mid_roll_positions": [0.33, 0.66]  # 33% and 66% through
+        }
+    },
+    "viewer_rules": {
+        "free_content": True,   # Show ads on free episodes
+        "paid_content": False,  # No ads on paid/coin episodes
+        "premium_subscribers": False  # No ads for premium subscribers
+    },
+    "ad_duration": {
+        "pre_roll": {"min": 5, "max": 10, "skip_after": 3},
+        "mid_roll": {"min": 5, "max": 15, "skip_after": 5},
+        "overlay": {"duration": 8},
+        "story": {"min": 5, "max": 15}
+    }
+}
+
+# Minimum wallet balance to create/run campaigns
+MIN_WALLET_BALANCE = 50.0
+
 # ============ CAMPAIGN ROUTES ============
 
 @router.post("/advertiser/campaigns")
 async def create_campaign(data: CampaignCreate, request):
-    """Create a new ad campaign"""
+    """Create a new ad campaign (PREPAY REQUIRED)"""
     from fastapi import Request
     advertiser = await require_advertiser(request)
+    
+    # PREPAY CHECK: Verify sufficient wallet balance
+    current_balance = advertiser.get("balance", 0)
+    if current_balance < MIN_WALLET_BALANCE:
+        raise HTTPException(
+            status_code=402,  # Payment Required
+            detail=f"Insufficient balance. Minimum ${MIN_WALLET_BALANCE} required. Current balance: ${current_balance:.2f}. Please add funds first."
+        )
+    
+    if data.budget > current_balance:
+        raise HTTPException(
+            status_code=402,
+            detail=f"Campaign budget (${data.budget}) exceeds wallet balance (${current_balance:.2f}). Please add more funds or reduce budget."
+        )
     
     # Validate tier permissions for ad placements
     tier = advertiser.get("tier", "basic")
     tier_info = PRICING_TIERS.get(tier, PRICING_TIERS["basic"])
+    
+    # Validate ad placements against tier
+    available_placements = []
+    for placement_id, placement_info in AD_PLACEMENT_RULES.get("ad_duration", {}).items():
+        # Check tier access
+        pricing_placement = {
+            "pre_roll": ["basic", "pro", "premium", "enterprise"],
+            "mid_roll": ["pro", "premium", "enterprise"],
+            "overlay": ["pro", "premium", "enterprise"],
+            "story": ["premium", "enterprise"]
+        }
+        if tier in pricing_placement.get(placement_id, []):
+            available_placements.append(placement_id)
+    
+    # Filter requested placements to only allowed ones
+    valid_placements = [p for p in data.ad_placements if p in available_placements]
+    if not valid_placements:
+        valid_placements = ["pre_roll"]  # Default to pre-roll
     
     campaign_id = f"camp-{uuid.uuid4().hex[:12]}"
     
@@ -259,13 +328,15 @@ async def create_campaign(data: CampaignCreate, request):
         "campaign_type": data.campaign_type,
         "tier": tier,
         "budget": data.budget,
+        "reserved_budget": data.budget,  # Reserve funds from wallet
         "daily_budget": data.daily_budget or data.budget / 30,
         "spent": 0.0,
         "start_date": data.start_date,
         "end_date": data.end_date,
         "targeting": data.targeting or {},
-        "ad_placements": data.ad_placements,
-        "status": "pending_approval",  # pending_approval, active, paused, completed, rejected
+        "ad_placements": valid_placements,
+        "placement_preference": data.ad_placements,  # What advertiser wanted
+        "status": "pending_approval",  # pending_approval, active, paused, completed, rejected, insufficient_funds
         "impressions": 0,
         "views": 0,
         "clicks": 0,
@@ -273,21 +344,45 @@ async def create_campaign(data: CampaignCreate, request):
         "cpv_rate": tier_info["cpv_rate"],
         "created_at": datetime.now(timezone.utc).isoformat(),
         "approved_at": None,
+        "paused_reason": None,
         "ads": []
     }
     
-    await db.campaigns.insert_one(campaign)
-    
-    # Update advertiser campaign count
+    # PREPAY: Reserve budget from wallet
     await db.advertisers.update_one(
         {"id": advertiser["id"]},
-        {"$inc": {"campaigns_count": 1}}
+        {
+            "$inc": {
+                "balance": -data.budget,  # Deduct from available balance
+                "reserved_balance": data.budget,  # Add to reserved
+                "campaigns_count": 1
+            }
+        }
     )
+    
+    # Log transaction
+    await db.ad_transactions.insert_one({
+        "id": f"txn-{uuid.uuid4().hex[:12]}",
+        "advertiser_id": advertiser["id"],
+        "campaign_id": campaign_id,
+        "type": "reserve",
+        "amount": -data.budget,
+        "description": f"Budget reserved for campaign: {data.name}",
+        "balance_after": current_balance - data.budget,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    
+    await db.campaigns.insert_one(campaign)
     
     campaign.pop("_id", None)
     return {
-        "message": "Campaign created and pending approval",
-        "campaign": campaign
+        "message": "Campaign created and pending approval. Budget reserved from wallet.",
+        "campaign": campaign,
+        "wallet": {
+            "previous_balance": current_balance,
+            "reserved": data.budget,
+            "new_available_balance": current_balance - data.budget
+        }
     }
 
 @router.get("/advertiser/campaigns")
