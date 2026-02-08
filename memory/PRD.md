@@ -100,6 +100,14 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Fullscreen toggle button for horizontal videos
   - Screen orientation detection (portrait/landscape)
   - No restrictions on creator content format
+- **Gesture Controls** for intuitive video interaction:
+  - Double-tap center: Like/unlike video (with heart animation)
+  - Double-tap left: Rewind 10 seconds
+  - Double-tap right: Forward 10 seconds
+  - Swipe left: Skip to next episode
+  - Swipe right: Go to previous episode
+  - Swipe down: Minimize to mini-player
+- **Video Library Variety**: Episodes now use varied sample videos from Google's CDN for better testing experience
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
