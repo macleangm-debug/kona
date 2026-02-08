@@ -1043,6 +1043,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
   const playerContent = (
     <div 
+      id="video-player-container"
       className="fixed inset-0 bg-black z-[9999]" 
       data-testid="video-player-page"
       onTouchStart={handleTouchStart}
@@ -1062,39 +1063,46 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         </div>
       )}
       
-      {/* Full-screen vertical video with lazy loading */}
-      <video
-        id="main-video"
-        ref={videoRef}
-        src={episode.video_url}
-        autoPlay
-        playsInline
-        preload="metadata"
-        crossOrigin="anonymous"
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={handleVideoEnded}
-        onWaiting={handleWaiting}
-        onClick={handleVideoTap}
-        onLoadedData={() => {
-          // Start playing when video is loaded (after pre-roll if any)
-          if (preRollComplete && videoRef.current) {
-            videoRef.current.play().catch(() => {});
-            setIsPlaying(true);
-          }
-        }}
-        className="absolute inset-0 w-full h-full object-cover"
-        data-testid="video-element"
-      >
-        {/* Subtitle tracks */}
-        {subtitles.en && (
-          <track 
-            kind="subtitles" 
-            src={subtitles.en} 
-            srcLang="en" 
-            label="English"
-            default={activeSubtitle === "en"}
-          />
-        )}
+      {/* Adaptive Video Player - Automatically adjusts for vertical/horizontal content */}
+      <div className="absolute inset-0 flex items-center justify-center bg-black">
+        <video
+          id="main-video"
+          ref={videoRef}
+          src={episode.video_url}
+          autoPlay
+          playsInline
+          preload="metadata"
+          crossOrigin="anonymous"
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleVideoEnded}
+          onWaiting={handleWaiting}
+          onClick={handleVideoTap}
+          onLoadedMetadata={handleVideoMetadataLoaded}
+          onLoadedData={() => {
+            // Start playing when video is loaded (after pre-roll if any)
+            if (preRollComplete && videoRef.current) {
+              videoRef.current.play().catch(() => {});
+              setIsPlaying(true);
+            }
+          }}
+          className={`w-full h-full transition-all duration-300 ${getVideoDisplayStyle()}`}
+          style={{
+            // For vertical videos in portrait mode, ensure full coverage
+            maxHeight: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
+            maxWidth: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
+          }}
+          data-testid="video-element"
+        >
+          {/* Subtitle tracks */}
+          {subtitles.en && (
+            <track 
+              kind="subtitles" 
+              src={subtitles.en} 
+              srcLang="en" 
+              label="English"
+              default={activeSubtitle === "en"}
+            />
+          )}
         {subtitles.sw && (
           <track 
             kind="subtitles" 
