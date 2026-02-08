@@ -172,6 +172,8 @@ class AdminEpisodeCreate(BaseModel):
     video_url: str
     is_free: bool = False
     coins_required: int = 5
+    is_story_content: bool = False  # If true, requires vertical video format (9:16)
+    aspect_ratio: Optional[str] = None  # e.g., "9:16", "16:9", "1:1"
 
 class AdminUserUpdate(BaseModel):
     coins: Optional[int] = None
