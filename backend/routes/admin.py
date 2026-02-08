@@ -1001,3 +1001,81 @@ async def remove_vertical_video_samples(user: dict = Depends(require_admin)):
         "episodes_affected": result.modified_count
     }
 
+
+@router.post("/seed/story-content")
+async def seed_story_content_flags(user: dict = Depends(require_admin)):
+    """
+    Mark Episode 1 of all series as story content (for vertical Stories feed).
+    This is a one-time migration for existing content.
+    """
+    # Update all Episode 1s to be story content
+    result = await db.episodes.update_many(
+        {"episode_number": 1},
+        {"$set": {
+            "is_story_content": True,
+            "requires_vertical": True
+        }}
+    )
+    
+    return {
+        "message": f"Marked {result.modified_count} Episode 1s as story content",
+        "episodes_affected": result.modified_count,
+        "note": "These episodes will appear in the Stories feed and should ideally be vertical (9:16) format"
+    }
+
+
+@router.post("/series/{series_id}/make-free")
+async def make_series_free(series_id: str, user: dict = Depends(require_admin)):
+    """
+    Make all episodes of a series free (e.g., for sponsored/completed series).
+    This ONLY changes is_free flag - does NOT affect is_story_content.
+    Horizontal episodes that become free will NOT appear in Stories feed.
+    """
+    # Verify series exists
+    series = await db.series.find_one({"id": series_id})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Make all episodes free
+    result = await db.episodes.update_many(
+        {"series_id": series_id},
+        {"$set": {
+            "is_free": True,
+            "coins_required": 0
+        }}
+    )
+    
+    return {
+        "message": f"Made {result.modified_count} episodes of '{series['title']}' free",
+        "series_id": series_id,
+        "episodes_affected": result.modified_count,
+        "note": "Only Episode 1 (if vertical) will appear in Stories feed. Other episodes remain in normal episode list."
+    }
+
+
+@router.post("/series/{series_id}/make-paid")
+async def make_series_paid(series_id: str, coins_required: int = 5, user: dict = Depends(require_admin)):
+    """
+    Revert a series back to paid (except Episode 1 which stays free).
+    """
+    # Verify series exists
+    series = await db.series.find_one({"id": series_id})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Make episodes paid (except Episode 1)
+    result = await db.episodes.update_many(
+        {"series_id": series_id, "episode_number": {"$ne": 1}},
+        {"$set": {
+            "is_free": False,
+            "coins_required": coins_required
+        }}
+    )
+    
+    return {
+        "message": f"Made {result.modified_count} episodes of '{series['title']}' paid ({coins_required} coins each)",
+        "series_id": series_id,
+        "episodes_affected": result.modified_count,
+        "note": "Episode 1 remains free as the preview/hook episode"
+    }
+
