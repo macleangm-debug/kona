@@ -632,7 +632,8 @@ async def get_pending_ads(user: dict = Depends(get_current_user)):
 @router.post("/admin/advertiser/ads/{ad_id}/approve")
 async def approve_ad(ad_id: str, user: dict = Depends(get_current_user)):
     """Approve an ad creative (Admin only)"""
-    if user.get("role") not in ["admin", "super_admin"]:
+    is_admin = user.get("role") in ["admin", "super_admin"] or user.get("is_super_admin") or user.get("is_admin")
+    if not is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.ad_creatives.update_one(
@@ -652,7 +653,8 @@ async def approve_ad(ad_id: str, user: dict = Depends(get_current_user)):
 @router.post("/admin/advertiser/ads/{ad_id}/reject")
 async def reject_ad(ad_id: str, user: dict = Depends(get_current_user)):
     """Reject an ad creative (Admin only)"""
-    if user.get("role") not in ["admin", "super_admin"]:
+    is_admin = user.get("role") in ["admin", "super_admin"] or user.get("is_super_admin") or user.get("is_admin")
+    if not is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     # Get rejection reason from body if provided
