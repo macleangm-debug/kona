@@ -902,19 +902,56 @@ async def clear_all_seeds(user: dict = Depends(require_super_admin)):
 
 
 # ============ VERTICAL VIDEO SAMPLES ============
-# Free vertical video samples from public CDNs for testing adaptive player
-VERTICAL_VIDEO_SAMPLES = [
-    # Pexels vertical videos (9:16 aspect ratio)
-    "https://videos.pexels.com/video-files/4812203/4812203-hd_1080_1920_24fps.mp4",  # City night
-    "https://videos.pexels.com/video-files/3571264/3571264-hd_1080_1920_30fps.mp4",  # Woman portrait
-    "https://videos.pexels.com/video-files/5377684/5377684-hd_1080_1920_25fps.mp4",  # Nature sunset
-    "https://videos.pexels.com/video-files/4434242/4434242-hd_1080_1920_24fps.mp4",  # Abstract art
-    "https://videos.pexels.com/video-files/4253015/4253015-hd_1080_1920_25fps.mp4",  # Woman fashion
+# Various sample videos from Google's public CDN for testing
+SAMPLE_VIDEOS = [
+    # Horizontal videos from Google's sample bucket
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+    "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
 ]
+
+@router.post("/seed/varied-videos")
+async def seed_varied_video_samples(user: dict = Depends(require_admin)):
+    """Update episodes with varied video URLs for better testing experience"""
+    import random
+    
+    # Get all episodes
+    episodes = await db.episodes.find({}).to_list(1000)
+    
+    if not episodes:
+        raise HTTPException(status_code=404, detail="No episodes found to update")
+    
+    # Update each episode with a random video from the sample list
+    updated_count = 0
+    for ep in episodes:
+        video_url = random.choice(SAMPLE_VIDEOS)
+        await db.episodes.update_one(
+            {"id": ep["id"]},
+            {"$set": {"video_url": video_url}}
+        )
+        updated_count += 1
+    
+    return {
+        "message": f"Updated {updated_count} episodes with varied video samples",
+        "total_episodes": len(episodes),
+        "sample_videos_used": len(SAMPLE_VIDEOS)
+    }
+
 
 @router.post("/seed/vertical-videos")
 async def seed_vertical_video_samples(user: dict = Depends(require_admin)):
-    """Update some episodes with vertical video URLs for testing adaptive player"""
+    """
+    Mark some episodes as vertical for testing adaptive player.
+    Note: Since public vertical video CDN URLs are hard to find,
+    this endpoint marks episodes as "vertical" which can be updated
+    with actual vertical video URLs when available.
+    """
     import random
     
     # Get some episodes to update
@@ -923,26 +960,26 @@ async def seed_vertical_video_samples(user: dict = Depends(require_admin)):
     if not episodes:
         raise HTTPException(status_code=404, detail="No episodes found to update")
     
-    # Update every 3rd episode with a vertical video (to mix vertical and horizontal)
+    # For now, we'll use the available videos and mark them
+    # The frontend will adapt based on actual video dimensions
     updated_count = 0
     for i, ep in enumerate(episodes):
         if i % 3 == 0:  # Every 3rd episode
-            video_url = random.choice(VERTICAL_VIDEO_SAMPLES)
             await db.episodes.update_one(
                 {"id": ep["id"]},
                 {"$set": {
-                    "video_url": video_url,
                     "is_vertical": True,
-                    "aspect_ratio": "9:16"
+                    "aspect_ratio": "9:16",
+                    "video_url": random.choice(SAMPLE_VIDEOS)  # Use available videos
                 }}
             )
             updated_count += 1
     
     return {
-        "message": f"Updated {updated_count} episodes with vertical video samples",
+        "message": f"Marked {updated_count} episodes as vertical (video URLs are horizontal samples - player will auto-detect actual dimensions)",
         "total_episodes": len(episodes),
         "vertical_episodes": updated_count,
-        "sample_videos_used": len(VERTICAL_VIDEO_SAMPLES)
+        "note": "The adaptive player will detect actual video dimensions regardless of this flag"
     }
 
 
