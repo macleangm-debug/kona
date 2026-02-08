@@ -338,19 +338,7 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
             />
           </div>
 
-          {/* Tagline */}
-          <p 
-            className="mt-8 text-xl tracking-[0.4em] uppercase font-light"
-            style={{
-              color: 'rgba(168, 85, 247, 0.9)',
-              opacity: phase >= 5 ? 1 : 0,
-              transform: phase >= 5 ? 'translateY(0)' : 'translateY(20px)',
-              transition: 'all 0.8s ease-out',
-              textShadow: '0 0 30px rgba(139, 92, 246, 0.4)'
-            }}
-          >
-            African Stories, Your Way
-          </p>
+          {/* Tagline removed */}
         </div>
       </div>
 
