@@ -106,13 +106,17 @@ const AppContent = () => {
   };
 
   // Pages that should have their own layout (no header/nav)
-  const fullScreenPages = ["/watch", "/admin", "/admin/login"];
+  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business"];
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page));
+  
+  // Pages that skip splash screen
+  const skipSplashPages = ["/business", "/creator/login", "/admin/login"];
+  const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page));
 
   return (
     <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
       {/* Splash Screen - Netflix-style loading animation with Magic Chime sound */}
-      {showSplash && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
+      {showSplash && !shouldSkipSplash && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
 
       {/* Desktop Header - Only on desktop and not on full-screen pages */}
       {isDesktop && !isFullScreenPage && (
