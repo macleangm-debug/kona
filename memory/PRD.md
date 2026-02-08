@@ -93,6 +93,13 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Main cinematic animation (logo zoom, particles, "KONA" text reveal)
   - Signature "Magic Chime" sound (plays after user interaction to comply with browser autoplay policies)
   - Smooth transition to home page after animation completes
+- **Adaptive/Hybrid Video Player** - Automatically adjusts for any video format:
+  - Auto-detects video aspect ratio (vertical 9:16, horizontal 16:9, square 1:1, etc.)
+  - Vertical videos fill the screen when phone is held vertically
+  - Horizontal videos show with "Rotate for fullscreen" hint
+  - Fullscreen toggle button for horizontal videos
+  - Screen orientation detection (portrait/landscape)
+  - No restrictions on creator content format
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
