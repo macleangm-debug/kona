@@ -147,6 +147,11 @@ const AppContent = () => {
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/advertisers" element={<AdvertisersPage />} />
         <Route path="/creators" element={<CreatorsLandingPage />} />
+        
+        {/* Business Portal Routes */}
+        <Route path="/business/auth" element={<BusinessAuthPage />} />
+        <Route path="/business/dashboard" element={<BusinessDashboard />} />
+        <Route path="/business/campaigns/new" element={<CampaignCreatePage />} />
       </Routes>
 
       {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
