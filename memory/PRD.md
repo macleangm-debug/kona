@@ -111,8 +111,9 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 ### P0 (Critical)
 - [x] Like button fix - COMPLETED
 - [x] Phone/Email auth system - COMPLETED
+- [x] Cinematic splash screen with sound - COMPLETED
 - [ ] Re-deploy application to production
-- [ ] Integrate Africa's Talking for real OTP
+- [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
 
 ### P1 (High Priority)
 - [ ] Submit sitemap to Bing Webmaster Tools (after re-deploy)
