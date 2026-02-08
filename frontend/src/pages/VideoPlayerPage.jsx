@@ -20,23 +20,54 @@ const SUBTITLE_LANGUAGES = [
 
 // ============ AD CONFIGURATION ============
 const AD_CONFIG = {
-  // Mock ad videos (replace with real ad network later)
-  mockAds: [
-    { id: "ad1", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", duration: 15, advertiser: "TechCorp", skipAfter: 5 },
-    { id: "ad2", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4", duration: 15, advertiser: "FoodBrand", skipAfter: 5 },
-    { id: "ad3", type: "video", url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4", duration: 10, advertiser: "TravelCo", skipAfter: 5 },
-  ],
-  // Ad placement by user tier
+  // Ad placement by user tier (determines if ads show)
   adsByTier: {
     free: { preRoll: true, midRoll: true, postRoll: true, overlay: true },
     basic: { preRoll: true, midRoll: false, postRoll: false, overlay: false },
     premium: { preRoll: false, midRoll: false, postRoll: false, overlay: false },
     vip: { preRoll: false, midRoll: false, postRoll: false, overlay: false }
   },
-  // Mid-roll ad intervals (percentage of video)
-  midRollPoints: [25, 50, 75], // Show mid-roll at 25%, 50%, 75%
+  // Mid-roll ad intervals (percentage of video) - controlled by platform rules
+  midRollPoints: [50], // Default: 50% - platform can override
   overlayDuration: 8, // seconds
   defaultIntroDuration: 30, // seconds
+  defaultSkipAfter: 3, // seconds before skip is available
+};
+
+// ============ FETCH ADS FROM SERVER ============
+const fetchAdsFromServer = async (episodeId, placement, videoDuration, isFreeContent, userId) => {
+  try {
+    const params = new URLSearchParams({
+      episode_id: episodeId,
+      placement: placement,
+      is_free_content: isFreeContent.toString()
+    });
+    if (videoDuration) params.append('video_duration', Math.round(videoDuration).toString());
+    if (userId) params.append('user_id', userId);
+    
+    const response = await axios.get(`${API}/ads/serve?${params.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch ads:', error);
+    return { ads: [], reason: 'Failed to fetch ads' };
+  }
+};
+
+// Track ad events (impressions, views, clicks)
+const trackAdEvent = async (adId, eventType, campaignId = null, userId = null, episodeId = null) => {
+  try {
+    const params = new URLSearchParams({
+      ad_id: adId,
+      event_type: eventType
+    });
+    if (campaignId) params.append('campaign_id', campaignId);
+    if (userId) params.append('user_id', userId);
+    if (episodeId) params.append('episode_id', episodeId);
+    
+    await axios.post(`${API}/ads/track?${params.toString()}`);
+  } catch (error) {
+    console.error('Failed to track ad event:', error);
+  }
 };
 
 // ============ AD COMPONENT ============
