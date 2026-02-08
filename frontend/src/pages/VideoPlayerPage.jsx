@@ -119,25 +119,45 @@ const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown, episodeId,
     return null;
   }
   
+  const handleAdClick = () => {
+    // Track click and open advertiser URL
+    if (ad.click_url) {
+      trackAdEvent(ad.id, 'click', ad.campaign_id, userId, episodeId);
+      window.open(ad.click_url, '_blank');
+    }
+  };
+  
   return (
     <div className="absolute inset-0 bg-black z-50" data-testid="ad-player">
       <video
         ref={adVideoRef}
-        src={ad.url}
+        src={ad.media_url || ad.url}
         autoPlay
         playsInline
         muted
-        onTimeUpdate={(e) => setAdProgress((e.target.currentTime / ad.duration) * 100)}
+        onTimeUpdate={(e) => setAdProgress((e.target.currentTime / (ad.duration || 15)) * 100)}
         onEnded={onAdComplete}
         onError={() => setAdError(true)}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-contain cursor-pointer"
+        onClick={handleAdClick}
       />
       
       {/* Ad badge */}
       <div className="absolute top-4 left-4 flex items-center gap-2">
         <span className="bg-yellow-500 text-black text-xs font-bold px-2 py-1 rounded">AD</span>
-        <span className="text-white/70 text-xs">{ad.advertiser}</span>
+        <span className="text-white/70 text-xs">{ad.campaign_name || ad.advertiser || 'Sponsor'}</span>
       </div>
+      
+      {/* Call to action button */}
+      {ad.click_url && (
+        <button
+          onClick={handleAdClick}
+          className="absolute bottom-24 left-4 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          data-testid="ad-cta-btn"
+        >
+          {ad.call_to_action || 'Learn More'}
+        </button>
+      )}
       
       {/* Skip button */}
       <div className="absolute bottom-20 right-4">
