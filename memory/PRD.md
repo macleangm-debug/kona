@@ -145,6 +145,17 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Free content only - paid episodes are ad-free
   - Premium subscribers see no ads
   - API: `/api/ads/serve`, `/api/ads/track`, `/api/ads/placement-rules`
+- **Ad Serving Integration in Video Player**:
+  - Fetches real ads from server via `/api/ads/serve`
+  - Pre-roll ads play before video starts (on free episodes only)
+  - Mid-roll ads play at 50% of video (for videos > 3 min)
+  - Overlay ads show randomly during playback
+  - Ad tracking: impressions (on load), views (at 75% completion), clicks
+  - CPV charges automatically when view is tracked
+  - Skip button appears after configured delay (default 3s for pre-roll, 5s for mid-roll)
+  - "AD" badge and advertiser name shown during ad playback
+  - Call-to-action button links to advertiser URL
+  - Admin approval required before ads go live
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
