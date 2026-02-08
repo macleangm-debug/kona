@@ -132,6 +132,19 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - **Analytics dashboard**: Impressions, views, clicks, CTR, cost tracking
   - **Billing system**: Add funds, transaction history
   - Routes: `/business/auth`, `/business/dashboard`, `/business/campaigns/new`
+- **Prepay Wallet System** (Industry Standard):
+  - 100% prepay model - no payment defaults
+  - Minimum $50 balance to create campaigns
+  - Budget reserved from wallet when campaign created
+  - Automatic campaign pause when funds exhausted
+  - Transaction history tracking
+- **Hybrid Ad Placement Rules** (Platform-controlled):
+  - Short videos (< 3 min): Pre-roll only (1 ad max)
+  - Medium videos (3-10 min): Pre-roll + 1 mid-roll
+  - Long videos (10+ min): Pre-roll + 2 mid-rolls + overlay
+  - Free content only - paid episodes are ad-free
+  - Premium subscribers see no ads
+  - API: `/api/ads/serve`, `/api/ads/track`, `/api/ads/placement-rules`
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
