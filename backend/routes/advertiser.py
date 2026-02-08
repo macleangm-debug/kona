@@ -189,7 +189,7 @@ async def login_advertiser(data: AdvertiserLogin):
     }
 
 @router.get("/advertiser/me")
-async def get_advertiser_profile(request):
+async def get_advertiser_profile(request: Request):
     """Get current advertiser profile"""
     advertiser = await require_advertiser(request)
     return advertiser
@@ -401,7 +401,7 @@ async def get_advertiser_campaigns(request, status: Optional[str] = None):
     return campaigns
 
 @router.get("/advertiser/campaigns/{campaign_id}")
-async def get_campaign_detail(campaign_id: str, request):
+async def get_campaign_detail(campaign_id: str, request: Request):
     """Get detailed campaign info with analytics"""
     advertiser = await require_advertiser(request)
     
@@ -427,7 +427,7 @@ async def get_campaign_detail(campaign_id: str, request):
     return campaign
 
 @router.patch("/advertiser/campaigns/{campaign_id}")
-async def update_campaign(campaign_id: str, request):
+async def update_campaign(campaign_id: str, request: Request):
     """Update campaign settings"""
     advertiser = await require_advertiser(request)
     body = await request.json()
@@ -456,7 +456,7 @@ async def update_campaign(campaign_id: str, request):
 # ============ AD CREATIVE ROUTES ============
 
 @router.post("/advertiser/campaigns/{campaign_id}/ads")
-async def create_ad_creative(campaign_id: str, data: AdCreativeCreate, request):
+async def create_ad_creative(campaign_id: str, data: AdCreativeCreate, request: Request):
     """Upload/create an ad creative for a campaign"""
     advertiser = await require_advertiser(request)
     
@@ -497,7 +497,7 @@ async def create_ad_creative(campaign_id: str, data: AdCreativeCreate, request):
     }
 
 @router.get("/advertiser/campaigns/{campaign_id}/ads")
-async def get_campaign_ads(campaign_id: str, request):
+async def get_campaign_ads(campaign_id: str, request: Request):
     """Get all ad creatives for a campaign"""
     advertiser = await require_advertiser(request)
     
@@ -518,7 +518,7 @@ async def get_campaign_ads(campaign_id: str, request):
 # ============ ANALYTICS ROUTES ============
 
 @router.get("/advertiser/analytics/overview")
-async def get_analytics_overview(request):
+async def get_analytics_overview(request: Request):
     """Get overall analytics for advertiser"""
     advertiser = await require_advertiser(request)
     
