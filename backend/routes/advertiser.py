@@ -459,7 +459,7 @@ async def get_analytics_overview(request):
 async def get_daily_analytics(request, days: int = 30):
     """Get daily analytics breakdown"""
     from fastapi import Request
-    advertiser = await require_advertiser(request)
+    await require_advertiser(request)  # Verify authentication
     
     # In a real implementation, this would query daily aggregated data
     # For now, return mock daily data structure
