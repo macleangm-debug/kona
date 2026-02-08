@@ -71,11 +71,29 @@ const trackAdEvent = async (adId, eventType, campaignId = null, userId = null, e
 };
 
 // ============ AD COMPONENT ============
-const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown }) => {
+const AdPlayer = ({ ad, onAdComplete, onSkip, canSkip, skipCountdown, episodeId, userId }) => {
   const adVideoRef = useRef(null);
   const [adProgress, setAdProgress] = useState(0);
   const [adError, setAdError] = useState(false);
+  const [impressionTracked, setImpressionTracked] = useState(false);
+  const [viewTracked, setViewTracked] = useState(false);
   const errorHandled = useRef(false);
+  
+  // Track impression when ad loads
+  useEffect(() => {
+    if (ad && !impressionTracked) {
+      trackAdEvent(ad.id, 'impression', ad.campaign_id, userId, episodeId);
+      setImpressionTracked(true);
+    }
+  }, [ad, impressionTracked, userId, episodeId]);
+  
+  // Track view when ad completes (or reaches 75%)
+  useEffect(() => {
+    if (adProgress >= 75 && !viewTracked && ad) {
+      trackAdEvent(ad.id, 'view', ad.campaign_id, userId, episodeId);
+      setViewTracked(true);
+    }
+  }, [adProgress, viewTracked, ad, userId, episodeId]);
   
   // Auto-complete if ad fails to load or doesn't play
   useEffect(() => {
