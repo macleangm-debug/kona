@@ -199,9 +199,14 @@ async def get_advertiser_profile(request):
 
 @router.get("/advertiser/pricing")
 async def get_pricing_tiers():
-    """Get all available pricing tiers"""
+    """Get all available pricing tiers and prepay requirements"""
     return {
         "tiers": PRICING_TIERS,
+        "prepay_requirements": {
+            "minimum_deposit": MIN_WALLET_BALANCE,
+            "currency": "USD",
+            "note": "Funds must be added before creating campaigns"
+        },
         "ad_placements": {
             "pre_roll": {
                 "name": "Pre-roll",
