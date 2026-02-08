@@ -257,7 +257,7 @@ AD_PLACEMENT_RULES = {
             "mid_roll_positions": [0.5]  # 50% through
         },
         "long": {  # 10+ minutes
-            "max_duration_seconds": float('inf'),
+            "max_duration_seconds": 999999,  # Effectively infinite
             "allowed_placements": ["pre_roll", "mid_roll", "overlay"],
             "max_ads": 3,
             "mid_roll_positions": [0.33, 0.66]  # 33% and 66% through
