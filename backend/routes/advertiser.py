@@ -389,7 +389,7 @@ async def create_campaign(data: CampaignCreate, request: "Request"):
     }
 
 @router.get("/advertiser/campaigns")
-async def get_advertiser_campaigns(request, status: Optional[str] = None):
+async def get_advertiser_campaigns(request: Request, status: Optional[str] = None):
     """Get all campaigns for current advertiser"""
     advertiser = await require_advertiser(request)
     
@@ -548,7 +548,7 @@ async def get_analytics_overview(request: Request):
     }
 
 @router.get("/advertiser/analytics/daily")
-async def get_daily_analytics(request, days: int = 30):
+async def get_daily_analytics(request: Request, days: int = 30):
     """Get daily analytics breakdown"""
     await require_advertiser(request)  # Verify authentication
     
@@ -595,7 +595,7 @@ async def add_funds(request: Request):
     }
 
 @router.get("/advertiser/billing/transactions")
-async def get_transactions(request, limit: int = 50):
+async def get_transactions(request: Request, limit: int = 50):
     """Get billing transaction history"""
     advertiser = await require_advertiser(request)
     
