@@ -1121,7 +1121,22 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             default={activeSubtitle === "fr"}
           />
         )}
-      </video>
+        </video>
+      </div>
+
+      {/* Video format indicator - shows when controls are visible */}
+      {showControls && videoAspectRatio && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30">
+          <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
+            <span className="text-white/70 text-xs">
+              {isVerticalVideo ? '📱 Vertical' : '📺 Horizontal'}
+            </span>
+            {!isVerticalVideo && screenOrientation === 'portrait' && (
+              <span className="text-purple-400 text-xs animate-pulse">Rotate for fullscreen</span>
+            )}
+          </div>
+        </div>
+      )}
       
       {/* Skip Intro Button */}
       <SkipIntroButton visible={showSkipIntro && !isPlayingAd} onClick={handleSkipIntro} />
