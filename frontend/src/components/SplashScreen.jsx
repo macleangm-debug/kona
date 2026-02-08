@@ -389,7 +389,7 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
   );
 };
 
-// Pre-splash for user interaction (enables sound)
+// Pre-splash - Clean design with just clickable animated logo
 export const PreSplash = ({ onEnter }) => {
   const [isReady, setIsReady] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
@@ -400,78 +400,150 @@ export const PreSplash = ({ onEnter }) => {
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] bg-[#030014] flex items-center justify-center cursor-pointer overflow-hidden"
-      onClick={onEnter}
+      className="fixed inset-0 z-[9999] bg-[#030014] flex items-center justify-center overflow-hidden"
     >
-      {/* Subtle animated background */}
+      {/* Subtle ambient background */}
       <div 
-        className="absolute inset-0"
+        className="absolute inset-0 opacity-50"
         style={{
-          background: `radial-gradient(ellipse 100% 100% at 50% 100%, rgba(139, 92, 246, 0.1) 0%, transparent 50%)`
+          background: `radial-gradient(ellipse 80% 60% at 50% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%)`
         }}
       />
 
-      {/* Content */}
-      <div 
-        className={`flex flex-col items-center transition-all duration-1000 ${
+      {/* Clickable Logo Container */}
+      <button
+        onClick={onEnter}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        className={`relative cursor-pointer focus:outline-none transition-all duration-700 ${
           isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
         }`}
+        aria-label="Enter Kona"
       >
-        {/* Mini logo */}
+        {/* Outer pulsing ring - indicates clickable */}
         <div 
-          className={`mb-10 transition-transform duration-500 ${isHovering ? 'scale-110' : 'scale-100'}`}
+          className="absolute -inset-8 rounded-3xl"
+          style={{
+            border: '2px solid rgba(139, 92, 246, 0.3)',
+            animation: 'pulseRing 2s ease-in-out infinite'
+          }}
+        />
+        
+        {/* Second pulsing ring - delayed */}
+        <div 
+          className="absolute -inset-12 rounded-3xl"
+          style={{
+            border: '1px solid rgba(139, 92, 246, 0.15)',
+            animation: 'pulseRing 2s ease-in-out infinite 0.5s'
+          }}
+        />
+
+        {/* Glow effect behind logo */}
+        <div 
+          className={`absolute -inset-6 rounded-2xl transition-all duration-500 ${
+            isHovering ? 'opacity-100' : 'opacity-60'
+          }`}
+          style={{
+            background: 'radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%)',
+            animation: 'breathe 3s ease-in-out infinite'
+          }}
+        />
+
+        {/* Main Logo */}
+        <div 
+          className={`relative transition-transform duration-300 ${
+            isHovering ? 'scale-110' : 'scale-100'
+          }`}
         >
-          <svg width="100" height="100" viewBox="0 0 100 100">
+          <svg width="160" height="160" viewBox="0 0 100 100">
             <defs>
-              <linearGradient id="miniGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="preLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#8B5CF6" />
-                <stop offset="100%" stopColor="#A855F7" />
+                <stop offset="50%" stopColor="#A855F7" />
+                <stop offset="100%" stopColor="#C084FC" />
               </linearGradient>
+              <filter id="preLogoGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
             </defs>
-            <rect x="10" y="10" width="80" height="80" rx="16" fill="none" stroke="url(#miniGrad)" strokeWidth="4" />
-            <path d="M38 30 L38 70 L72 50 Z" fill="url(#miniGrad)" />
+            
+            {/* Rounded square border */}
+            <rect 
+              x="10" y="10" 
+              width="80" height="80" 
+              rx="16" 
+              fill="none" 
+              stroke="url(#preLogoGrad)" 
+              strokeWidth="4"
+              filter="url(#preLogoGlow)"
+            />
+            
+            {/* Play triangle with subtle animation */}
+            <path 
+              d="M40 28 L40 72 L74 50 Z" 
+              fill="url(#preLogoGrad)"
+              filter="url(#preLogoGlow)"
+              style={{
+                transformOrigin: '52px 50px',
+                animation: 'playPulse 2s ease-in-out infinite'
+              }}
+            />
           </svg>
         </div>
 
-        {/* Play button */}
-        <button 
-          className="group relative px-12 py-5 rounded-full font-semibold text-white text-lg overflow-hidden transition-all duration-300 hover:scale-105"
-          style={{
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.4) 0%, rgba(168, 85, 247, 0.4) 100%)',
-            border: '2px solid rgba(139, 92, 246, 0.6)',
-            boxShadow: isHovering ? '0 0 60px rgba(139, 92, 246, 0.5)' : '0 0 30px rgba(139, 92, 246, 0.2)'
-          }}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
+        {/* Hover hint - appears on hover */}
+        <div 
+          className={`absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap transition-all duration-300 ${
+            isHovering ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+          }`}
         >
-          <span className="relative z-10 flex items-center gap-4">
-            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z"/>
-            </svg>
-            Enter Experience
-          </span>
-          <div 
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-            style={{
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.6) 0%, rgba(168, 85, 247, 0.6) 100%)'
-            }}
-          />
-        </button>
+          <span className="text-sm text-purple-400/80 font-medium">Click to enter</span>
+        </div>
+      </button>
 
-        {/* Hint */}
-        <p className="mt-8 text-sm text-gray-500 flex items-center gap-2">
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-          </svg>
-          Best with sound on
-        </p>
+      {/* Sound hint at bottom - subtle */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 text-gray-600 text-sm">
+        <svg className="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+        </svg>
+        <span className="opacity-60">Sound on</span>
       </div>
 
-      {/* Corner accents */}
-      <div className="absolute top-10 left-10 w-20 h-20 border-l-2 border-t-2 border-purple-500/30 rounded-tl-xl" />
-      <div className="absolute top-10 right-10 w-20 h-20 border-r-2 border-t-2 border-purple-500/30 rounded-tr-xl" />
-      <div className="absolute bottom-10 left-10 w-20 h-20 border-l-2 border-b-2 border-purple-500/30 rounded-bl-xl" />
-      <div className="absolute bottom-10 right-10 w-20 h-20 border-r-2 border-b-2 border-purple-500/30 rounded-br-xl" />
+      {/* Keyframe animations */}
+      <style>{`
+        @keyframes pulseRing {
+          0%, 100% { 
+            transform: scale(1); 
+            opacity: 0.5; 
+          }
+          50% { 
+            transform: scale(1.08); 
+            opacity: 0.8; 
+          }
+        }
+        @keyframes breathe {
+          0%, 100% { 
+            transform: scale(1); 
+            opacity: 0.5; 
+          }
+          50% { 
+            transform: scale(1.15); 
+            opacity: 0.8; 
+          }
+        }
+        @keyframes playPulse {
+          0%, 100% { 
+            transform: scale(1); 
+          }
+          50% { 
+            transform: scale(1.05); 
+          }
+        }
+      `}</style>
     </div>
   );
 };
