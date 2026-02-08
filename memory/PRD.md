@@ -108,6 +108,13 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Swipe right: Go to previous episode
   - Swipe down: Minimize to mini-player
 - **Video Library Variety**: Episodes now use varied sample videos from Google's CDN for better testing experience
+- **Stories Content System**: Separate "Stories" feed from "Free Access" for flexible content management:
+  - Episode 1 of every series is automatically "Story Content" (appears in Stories feed)
+  - Stories feed requires/recommends vertical (9:16) format for TikTok-style experience
+  - Admin can make entire seasons free WITHOUT adding them to Stories feed
+  - Creator Portal shows "STORIES" badge and vertical format guidance for Episode 1
+  - API: `/api/stories/feed` returns only story content (Episode 1s + bonus stories)
+  - Admin APIs: `/api/admin/series/{id}/make-free` and `/api/admin/series/{id}/make-paid`
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
