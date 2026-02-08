@@ -386,43 +386,72 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
     // Show pre-roll ad when video loads (if applicable)
-    if (episode && !preRollComplete && !loading) {
-      const adConfig = AD_CONFIG.adsByTier[userTier];
-      if (adConfig?.preRoll) {
-        const randomAd = AD_CONFIG.mockAds[Math.floor(Math.random() * AD_CONFIG.mockAds.length)];
-        setCurrentAd(randomAd);
-        setAdType("preRoll");
-        setIsPlayingAd(true);
-        setCanSkipAd(false);
-        setSkipCountdown(randomAd.skipAfter);
-        
-        // Start countdown for skip button
-        adTimerRef.current = setInterval(() => {
-          setSkipCountdown(prev => {
-            if (prev <= 1) {
-              setCanSkipAd(true);
-              clearInterval(adTimerRef.current);
-              return 0;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        
-        // Fallback: Auto-skip ad after 20 seconds if video doesn't load
-        setTimeout(() => {
-          if (!preRollComplete) {
-            handleAdComplete();
+    const fetchAndShowPreRoll = async () => {
+      if (episode && !preRollComplete && !loading) {
+        const adConfig = AD_CONFIG.adsByTier[userTier];
+        if (adConfig?.preRoll && episode.is_free) {
+          // Fetch real ads from server
+          const adResponse = await fetchAdsFromServer(
+            episode.id,
+            'pre_roll',
+            null, // duration not known yet
+            true, // is_free_content
+            user?.id
+          );
+          
+          if (adResponse.ads && adResponse.ads.length > 0) {
+            const serverAd = adResponse.ads[0];
+            setCurrentAd({
+              id: serverAd.id,
+              campaign_id: serverAd.campaign_id,
+              url: serverAd.media_url,
+              media_url: serverAd.media_url,
+              duration: serverAd.duration || 10,
+              advertiser: serverAd.campaign_name || 'Sponsor',
+              campaign_name: serverAd.campaign_name,
+              skipAfter: serverAd.skip_after || AD_CONFIG.defaultSkipAfter,
+              click_url: serverAd.click_url,
+              call_to_action: serverAd.call_to_action
+            });
+            setAdType("preRoll");
+            setIsPlayingAd(true);
+            setCanSkipAd(false);
+            setSkipCountdown(serverAd.skip_after || AD_CONFIG.defaultSkipAfter);
+            
+            // Start countdown for skip button
+            adTimerRef.current = setInterval(() => {
+              setSkipCountdown(prev => {
+                if (prev <= 1) {
+                  setCanSkipAd(true);
+                  clearInterval(adTimerRef.current);
+                  return 0;
+                }
+                return prev - 1;
+              });
+            }, 1000);
+            
+            // Fallback: Auto-skip ad after 20 seconds if video doesn't load
+            setTimeout(() => {
+              if (!preRollComplete) {
+                handleAdComplete();
+              }
+            }, 20000);
+          } else {
+            // No ads available, skip to main content
+            setPreRollComplete(true);
           }
-        }, 20000);
-      } else {
-        setPreRollComplete(true);
+        } else {
+          setPreRollComplete(true);
+        }
       }
-    }
+    };
+    
+    fetchAndShowPreRoll();
     
     return () => {
       if (adTimerRef.current) clearInterval(adTimerRef.current);
     };
-  }, [episode, loading, userTier, preRollComplete]);
+  }, [episode, loading, userTier, preRollComplete, user]);
 
   // ============ MID-ROLL AD LOGIC ============
   useEffect(() => {
