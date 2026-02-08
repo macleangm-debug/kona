@@ -563,8 +563,8 @@ async def get_daily_analytics(request, days: int = 30):
 # ============ BILLING ROUTES ============
 
 @router.post("/advertiser/billing/add-funds")
-async def add_funds(request):
-    """Add funds to advertiser account"""
+async def add_funds(request: Request):
+    """Add funds to advertiser account (PREPAY wallet)"""
     advertiser = await require_advertiser(request)
     body = await request.json()
     
