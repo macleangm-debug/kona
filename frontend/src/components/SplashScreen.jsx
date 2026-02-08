@@ -1,77 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-// Pre-splash screen - requires user interaction to enable sound
-export const PreSplash = ({ onEnter }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div 
-      className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center cursor-pointer"
-      onClick={onEnter}
-      data-testid="pre-splash"
-    >
-      {/* Ambient glow */}
-      <div 
-        className="absolute inset-0 transition-opacity duration-1000"
-        style={{
-          background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.1) 0%, transparent 50%)'
-        }}
-      />
-
-      {/* Logo */}
-      <div 
-        className={`relative transition-transform duration-500 ${isHovered ? 'scale-110' : 'scale-100'}`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <svg width="120" height="120" viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="preGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#8B5CF6" />
-              <stop offset="100%" stopColor="#A855F7" />
-            </linearGradient>
-          </defs>
-          <rect 
-            x="10" y="10" 
-            width="80" height="80" 
-            rx="16" 
-            fill="none" 
-            stroke="url(#preGrad)" 
-            strokeWidth="4"
-          />
-          <path d="M38 30 L38 70 L72 50 Z" fill="url(#preGrad)" />
-        </svg>
-      </div>
-
-      {/* Enter button */}
-      <button 
-        className={`mt-8 px-8 py-3 rounded-full font-semibold text-white transition-all duration-300 ${
-          isHovered 
-            ? 'bg-primary scale-105 shadow-lg shadow-primary/50' 
-            : 'bg-primary/80'
-        }`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        ▶ Enter Kona
-      </button>
-
-      <p className="mt-4 text-sm text-gray-500">Click anywhere to continue</p>
-      
-      {/* Sound icon hint */}
-      <div className="absolute bottom-8 flex items-center gap-2 text-xs text-gray-600">
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-        </svg>
-        <span>Best with sound</span>
-      </div>
-    </div>
-  );
-};
-
-// Main splash screen with Magic Chime sound
-export const SplashScreen = ({ onComplete, minDuration = 3500 }) => {
-  const [phase, setPhase] = useState('initial');
+// Cinematic Splash Screen - Premium Netflix/HBO style
+export const SplashScreen = ({ onComplete, minDuration = 4000 }) => {
+  const [phase, setPhase] = useState(0);
+  const canvasRef = useRef(null);
   const onCompleteRef = useRef(onComplete);
   const hasCompleted = useRef(false);
 
@@ -79,65 +11,145 @@ export const SplashScreen = ({ onComplete, minDuration = 3500 }) => {
     onCompleteRef.current = onComplete;
   }, [onComplete]);
 
-  // Magic Chime Sound
-  const playMagicChime = () => {
+  // Epic Cinematic Sound - Deep impact with magical shimmer
+  const playEpicSound = () => {
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const notes = [523, 659, 784, 1047, 1318]; // C5, E5, G5, C6, E6
       
-      notes.forEach((freq, i) => {
-        // Main tone
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
-        gain.gain.setValueAtTime(0, ctx.currentTime);
-        gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 1.5);
-        osc.start(ctx.currentTime + i * 0.1);
-        osc.stop(ctx.currentTime + i * 0.1 + 1.5);
+      // Deep cinematic boom
+      const boom = ctx.createOscillator();
+      const boomGain = ctx.createGain();
+      boom.connect(boomGain);
+      boomGain.connect(ctx.destination);
+      boom.type = 'sine';
+      boom.frequency.setValueAtTime(55, ctx.currentTime);
+      boom.frequency.exponentialRampToValueAtTime(30, ctx.currentTime + 0.8);
+      boomGain.gain.setValueAtTime(0.7, ctx.currentTime);
+      boomGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+      boom.start(ctx.currentTime);
+      boom.stop(ctx.currentTime + 1.5);
 
-        // Shimmer harmonic
-        const shimmer = ctx.createOscillator();
-        const shimmerGain = ctx.createGain();
-        shimmer.connect(shimmerGain);
-        shimmerGain.connect(ctx.destination);
-        shimmer.type = 'sine';
-        shimmer.frequency.setValueAtTime(freq * 2, ctx.currentTime + i * 0.1);
-        shimmerGain.gain.setValueAtTime(0, ctx.currentTime);
-        shimmerGain.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.1);
-        shimmerGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.8);
-        shimmer.start(ctx.currentTime + i * 0.1);
-        shimmer.stop(ctx.currentTime + i * 0.1 + 0.8);
+      // Sub bass rumble
+      const sub = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      sub.connect(subGain);
+      subGain.connect(ctx.destination);
+      sub.type = 'sine';
+      sub.frequency.setValueAtTime(35, ctx.currentTime);
+      subGain.gain.setValueAtTime(0.5, ctx.currentTime);
+      subGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 2);
+      sub.start(ctx.currentTime);
+      sub.stop(ctx.currentTime + 2);
+
+      // Magical shimmer chimes (delayed)
+      setTimeout(() => {
+        const notes = [523, 784, 1047, 1318, 1568];
+        notes.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.06);
+          gain.gain.setValueAtTime(0, ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.06 + 1.2);
+          osc.start(ctx.currentTime + i * 0.06);
+          osc.stop(ctx.currentTime + i * 0.06 + 1.2);
+        });
+      }, 400);
+
+      // Ethereal pad
+      [130, 196, 261].forEach((freq, i) => {
+        const pad = ctx.createOscillator();
+        const padGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        pad.connect(filter);
+        filter.connect(padGain);
+        padGain.connect(ctx.destination);
+        pad.type = 'sine';
+        pad.frequency.setValueAtTime(freq, ctx.currentTime + 0.3);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, ctx.currentTime);
+        padGain.gain.setValueAtTime(0, ctx.currentTime);
+        padGain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.5);
+        padGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 3);
+        pad.start(ctx.currentTime + 0.3);
+        pad.stop(ctx.currentTime + 3);
       });
 
-      // Subtle bass foundation
-      const bass = ctx.createOscillator();
-      const bassGain = ctx.createGain();
-      bass.connect(bassGain);
-      bassGain.connect(ctx.destination);
-      bass.type = 'sine';
-      bass.frequency.setValueAtTime(130, ctx.currentTime + 0.2);
-      bassGain.gain.setValueAtTime(0.2, ctx.currentTime + 0.2);
-      bassGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 2);
-      bass.start(ctx.currentTime + 0.2);
-      bass.stop(ctx.currentTime + 2);
-
     } catch (e) {
-      console.log('Audio playback failed:', e);
+      console.log('Audio error:', e);
     }
   };
 
+  // Particle animation on canvas
   useEffect(() => {
-    // Timeline with Magic Chime at logo reveal
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles = [];
+    const particleCount = 100;
+
+    // Create particles
+    for (let i = 0; i < particleCount; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 0.5,
+        speedX: (Math.random() - 0.5) * 0.5,
+        speedY: (Math.random() - 0.5) * 0.5,
+        opacity: Math.random() * 0.5 + 0.2,
+        pulse: Math.random() * Math.PI * 2
+      });
+    }
+
+    let animationId;
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        p.pulse += 0.02;
+        
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+
+        const currentOpacity = p.opacity * (0.5 + 0.5 * Math.sin(p.pulse));
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(139, 92, 246, ${currentOpacity})`;
+        ctx.fill();
+      });
+
+      animationId = requestAnimationFrame(animate);
+    };
+
+    if (phase >= 1) {
+      animate();
+    }
+
+    return () => {
+      if (animationId) cancelAnimationFrame(animationId);
+    };
+  }, [phase]);
+
+  // Animation timeline
+  useEffect(() => {
     const timeline = [
-      { delay: 300, action: () => setPhase('logo-appear') },
-      { delay: 600, action: () => playMagicChime() }, // Play Magic Chime
-      { delay: 900, action: () => setPhase('text-appear') },
-      { delay: 1500, action: () => setPhase('glow') },
-      { delay: 2800, action: () => setPhase('fade-out') },
+      { delay: 100, action: () => setPhase(1) },      // Start particles
+      { delay: 500, action: () => { setPhase(2); playEpicSound(); } },  // Logo zoom + sound
+      { delay: 1200, action: () => setPhase(3) },     // Logo settle + glow
+      { delay: 1800, action: () => setPhase(4) },     // Text reveal
+      { delay: 2500, action: () => setPhase(5) },     // Tagline
+      { delay: 3300, action: () => setPhase(6) },     // Fade out
       { delay: minDuration, action: () => {
         if (!hasCompleted.current && onCompleteRef.current) {
           hasCompleted.current = true;
@@ -146,299 +158,349 @@ export const SplashScreen = ({ onComplete, minDuration = 3500 }) => {
       }}
     ];
 
-    const timers = timeline.map(({ delay, action }) => 
-      setTimeout(action, delay)
-    );
-
+    const timers = timeline.map(({ delay, action }) => setTimeout(action, delay));
     return () => timers.forEach(clearTimeout);
   }, [minDuration]);
 
   return (
     <div 
-      className={`fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-700 ${
-        phase === 'fade-out' ? 'opacity-0 pointer-events-none' : 'opacity-100'
+      className={`fixed inset-0 z-[9999] bg-[#030014] overflow-hidden transition-opacity duration-1000 ${
+        phase >= 6 ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
-      data-testid="splash-screen"
     >
-      {/* Background ambient glow */}
+      {/* Particle canvas */}
+      <canvas 
+        ref={canvasRef} 
+        className={`absolute inset-0 transition-opacity duration-1000 ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}
+      />
+
+      {/* Radial gradient backdrop */}
       <div 
-        className={`absolute inset-0 transition-opacity duration-1000 ${
-          phase === 'glow' ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`absolute inset-0 transition-all duration-1000 ${phase >= 2 ? 'opacity-100' : 'opacity-0'}`}
         style={{
-          background: 'radial-gradient(circle at center, rgba(139, 92, 246, 0.2) 0%, transparent 60%)'
+          background: `
+            radial-gradient(ellipse 80% 50% at 50% 50%, rgba(139, 92, 246, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse 60% 40% at 50% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 40%)
+          `
         }}
       />
 
-      {/* Sparkle particles during glow */}
-      {(phase === 'glow' || phase === 'fade-out') && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-purple-300 rounded-full animate-ping"
-              style={{
-                top: `${20 + Math.random() * 60}%`,
-                left: `${20 + Math.random() * 60}%`,
-                animationDuration: `${1 + Math.random()}s`,
-                animationDelay: `${Math.random() * 0.5}s`,
-                opacity: 0.6
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {/* Light rays */}
+      <div 
+        className={`absolute inset-0 transition-opacity duration-700 ${phase >= 3 ? 'opacity-100' : 'opacity-0'}`}
+        style={{
+          background: `
+            conic-gradient(from 0deg at 50% 50%, 
+              transparent 0deg, 
+              rgba(139, 92, 246, 0.03) 10deg, 
+              transparent 20deg,
+              transparent 40deg,
+              rgba(139, 92, 246, 0.03) 50deg,
+              transparent 60deg,
+              transparent 80deg,
+              rgba(139, 92, 246, 0.03) 90deg,
+              transparent 100deg,
+              transparent 120deg,
+              rgba(139, 92, 246, 0.03) 130deg,
+              transparent 140deg,
+              transparent 160deg,
+              rgba(139, 92, 246, 0.03) 170deg,
+              transparent 180deg,
+              transparent 200deg,
+              rgba(139, 92, 246, 0.03) 210deg,
+              transparent 220deg,
+              transparent 240deg,
+              rgba(139, 92, 246, 0.03) 250deg,
+              transparent 260deg,
+              transparent 280deg,
+              rgba(139, 92, 246, 0.03) 290deg,
+              transparent 300deg,
+              transparent 320deg,
+              rgba(139, 92, 246, 0.03) 330deg,
+              transparent 340deg,
+              transparent 360deg
+            )
+          `,
+          animation: phase >= 3 ? 'slowRotate 20s linear infinite' : 'none'
+        }}
+      />
 
-      {/* Logo Container */}
-      <div className="relative flex flex-col items-center">
-        {/* Main Logo SVG */}
-        <div 
-          className={`relative transition-all duration-700 ease-out ${
-            phase === 'initial' 
-              ? 'scale-50 opacity-0' 
-              : phase === 'logo-appear'
-              ? 'scale-110 opacity-100'
-              : 'scale-100 opacity-100'
-          }`}
-        >
-          <svg 
-            width="160" 
-            height="160" 
-            viewBox="0 0 100 100" 
-            className="relative z-10"
-          >
-            <defs>
-              <linearGradient id="splashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#8B5CF6">
-                  <animate 
-                    attributeName="stop-color" 
-                    values="#8B5CF6;#A855F7;#8B5CF6" 
-                    dur="2s" 
-                    repeatCount="indefinite" 
-                  />
-                </stop>
-                <stop offset="100%" stopColor="#A855F7">
-                  <animate 
-                    attributeName="stop-color" 
-                    values="#A855F7;#EC4899;#A855F7" 
-                    dur="2s" 
-                    repeatCount="indefinite" 
-                  />
-                </stop>
-              </linearGradient>
-              
-              <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
-                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-
-              <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="0" stdDeviation="8" floodColor="#8B5CF6" floodOpacity="0.8"/>
-              </filter>
-            </defs>
-            
-            {/* Outer ring with draw animation */}
-            <rect 
-              x="10" y="10" 
-              width="80" height="80" 
-              rx="16" 
-              fill="none" 
-              stroke="url(#splashGrad)" 
-              strokeWidth="4"
-              filter={phase === 'glow' ? "url(#glow)" : "none"}
-              strokeDasharray="320"
-              style={{
-                strokeDashoffset: phase === 'initial' ? 320 : 0,
-                transition: 'stroke-dashoffset 0.6s ease-out'
-              }}
-            />
-            
-            {/* Play triangle */}
-            <path 
-              d="M38 30 L38 70 L72 50 Z" 
-              fill="url(#splashGrad)"
-              filter={phase === 'glow' ? "url(#shadow)" : "none"}
-              style={{
-                transformOrigin: '50px 50px',
-                transform: (phase === 'text-appear' || phase === 'glow' || phase === 'fade-out') 
-                  ? 'scale(1)' 
-                  : 'scale(0)',
-                opacity: (phase === 'text-appear' || phase === 'glow' || phase === 'fade-out') ? 1 : 0,
-                transition: 'transform 0.4s ease-out, opacity 0.4s ease-out'
-              }}
-            />
-          </svg>
-
-          {/* Pulse rings */}
-          {(phase === 'glow' || phase === 'fade-out') && (
-            <>
-              <div 
-                className="absolute inset-0 rounded-2xl animate-ping opacity-30"
-                style={{ border: '2px solid rgba(139, 92, 246, 0.5)', animationDuration: '1.5s' }}
-              />
-            </>
-          )}
-        </div>
-
-        {/* KONA Text */}
-        <div 
-          className={`mt-6 overflow-hidden transition-all duration-700 ${
-            phase === 'text-appear' || phase === 'glow' || phase === 'fade-out'
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-6'
-          }`}
-        >
-          <div className="flex items-center justify-center">
-            {['K', 'O', 'N', 'A'].map((letter, index) => (
-              <span 
-                key={letter}
-                className="text-5xl font-black tracking-wider inline-block"
-                style={{
-                  background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 50%, #EC4899 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  textShadow: phase === 'glow' ? '0 0 40px rgba(139, 92, 246, 0.6)' : 'none',
-                  transform: (phase === 'text-appear' || phase === 'glow' || phase === 'fade-out')
-                    ? 'translateY(0) scale(1)' 
-                    : 'translateY(20px) scale(0.8)',
-                  opacity: (phase === 'text-appear' || phase === 'glow' || phase === 'fade-out') ? 1 : 0,
-                  transition: `transform 0.5s ease-out ${index * 0.08}s, opacity 0.5s ease-out ${index * 0.08}s`
-                }}
-              >
-                {letter}
-              </span>
-            ))}
-          </div>
+      {/* Main content */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative flex flex-col items-center">
           
+          {/* Logo container with zoom effect */}
+          <div 
+            className="relative transition-all ease-out"
+            style={{
+              transform: phase < 2 ? 'scale(3) translateY(0)' 
+                : phase === 2 ? 'scale(1.1) translateY(0)' 
+                : 'scale(1) translateY(0)',
+              opacity: phase < 2 ? 0 : 1,
+              transitionDuration: phase === 2 ? '800ms' : '500ms',
+              filter: phase >= 3 ? 'drop-shadow(0 0 60px rgba(139, 92, 246, 0.8))' : 'none'
+            }}
+          >
+            {/* Outer glow ring */}
+            <div 
+              className={`absolute -inset-8 rounded-3xl transition-opacity duration-1000 ${phase >= 3 ? 'opacity-100' : 'opacity-0'}`}
+              style={{
+                background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 70%)',
+                animation: phase >= 3 ? 'pulse 2s ease-in-out infinite' : 'none'
+              }}
+            />
+
+            {/* Main logo */}
+            <svg 
+              width="200" 
+              height="200" 
+              viewBox="0 0 100 100"
+              className="relative z-10"
+            >
+              <defs>
+                <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#8B5CF6" />
+                  <stop offset="50%" stopColor="#A855F7" />
+                  <stop offset="100%" stopColor="#C084FC" />
+                </linearGradient>
+                <filter id="logoGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              
+              {/* Rounded square border */}
+              <rect 
+                x="8" y="8" 
+                width="84" height="84" 
+                rx="18" 
+                fill="none" 
+                stroke="url(#logoGrad)" 
+                strokeWidth="5"
+                filter={phase >= 3 ? "url(#logoGlow)" : "none"}
+                style={{
+                  strokeDasharray: 340,
+                  strokeDashoffset: phase >= 2 ? 0 : 340,
+                  transition: 'stroke-dashoffset 0.8s ease-out'
+                }}
+              />
+              
+              {/* Play triangle */}
+              <path 
+                d="M40 28 L40 72 L76 50 Z" 
+                fill="url(#logoGrad)"
+                filter={phase >= 3 ? "url(#logoGlow)" : "none"}
+                style={{
+                  opacity: phase >= 3 ? 1 : 0,
+                  transform: phase >= 3 ? 'scale(1)' : 'scale(0.5)',
+                  transformOrigin: '50px 50px',
+                  transition: 'all 0.5s ease-out 0.3s'
+                }}
+              />
+            </svg>
+          </div>
+
+          {/* KONA text with dramatic reveal */}
+          <div 
+            className="mt-8 overflow-hidden"
+            style={{
+              opacity: phase >= 4 ? 1 : 0,
+              transform: phase >= 4 ? 'translateY(0)' : 'translateY(30px)',
+              transition: 'all 0.8s ease-out'
+            }}
+          >
+            <h1 
+              className="text-7xl font-black tracking-[0.2em] relative"
+              style={{
+                background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 30%, #C084FC 60%, #E879F9 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: phase >= 4 ? 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.5))' : 'none'
+              }}
+            >
+              KONA
+            </h1>
+            
+            {/* Underline accent */}
+            <div 
+              className="h-1 mx-auto mt-2 rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, transparent, #8B5CF6, #A855F7, #8B5CF6, transparent)',
+                width: phase >= 4 ? '100%' : '0%',
+                transition: 'width 0.6s ease-out 0.3s'
+              }}
+            />
+          </div>
+
           {/* Tagline */}
           <p 
-            className={`text-center text-sm text-gray-500 mt-3 transition-all duration-700 ${
-              phase === 'glow' || phase === 'fade-out'
-                ? 'opacity-100 translate-y-0'
-                : 'opacity-0 translate-y-4'
-            }`}
-            style={{ transitionDelay: '400ms' }}
+            className="mt-6 text-lg tracking-[0.3em] uppercase"
+            style={{
+              color: 'rgba(168, 85, 247, 0.8)',
+              opacity: phase >= 5 ? 1 : 0,
+              transform: phase >= 5 ? 'translateY(0)' : 'translateY(20px)',
+              transition: 'all 0.6s ease-out',
+              textShadow: '0 0 20px rgba(139, 92, 246, 0.3)'
+            }}
           >
             African Stories, Your Way
           </p>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-40">
-        <div className="h-1 bg-gray-800/50 rounded-full overflow-hidden">
-          <div 
-            className="h-full rounded-full"
-            style={{ 
-              width: phase === 'initial' ? '0%' 
-                : phase === 'logo-appear' ? '20%' 
-                : phase === 'text-appear' ? '50%' 
-                : phase === 'glow' ? '80%' 
-                : '100%',
-              background: 'linear-gradient(90deg, #8B5CF6, #A855F7, #EC4899)',
-              transition: 'width 0.6s ease-out',
-              boxShadow: '0 0 10px rgba(139, 92, 246, 0.5)'
-            }}
-          />
-        </div>
-      </div>
+      {/* Bottom vignette */}
+      <div 
+        className="absolute inset-x-0 bottom-0 h-40 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to top, rgba(3, 0, 20, 0.8) 0%, transparent 100%)'
+        }}
+      />
+
+      {/* Cinematic bars (optional letterbox effect) */}
+      <div className="absolute inset-x-0 top-0 h-12 bg-black" />
+      <div className="absolute inset-x-0 bottom-0 h-12 bg-black" />
+
+      {/* Keyframe animations */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); opacity: 0.5; }
+          50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        @keyframes slowRotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 };
 
-// Combined splash with pre-splash for sound
-export const SplashWithSound = ({ onComplete, minDuration = 3500 }) => {
-  const [showPreSplash, setShowPreSplash] = useState(true);
-  const [showSplash, setShowSplash] = useState(false);
+// Pre-splash for user interaction (enables sound)
+export const PreSplash = ({ onEnter }) => {
+  const [isReady, setIsReady] = useState(false);
 
-  const handleEnter = () => {
-    setShowPreSplash(false);
-    setShowSplash(true);
-  };
+  useEffect(() => {
+    // Small delay for dramatic effect
+    setTimeout(() => setIsReady(true), 300);
+  }, []);
 
-  const handleSplashComplete = () => {
-    setShowSplash(false);
+  return (
+    <div 
+      className="fixed inset-0 z-[9999] bg-[#030014] flex items-center justify-center cursor-pointer overflow-hidden"
+      onClick={onEnter}
+    >
+      {/* Subtle animated background */}
+      <div 
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse 100% 100% at 50% 100%, rgba(139, 92, 246, 0.08) 0%, transparent 50%)
+          `
+        }}
+      />
+
+      {/* Content */}
+      <div 
+        className={`flex flex-col items-center transition-all duration-1000 ${
+          isReady ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`}
+      >
+        {/* Mini logo */}
+        <svg width="80" height="80" viewBox="0 0 100 100" className="mb-8">
+          <defs>
+            <linearGradient id="miniGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#A855F7" />
+            </linearGradient>
+          </defs>
+          <rect x="10" y="10" width="80" height="80" rx="16" fill="none" stroke="url(#miniGrad)" strokeWidth="4" />
+          <path d="M38 30 L38 70 L72 50 Z" fill="url(#miniGrad)" />
+        </svg>
+
+        {/* Play button */}
+        <button 
+          className="group relative px-10 py-4 rounded-full font-semibold text-white overflow-hidden transition-all duration-300 hover:scale-105"
+          style={{
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(168, 85, 247, 0.3) 100%)',
+            border: '1px solid rgba(139, 92, 246, 0.5)',
+            boxShadow: '0 0 30px rgba(139, 92, 246, 0.2)'
+          }}
+        >
+          <span className="relative z-10 flex items-center gap-3">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Enter Experience
+          </span>
+          <div 
+            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            style={{
+              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.5) 0%, rgba(168, 85, 247, 0.5) 100%)'
+            }}
+          />
+        </button>
+
+        {/* Hint */}
+        <p className="mt-6 text-sm text-gray-600 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+          </svg>
+          Sound recommended
+        </p>
+      </div>
+
+      {/* Animated corner accents */}
+      <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-purple-500/20 rounded-tl-lg" />
+      <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-purple-500/20 rounded-tr-lg" />
+      <div className="absolute bottom-8 left-8 w-16 h-16 border-l-2 border-b-2 border-purple-500/20 rounded-bl-lg" />
+      <div className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 border-purple-500/20 rounded-br-lg" />
+    </div>
+  );
+};
+
+// Combined component
+export const SplashWithSound = ({ onComplete, minDuration = 4000 }) => {
+  const [stage, setStage] = useState('pre'); // 'pre' | 'splash' | 'done'
+
+  const handleEnter = () => setStage('splash');
+  const handleComplete = () => {
+    setStage('done');
     onComplete?.();
   };
 
-  if (showPreSplash) {
-    return <PreSplash onEnter={handleEnter} />;
-  }
-
-  if (showSplash) {
-    return <SplashScreen onComplete={handleSplashComplete} minDuration={minDuration} />;
-  }
-
+  if (stage === 'pre') return <PreSplash onEnter={handleEnter} />;
+  if (stage === 'splash') return <SplashScreen onComplete={handleComplete} minDuration={minDuration} />;
   return null;
 };
 
-// Mini loading spinner
-export const KonaLoader = ({ size = 40, className = "", showText = false }) => (
-  <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
+// Loader components
+export const KonaLoader = ({ size = 40, className = "" }) => (
+  <div className={`flex items-center justify-center ${className}`}>
     <div className="relative" style={{ width: size, height: size }}>
-      <svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 100 100"
-        className="absolute inset-0"
-      >
+      <svg width={size} height={size} viewBox="0 0 100 100" className="animate-spin" style={{ animationDuration: '1.5s' }}>
         <defs>
-          <linearGradient id="loaderGradRing" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id="spinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#8B5CF6" />
             <stop offset="100%" stopColor="#A855F7" />
           </linearGradient>
         </defs>
-        <rect 
-          x="10" y="10" 
-          width="80" height="80" 
-          rx="16" 
-          fill="none" 
-          stroke="url(#loaderGradRing)" 
-          strokeWidth="4"
-          strokeDasharray="240"
-          strokeDashoffset="60"
-          style={{ 
-            transformOrigin: 'center',
-            animation: 'spin 1.5s linear infinite'
-          }}
-        />
+        <rect x="10" y="10" width="80" height="80" rx="16" fill="none" stroke="url(#spinGrad)" strokeWidth="4" strokeDasharray="240" strokeDashoffset="60" />
       </svg>
-      
-      <svg 
-        width={size} 
-        height={size} 
-        viewBox="0 0 100 100"
-        className="absolute inset-0 animate-pulse"
-      >
-        <defs>
-          <linearGradient id="loaderGradPlay" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#8B5CF6" />
-            <stop offset="100%" stopColor="#A855F7" />
-          </linearGradient>
-        </defs>
-        <path d="M38 30 L38 70 L72 50 Z" fill="url(#loaderGradPlay)" />
+      <svg width={size} height={size} viewBox="0 0 100 100" className="absolute inset-0 animate-pulse">
+        <path d="M38 30 L38 70 L72 50 Z" fill="#8B5CF6" />
       </svg>
     </div>
-    {showText && (
-      <span className="text-xs text-gray-400 animate-pulse">Loading...</span>
-    )}
-    <style>{`
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(360deg); }
-      }
-    `}</style>
   </div>
 );
 
 export const PageLoader = ({ message = "Loading..." }) => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-background">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-[#030014]">
     <KonaLoader size={60} />
-    <p className="mt-4 text-sm text-gray-400 animate-pulse">{message}</p>
+    <p className="mt-4 text-sm text-gray-500 animate-pulse">{message}</p>
   </div>
 );
 
