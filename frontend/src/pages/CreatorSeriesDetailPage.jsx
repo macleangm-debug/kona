@@ -58,6 +58,81 @@ export const CreatorSeriesDetailPage = () => {
   const [episodeSubtitles, setEpisodeSubtitles] = useState({});
   const [selectedSubtitleLanguage, setSelectedSubtitleLanguage] = useState("en");
   const subtitleFileInputRef = useRef(null);
+  
+  // Video validation state
+  const [videoValidation, setVideoValidation] = useState({
+    isValidating: false,
+    isVertical: null,
+    dimensions: null,
+    error: null
+  });
+  const videoValidationRef = useRef(null);
+
+  // Validate video dimensions before upload
+  const validateVideoDimensions = (file, isEpisode1 = false) => {
+    return new Promise((resolve) => {
+      setVideoValidation({ isValidating: true, isVertical: null, dimensions: null, error: null });
+      
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      
+      video.onloadedmetadata = () => {
+        window.URL.revokeObjectURL(video.src);
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+        const aspectRatio = width / height;
+        const isVertical = aspectRatio < 1; // Height > Width = vertical
+        
+        const validation = {
+          isValidating: false,
+          isVertical,
+          dimensions: { width, height, aspectRatio: aspectRatio.toFixed(2) },
+          error: null
+        };
+        
+        // If Episode 1 and not vertical, show warning
+        if (isEpisode1 && !isVertical) {
+          validation.error = `This video is horizontal (${width}x${height}). Episode 1 should be vertical (9:16) for the Stories feed. Vertical videos get 3x more engagement!`;
+        }
+        
+        setVideoValidation(validation);
+        resolve(validation);
+      };
+      
+      video.onerror = () => {
+        setVideoValidation({
+          isValidating: false,
+          isVertical: null,
+          dimensions: null,
+          error: 'Could not read video dimensions'
+        });
+        resolve({ isVertical: null, error: 'Could not read video' });
+      };
+      
+      video.src = URL.createObjectURL(file);
+    });
+  };
+
+  // Handle video file selection with validation
+  const handleVideoFileSelect = async (e, isEpisode1 = false) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate dimensions
+    const validation = await validateVideoDimensions(file, isEpisode1);
+    
+    // If Episode 1 and horizontal, show warning but allow continue
+    if (isEpisode1 && validation.isVertical === false) {
+      toast.warning(
+        'Horizontal video detected! Episode 1 appears in the Stories feed and works best with vertical (9:16) format.',
+        { duration: 6000 }
+      );
+    } else if (validation.isVertical === true) {
+      toast.success('Perfect! Vertical video detected - ideal for Stories feed!');
+    }
+    
+    return file;
+  };
 
   const fetchSeriesDetail = async () => {
     if (!token || !seriesId) return;
