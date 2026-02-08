@@ -100,12 +100,6 @@ def get_advertiser_token(advertiser_id: str, company_name: str):
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
 
-async def get_current_advertiser(token: str = Depends(lambda: None)):
-    """Dependency to get current advertiser from token"""
-    from fastapi import Request
-    from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-    security = HTTPBearer()
-    
 async def require_advertiser(request):
     """Extract and verify advertiser from request"""
     auth_header = request.headers.get("Authorization", "")
