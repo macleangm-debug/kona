@@ -641,6 +641,118 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   }, [autoQuality, videoQuality]);
 
+  // ============ ADAPTIVE VIDEO PLAYER - Aspect Ratio Detection ============
+  const handleVideoMetadataLoaded = useCallback((e) => {
+    const video = e.target;
+    const { videoWidth, videoHeight } = video;
+    
+    if (videoWidth && videoHeight) {
+      const aspectRatio = videoWidth / videoHeight;
+      setVideoAspectRatio(aspectRatio);
+      
+      // Video is vertical if height > width (aspect ratio < 1)
+      // Standard vertical: 9:16 = 0.5625
+      // Square: 1:1 = 1.0
+      // Standard horizontal: 16:9 = 1.78
+      setIsVerticalVideo(aspectRatio < 1);
+      
+      console.log(`Video detected: ${videoWidth}x${videoHeight}, Aspect: ${aspectRatio.toFixed(2)}, Vertical: ${aspectRatio < 1}`);
+    }
+  }, []);
+
+  // ============ SCREEN ORIENTATION DETECTION ============
+  useEffect(() => {
+    const updateOrientation = () => {
+      if (window.screen?.orientation?.type) {
+        const type = window.screen.orientation.type;
+        setScreenOrientation(type.includes('portrait') ? 'portrait' : 'landscape');
+      } else if (window.innerWidth > window.innerHeight) {
+        setScreenOrientation('landscape');
+      } else {
+        setScreenOrientation('portrait');
+      }
+    };
+
+    updateOrientation();
+    window.addEventListener('resize', updateOrientation);
+    window.addEventListener('orientationchange', updateOrientation);
+    
+    if (window.screen?.orientation) {
+      window.screen.orientation.addEventListener('change', updateOrientation);
+    }
+
+    return () => {
+      window.removeEventListener('resize', updateOrientation);
+      window.removeEventListener('orientationchange', updateOrientation);
+      if (window.screen?.orientation) {
+        window.screen.orientation.removeEventListener('change', updateOrientation);
+      }
+    };
+  }, []);
+
+  // ============ FULLSCREEN TOGGLE ============
+  const toggleFullscreen = useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        const playerContainer = document.getElementById('video-player-container');
+        if (playerContainer?.requestFullscreen) {
+          await playerContainer.requestFullscreen();
+          setIsFullscreen(true);
+          // Try to lock to landscape for horizontal videos
+          if (!isVerticalVideo && window.screen?.orientation?.lock) {
+            try {
+              await window.screen.orientation.lock('landscape');
+            } catch (e) {
+              // Orientation lock not supported or failed
+            }
+          }
+        }
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+        // Unlock orientation
+        if (window.screen?.orientation?.unlock) {
+          window.screen.orientation.unlock();
+        }
+      }
+    } catch (err) {
+      console.error('Fullscreen error:', err);
+    }
+  }, [isVerticalVideo]);
+
+  // Listen for fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // Determine video display style based on aspect ratio and orientation
+  const getVideoDisplayStyle = useCallback(() => {
+    // Vertical video (9:16, etc.)
+    if (isVerticalVideo) {
+      if (screenOrientation === 'portrait') {
+        // Vertical video on portrait phone = fill screen (object-cover)
+        return 'object-cover';
+      } else {
+        // Vertical video on landscape = fit with black bars on sides
+        return 'object-contain';
+      }
+    }
+    
+    // Horizontal video (16:9, etc.)
+    if (screenOrientation === 'landscape' || isFullscreen) {
+      // Horizontal video on landscape = fill screen
+      return 'object-contain';
+    } else {
+      // Horizontal video on portrait phone = fit with bars on top/bottom
+      return 'object-contain';
+    }
+  }, [isVerticalVideo, screenOrientation, isFullscreen]);
+
   // Handle buffering events for adaptive quality
   const handleWaiting = useCallback(() => {
     setBufferingCount(prev => {
