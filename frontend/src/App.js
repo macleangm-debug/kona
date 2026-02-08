@@ -51,7 +51,10 @@ import {
   TermsPage,
   PrivacyPage,
   AdvertisersPage,
-  CreatorsLandingPage
+  CreatorsLandingPage,
+  BusinessAuthPage,
+  BusinessDashboard,
+  CampaignCreatePage
 } from "@/pages";
 
 // Swiper CSS
