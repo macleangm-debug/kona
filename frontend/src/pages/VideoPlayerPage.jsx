@@ -1159,9 +1159,21 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       id="video-player-container"
       className="fixed inset-0 bg-black z-[9999]" 
       data-testid="video-player-page"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      onTouchStart={(e) => {
+        handleTouchStart(e); // Vertical swipe for mini-player
+        handleHorizontalSwipeStart(e); // Horizontal swipe for episode navigation
+      }}
+      onTouchMove={(e) => {
+        handleTouchMove(e);
+        handleHorizontalSwipeMove(e);
+      }}
+      onTouchEnd={(e) => {
+        handleTouchEnd(e);
+        handleHorizontalSwipeEnd(e);
+      }}
+      onMouseDown={handleHorizontalSwipeStart}
+      onMouseMove={handleHorizontalSwipeMove}
+      onMouseUp={handleHorizontalSwipeEnd}
       style={{
         transform: swipeDistance > 0 ? `translateY(${Math.min(swipeDistance, 150)}px) scale(${1 - swipeDistance / 1000})` : 'none',
         opacity: swipeDistance > 0 ? 1 - swipeDistance / 300 : 1,
@@ -1173,6 +1185,50 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center animate-pulse">
           <ChevronDown className="w-6 h-6 text-white" />
           <span className="text-white/70 text-xs">Release to minimize</span>
+        </div>
+      )}
+
+      {/* Double-tap feedback overlay */}
+      {showDoubleTapFeedback && (
+        <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center">
+          {doubleTapSide === 'center' && (
+            <div className="animate-ping">
+              <Heart className="w-20 h-20 text-red-500 fill-red-500" />
+            </div>
+          )}
+          {doubleTapSide === 'left' && (
+            <div className="absolute left-8 flex items-center gap-2 bg-black/50 rounded-full px-4 py-2 animate-pulse">
+              <ChevronLeft className="w-6 h-6 text-white" />
+              <span className="text-white font-bold">10s</span>
+            </div>
+          )}
+          {doubleTapSide === 'right' && (
+            <div className="absolute right-8 flex items-center gap-2 bg-black/50 rounded-full px-4 py-2 animate-pulse">
+              <span className="text-white font-bold">10s</span>
+              <ChevronLeft className="w-6 h-6 text-white rotate-180" />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Horizontal swipe feedback */}
+      {swipeDirection && (
+        <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
+          <div className={`flex items-center gap-2 bg-black/70 rounded-full px-6 py-3 ${
+            swipeDirection === 'left' ? 'animate-slide-left' : 'animate-slide-right'
+          }`}>
+            {swipeDirection === 'right' ? (
+              <>
+                <ChevronLeft className="w-6 h-6 text-white" />
+                <span className="text-white font-medium">Previous Episode</span>
+              </>
+            ) : (
+              <>
+                <span className="text-white font-medium">Next Episode</span>
+                <ChevronLeft className="w-6 h-6 text-white rotate-180" />
+              </>
+            )}
+          </div>
         </div>
       )}
       
