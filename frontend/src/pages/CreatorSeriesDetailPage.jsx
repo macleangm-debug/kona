@@ -475,6 +475,11 @@ export const CreatorSeriesDetailPage = () => {
                         {ep.is_free && (
                           <Badge className="text-[10px] bg-green-500/20 text-green-400">FREE</Badge>
                         )}
+                        {ep.episode_number === 1 && (
+                          <Badge className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/30">
+                            📱 STORIES
+                          </Badge>
+                        )}
                         {ep.subtitles && Object.keys(ep.subtitles).length > 0 && (
                           <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
                             CC ({Object.keys(ep.subtitles).length})
@@ -482,6 +487,11 @@ export const CreatorSeriesDetailPage = () => {
                         )}
                       </div>
                       <h4 className="font-medium text-sm lg:text-base line-clamp-1 mb-1">{ep.title}</h4>
+                      {ep.episode_number === 1 && (
+                        <p className="text-[10px] text-purple-400 mb-1">
+                          Vertical format (9:16) recommended for Stories feed
+                        </p>
+                      )}
                       <div className="flex gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <Eye className="w-3 h-3" /> {ep.views || 0}
