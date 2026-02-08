@@ -676,7 +676,8 @@ async def reject_ad(ad_id: str, user: dict = Depends(get_current_user)):
 @router.post("/admin/advertiser/campaigns/{campaign_id}/approve")
 async def approve_campaign(campaign_id: str, user: dict = Depends(get_current_user)):
     """Approve a campaign (Admin only)"""
-    if user.get("role") not in ["admin", "super_admin"]:
+    is_admin = user.get("role") in ["admin", "super_admin"] or user.get("is_super_admin") or user.get("is_admin")
+    if not is_admin:
         raise HTTPException(status_code=403, detail="Admin access required")
     
     result = await db.campaigns.update_one(
