@@ -899,3 +899,68 @@ async def clear_all_seeds(user: dict = Depends(require_super_admin)):
     )
     
     return {"message": "All seeded data cleared"}
+
+
+# ============ VERTICAL VIDEO SAMPLES ============
+# Free vertical video samples from public CDNs for testing adaptive player
+VERTICAL_VIDEO_SAMPLES = [
+    # Pexels vertical videos (9:16 aspect ratio)
+    "https://videos.pexels.com/video-files/4812203/4812203-hd_1080_1920_24fps.mp4",  # City night
+    "https://videos.pexels.com/video-files/3571264/3571264-hd_1080_1920_30fps.mp4",  # Woman portrait
+    "https://videos.pexels.com/video-files/5377684/5377684-hd_1080_1920_25fps.mp4",  # Nature sunset
+    "https://videos.pexels.com/video-files/4434242/4434242-hd_1080_1920_24fps.mp4",  # Abstract art
+    "https://videos.pexels.com/video-files/4253015/4253015-hd_1080_1920_25fps.mp4",  # Woman fashion
+]
+
+@router.post("/seed/vertical-videos")
+async def seed_vertical_video_samples(user: dict = Depends(require_admin)):
+    """Update some episodes with vertical video URLs for testing adaptive player"""
+    import random
+    
+    # Get some episodes to update
+    episodes = await db.episodes.find({}).to_list(100)
+    
+    if not episodes:
+        raise HTTPException(status_code=404, detail="No episodes found to update")
+    
+    # Update every 3rd episode with a vertical video (to mix vertical and horizontal)
+    updated_count = 0
+    for i, ep in enumerate(episodes):
+        if i % 3 == 0:  # Every 3rd episode
+            video_url = random.choice(VERTICAL_VIDEO_SAMPLES)
+            await db.episodes.update_one(
+                {"id": ep["id"]},
+                {"$set": {
+                    "video_url": video_url,
+                    "is_vertical": True,
+                    "aspect_ratio": "9:16"
+                }}
+            )
+            updated_count += 1
+    
+    return {
+        "message": f"Updated {updated_count} episodes with vertical video samples",
+        "total_episodes": len(episodes),
+        "vertical_episodes": updated_count,
+        "sample_videos_used": len(VERTICAL_VIDEO_SAMPLES)
+    }
+
+
+@router.delete("/seed/vertical-videos")
+async def remove_vertical_video_samples(user: dict = Depends(require_admin)):
+    """Revert all episodes back to horizontal sample video"""
+    horizontal_video = "https://storage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    
+    result = await db.episodes.update_many(
+        {"is_vertical": True},
+        {"$set": {
+            "video_url": horizontal_video,
+            "is_vertical": False
+        }, "$unset": {"aspect_ratio": ""}}
+    )
+    
+    return {
+        "message": f"Reverted {result.modified_count} episodes back to horizontal video",
+        "episodes_affected": result.modified_count
+    }
+
