@@ -274,6 +274,12 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [activeSubtitle, setActiveSubtitle] = useState("off");
   const [showSubtitleMenu, setShowSubtitleMenu] = useState(false);
 
+  // Adaptive Video Player states
+  const [videoAspectRatio, setVideoAspectRatio] = useState(null); // e.g., 16/9, 9/16, 1
+  const [isVerticalVideo, setIsVerticalVideo] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [screenOrientation, setScreenOrientation] = useState('portrait');
+
   // Format time as MM:SS
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return '00:00';
