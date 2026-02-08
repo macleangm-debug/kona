@@ -963,6 +963,10 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
         "is_pilot": data.season_number == 1 and data.episode_number == 1,
         "coins_required": 0 if (data.is_free or (data.season_number == 1 and data.episode_number == 1)) else data.coins_required,
         "intro_duration": data.intro_duration,
+        # Story content: Episode 1 of Season 1 is always story content (requires vertical video)
+        "is_story_content": data.season_number == 1 and data.episode_number == 1,
+        "requires_vertical": data.season_number == 1 and data.episode_number == 1,  # Hint for frontend validation
+        "aspect_ratio": None,  # Will be set after video upload/processing
         "views": 0,
         "earnings": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
