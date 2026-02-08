@@ -1290,6 +1290,8 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         onSkip={handleSkipAd}
         canSkip={canSkipAd}
         skipCountdown={skipCountdown}
+        episodeId={episode?.id}
+        userId={user?.id}
       />,
       document.body
     );
