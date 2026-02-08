@@ -115,6 +115,23 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Creator Portal shows "STORIES" badge and vertical format guidance for Episode 1
   - API: `/api/stories/feed` returns only story content (Episode 1s + bonus stories)
   - Admin APIs: `/api/admin/series/{id}/make-free` and `/api/admin/series/{id}/make-paid`
+- **Upload Validation for Vertical Videos**: Creator Portal shows vertical format requirements for Episode 1:
+  - Visual badge "📱 Vertical (9:16) Required" on Episode 1 video uploads
+  - Guidance panel explaining Stories feed requirement with recommended dimensions
+  - Video dimension detection feedback (validates after video upload)
+- **Business/Advertiser Portal**: Full advertising platform for businesses:
+  - **4-tier pricing model**:
+    - Basic (CPV): $0.02/view - Pay only for actual eyeballs
+    - Pro (Monthly + CPV): $500/mo + $0.01/view - Lower rates with commitment
+    - Premium (Sponsorship): From $2,000 - Series/genre exclusivity
+    - Enterprise (Takeover): From $5,000 - Story takeover, full exclusivity
+  - **Ad placements**: Pre-roll, mid-roll, overlay banner, story ads, sponsorships
+  - **Campaign wizard**: 5-step creation (type → placement → budget/targeting → creative → review)
+  - **Targeting options**: Genres, countries, age ranges
+  - **Admin approval workflow**: Ads require approval before going live
+  - **Analytics dashboard**: Impressions, views, clicks, CTR, cost tracking
+  - **Billing system**: Add funds, transaction history
+  - Routes: `/business/auth`, `/business/dashboard`, `/business/campaigns/new`
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
