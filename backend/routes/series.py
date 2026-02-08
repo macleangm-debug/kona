@@ -104,6 +104,45 @@ async def get_series_detail(request: Request, series_id: str):
     await cache.set(cache_key, series, CACHE_TTL["series"])
     return series
 
+@router.get("/stories/feed")
+@limiter.limit("60/minute")
+async def get_stories_feed(request: Request, limit: int = 20):
+    """
+    Get vertical Stories feed - only episodes marked as story content.
+    These are vertical (9:16) videos meant for the TikTok-style browsing experience.
+    Includes Episode 1s and any bonus story content from creators.
+    """
+    cache_key = series_list_key("stories_feed")
+    
+    cached = await cache.get(cache_key)
+    if cached:
+        return cached[:limit]
+    
+    # Get all story content episodes (Episode 1s are automatically story content)
+    stories = await db.episodes.find(
+        {"$or": [
+            {"is_story_content": True},
+            {"episode_number": 1}  # Episode 1 is always story content
+        ]},
+        {"_id": 0}
+    ).sort([("created_at", -1), ("episode_number", 1)]).to_list(100)
+    
+    # Enrich with series info
+    enriched_stories = []
+    for story in stories:
+        series = await db.series.find_one({"id": story["series_id"]}, {"_id": 0})
+        if series:
+            enriched_stories.append({
+                **story,
+                "series_title": series.get("title", ""),
+                "series_thumbnail": series.get("thumbnail", ""),
+                "series_genre": series.get("genre", ""),
+                "is_story_content": True  # Ensure this flag is set
+            })
+    
+    await cache.set(cache_key, enriched_stories, CACHE_TTL["series_list"])
+    return enriched_stories[:limit]
+
 @router.get("/series/{series_id}/episodes", response_model=List[EpisodeResponse])
 @limiter.limit("100/minute")
 async def get_episodes(request: Request, series_id: str):
