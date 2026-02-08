@@ -718,6 +718,11 @@ export const CreatorSeriesDetailPage = () => {
               <label className="text-sm font-medium flex items-center gap-2 mb-2">
                 <Video className="w-4 h-4 text-green-400" />
                 Video URL
+                {selectedEpisode?.episode_number === 1 && (
+                  <Badge className="text-[10px] bg-purple-500/20 text-purple-400 ml-2">
+                    📱 Vertical (9:16) Required
+                  </Badge>
+                )}
               </label>
               <Input 
                 value={episodeForm.video_url}
@@ -725,6 +730,55 @@ export const CreatorSeriesDetailPage = () => {
                 placeholder="https://example.com/video.mp4 or Bunny.net URL"
                 data-testid="episode-video-input"
               />
+              
+              {/* Episode 1 vertical format guidance */}
+              {selectedEpisode?.episode_number === 1 && (
+                <div className="mt-2 p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-purple-300 font-medium">Stories Feed Requirement</p>
+                      <p className="text-xs text-purple-400/80 mt-1">
+                        Episode 1 appears in the <strong>Stories feed</strong> (like TikTok/Reels). 
+                        For best results, upload a <strong>vertical video (9:16 aspect ratio)</strong>.
+                      </p>
+                      <div className="flex gap-4 mt-2 text-xs">
+                        <span className="text-green-400">✓ 1080x1920 (9:16)</span>
+                        <span className="text-green-400">✓ 720x1280 (9:16)</span>
+                        <span className="text-red-400/70">✗ 1920x1080 (16:9)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* Video dimension validation feedback */}
+              {videoValidation.dimensions && (
+                <div className={`mt-2 p-2 rounded-lg border ${
+                  videoValidation.isVertical 
+                    ? 'bg-green-500/10 border-green-500/30' 
+                    : selectedEpisode?.episode_number === 1 
+                      ? 'bg-yellow-500/10 border-yellow-500/30'
+                      : 'bg-blue-500/10 border-blue-500/30'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    {videoValidation.isVertical ? (
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <AlertCircle className={`w-4 h-4 ${selectedEpisode?.episode_number === 1 ? 'text-yellow-400' : 'text-blue-400'}`} />
+                    )}
+                    <span className={`text-xs ${
+                      videoValidation.isVertical ? 'text-green-400' : selectedEpisode?.episode_number === 1 ? 'text-yellow-400' : 'text-blue-400'
+                    }`}>
+                      {videoValidation.isVertical 
+                        ? `✓ Vertical video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height}) - Perfect for Stories!`
+                        : `Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height})${selectedEpisode?.episode_number === 1 ? ' - Consider vertical for Stories feed' : ''}`
+                      }
+                    </span>
+                  </div>
+                </div>
+              )}
+              
               <p className="text-xs text-muted-foreground mt-1">
                 Direct video URL (MP4, HLS) or Bunny.net streaming URL
               </p>
