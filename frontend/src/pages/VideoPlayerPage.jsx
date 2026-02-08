@@ -455,59 +455,102 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
   // ============ MID-ROLL AD LOGIC ============
   useEffect(() => {
-    if (!duration || isPlayingAd || !preRollComplete) return;
+    if (!duration || isPlayingAd || !preRollComplete || !episode?.is_free) return;
     
     const adConfig = AD_CONFIG.adsByTier[userTier];
     if (!adConfig?.midRoll) return;
     
     const progressPercent = (currentTime / duration) * 100;
     
-    for (const point of AD_CONFIG.midRollPoints) {
+    const showMidRollAd = async (point) => {
       if (progressPercent >= point && !shownMidRollPoints.includes(point)) {
-        // Pause video and show mid-roll ad
+        // Pause video and fetch mid-roll ad
         const video = videoRef.current;
         if (video) video.pause();
         
-        const randomAd = AD_CONFIG.mockAds[Math.floor(Math.random() * AD_CONFIG.mockAds.length)];
-        setCurrentAd(randomAd);
-        setAdType("midRoll");
-        setIsPlayingAd(true);
-        setCanSkipAd(false);
-        setSkipCountdown(randomAd.skipAfter);
-        setShownMidRollPoints(prev => [...prev, point]);
+        // Fetch real ads from server
+        const adResponse = await fetchAdsFromServer(
+          episode.id,
+          'mid_roll',
+          duration,
+          true,
+          user?.id
+        );
         
-        adTimerRef.current = setInterval(() => {
-          setSkipCountdown(prev => {
-            if (prev <= 1) {
-              setCanSkipAd(true);
-              clearInterval(adTimerRef.current);
-              return 0;
-            }
-            return prev - 1;
+        if (adResponse.ads && adResponse.ads.length > 0) {
+          const serverAd = adResponse.ads[0];
+          setCurrentAd({
+            id: serverAd.id,
+            campaign_id: serverAd.campaign_id,
+            url: serverAd.media_url,
+            media_url: serverAd.media_url,
+            duration: serverAd.duration || 10,
+            advertiser: serverAd.campaign_name || 'Sponsor',
+            campaign_name: serverAd.campaign_name,
+            skipAfter: serverAd.skip_after || 5,
+            click_url: serverAd.click_url,
+            call_to_action: serverAd.call_to_action
           });
-        }, 1000);
-        
-        break;
+          setAdType("midRoll");
+          setIsPlayingAd(true);
+          setCanSkipAd(false);
+          setSkipCountdown(serverAd.skip_after || 5);
+          setShownMidRollPoints(prev => [...prev, point]);
+          
+          adTimerRef.current = setInterval(() => {
+            setSkipCountdown(prev => {
+              if (prev <= 1) {
+                setCanSkipAd(true);
+                clearInterval(adTimerRef.current);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        } else {
+          // No ads available, continue video
+          setShownMidRollPoints(prev => [...prev, point]);
+          if (video) video.play();
+        }
       }
+    };
+    
+    for (const point of AD_CONFIG.midRollPoints) {
+      showMidRollAd(point);
     }
-  }, [currentTime, duration, userTier, isPlayingAd, preRollComplete, shownMidRollPoints]);
+  }, [currentTime, duration, userTier, isPlayingAd, preRollComplete, shownMidRollPoints, episode, user]);
 
   // ============ OVERLAY AD LOGIC ============
   useEffect(() => {
+    if (!episode?.is_free) return;
+    
     const adConfig = AD_CONFIG.adsByTier[userTier];
     if (!adConfig?.overlay || !preRollComplete || isPlayingAd) return;
     
     // Show overlay ad at random intervals (between 20-40 seconds after start)
-    const showOverlayTimer = setTimeout(() => {
+    const showOverlayTimer = setTimeout(async () => {
       if (!isMiniPlayer) {
-        setShowOverlayAd(true);
-        // Auto-hide after duration
-        setTimeout(() => setShowOverlayAd(false), AD_CONFIG.overlayDuration * 1000);
+        // Fetch overlay ad from server
+        const adResponse = await fetchAdsFromServer(
+          episode.id,
+          'overlay',
+          duration,
+          true,
+          user?.id
+        );
+        
+        if (adResponse.ads && adResponse.ads.length > 0) {
+          setShowOverlayAd(true);
+          // Track impression
+          trackAdEvent(adResponse.ads[0].id, 'impression', adResponse.ads[0].campaign_id, user?.id, episode.id);
+          // Auto-hide after duration
+          setTimeout(() => setShowOverlayAd(false), AD_CONFIG.overlayDuration * 1000);
+        }
       }
     }, (20 + Math.random() * 20) * 1000);
     
     return () => clearTimeout(showOverlayTimer);
-  }, [preRollComplete, userTier, isPlayingAd, isMiniPlayer]);
+  }, [preRollComplete, userTier, isPlayingAd, isMiniPlayer, episode, user, duration]);
 
   // ============ SKIP INTRO LOGIC ============
   useEffect(() => {
