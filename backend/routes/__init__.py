@@ -20,6 +20,7 @@ from .gamification import router as gamification_router
 from .safeguards import router as safeguards_router
 from .revenue import router as revenue_router
 from .streaming import router as streaming_router
+from .advertiser import router as advertiser_router
 
 # Create main API router
 api_router = APIRouter()
@@ -44,3 +45,4 @@ api_router.include_router(gamification_router)
 api_router.include_router(safeguards_router)
 api_router.include_router(revenue_router)
 api_router.include_router(streaming_router)
+api_router.include_router(advertiser_router)
