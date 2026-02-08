@@ -964,8 +964,111 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   };
 
-  const handleVideoTap = () => {
-    setShowControls(!showControls);
+  // ============ GESTURE CONTROLS ============
+  // Double-tap to like (center) or seek (left/right)
+  const handleVideoTap = (e) => {
+    const now = Date.now();
+    const timeDiff = now - lastTapTime;
+    
+    // Get tap position
+    const rect = e.currentTarget.getBoundingClientRect();
+    const tapX = e.clientX || (e.touches && e.touches[0]?.clientX) || rect.width / 2;
+    const relativeX = tapX - rect.left;
+    const screenThird = rect.width / 3;
+    
+    let tapSide = 'center';
+    if (relativeX < screenThird) tapSide = 'left';
+    else if (relativeX > screenThird * 2) tapSide = 'right';
+    
+    if (timeDiff < DOUBLE_TAP_DELAY && timeDiff > 0) {
+      // Double tap detected!
+      setDoubleTapSide(tapSide);
+      setShowDoubleTapFeedback(true);
+      
+      if (tapSide === 'center') {
+        // Double-tap center = Like
+        handleLikeToggle();
+      } else if (tapSide === 'left') {
+        // Double-tap left = Rewind 10 seconds
+        const video = document.getElementById('main-video');
+        if (video) {
+          video.currentTime = Math.max(0, video.currentTime - 10);
+          toast.info('⏪ -10s');
+        }
+      } else if (tapSide === 'right') {
+        // Double-tap right = Forward 10 seconds
+        const video = document.getElementById('main-video');
+        if (video) {
+          video.currentTime = Math.min(video.duration, video.currentTime + 10);
+          toast.info('⏩ +10s');
+        }
+      }
+      
+      // Hide feedback after animation
+      setTimeout(() => {
+        setShowDoubleTapFeedback(false);
+        setDoubleTapSide(null);
+      }, 500);
+      
+      setLastTapTime(0); // Reset to prevent triple tap
+    } else {
+      // Single tap - toggle controls
+      setLastTapTime(now);
+      // Delay single tap action to wait for potential double tap
+      setTimeout(() => {
+        if (Date.now() - now >= DOUBLE_TAP_DELAY) {
+          setShowControls(prev => !prev);
+        }
+      }, DOUBLE_TAP_DELAY);
+    }
+  };
+
+  // Horizontal swipe to navigate episodes
+  const handleHorizontalSwipeStart = (e) => {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    setHorizontalSwipeStart(clientX);
+  };
+
+  const handleHorizontalSwipeMove = (e) => {
+    if (horizontalSwipeStart === null) return;
+    
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const diff = clientX - horizontalSwipeStart;
+    
+    if (Math.abs(diff) > SWIPE_THRESHOLD / 2) {
+      setSwipeDirection(diff > 0 ? 'right' : 'left');
+    }
+  };
+
+  const handleHorizontalSwipeEnd = () => {
+    if (horizontalSwipeStart === null || !swipeDirection) {
+      setHorizontalSwipeStart(null);
+      setSwipeDirection(null);
+      return;
+    }
+    
+    // Navigate to previous/next episode
+    if (swipeDirection === 'right' && currentEpisodeIndex > 0) {
+      // Swipe right = Previous episode
+      const prevEpisode = allEpisodes[currentEpisodeIndex - 1];
+      if (prevEpisode) {
+        setShowSwipeFeedback(true);
+        setTimeout(() => {
+          navigate(`/watch/${prevEpisode.id}`);
+          setShowSwipeFeedback(false);
+        }, 300);
+      }
+    } else if (swipeDirection === 'left' && nextEpisode) {
+      // Swipe left = Next episode
+      setShowSwipeFeedback(true);
+      setTimeout(() => {
+        navigate(`/watch/${nextEpisode.id}`);
+        setShowSwipeFeedback(false);
+      }, 300);
+    }
+    
+    setHorizontalSwipeStart(null);
+    setSwipeDirection(null);
   };
 
   const changeSpeed = () => {
