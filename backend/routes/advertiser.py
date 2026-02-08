@@ -5,7 +5,7 @@ Handles advertiser registration, campaign management, and ad operations
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Request
 from pydantic import BaseModel, EmailStr
 from passlib.context import CryptContext
 import jwt
