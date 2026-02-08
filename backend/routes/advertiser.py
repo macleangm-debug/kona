@@ -283,9 +283,9 @@ MIN_WALLET_BALANCE = 50.0
 # ============ CAMPAIGN ROUTES ============
 
 @router.post("/advertiser/campaigns")
-async def create_campaign(data: CampaignCreate, request):
+async def create_campaign(data: CampaignCreate, request: "Request"):
     """Create a new ad campaign (PREPAY REQUIRED)"""
-    from fastapi import Request
+    from fastapi import Request as FastAPIRequest
     advertiser = await require_advertiser(request)
     
     # PREPAY CHECK: Verify sufficient wallet balance
