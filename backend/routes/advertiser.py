@@ -702,3 +702,189 @@ async def approve_campaign(campaign_id: str, user: dict = Depends(get_current_us
         raise HTTPException(status_code=404, detail="Campaign not found")
     
     return {"message": "Campaign approved and now active", "campaign_id": campaign_id}
+
+
+# ============ AD SERVING ROUTES (Called by Video Player) ============
+
+@router.get("/ads/serve")
+async def serve_ads(
+    episode_id: str,
+    placement: str = "pre_roll",
+    video_duration: Optional[int] = None,
+    is_free_content: bool = True,
+    user_id: Optional[str] = None
+):
+    """
+    Serve ads for video playback (called by video player).
+    Platform decides which ads to show based on rules.
+    
+    Args:
+        episode_id: The episode being watched
+        placement: Requested placement type (pre_roll, mid_roll, etc.)
+        video_duration: Duration of the video in seconds
+        is_free_content: Whether this is a free episode
+        user_id: Optional user ID to check if premium subscriber
+    """
+    import random
+    
+    # Rule 1: No ads on paid content
+    if not is_free_content:
+        return {"ads": [], "reason": "Paid content - ad-free experience"}
+    
+    # Rule 2: Check if user is premium subscriber (no ads)
+    if user_id:
+        user = await db.users.find_one({"id": user_id}, {"subscription": 1})
+        if user and user.get("subscription", {}).get("active"):
+            return {"ads": [], "reason": "Premium subscriber - ad-free experience"}
+    
+    # Rule 3: Determine allowed placements based on video duration
+    allowed_placements = ["pre_roll"]  # Default
+    if video_duration:
+        if video_duration < 180:  # < 3 minutes
+            allowed_placements = ["pre_roll"]
+        elif video_duration < 600:  # 3-10 minutes
+            allowed_placements = ["pre_roll", "mid_roll"]
+        else:  # 10+ minutes
+            allowed_placements = ["pre_roll", "mid_roll", "overlay"]
+    
+    # Only serve if requested placement is allowed
+    if placement not in allowed_placements:
+        return {
+            "ads": [],
+            "reason": f"Placement '{placement}' not allowed for this video length",
+            "allowed_placements": allowed_placements
+        }
+    
+    # Get active campaigns with approved ads for this placement
+    campaigns = await db.campaigns.find({
+        "status": "active",
+        "ad_placements": placement,
+        "$expr": {"$lt": ["$spent", "$budget"]}  # Has remaining budget
+    }, {"_id": 0}).to_list(100)
+    
+    if not campaigns:
+        return {"ads": [], "reason": "No active campaigns available"}
+    
+    # Get approved ads from active campaigns
+    campaign_ids = [c["id"] for c in campaigns]
+    ads = await db.ad_creatives.find({
+        "campaign_id": {"$in": campaign_ids},
+        "status": "approved"
+    }, {"_id": 0}).to_list(50)
+    
+    if not ads:
+        return {"ads": [], "reason": "No approved ads available"}
+    
+    # Select ads based on targeting and budget
+    # For now, random selection weighted by remaining budget
+    selected_ads = []
+    for ad in ads:
+        campaign = next((c for c in campaigns if c["id"] == ad["campaign_id"]), None)
+        if campaign:
+            ad["campaign_name"] = campaign.get("name")
+            ad["cpv_rate"] = campaign.get("cpv_rate", 0.02)
+            ad["skip_after"] = AD_PLACEMENT_RULES["ad_duration"].get(placement, {}).get("skip_after", 3)
+            selected_ads.append(ad)
+    
+    # Limit number of ads based on rules
+    max_ads = 1 if placement == "pre_roll" else 2
+    selected_ads = random.sample(selected_ads, min(len(selected_ads), max_ads))
+    
+    return {
+        "ads": selected_ads,
+        "placement": placement,
+        "rules_applied": {
+            "video_duration_category": "short" if (video_duration or 0) < 180 else "medium" if (video_duration or 0) < 600 else "long",
+            "allowed_placements": allowed_placements,
+            "max_ads": max_ads
+        }
+    }
+
+
+@router.post("/ads/track")
+async def track_ad_event(
+    ad_id: str,
+    event_type: str,  # impression, view, click, skip
+    campaign_id: Optional[str] = None,
+    user_id: Optional[str] = None,
+    episode_id: Optional[str] = None
+):
+    """
+    Track ad events and charge advertiser (PREPAY deduction).
+    Called when ad is shown, viewed, clicked, or skipped.
+    """
+    # Get ad and campaign
+    ad = await db.ad_creatives.find_one({"id": ad_id})
+    if not ad:
+        raise HTTPException(status_code=404, detail="Ad not found")
+    
+    campaign_id = campaign_id or ad.get("campaign_id")
+    campaign = await db.campaigns.find_one({"id": campaign_id})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    
+    # Update ad stats
+    update_ad = {"$inc": {}}
+    if event_type == "impression":
+        update_ad["$inc"]["impressions"] = 1
+    elif event_type == "view":
+        update_ad["$inc"]["views"] = 1
+    elif event_type == "click":
+        update_ad["$inc"]["clicks"] = 1
+    
+    if update_ad["$inc"]:
+        await db.ad_creatives.update_one({"id": ad_id}, update_ad)
+    
+    # Update campaign stats and charge for views
+    update_campaign = {"$inc": {}}
+    charge_amount = 0
+    
+    if event_type == "impression":
+        update_campaign["$inc"]["impressions"] = 1
+    elif event_type == "view":
+        update_campaign["$inc"]["views"] = 1
+        # Charge CPV rate for completed views
+        charge_amount = campaign.get("cpv_rate", 0.02)
+        update_campaign["$inc"]["spent"] = charge_amount
+    elif event_type == "click":
+        update_campaign["$inc"]["clicks"] = 1
+    
+    if update_campaign["$inc"]:
+        await db.campaigns.update_one({"id": campaign_id}, update_campaign)
+    
+    # If charged, update advertiser reserved balance
+    if charge_amount > 0:
+        await db.advertisers.update_one(
+            {"id": campaign["advertiser_id"]},
+            {"$inc": {"reserved_balance": -charge_amount, "total_spent": charge_amount}}
+        )
+        
+        # Check if campaign budget exhausted
+        updated_campaign = await db.campaigns.find_one({"id": campaign_id})
+        if updated_campaign and updated_campaign.get("spent", 0) >= updated_campaign.get("budget", 0):
+            await db.campaigns.update_one(
+                {"id": campaign_id},
+                {"$set": {"status": "completed", "paused_reason": "Budget exhausted"}}
+            )
+    
+    return {
+        "tracked": True,
+        "event_type": event_type,
+        "ad_id": ad_id,
+        "charged": charge_amount
+    }
+
+
+@router.get("/ads/placement-rules")
+async def get_placement_rules():
+    """Get ad placement rules (for frontend reference)"""
+    return {
+        "rules": AD_PLACEMENT_RULES,
+        "summary": {
+            "short_videos": "< 3 min: Pre-roll only (1 ad max)",
+            "medium_videos": "3-10 min: Pre-roll + 1 Mid-roll",
+            "long_videos": "10+ min: Pre-roll + 2 Mid-rolls + Overlay",
+            "free_content_only": "Ads only shown on free episodes",
+            "premium_users": "No ads for premium subscribers"
+        }
+    }
