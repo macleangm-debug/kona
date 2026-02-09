@@ -47,8 +47,11 @@ export const BusinessDashboard = () => {
   const navigate = useNavigate();
   const [advertiser, setAdvertiser] = useState(null);
   const [analytics, setAnalytics] = useState(null);
+  const [dailyData, setDailyData] = useState([]);
+  const [campaignAnalytics, setCampaignAnalytics] = useState(null);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview"); // overview, performance, campaigns
 
   const token = localStorage.getItem("advertiser_token");
 
@@ -68,17 +71,25 @@ export const BusinessDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const [analyticsRes, campaignsRes] = await Promise.all([
+      const [analyticsRes, campaignsRes, dailyRes, campaignAnalyticsRes] = await Promise.all([
         axios.get(`${API}/advertiser/analytics/overview`, {
           headers: { Authorization: `Bearer ${token}` }
         }),
         axios.get(`${API}/advertiser/campaigns`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/advertiser/analytics/daily?days=14`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/advertiser/analytics/campaigns`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
       
       setAnalytics(analyticsRes.data);
       setCampaigns(campaignsRes.data);
+      setDailyData(dailyRes.data.daily_data || []);
+      setCampaignAnalytics(campaignAnalyticsRes.data);
     } catch (err) {
       console.error("Failed to fetch dashboard data:", err);
       if (err.response?.status === 401) {
