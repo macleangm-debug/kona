@@ -256,6 +256,10 @@ export const RewardsPage = ({ onAuthClick }) => {
   const [claimingDaily, setClaimingDaily] = useState(false);
   const [showRewardModal, setShowRewardModal] = useState(false);
   const [rewardModalData, setRewardModalData] = useState({ amount: 0, type: "Daily Reward" });
+  
+  // Coin animation state
+  const [showCoinAnimation, setShowCoinAnimation] = useState(false);
+  const [coinAnimationAmount, setCoinAnimationAmount] = useState(0);
 
   // Mock missions data (in production, fetch from API)
   const [missions, setMissions] = useState([
