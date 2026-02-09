@@ -157,6 +157,9 @@ const AppContent = () => {
         <Route path="/business/auth" element={<BusinessAuthPage />} />
         <Route path="/business/dashboard" element={<BusinessDashboard />} />
         <Route path="/business/campaigns/new" element={<CampaignCreatePage />} />
+        
+        {/* Demo Routes */}
+        <Route path="/demo/coins" element={<CoinAnimationDemo />} />
       </Routes>
 
       {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
