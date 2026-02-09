@@ -325,9 +325,10 @@ export const RewardsPage = ({ onAuthClick }) => {
       });
       await refreshUser();
       setDailyReward({ ...dailyReward, canClaim: false });
-      // Show animated modal instead of toast
-      setRewardModalData({ amount: res.data?.coins || 3, type: "Daily Reward" });
-      setShowRewardModal(true);
+      // Show coin animation
+      const coinsWon = res.data?.coins || 3;
+      setCoinAnimationAmount(coinsWon);
+      setShowCoinAnimation(true);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to claim");
     }
@@ -341,9 +342,10 @@ export const RewardsPage = ({ onAuthClick }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setIsSpinning(false);
-      // Show animated modal for spin win
-      setRewardModalData({ amount: res.data.prize, type: "Lucky Spin" });
-      setShowRewardModal(true);
+      // Show coin animation for spin win
+      const coinsWon = res.data.prize || prize || 1;
+      setCoinAnimationAmount(coinsWon);
+      setShowCoinAnimation(true);
       setSpinData(prev => ({
         ...prev,
         canSpin: res.data.spins_remaining > 0,
