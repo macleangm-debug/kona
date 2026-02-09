@@ -1878,6 +1878,350 @@ const EngagementSeedingTab = ({ token }) => {
   );
 };
 
+// ============ ADS APPROVAL TAB ============
+const AdsApprovalTab = ({ token }) => {
+  const [pendingAds, setPendingAds] = useState([]);
+  const [pendingCampaigns, setPendingCampaigns] = useState([]);
+  const [adsStats, setAdsStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [processingId, setProcessingId] = useState(null);
+  const [activeSection, setActiveSection] = useState("ads"); // "ads" or "campaigns"
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [adsRes, campaignsRes, statsRes] = await Promise.all([
+        axios.get(`${API}/admin/ads/pending`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get(`${API}/admin/campaigns/pending`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get(`${API}/admin/ads/stats`, { headers: { Authorization: `Bearer ${token}` }})
+      ]);
+      setPendingAds(adsRes.data);
+      setPendingCampaigns(campaignsRes.data);
+      setAdsStats(statsRes.data);
+    } catch (e) {
+      console.error("Failed to fetch ads data:", e);
+      toast.error("Failed to load advertising data");
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token]);
+
+  const handleApproveAd = async (adId) => {
+    setProcessingId(adId);
+    try {
+      await axios.post(`${API}/admin/ads/${adId}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Ad approved successfully!");
+      fetchData();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to approve ad");
+    }
+    setProcessingId(null);
+  };
+
+  const handleRejectAd = async (adId) => {
+    setProcessingId(adId);
+    try {
+      await axios.post(`${API}/admin/ads/${adId}/reject`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Ad rejected");
+      fetchData();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to reject ad");
+    }
+    setProcessingId(null);
+  };
+
+  const handleApproveCampaign = async (campaignId) => {
+    setProcessingId(campaignId);
+    try {
+      await axios.post(`${API}/admin/campaigns/${campaignId}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Campaign approved and activated!");
+      fetchData();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to approve campaign");
+    }
+    setProcessingId(null);
+  };
+
+  const handleRejectCampaign = async (campaignId) => {
+    setProcessingId(campaignId);
+    try {
+      await axios.post(`${API}/admin/campaigns/${campaignId}/reject`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Campaign rejected and budget refunded");
+      fetchData();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to reject campaign");
+    }
+    setProcessingId(null);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Overview */}
+      {adsStats && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Card className="p-4 bg-yellow-500/10 border-yellow-500/20">
+            <div className="flex items-center gap-3">
+              <Clock className="w-8 h-8 text-yellow-400" />
+              <div>
+                <p className="text-2xl font-bold">{adsStats.ads.pending}</p>
+                <p className="text-xs text-muted-foreground">Pending Ads</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-blue-500/10 border-blue-500/20">
+            <div className="flex items-center gap-3">
+              <Megaphone className="w-8 h-8 text-blue-400" />
+              <div>
+                <p className="text-2xl font-bold">{adsStats.campaigns.pending}</p>
+                <p className="text-xs text-muted-foreground">Pending Campaigns</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-green-500/10 border-green-500/20">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-8 h-8 text-green-400" />
+              <div>
+                <p className="text-2xl font-bold">{adsStats.campaigns.active}</p>
+                <p className="text-xs text-muted-foreground">Active Campaigns</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="p-4 bg-purple-500/10 border-purple-500/20">
+            <div className="flex items-center gap-3">
+              <DollarSign className="w-8 h-8 text-purple-400" />
+              <div>
+                <p className="text-2xl font-bold">${adsStats.total_ad_revenue}</p>
+                <p className="text-xs text-muted-foreground">Total Ad Revenue</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Section Toggle */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setActiveSection("ads")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+            activeSection === "ads" 
+              ? 'bg-primary text-white' 
+              : 'bg-white/5 hover:bg-white/10 text-muted-foreground'
+          }`}
+          data-testid="ads-section-btn"
+        >
+          <Video className="w-4 h-4" />
+          Ad Creatives ({pendingAds.length})
+        </button>
+        <button
+          onClick={() => setActiveSection("campaigns")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+            activeSection === "campaigns" 
+              ? 'bg-primary text-white' 
+              : 'bg-white/5 hover:bg-white/10 text-muted-foreground'
+          }`}
+          data-testid="campaigns-section-btn"
+        >
+          <Megaphone className="w-4 h-4" />
+          Campaigns ({pendingCampaigns.length})
+        </button>
+      </div>
+
+      {/* Pending Ads Section */}
+      {activeSection === "ads" && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg">Pending Ad Creatives</h3>
+          {pendingAds.length === 0 ? (
+            <Card className="p-8 text-center">
+              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-400" />
+              <p className="text-muted-foreground">No pending ads to review</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {pendingAds.map(ad => (
+                <Card key={ad.id} className="p-4 bg-white/5 border-white/10" data-testid={`pending-ad-${ad.id}`}>
+                  <div className="flex items-start gap-4">
+                    {/* Ad Preview */}
+                    <div className="w-32 h-20 rounded-lg bg-gray-800 overflow-hidden flex-shrink-0">
+                      {ad.creative_type === "video" ? (
+                        <video
+                          src={ad.media_url}
+                          className="w-full h-full object-cover"
+                          muted
+                          onMouseEnter={(e) => e.target.play()}
+                          onMouseLeave={(e) => { e.target.pause(); e.target.currentTime = 0; }}
+                        />
+                      ) : (
+                        <img src={ad.media_url} alt={ad.name} className="w-full h-full object-cover" />
+                      )}
+                    </div>
+
+                    {/* Ad Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold truncate">{ad.name}</h4>
+                        <Badge variant="outline" className="flex-shrink-0">{ad.creative_type}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {ad.advertiser?.company_name} • {ad.campaign?.name}
+                      </p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>Duration: {ad.duration}s</span>
+                        <span>CTA: {ad.call_to_action}</span>
+                        {ad.click_url && (
+                          <a href={ad.click_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-blue-400 hover:underline">
+                            <ExternalLink className="w-3 h-3" />
+                            Link
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRejectAd(ad.id)}
+                        disabled={processingId === ad.id}
+                        data-testid={`reject-ad-${ad.id}`}
+                      >
+                        {processingId === ad.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <X className="w-4 h-4" />}
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => handleApproveAd(ad.id)}
+                        disabled={processingId === ad.id}
+                        data-testid={`approve-ad-${ad.id}`}
+                      >
+                        {processingId === ad.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Pending Campaigns Section */}
+      {activeSection === "campaigns" && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg">Pending Campaigns</h3>
+          {pendingCampaigns.length === 0 ? (
+            <Card className="p-8 text-center">
+              <CheckCircle className="w-12 h-12 mx-auto mb-4 text-green-400" />
+              <p className="text-muted-foreground">No pending campaigns to review</p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {pendingCampaigns.map(campaign => (
+                <Card key={campaign.id} className="p-4 bg-white/5 border-white/10" data-testid={`pending-campaign-${campaign.id}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Campaign Info */}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h4 className="font-semibold">{campaign.name}</h4>
+                        <Badge variant="outline">{campaign.campaign_type}</Badge>
+                        <Badge className="bg-purple-500/20 text-purple-300">{campaign.tier}</Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {campaign.advertiser?.company_name} ({campaign.advertiser?.email})
+                      </p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        <div className="p-2 rounded bg-white/5">
+                          <p className="text-xs text-muted-foreground">Budget</p>
+                          <p className="font-semibold text-green-400">${campaign.budget}</p>
+                        </div>
+                        <div className="p-2 rounded bg-white/5">
+                          <p className="text-xs text-muted-foreground">Daily Budget</p>
+                          <p className="font-semibold">${campaign.daily_budget?.toFixed(2) || 'N/A'}</p>
+                        </div>
+                        <div className="p-2 rounded bg-white/5">
+                          <p className="text-xs text-muted-foreground">Placements</p>
+                          <p className="font-semibold">{campaign.ad_placements?.join(', ')}</p>
+                        </div>
+                        <div className="p-2 rounded bg-white/5">
+                          <p className="text-xs text-muted-foreground">Ads Uploaded</p>
+                          <p className="font-semibold">{campaign.ads_count} creative(s)</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 text-xs text-muted-foreground">
+                        Start: {new Date(campaign.start_date).toLocaleDateString()} 
+                        {campaign.end_date && ` → End: ${new Date(campaign.end_date).toLocaleDateString()}`}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col gap-2 flex-shrink-0">
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={() => handleApproveCampaign(campaign.id)}
+                        disabled={processingId === campaign.id}
+                        data-testid={`approve-campaign-${campaign.id}`}
+                      >
+                        {processingId === campaign.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Check className="w-4 h-4 mr-2" />
+                        )}
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRejectCampaign(campaign.id)}
+                        disabled={processingId === campaign.id}
+                        data-testid={`reject-campaign-${campaign.id}`}
+                      >
+                        {processingId === campaign.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <X className="w-4 h-4 mr-2" />
+                        )}
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Info Card */}
+      <Card className="p-4 bg-blue-500/10 border-blue-500/20">
+        <p className="text-sm text-blue-300">
+          <strong>Note:</strong> Approving a campaign activates it for ad serving. Rejecting a campaign automatically refunds the reserved budget to the advertiser's wallet.
+        </p>
+      </Card>
+    </div>
+  );
+};
+
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
