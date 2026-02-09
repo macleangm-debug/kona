@@ -2049,6 +2049,18 @@ const AdsApprovalTab = ({ token }) => {
           <Megaphone className="w-4 h-4" />
           Campaigns ({pendingCampaigns.length})
         </button>
+        <button
+          onClick={() => setActiveSection("alerts")}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+            activeSection === "alerts" 
+              ? 'bg-primary text-white' 
+              : 'bg-white/5 hover:bg-white/10 text-muted-foreground'
+          }`}
+          data-testid="alerts-section-btn"
+        >
+          <AlertTriangle className="w-4 h-4" />
+          Alerts {alertsUnread > 0 && <span className="px-1.5 py-0.5 rounded-full bg-red-500 text-white text-xs">{alertsUnread}</span>}
+        </button>
       </div>
 
       {/* Pending Ads Section */}
