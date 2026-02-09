@@ -224,8 +224,16 @@ async def register(data: UserCreate, request: Request):
     }
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin):
+async def login(data: UserLogin, request: Request):
     """Login with email or phone"""
+    
+    # Detect user's geo-location from IP
+    client_ip = request.client.host
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        client_ip = forwarded_for.split(",")[0].strip()
+    geo_data = await detect_country_from_ip(client_ip)
+    
     user = None
     
     # Find user by email or phone
@@ -260,6 +268,26 @@ async def login(data: UserLogin):
             {"$set": {"referral_code": referral_code}}
         )
         user["referral_code"] = referral_code
+    
+    # Update last login geo-location
+    last_login_geo = {
+        "country": geo_data.get("country"),
+        "country_code": geo_data.get("country_code"),
+        "city": geo_data.get("city"),
+        "region": geo_data.get("region"),
+        "timezone": geo_data.get("timezone"),
+        "currency": geo_data.get("currency"),
+        "logged_in_at": datetime.now(timezone.utc).isoformat(),
+        "ip": client_ip if client_ip != "127.0.0.1" else None
+    }
+    
+    await db.users.update_one(
+        {"id": user["id"]},
+        {
+            "$set": {"last_login_geo": last_login_geo},
+            "$push": {"login_history": {"$each": [last_login_geo], "$slice": -10}}  # Keep last 10 logins
+        }
+    )
     
     return {
         "token": token,
