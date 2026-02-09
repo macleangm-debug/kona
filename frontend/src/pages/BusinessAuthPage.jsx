@@ -4,7 +4,7 @@ import axios from "axios";
 import { 
   Building2, Mail, Lock, User, Phone, Globe, 
   Briefcase, ArrowRight, ChevronLeft, Loader2,
-  BarChart3, Target, DollarSign, Megaphone
+  BarChart3, Target, DollarSign, Megaphone, Shield, CheckCircle
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
