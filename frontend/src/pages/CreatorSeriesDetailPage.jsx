@@ -228,6 +228,12 @@ export const CreatorSeriesDetailPage = () => {
   const handleUpdateEpisode = async () => {
     if (!selectedEpisode) return;
     
+    // Block save if Episode 1 and video is horizontal
+    if (selectedEpisode.episode_number === 1 && videoValidation.isVertical === false) {
+      toast.error("Episode 1 must be a vertical video (9:16) for the Stories feed. Please upload a vertical video.");
+      return;
+    }
+    
     try {
       const params = new URLSearchParams();
       if (episodeForm.title) params.append("title", episodeForm.title);
@@ -244,9 +250,76 @@ export const CreatorSeriesDetailPage = () => {
       toast.success("Episode updated!");
       setShowEpisodeEditor(false);
       setSelectedEpisode(null);
+      setVideoValidation({ isValidating: false, isVertical: null, dimensions: null, error: null });
       fetchSeriesDetail();
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to update episode");
+    }
+  };
+
+  // Validate video dimensions from URL
+  const validateVideoFromUrl = async (url) => {
+    if (!url) {
+      toast.error("Please enter a video URL first");
+      return;
+    }
+    
+    setVideoValidation({ isValidating: true, isVertical: null, dimensions: null, error: null });
+    
+    try {
+      const video = document.createElement('video');
+      video.crossOrigin = 'anonymous';
+      video.preload = 'metadata';
+      
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = () => {
+          const width = video.videoWidth;
+          const height = video.videoHeight;
+          const aspectRatio = width / height;
+          const isVertical = aspectRatio < 1;
+          
+          const validation = {
+            isValidating: false,
+            isVertical,
+            dimensions: { width, height, aspectRatio: aspectRatio.toFixed(2) },
+            error: null
+          };
+          
+          if (selectedEpisode?.episode_number === 1 && !isVertical) {
+            validation.error = `Horizontal video detected (${width}x${height}). Episode 1 requires vertical format for Stories feed.`;
+            toast.error("This video is horizontal. Episode 1 must be vertical (9:16) for the Stories feed.");
+          } else if (isVertical) {
+            toast.success(`Perfect! Vertical video detected (${width}x${height}) - ideal for Stories!`);
+          } else {
+            toast.info(`Video dimensions: ${width}x${height} (horizontal)`);
+          }
+          
+          setVideoValidation(validation);
+          resolve();
+        };
+        
+        video.onerror = () => {
+          setVideoValidation({
+            isValidating: false,
+            isVertical: null,
+            dimensions: null,
+            error: 'Could not load video. Try a direct MP4 link.'
+          });
+          toast.error("Could not load video to check dimensions. Ensure it's a direct video URL.");
+          reject();
+        };
+        
+        // Add timeout
+        setTimeout(() => {
+          if (video.readyState === 0) {
+            video.onerror();
+          }
+        }, 10000);
+        
+        video.src = url;
+      });
+    } catch (e) {
+      console.error("Video validation error:", e);
     }
   };
 
