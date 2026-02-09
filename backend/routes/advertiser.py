@@ -149,7 +149,8 @@ async def register_advertiser(data: AdvertiserRegister):
         "total_spent": 0.0,
         "campaigns_count": 0,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "verified": False
+        "verified": False,
+        "email_verified": False
     }
     
     await db.advertisers.insert_one(advertiser)
