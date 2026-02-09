@@ -371,6 +371,17 @@ export const StorePage = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* Coin Animation */}
+      <CoinAnimation
+        show={showCoinAnimation}
+        amount={coinAnimationAmount}
+        variant="topup"
+        onComplete={() => {
+          setShowCoinAnimation(false);
+          toast.success("Coins added to your account!");
+        }}
+      />
     </div>
   );
 };
