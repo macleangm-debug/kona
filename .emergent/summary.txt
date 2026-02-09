@@ -1,165 +1,176 @@
-<analysis>original_problem_statement:
-The initial request was to continue work on a stalled project, starting with the Subtitle Upload UI. Over the session, the user added several new feature requests and provided feedback on existing implementations.
+<analysis>**original_problem_statement:**
+The user requested the implementation of a series of features for their Kona video streaming platform. The key requirements included:
+- A redesigned, animated, and clickable pre-splash screen.
+- An adaptive video player that can handle both vertical (for stories) and horizontal (for standard content) videos gracefully.
+- Gesture controls in the video player, specifically double-tap to like and horizontal swipes to navigate between episodes.
+- A Stories feature to showcase short, vertical videos, with a rule that the first episode of any series must be a vertical Story.
+- A complete Business/Advertiser Portal for businesses to register, create, and manage ad campaigns.
+- An ad system with a pre-pay wallet model, where advertisers top up a balance and budgets are reserved from this wallet for campaigns.
+- Integration of the ad system into the main video player to serve pre-roll and mid-roll ads from approved campaigns.
+- A visually appealing coin animation to provide positive feedback when a user earns rewards or purchases in-app currency.
+- Geo-location tracking to identify and store the user's country based on their IP address during registration and login.
 
-PRODUCT REQUIREMENTS:
-1.  Complete the Subtitle Upload UI in the Creator Portal.
-2.  Answer the question: How does revenue distribution work for views paid with rewarded coins?
-3.  Implement Video & Thumbnail Upload UI for creators. The user prefers URL input for thumbnails as an industry standard and a smooth, low-storage backend solution for video uploads, leveraging the existing bunny.net integration.
-4.  Implement an enhanced Creator Analytics dashboard with time period options (7, 30, 90 days, all-time).
-5.  Implement a Creator Payout History & Notification System.
-6.  Refactor the  into smaller components.
-7.  Improve the desktop web view layout for both the Super Admin and Creator accounts for better spacing and organization, using the current dark theme. This includes the main Creator Portal, the Creator Series Detail page, and the Admin Dashboard.
-8.  Address a layout bug where the main site navigation bar overlaps the Creator Portal content. The final user preference was to keep the top navigation bar but ensure the portal content renders below it, not behind it.
-9.  Verify if the heart/like icon in the video player works.
-10. Implement a mechanism for admins to artificially increase the number of likes on videos to boost traction for launch.
-
-**User's preferred language**: English
+**User's preferred language**: The user's primary language is English. The next agent MUST respond in English only.
 
 **what currently exists?**
-The application is a video streaming platform named Kona with distinct portals for users, creators, and admins.
--   **Creator Portal:** Features a dashboard, analytics, payout history, notification system, and series/episode management. It supports uploading subtitles, video URLs, and thumbnail URLs. The desktop layout has been significantly improved with a persistent sidebar.
--   **Admin Portal:** Features a dashboard for monitoring platform stats like revenue and user growth, content approval workflows, and user management. It also has an improved desktop layout with a sidebar.
--   **Backend:** A FastAPI backend handles all business logic, including user authentication, content management, revenue calculations, and payouts. It integrates with Bunny.net for video streaming.
--   **Revenue Model:** A system is in place where creators earn a percentage of revenue from views, but only when users pay with purchased coins. Free/rewarded coins do not generate revenue for creators.
--   **Like System:** A like functionality is implemented for episodes, with backend endpoints and frontend UI.
+The application is a feature-rich video streaming platform. Most of the user's requests have been implemented. This includes a functional pre-splash screen, an adaptive video player with gesture controls, and a Stories section for vertical content. A comprehensive Business Portal for advertisers now exists, complete with registration, a dashboard, campaign creation, and a pre-pay wallet system. The ad serving logic is integrated into the video player, replacing the previous mock system. A reusable coin animation component has been created and integrated into the rewards and store pages. The backend logic for geo-location tracking at login/registration is in place and successfully stores data, but the data is not yet being returned in the API response.
 
 **Last working item**:
-    - Last item agent was working: The agent was implementing an admin-only feature to seed likes on videos. An admin endpoint () was created to add a  count to an episode in the database. However, the agent discovered that the seeded likes were not reflected in the API responses. The investigation revealed that the  collection in the  MongoDB database was empty, leading to the suspicion that the application is using in-memory mock data for episodes instead of the database.
-    - Status: BLOCKED
-    - Agent Testing Done: N
-    - Which testing method agent to use? backend testing agent
-    - User Testing Done: N
+- **Last item agent was working:** The agent was implementing geo-location tracking for users. The system correctly detects the user's country from their IP address and saves it to the database upon registration or login. However, the agent discovered that this  data was not being included in the JSON response sent back to the client.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** Y
+- **Which testing method agent to use?** backend testing agent
+- **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-  - Issue 1:  (P0) Like-seeding mechanism is not working because the backend seems to use mock data for episodes instead of the MongoDB database.
-  
-  Issues Detail:
-  - Issue 1: 
-     - Attempted fixes: The agent created an admin endpoint () to update the  field for an episode in the  MongoDB collection. The agent then updated the user-facing endpoints ( and ) to include this  count. When testing showed this didn't work, the agent inspected the MongoDB  collection directly and found it was empty. This indicates a fundamental mismatch between the data source the agent is trying to modify and the data source the application is actually using.
-     - Next debug checklist: 
-        1. Investigate the backend codebase, starting from  and the routes in , to determine the source of episode data. Look for any files that load mock data, e.g., from a JSON file or an in-memory list. The file  is a prime suspect.
-        2. Once the actual data source is identified, modify the like-seeding logic to update this source instead of the MongoDB collection.
-        3. If the app is intended to use MongoDB, fix the data-loading mechanism to correctly populate and read from the  collection.
-     - Why fix this issue and what will be achieved with the fix? This is required to fulfill the user's request for a way to artificially boost video like counts for the platform's launch, which can help drive initial user engagement.
-     - Status:  IN PROGRESS
-     - Is recurring issue? N
-     - Should Test frontend/backend/both after fix? Backend
-     - Blocked on other issue: None
+- **Issue 1:** Geo-location data not returned in auth API response (P0)
+
+  **Issues Detail:**
+  - **Issue 1:**
+     - **Description**: The  and  endpoints successfully detect and store the user's geo-location data in the database, but this data is omitted from the API response body. The agent has identified the root cause as the Pydantic  model lacking the  field.
+     - **Attempted fixes**: The agent confirmed the geo-detection service works via . Debug logs were added to  to confirm the geo-data is correctly fetched before the response is sent. The agent correctly deduced that the  was filtering out the field.
+     - **Next debug checklist**:
+       1.  Open the file .
+       2.  Locate the  Pydantic model.
+       3.  Add the field  to the model definition.
+       4.  Restart the backend server.
+       5.  Use  to test the  endpoint with a new user and verify that the  object is now present in the JSON response.
+     - **Why fix this issue and what will be achieved with the fix?** Completing this will make the user's geo-location data available to the frontend upon authentication. This data is crucial for future features like content personalization, analytics, and targeted advertising.
+     - **Status:** IN PROGRESS
+     - **Is recurring issue?** N
+     - **Should Test frontend/backend/both after fix?** backend
+     - **Blocked on other issue:** None
 
 **In progress Task List**:
-There are no partially completed tasks. The current focus is on resolving the blocked issue above.
+There are no partially completed tasks; the current work is categorized as an issue fix.
 
 **Upcoming and Future Tasks**
-There are no outstanding feature requests from the user at this time. All previous requests have either been completed or are part of the currently blocked issue.
+**Upcoming Tasks:**
+- **(P1) Implement Frontend Vertical Video Validation:** In the Creator Portal's episode editor (), implement client-side validation logic. This script should read the dimensions of a selected video file *before* upload. If the content is for Episode 1 (a Story), it must enforce a vertical aspect ratio and block the upload if the condition is not met.
+- **(P2) Build Admin UI for Ad Approval:** The backend has endpoints for an admin to approve campaigns and ad creatives. A new section needs to be built in the Admin Portal UI to list pending campaigns/ads and allow an admin to approve or reject them with a button click, removing the need for manual API calls.
+
+**Future Tasks:**
+- **Enhanced Advertiser Analytics Dashboard:** Expand the Business Portal to include detailed charts and reports on campaign performance (e.g., views, clicks, CTR, spend over time).
+- **Stripe Integration for Wallet Top-up:** Integrate Stripe into the Business Portal to allow advertisers to securely add funds to their wallet using a credit card.
+- **Creator Monetization Dashboard:** Build a dashboard in the Creator Portal for creators to track their earnings, video performance metrics, and payouts.
+- **Advanced Ad Targeting:** Utilize the collected user  data and viewing history to enable more granular ad targeting options for advertisers.
 
 **Completed work in this session**
-- **Subtitle Upload UI**: Implemented a complete UI in the Episode Editor dialog for uploading  subtitle files, including a language selector and a list of existing subtitles. ().
-- **Creator Content Management UI**: Added fields for editing Episode Thumbnails and Video URLs in the Episode Editor dialog (, ).
-- **Creator Analytics**: Implemented a new Analytics tab in the Creator Portal with charts, summary cards, and time-period filtering ().
-- **Creator Payouts & Notifications**: Added a Payouts tab with payout history and status filtering, and a notification system with a dropdown menu accessible from the header (, ).
-- **Creator Portal Refactor**: Broke down the monolithic  into smaller, reusable components located in .
-- **Desktop Layout Overhaul**:
-    - Redesigned the Creator Portal, Admin Dashboard, and Creator Series Detail page with modern, spaced-out, sidebar-based layouts for better desktop usability. (, , ).
-- **Layout Bug Fix**: Resolved a z-index/layout issue where the main site header overlapped the Creator Portal content by adjusting the page layout to render content below the header (, , ).
-- **Like Functionality Verification**: Confirmed that the episode liking/unliking functionality works as expected.
+- **Pre-splash Screen Implementation:** A new animated, clickable pre-splash screen was successfully built and integrated.
+- **Adaptive Video Player:** A player that automatically adjusts its display mode ( for vertical,  for horizontal) based on video aspect ratio was implemented in .
+- **Video Player Gesture Controls:** Added double-tap-to-like and swipe-to-skip functionalities to the video player.
+- **Stories Feature:** Created the backend ( endpoint) and frontend () for a vertical video Stories experience.
+- **Business / Advertiser Portal:** Built a full-featured portal for advertisers, including authentication, a dashboard, and campaign creation (, ).
+- **Advertiser Pre-pay Wallet System:** Implemented a backend wallet system where advertisers must pre-pay for campaigns.
+- **Ad Serving Integration:** Replaced the mock ad system with a live one that fetches and displays ads from the backend () in the video player.
+- **Coin Animation:** Created a reusable  component and integrated it into the  and .
 
 **Earlier issues found/mentioned but not fixed**
-   - Issue 1: Pre-existing lint errors in  and . The agent identified these but did not fix them as they were not introduced by its changes.
+- **Issue 1:** Videos do not play within the automated screenshot tool.
+  - **Debug checklist**: This is a known limitation of the Playwright/browser automation environment due to autoplay policies. It is not a bug in the application code itself. The agent correctly diagnosed this and proceeded, confirming functionality through API calls and UI structure checks.
+  - **Why to solve this issue and what will be achieved with this?** No fix is required in the application. Manual testing or alternative testing strategies would be needed to get a visual confirmation of video playback.
+  - **Should Test frontend/backend/both after fix:** NA
+  - **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
-  - None identified.
+- No recurring issues were noted from the previous fork.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React, TailwindCSS, Vite
--   **Backend**: Python, FastAPI
--   **Database**: MongoDB
--   **Video Hosting**: Bunny.net
--   **Architecture**: Monorepo with a React SPA frontend and a FastAPI backend.
+- **Frontend:** React, Vite, Tailwind CSS
+- **Backend:** Python with FastAPI
+- **Database:** PostgreSQL with SQLAlchemy ORM
+- **Architecture:** Monolithic repository containing both the React frontend and FastAPI backend.
 
 **key DB schema**
--   **episodes**: 
--   **series**: 
--   **likes**: 
--   **users**: 
+- **users:** {id, email, hashed_password, role, is_super_admin, geo, wallet_balance}
+- **episodes:** {id, title, series_id, video_url, is_free, is_story_content}
+- **advertisers:** {id, company_name, user_id, wallet_balance}
+- **campaigns:** {id, name, advertiser_id, budget, status}
+- **ad_creatives:** {id, campaign_id, ad_type, asset_url, status}
 
 **changes in tech stack**
--   None.
+- There were no changes to the core technology stack during this session.
 
 **All files of reference**
--   : Modified to add the  endpoint.
--   : Modified to include  in like count calculations.
--   : Refactored and updated with a new desktop layout and tabs for Analytics and Payouts.
--   : Updated with an improved desktop sidebar layout.
--   : Rewritten with a new desktop sidebar layout.
--   : Modified to manage which routes should hide the main .
--   : New component files created during the refactor of .
+- : **Last worked on.** Modified to add geo-location detection logic.
+- : **Next file to edit.** Needs the  field added to the  model.
+- : Heavily modified to support the adaptive player, gesture controls, and live ad integration.
+- : **New file.** Created to manage all backend logic for the Business Portal.
+- : **New file.** Defines the database schema for advertisers, campaigns, and ads.
+- : **New directory.** Contains all frontend pages for the Business Portal.
+- : **New file.** A reusable component for reward/purchase animations.
 
 **Areas that need refactoring**:
-- The pre-existing lint errors in  and  should be addressed to improve code quality.
+- The temporary page  and its associated route in  were created for demonstration purposes and should now be removed to clean up the codebase.
 
 **key api endpoints**
--   : [New] Admin endpoint to add a base number of likes to an episode.
--   : [New] Endpoint to update series details, including thumbnail.
--   : Modified to allow updating thumbnail and video URLs.
--   : [New] Endpoint to fetch creator analytics data.
--   : [New] Endpoint to fetch creator payout history.
--   : [New] Endpoint for user/creator notifications.
+- : Creates a new user account.
+- : Authenticates a user.
+- : Retrieves the feed of vertical Story content.
+- : Creates a new advertiser account.
+- : Authenticates an advertiser.
+- : Creates a new ad campaign and reserves funds from the advertiser's wallet.
+- : Endpoint to add funds to an advertiser's wallet.
+- : The primary endpoint called by the video player to fetch a relevant ad.
+- : An admin-only endpoint to approve a pending ad creative.
 
 **Critical Info for New Agent**
-The most critical issue is the data source discrepancy. The application appears to be using in-memory mock data for episodes, not the MongoDB  collection. Before attempting to fix the like seeding feature, you **must** first identify the true source of the episode data (likely in  or a similar file) and adapt the implementation to modify that source. Modifying the MongoDB  collection will have no effect on the running application as it currently stands.
+- **Multiple User Roles:** The application now has four distinct roles (Viewer, Creator, Advertiser, Super Admin), each with its own portal or dashboard. Ensure you are using the correct credentials and accessing the correct part of the application for the task at hand.
+- **Ad System Testing:** To fully test the ad serving flow, you must use four different accounts: 1) Register as an advertiser, 2) create a campaign/ad and add funds, 3) log in as the super admin to approve the ad via API, and 4) log in as a regular viewer to watch a video and see the ad.
+- **Autoplay Limitation:** Be aware that videos (and video ads) may not play automatically in the screenshot testing tool due to browser autoplay policies. This is a limitation of the testing environment, not necessarily a bug in the code.
 
 **documents and test reports created in this job**
--   : Updated multiple times to reflect newly completed features.
+- : This Product Requirements Document was updated throughout the session to reflect completed and upcoming tasks.
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** How does the system deal with free/rewarded coins... - User asked about revenue distribution.
-    - *Status: Addressed. Agent provided a detailed explanation.*
-2.  **User:** This is olay - fair and square nobody gets any revenue - User confirmed satisfaction with the revenue model.
-    - *Status: Acknowledged.*
-3.  **User:** Does the heart icon in video player count? - User inquired about the like feature.
-    - *Status: Addressed. Agent confirmed its existence.*
-4.  **User:** Do the testing. And for launch we can implement on the background for videos to have a higher number of likes to increase traction. How can we do this? - User requested verification of the like feature and a new feature to seed likes.
-    - *Status: In Progress. This led to the current blocked issue.*
-5.  **User:** (Responded to agent plan) - Implicitly approved the plan.
-    - *Status: Acknowledged.*
-6.  **User:** Left a message with a screenshot showing a layout bug on the creator page.
-    - *Status: Addressed. Agent fixed the overlapping header issue.*
-7.  **User:** Leave the bar at the top with rewards etc. but it should not go behind the dashboard page - User clarified the desired layout fix.
-    - *Status: Addressed. Agent implemented the requested layout.*
-8.  **User:** How does the system deal with free/rewarded coins in revenue distribution - say the user has used Free coins to watch an episode - User re-asked the revenue question for clarity.
-    - *Status: Addressed. Agent provided a more detailed summary.*
-9.  **User:** This is olay - fair and square nobody gets any revenue - User again confirmed satisfaction.
-    - *Status: Acknowledged.*
-10. **User:** Does the heart icon in video player count? - User re-asked about the heart icon.
-    - *Status: Addressed. Agent confirmed and detailed its functionality.*
+1.  **Geo-locate the countries which the user logs in from - do the same as we implemented during the payment process**: User requested geo-location tracking on login/registration. (IN PROGRESS)
+2.  **Implement a coin animation which is catchy when user gets reward or op ups their coins**: User requested a coin animation. (Completed)
+3.  **I cannot log in to the business account**: User reported a login issue. Agent investigated and confirmed it was working. (Resolved)
+4.  **Can you share login credentials?**: User asked for test account details. (Completed)
+5.  **Integrate ad serving into video player (so approved ads actually play)**: User requested to make the ad system live in the player. (Completed)
+6.  **Proceed**: User approved the agent's plan for a pre-pay wallet system. (Completed)
+7.  **What is the industry standard - I also want users to Prepay for the service to avoid any defaults**: User specified the need for a pre-pay model for advertisers. (Completed)
+8.  **Who decides if it is preroll or midroll**: User asked about ad placement logic. (Completed)
+9.  **Proceed with this**: User approved the proposed advertising profit models. (Completed)
+10. **What modes shoudl we use to make the most profit**: User asked for advice on profitable advertising models. (Completed)
 
 **Project Health Check:**
--   **Broken**: The like-seeding feature is non-functional.
--   **Mocked**: Episode data is being served from a mock source, not the database, which is the root cause of the broken feature.
+- **Broken:**
+  - The API response for authentication (, ) is missing the  field, preventing the frontend from accessing user location data.
+- **Mocked:**
+  - None.
 
 **3rd Party Integrations**
--   Bunny.net (Video Streaming/Hosting) — requires User API Key.
+- **Bunny.net (Video CDN):** Manages all video hosting, encoding, and delivery. Does not use any API keys managed by the agent.
+- **GeoJS.io (IP Geolocation):** A public API used to look up a user's country from their IP address. Does not require an API key.
 
 **Testing status**
-  - Testing agent used after significant changes: YES
-  - Troubleshoot agent used after agent stuck in loop: NO
-  - Test files created: []
-  - Known regressions: None.
+- **Testing agent used after significant changes:** NO
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** []
+- **Known regressions:** None identified.
 
 **Credentials to test flow:**
-### 👤 Demo User / Creator
-- **Email:** 
-- **Password:** 
-- **Access:** User features + Creator Portal (approved creator)
+### 👤 **Viewer/User Account**
+- **Action**: Register a new user via the Sign Up form on the main page.
 
-### 👑 Super Admin
-- **Email:** 
-- **Password:** 
-- **Access:** Admin Dashboard, Series Approval, Platform Analytics
+### 🎬 **Creator Portal**
+- **URL path**: 
+- **Action**: Register a new creator account.
+
+### 💼 **Business/Advertiser Portal**
+- **URL path**: 
+- **Email**: 
+- **Password**: 
+
+### 🔧 **Super Admin Dashboard**
+- **URL path**: 
+- **Email**: 
+- **Password**: 
 
 **What agent forgot to execute**
-- The agent correctly identified that the app uses mock data for episodes but was terminated before it could pivot to fix the root cause. The next step is to investigate this mock data source.
-- The agent noted pre-existing linting issues in several files but did not fix them, which was an intentional decision to stay on task.</analysis>
+- The agent did not implement the client-side validation logic in the  component to check a video file's dimensions *before* upload to enforce the vertical video rule for Story content.
+- The agent created the backend API endpoints for an administrator to approve ads and campaigns but did not build the corresponding user interface in the admin dashboard. This means approval must be done via manual API calls.</analysis>
