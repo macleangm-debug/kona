@@ -49,8 +49,9 @@ class TestEmailPhoneVerification:
         """Create a test user with phone for phone verification tests"""
         unique_id = str(uuid.uuid4())[:8]
         email = f"TEST_phone_verify_{unique_id}@example.com"
-        # Valid Kenyan phone format: 712XXXXXX (9 digits)
-        phone = f"712{unique_id[:6].replace('-', '').ljust(6, '0')}"
+        # Valid Kenyan phone format: 712XXXXXX (9 digits, all numeric)
+        import random
+        phone = f"712{random.randint(100000, 999999)}"
         password = "TestPass123!"
         
         response = requests.post(f"{BASE_URL}/api/auth/register", json={
