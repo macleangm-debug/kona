@@ -330,3 +330,228 @@ async def get_me(user: dict = Depends(get_current_user)):
         "geo": user.get("geo"),
         "last_login_geo": user.get("last_login_geo")
     }
+
+
+# ============ EMAIL VERIFICATION ============
+
+# In-memory email verification storage (use Redis in production)
+email_verification_store = {}
+
+@router.post("/send-email-verification")
+async def send_email_verification(user: dict = Depends(get_current_user)):
+    """Send email verification code to user's email"""
+    from services.email_service import send_verification_email, generate_verification_token
+    
+    email = user.get("email")
+    if not email:
+        raise HTTPException(status_code=400, detail="No email associated with this account")
+    
+    if user.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    # Generate 6-digit code
+    code = generate_verification_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+    
+    # Store verification code
+    email_verification_store[user["id"]] = {
+        "code": code,
+        "email": email,
+        "expires_at": expires_at,
+        "attempts": 0
+    }
+    
+    # Send email
+    result = await send_verification_email(email, code, user.get("name", "there"))
+    
+    if not result.get("success"):
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+    
+    return {
+        "message": "Verification code sent to your email",
+        "email_masked": f"{email[:3]}***{email[email.index('@'):]}"
+    }
+
+@router.post("/verify-email")
+async def verify_email(code: str, user: dict = Depends(get_current_user)):
+    """Verify email with the code sent"""
+    from services.email_service import send_welcome_email
+    
+    if user.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    stored = email_verification_store.get(user["id"])
+    if not stored:
+        raise HTTPException(status_code=400, detail="No verification code found. Please request a new one.")
+    
+    # Check expiry
+    if datetime.now(timezone.utc) > stored["expires_at"]:
+        del email_verification_store[user["id"]]
+        raise HTTPException(status_code=400, detail="Verification code expired. Please request a new one.")
+    
+    # Check attempts
+    stored["attempts"] += 1
+    if stored["attempts"] > 5:
+        del email_verification_store[user["id"]]
+        raise HTTPException(status_code=400, detail="Too many attempts. Please request a new code.")
+    
+    # Verify code
+    if stored["code"] != code:
+        raise HTTPException(status_code=400, detail=f"Invalid code. {5 - stored['attempts']} attempts remaining.")
+    
+    # Mark email as verified and award coins
+    VERIFICATION_REWARD = 5
+    await db.users.update_one(
+        {"id": user["id"]},
+        {
+            "$set": {
+                "email_verified": True,
+                "email_verified_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$inc": {"coins": VERIFICATION_REWARD}
+        }
+    )
+    
+    # Clean up
+    del email_verification_store[user["id"]]
+    
+    # Send welcome email
+    await send_welcome_email(user.get("email"), user.get("name", "there"))
+    
+    return {
+        "message": "Email verified successfully!",
+        "coins_awarded": VERIFICATION_REWARD
+    }
+
+
+@router.post("/verify-phone-code")
+async def verify_phone_code(code: str, user: dict = Depends(get_current_user)):
+    """Verify phone with OTP code (alternative to /verify-otp for logged-in users)"""
+    phone = user.get("phone")
+    country_code = user.get("country_code", "254")
+    
+    if not phone:
+        raise HTTPException(status_code=400, detail="No phone number associated with this account")
+    
+    if user.get("phone_verified"):
+        raise HTTPException(status_code=400, detail="Phone already verified")
+    
+    full_phone = format_phone(phone, country_code)
+    stored = otp_store.get(full_phone)
+    
+    if not stored:
+        raise HTTPException(status_code=400, detail="No OTP found. Please request a new one.")
+    
+    # Check expiry
+    if datetime.now(timezone.utc) > stored["expires_at"]:
+        del otp_store[full_phone]
+        raise HTTPException(status_code=400, detail="OTP expired. Please request a new one.")
+    
+    # Check attempts
+    stored["attempts"] += 1
+    if stored["attempts"] > 5:
+        del otp_store[full_phone]
+        raise HTTPException(status_code=400, detail="Too many attempts. Please request a new code.")
+    
+    # Verify OTP
+    if stored["otp"] != code:
+        raise HTTPException(status_code=400, detail=f"Invalid code. {5 - stored['attempts']} attempts remaining.")
+    
+    # Mark phone as verified and award coins
+    VERIFICATION_REWARD = 5
+    await db.users.update_one(
+        {"id": user["id"]},
+        {
+            "$set": {
+                "phone_verified": True,
+                "phone_verified_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$inc": {"coins": VERIFICATION_REWARD}
+        }
+    )
+    
+    # Clean up
+    del otp_store[full_phone]
+    
+    return {
+        "message": "Phone verified successfully!",
+        "coins_awarded": VERIFICATION_REWARD
+    }
+
+
+@router.get("/verification-status")
+async def get_verification_status(user: dict = Depends(get_current_user)):
+    """Get current verification status for the user"""
+    return {
+        "email": user.get("email"),
+        "email_verified": user.get("email_verified", False),
+        "phone": user.get("phone"),
+        "phone_verified": user.get("phone_verified", False),
+        "verification_reward": 5,
+        "features_locked": not (user.get("email_verified") or user.get("phone_verified"))
+    }
+
+
+@router.post("/request-password-reset")
+async def request_password_reset(email: str):
+    """Request password reset email"""
+    from services.email_service import send_password_reset_email, generate_secure_token
+    
+    # Find user by email
+    user = await db.users.find_one({"email": email.lower()})
+    if not user:
+        # Don't reveal if user exists - return success anyway
+        return {"message": "If an account exists with this email, a reset link has been sent."}
+    
+    # Generate reset token
+    reset_token = generate_secure_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    # Store reset token
+    await db.password_resets.update_one(
+        {"user_id": user["id"]},
+        {
+            "$set": {
+                "token": reset_token,
+                "expires_at": expires_at.isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        upsert=True
+    )
+    
+    # Send email
+    await send_password_reset_email(email, reset_token, user.get("name", "there"))
+    
+    return {"message": "If an account exists with this email, a reset link has been sent."}
+
+
+@router.post("/reset-password")
+async def reset_password(token: str, new_password: str):
+    """Reset password using token from email"""
+    # Find reset request
+    reset_request = await db.password_resets.find_one({"token": token})
+    if not reset_request:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link")
+    
+    # Check expiry
+    expires_at = datetime.fromisoformat(reset_request["expires_at"].replace("Z", "+00:00"))
+    if datetime.now(timezone.utc) > expires_at:
+        await db.password_resets.delete_one({"token": token})
+        raise HTTPException(status_code=400, detail="Reset link has expired. Please request a new one.")
+    
+    # Validate password
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+    
+    # Update password
+    hashed = hash_password(new_password)
+    await db.users.update_one(
+        {"id": reset_request["user_id"]},
+        {"$set": {"password": hashed}}
+    )
+    
+    # Delete reset token
+    await db.password_resets.delete_one({"token": token})
+    
+    return {"message": "Password reset successfully. You can now log in with your new password."}
