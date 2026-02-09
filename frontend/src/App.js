@@ -26,6 +26,7 @@ import {
 import DesktopHeader from "@/components/DesktopHeader";
 import { SplashWithSound } from "@/components/SplashScreen";
 import { InstallPrompt } from "@/components/InstallPrompt";
+import { VerificationBanner } from "@/components/VerificationBanner";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
