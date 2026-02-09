@@ -127,6 +127,15 @@ const AppContent = () => {
         />
       )}
 
+      {/* Verification Banner - Shows when user has unverified email/phone */}
+      {user && !isFullScreenPage && (
+        <VerificationBanner 
+          user={user} 
+          token={token} 
+          onVerified={refreshUser} 
+        />
+      )}
+
       <Routes>
         <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
         <Route path="/discover" element={<DiscoverPage onAuthClick={() => handleAuthClick()} />} />
