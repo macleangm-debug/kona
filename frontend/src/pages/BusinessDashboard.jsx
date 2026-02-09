@@ -572,108 +572,57 @@ export const BusinessDashboard = () => {
                 </div>
               )}
             </div>
-                    
-                    {/* Progress bar for budget spent */}
-                    <div className="mt-4">
-                      <div className="flex justify-between text-xs text-white/50 mb-1">
-                        <span>Budget Used</span>
-                        <span>${campaign.spent?.toFixed(2)} / ${campaign.budget}</span>
-                      </div>
-                      <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all"
-                          style={{ width: `${Math.min((campaign.spent / campaign.budget) * 100, 100)}%` }}
-                        />
-                      </div>
+
+            {/* Sidebar for Campaigns Tab */}
+            <div className="space-y-6">
+              {/* Ad Formats */}
+              <Card className="p-6 bg-black/40 border-white/10">
+                <h3 className="font-medium text-white mb-4">Available Ad Formats</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                    <Film className="w-5 h-5 text-blue-400" />
+                    <div>
+                      <p className="text-sm text-white">Pre-roll</p>
+                      <p className="text-xs text-white/50">5-10s before video</p>
                     </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                    <Target className="w-5 h-5 text-green-400" />
+                    <div>
+                      <p className="text-sm text-white">Mid-roll</p>
+                      <p className="text-xs text-white/50">During video playback</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                    <Users className="w-5 h-5 text-purple-400" />
+                    <div>
+                      <p className="text-sm text-white">Story Ads</p>
+                      <p className="text-xs text-white/50">Full-screen vertical</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
+                    <Megaphone className="w-5 h-5 text-yellow-400" />
+                    <div>
+                      <p className="text-sm text-white">Sponsorship</p>
+                      <p className="text-xs text-white/50">"Brought to you by..."</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Help */}
+              <Card className="p-6 bg-gradient-to-br from-primary/20 to-purple-600/20 border-primary/30">
+                <h3 className="font-medium text-white mb-2">Need Help?</h3>
+                <p className="text-sm text-white/70 mb-4">
+                  Our team is here to help you create effective campaigns.
+                </p>
+                <Button variant="outline" className="w-full border-white/20">
+                  Contact Support
+                </Button>
+              </Card>
+            </div>
           </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <Card className="p-6 bg-black/40 border-white/10">
-              <h3 className="font-medium text-white mb-4">Account Summary</h3>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-white/60">Account Tier</span>
-                  <Badge className={TIER_COLORS[advertiser?.tier || "basic"]}>
-                    {advertiser?.tier?.toUpperCase() || "BASIC"}
-                  </Badge>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/60">Balance</span>
-                  <span className="text-white font-medium">${analytics?.balance?.toFixed(2) || "0.00"}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/60">Active Campaigns</span>
-                  <span className="text-white font-medium">{analytics?.active_campaigns || 0}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-white/60">Total Campaigns</span>
-                  <span className="text-white font-medium">{analytics?.total_campaigns || 0}</span>
-                </div>
-              </div>
-              
-              <Button 
-                variant="outline" 
-                className="w-full mt-4"
-                onClick={() => navigate("/business/pricing")}
-              >
-                Upgrade Plan
-              </Button>
-            </Card>
-
-            {/* Ad Formats */}
-            <Card className="p-6 bg-black/40 border-white/10">
-              <h3 className="font-medium text-white mb-4">Available Ad Formats</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                  <Film className="w-5 h-5 text-blue-400" />
-                  <div>
-                    <p className="text-sm text-white">Pre-roll</p>
-                    <p className="text-xs text-white/50">5-10s before video</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                  <Target className="w-5 h-5 text-green-400" />
-                  <div>
-                    <p className="text-sm text-white">Mid-roll</p>
-                    <p className="text-xs text-white/50">During video playback</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                  <Users className="w-5 h-5 text-purple-400" />
-                  <div>
-                    <p className="text-sm text-white">Story Ads</p>
-                    <p className="text-xs text-white/50">Full-screen vertical</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-2 rounded-lg bg-white/5">
-                  <Megaphone className="w-5 h-5 text-yellow-400" />
-                  <div>
-                    <p className="text-sm text-white">Sponsorship</p>
-                    <p className="text-xs text-white/50">"Brought to you by..."</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Help */}
-            <Card className="p-6 bg-gradient-to-br from-primary/20 to-purple-600/20 border-primary/30">
-              <h3 className="font-medium text-white mb-2">Need Help?</h3>
-              <p className="text-sm text-white/70 mb-4">
-                Our team is here to help you create effective campaigns.
-              </p>
-              <Button variant="outline" className="w-full border-white/20">
-                Contact Support
-              </Button>
-            </Card>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
