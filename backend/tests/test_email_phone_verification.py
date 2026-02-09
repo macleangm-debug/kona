@@ -257,9 +257,9 @@ class TestEmailPhoneVerification:
     
     def test_verify_phone_code_no_otp(self, test_user_with_phone):
         """Test verify-phone-code without sending OTP first"""
-        # Create fresh user
+        # Create fresh user with valid phone format
         unique_id = str(uuid.uuid4())[:8]
-        phone = f"8{unique_id[:7].replace('-', '')}"
+        phone = f"713{unique_id[:6].replace('-', '').ljust(6, '0')}"
         
         reg_response = requests.post(f"{BASE_URL}/api/auth/register", json={
             "email": f"TEST_phone_no_otp_{unique_id}@example.com",
