@@ -226,11 +226,11 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 ## API Endpoints
 
 ### Auth
-- `POST /api/auth/register` - Register with email or phone
-- `POST /api/auth/login` - Login with email or phone
+- `POST /api/auth/register` - Register with email or phone (returns geo data)
+- `POST /api/auth/login` - Login with email or phone (returns geo and last_login_geo)
 - `POST /api/auth/send-otp` - Send OTP via WhatsApp/FlashCall/SMS
 - `POST /api/auth/verify-otp` - Verify OTP code
-- `GET /api/auth/me` - Get current user
+- `GET /api/auth/me` - Get current user (includes geo fields)
 
 ### Content
 - `GET /api/series` - List all series
@@ -238,6 +238,22 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - `POST /api/episodes/like` - Like an episode
 - `POST /api/episodes/unlike` - Unlike an episode
 - `GET /api/episodes/:id/like-status` - Check like status
+
+### Admin - Ads Management (NEW)
+- `GET /api/admin/ads/pending` - Get pending ad creatives for approval
+- `GET /api/admin/campaigns/pending` - Get pending campaigns for approval  
+- `GET /api/admin/ads/stats` - Get advertising statistics
+- `POST /api/admin/ads/{id}/approve` - Approve an ad creative
+- `POST /api/admin/ads/{id}/reject` - Reject an ad creative
+- `POST /api/admin/campaigns/{id}/approve` - Approve and activate a campaign
+- `POST /api/admin/campaigns/{id}/reject` - Reject campaign and refund budget
+
+### Advertiser
+- `POST /api/advertiser/register` - Register business account
+- `POST /api/advertiser/login` - Login as advertiser
+- `POST /api/advertiser/campaigns` - Create campaign (requires wallet balance)
+- `GET /api/ads/serve` - Serve ads for video playback
+- `POST /api/ads/track` - Track ad events (impressions, views, clicks)
 
 ## Notes
 - OTP sending is currently MOCKED (prints to console)
