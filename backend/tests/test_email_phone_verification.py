@@ -260,7 +260,6 @@ class TestEmailPhoneVerification:
         """Test verify-phone-code without sending OTP first"""
         # Create fresh user with valid phone format
         unique_id = str(uuid.uuid4())[:8]
-        import random
         phone = f"713{random.randint(100000, 999999)}"
         
         reg_response = requests.post(f"{BASE_URL}/api/auth/register", json={
