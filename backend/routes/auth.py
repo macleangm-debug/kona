@@ -218,7 +218,8 @@ async def register(data: UserCreate, request: Request):
             "referral_count": user["referral_count"],
             "referral_earnings": user["referral_earnings"],
             "phone_verified": user.get("phone_verified", False),
-            "email_verified": user.get("email_verified", False)
+            "email_verified": user.get("email_verified", False),
+            "geo": user.get("geo")
         }
     }
 
