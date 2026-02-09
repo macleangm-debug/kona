@@ -75,7 +75,7 @@ const AppContent = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [showSplash, setShowSplash] = useState(true); // Always show splash on page load
   
-  const { user } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   const { activePromo, showPromo, closePromo } = usePromoManager();
   const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
 
