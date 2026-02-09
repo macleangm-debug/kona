@@ -364,13 +364,20 @@ async def send_email_verification(user: dict = Depends(get_current_user)):
     # Send email
     result = await send_verification_email(email, code, user.get("name", "there"))
     
-    if not result.get("success"):
-        raise HTTPException(status_code=500, detail="Failed to send verification email")
-    
-    return {
+    response = {
         "message": "Verification code sent to your email",
         "email_masked": f"{email[:3]}***{email[email.index('@'):]}"
     }
+    
+    # In test mode, include the code for development (remove in production)
+    if result.get("test_mode"):
+        response["test_mode"] = True
+        response["test_code"] = code  # Only for development!
+        response["note"] = "Email service in test mode. Use test_code to verify."
+    elif not result.get("success"):
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+    
+    return response
 
 @router.post("/verify-email")
 async def verify_email(code: str, user: dict = Depends(get_current_user)):
