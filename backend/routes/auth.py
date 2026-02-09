@@ -4,7 +4,7 @@ Authentication routes
 import uuid
 import random
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 
 from models.schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
@@ -12,6 +12,7 @@ from models.schemas import (
 )
 from services import db, hash_password, verify_password, create_token, generate_referral_code, get_current_user
 from config.settings import REFERRAL_REWARD_REFERRER, REFERRAL_REWARD_REFEREE
+from routes.payments import detect_country_from_ip
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
