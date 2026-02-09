@@ -182,7 +182,19 @@ async def register(data: UserCreate, request: Request):
         "is_admin": False,
         "claimed_milestones": [],
         "phone_verified": False,
-        "email_verified": False
+        "email_verified": False,
+        # Geo-location data from IP
+        "geo": {
+            "country": geo_data.get("country"),
+            "country_code": geo_data.get("country_code"),
+            "city": geo_data.get("city"),
+            "region": geo_data.get("region"),
+            "timezone": geo_data.get("timezone"),
+            "currency": geo_data.get("currency"),
+            "detected_at": datetime.now(timezone.utc).isoformat(),
+            "ip": client_ip if client_ip != "127.0.0.1" else None
+        },
+        "last_login_geo": None
     }
     
     await db.users.insert_one(user)
