@@ -196,15 +196,15 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 
 - **Email & Phone Verification System** (as of Feb 9, 2026):
   - **Resend Integration**: Beautiful HTML email templates with Kona branding
-  - **Email Verification**: 6-digit code, 15-minute expiry, max 5 attempts
-  - **Phone Verification**: Uses existing OTP system (SMS/WhatsApp/FlashCall)
-  - **5 Coin Reward**: Awarded on successful email or phone verification
-  - **Feature-Gating**: Unverified users blocked from: payouts, referral claims, campaign creation
-  - **Non-Blocking**: Users can browse and watch content without verification
-  - **Password Reset**: Secure token-based reset via email (1-hour expiry)
-  - **Verification Banner**: Dismissible banner prompts users to verify
-  - **Endpoints**: /send-email-verification, /verify-email, /verify-phone-code, /verification-status
-  - **Test Mode**: Resend API in test mode returns code in response for development
+  - **Non-Blocking for Viewers**: No verification banner, users can browse/watch/buy coins freely
+  - **Mandatory for Business Portal**: Advertisers MUST verify email before accessing dashboard
+  - **Mandatory for Creator Portal**: Creators MUST verify email before accessing Creator Studio
+  - **5 Coin Reward**: Awarded on verification (only if user seeks verification for rewards)
+  - **Feature-Gating for Viewers**: Unverified blocked from: payouts, referral claims, password changes
+  - **Password Reset**: Secure token-based reset via email (1-hour expiry) at /forgot-password
+  - **Forgot Password Link**: Added to auth modal for easy access
+  - **Test Mode**: Resend API returns code in response for development
+  - **Domain Verification Needed**: Add DNS records to send from custom domain
 
 - **Vertical Video Validation** (as of Feb 9, 2026):
   - "Validate" button in Episode Editor checks video dimensions from URL
