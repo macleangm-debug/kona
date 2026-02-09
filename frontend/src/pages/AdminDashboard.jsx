@@ -1883,21 +1883,26 @@ const AdsApprovalTab = ({ token }) => {
   const [pendingAds, setPendingAds] = useState([]);
   const [pendingCampaigns, setPendingCampaigns] = useState([]);
   const [adsStats, setAdsStats] = useState(null);
+  const [campaignAlerts, setCampaignAlerts] = useState([]);
+  const [alertsUnread, setAlertsUnread] = useState(0);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState(null);
-  const [activeSection, setActiveSection] = useState("ads"); // "ads" or "campaigns"
+  const [activeSection, setActiveSection] = useState("ads"); // "ads", "campaigns", or "alerts"
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [adsRes, campaignsRes, statsRes] = await Promise.all([
+      const [adsRes, campaignsRes, statsRes, alertsRes] = await Promise.all([
         axios.get(`${API}/admin/ads/pending`, { headers: { Authorization: `Bearer ${token}` }}),
         axios.get(`${API}/admin/campaigns/pending`, { headers: { Authorization: `Bearer ${token}` }}),
-        axios.get(`${API}/admin/ads/stats`, { headers: { Authorization: `Bearer ${token}` }})
+        axios.get(`${API}/admin/ads/stats`, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.get(`${API}/admin/ads/alerts`, { headers: { Authorization: `Bearer ${token}` }})
       ]);
       setPendingAds(adsRes.data);
       setPendingCampaigns(campaignsRes.data);
       setAdsStats(statsRes.data);
+      setCampaignAlerts(alertsRes.data.alerts || []);
+      setAlertsUnread(alertsRes.data.unread_count || 0);
     } catch (e) {
       console.error("Failed to fetch ads data:", e);
       toast.error("Failed to load advertising data");
