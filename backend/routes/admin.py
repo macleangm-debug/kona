@@ -1079,3 +1079,188 @@ async def make_series_paid(series_id: str, coins_required: int = 5, user: dict =
         "note": "Episode 1 remains free as the preview/hook episode"
     }
 
+
+# ============ ADVERTISER/ADS MANAGEMENT (ADMIN) ============
+
+@router.get("/ads/pending")
+async def get_pending_ads(user: dict = Depends(require_admin)):
+    """Get all ads pending approval"""
+    pending_ads = await db.ad_creatives.find(
+        {"status": "pending_approval"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with advertiser and campaign info
+    for ad in pending_ads:
+        advertiser = await db.advertisers.find_one(
+            {"id": ad.get("advertiser_id")},
+            {"_id": 0, "company_name": 1, "email": 1, "tier": 1}
+        )
+        campaign = await db.campaigns.find_one(
+            {"id": ad.get("campaign_id")},
+            {"_id": 0, "name": 1, "budget": 1, "ad_placements": 1}
+        )
+        ad["advertiser"] = advertiser
+        ad["campaign"] = campaign
+    
+    return pending_ads
+
+@router.get("/campaigns/pending")
+async def get_pending_campaigns(user: dict = Depends(require_admin)):
+    """Get all campaigns pending approval"""
+    pending_campaigns = await db.campaigns.find(
+        {"status": "pending_approval"},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with advertiser info
+    for campaign in pending_campaigns:
+        advertiser = await db.advertisers.find_one(
+            {"id": campaign.get("advertiser_id")},
+            {"_id": 0, "company_name": 1, "email": 1, "tier": 1}
+        )
+        campaign["advertiser"] = advertiser
+        # Count ads in this campaign
+        ads_count = await db.ad_creatives.count_documents({"campaign_id": campaign["id"]})
+        campaign["ads_count"] = ads_count
+    
+    return pending_campaigns
+
+@router.post("/ads/{ad_id}/approve")
+async def approve_ad(ad_id: str, user: dict = Depends(require_admin)):
+    """Approve an ad creative"""
+    from datetime import datetime, timezone
+    
+    result = await db.ad_creatives.update_one(
+        {"id": ad_id, "status": "pending_approval"},
+        {"$set": {
+            "status": "approved",
+            "approved_at": datetime.now(timezone.utc).isoformat(),
+            "approved_by": user["id"]
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Ad not found or already processed")
+    
+    return {"message": "Ad approved successfully", "ad_id": ad_id}
+
+@router.post("/ads/{ad_id}/reject")
+async def reject_ad(ad_id: str, reason: str = "Does not meet content guidelines", user: dict = Depends(require_admin)):
+    """Reject an ad creative"""
+    from datetime import datetime, timezone
+    
+    result = await db.ad_creatives.update_one(
+        {"id": ad_id, "status": "pending_approval"},
+        {"$set": {
+            "status": "rejected",
+            "rejected_at": datetime.now(timezone.utc).isoformat(),
+            "rejected_by": user["id"],
+            "rejection_reason": reason
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Ad not found or already processed")
+    
+    return {"message": "Ad rejected", "ad_id": ad_id}
+
+@router.post("/campaigns/{campaign_id}/approve")
+async def approve_campaign(campaign_id: str, user: dict = Depends(require_admin)):
+    """Approve a campaign (activates it)"""
+    from datetime import datetime, timezone
+    
+    result = await db.campaigns.update_one(
+        {"id": campaign_id, "status": "pending_approval"},
+        {"$set": {
+            "status": "active",
+            "approved_at": datetime.now(timezone.utc).isoformat(),
+            "approved_by": user["id"]
+        }}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Campaign not found or already processed")
+    
+    return {"message": "Campaign approved and activated", "campaign_id": campaign_id}
+
+@router.post("/campaigns/{campaign_id}/reject")
+async def reject_campaign(campaign_id: str, reason: str = "Does not meet platform guidelines", user: dict = Depends(require_admin)):
+    """Reject a campaign and refund reserved budget"""
+    from datetime import datetime, timezone
+    
+    campaign = await db.campaigns.find_one({"id": campaign_id, "status": "pending_approval"})
+    if not campaign:
+        raise HTTPException(status_code=404, detail="Campaign not found or already processed")
+    
+    # Refund reserved budget back to advertiser
+    reserved_budget = campaign.get("reserved_budget", 0)
+    if reserved_budget > 0:
+        await db.advertisers.update_one(
+            {"id": campaign["advertiser_id"]},
+            {"$inc": {
+                "balance": reserved_budget,
+                "reserved_balance": -reserved_budget
+            }}
+        )
+        
+        # Log refund transaction
+        await db.ad_transactions.insert_one({
+            "id": f"txn-{uuid.uuid4().hex[:12]}",
+            "advertiser_id": campaign["advertiser_id"],
+            "campaign_id": campaign_id,
+            "type": "refund",
+            "amount": reserved_budget,
+            "description": f"Campaign rejected: {reason}",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+    
+    result = await db.campaigns.update_one(
+        {"id": campaign_id},
+        {"$set": {
+            "status": "rejected",
+            "rejected_at": datetime.now(timezone.utc).isoformat(),
+            "rejected_by": user["id"],
+            "rejection_reason": reason
+        }}
+    )
+    
+    return {
+        "message": "Campaign rejected and budget refunded",
+        "campaign_id": campaign_id,
+        "refunded_amount": reserved_budget
+    }
+
+@router.get("/ads/stats")
+async def get_ads_stats(user: dict = Depends(require_admin)):
+    """Get advertising statistics for admin dashboard"""
+    pending_ads = await db.ad_creatives.count_documents({"status": "pending_approval"})
+    approved_ads = await db.ad_creatives.count_documents({"status": "approved"})
+    rejected_ads = await db.ad_creatives.count_documents({"status": "rejected"})
+    
+    pending_campaigns = await db.campaigns.count_documents({"status": "pending_approval"})
+    active_campaigns = await db.campaigns.count_documents({"status": "active"})
+    completed_campaigns = await db.campaigns.count_documents({"status": "completed"})
+    
+    total_advertisers = await db.advertisers.count_documents({})
+    
+    # Total revenue from ads
+    pipeline = [{"$group": {"_id": None, "total": {"$sum": "$total_spent"}}}]
+    revenue_result = await db.advertisers.aggregate(pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total"] if revenue_result else 0
+    
+    return {
+        "ads": {
+            "pending": pending_ads,
+            "approved": approved_ads,
+            "rejected": rejected_ads
+        },
+        "campaigns": {
+            "pending": pending_campaigns,
+            "active": active_campaigns,
+            "completed": completed_campaigns
+        },
+        "total_advertisers": total_advertisers,
+        "total_ad_revenue": round(total_revenue, 2)
+    }
+
