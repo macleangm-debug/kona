@@ -1264,3 +1264,58 @@ async def get_ads_stats(user: dict = Depends(require_admin)):
         "total_ad_revenue": round(total_revenue, 2)
     }
 
+
+@router.get("/ads/alerts")
+async def get_admin_campaign_alerts(
+    user: dict = Depends(require_admin),
+    unread_only: bool = False,
+    limit: int = 100
+):
+    """Get all campaign alerts for admin dashboard"""
+    query = {}
+    if unread_only:
+        query["is_read_admin"] = False
+    
+    alerts = await db.campaign_alerts.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    # Enrich with advertiser info
+    for alert in alerts:
+        advertiser = await db.advertisers.find_one(
+            {"id": alert.get("advertiser_id")},
+            {"_id": 0, "company_name": 1, "email": 1}
+        )
+        alert["advertiser"] = advertiser
+    
+    unread_count = await db.campaign_alerts.count_documents({"is_read_admin": False})
+    
+    return {
+        "alerts": alerts,
+        "unread_count": unread_count
+    }
+
+@router.post("/ads/alerts/{alert_id}/read")
+async def mark_admin_alert_read(alert_id: str, user: dict = Depends(require_admin)):
+    """Mark an alert as read for admin"""
+    result = await db.campaign_alerts.update_one(
+        {"id": alert_id},
+        {"$set": {"is_read_admin": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    return {"message": "Alert marked as read"}
+
+@router.post("/ads/alerts/mark-all-read")
+async def mark_all_admin_alerts_read(user: dict = Depends(require_admin)):
+    """Mark all alerts as read for admin"""
+    result = await db.campaign_alerts.update_many(
+        {"is_read_admin": False},
+        {"$set": {"is_read_admin": True}}
+    )
+    
+    return {"message": f"Marked {result.modified_count} alerts as read"}
+
