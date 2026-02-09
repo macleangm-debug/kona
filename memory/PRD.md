@@ -194,6 +194,18 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - PayoutHistory component with M-Pesa, Bank Transfer, PayPal payout methods
   - Payout request with minimum 100 coins threshold
 
+- **Email & Phone Verification System** (as of Feb 9, 2026):
+  - **Resend Integration**: Beautiful HTML email templates with Kona branding
+  - **Email Verification**: 6-digit code, 15-minute expiry, max 5 attempts
+  - **Phone Verification**: Uses existing OTP system (SMS/WhatsApp/FlashCall)
+  - **5 Coin Reward**: Awarded on successful email or phone verification
+  - **Feature-Gating**: Unverified users blocked from: payouts, referral claims, campaign creation
+  - **Non-Blocking**: Users can browse and watch content without verification
+  - **Password Reset**: Secure token-based reset via email (1-hour expiry)
+  - **Verification Banner**: Dismissible banner prompts users to verify
+  - **Endpoints**: /send-email-verification, /verify-email, /verify-phone-code, /verification-status
+  - **Test Mode**: Resend API in test mode returns code in response for development
+
 - **Vertical Video Validation** (as of Feb 9, 2026):
   - "Validate" button in Episode Editor checks video dimensions from URL
   - Episode 1 MUST be vertical (9:16) for Stories feed - save is blocked if horizontal
