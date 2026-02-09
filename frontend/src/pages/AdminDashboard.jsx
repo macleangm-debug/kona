@@ -2529,6 +2529,7 @@ export const AdminDashboard = () => {
                 {activeTab === "submissions" && "Review creator submissions"}
                 {activeTab === "revenue" && "Revenue tracking and reports"}
                 {activeTab === "creators" && "Manage creator applications"}
+                {activeTab === "ads" && "Review and approve advertiser ads and campaigns"}
                 {activeTab === "checklist" && "Pre-launch verification checklist"}
                 {activeTab === "seeding" && "Boost engagement for launch traction"}
                 {activeTab === "revenue-settings" && "Configure revenue distribution"}
