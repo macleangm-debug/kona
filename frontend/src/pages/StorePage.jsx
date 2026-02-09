@@ -92,8 +92,12 @@ export const StorePage = () => {
           });
           
           if (res.data.payment_status === "paid") {
+            // Show coin animation with the purchased amount
+            const purchasedCoins = res.data.coins_added || res.data.total_coins || 100;
+            setCoinAnimationAmount(purchasedCoins);
+            setShowCoinAnimation(true);
+            
             await refreshUser();
-            toast.success("Payment successful! Coins added to your account.");
             setCheckingPayment(false);
             navigate("/store", { replace: true });
           } else if (res.data.status === "expired" || res.data.status === "failed") {
