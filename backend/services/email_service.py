@@ -50,8 +50,18 @@ async def send_email(to: str, subject: str, html_content: str) -> dict:
         logger.info(f"Email sent successfully to {to}")
         return {"success": True, "email_id": email.get("id")}
     except Exception as e:
-        logger.error(f"Failed to send email to {to}: {str(e)}")
-        return {"success": False, "error": str(e)}
+        error_msg = str(e)
+        logger.error(f"Failed to send email to {to}: {error_msg}")
+        
+        # Check for Resend test mode restriction
+        if "only send testing emails to your own email" in error_msg:
+            return {
+                "success": False, 
+                "error": "Email service in test mode. Please verify your domain at resend.com/domains for production use.",
+                "test_mode": True
+            }
+        
+        return {"success": False, "error": error_msg}
 
 
 async def send_verification_email(to: str, code: str, name: str = "there") -> dict:
