@@ -5,13 +5,28 @@ import {
   Building2, BarChart3, DollarSign, Eye, MousePointer,
   TrendingUp, Plus, Settings, LogOut, ChevronRight,
   Play, Pause, Clock, CheckCircle, XCircle, AlertCircle,
-  CreditCard, Target, Film, Megaphone, Users, Calendar
+  CreditCard, Target, Film, Megaphone, Users, Calendar,
+  PieChart, Activity, Globe, ArrowUpRight, ArrowDownRight
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  LineChart, Line, AreaChart, Area, BarChart, Bar,
+  PieChart as RechartsPie, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from "recharts";
 import { API } from "@/config";
 import { toast } from "sonner";
+
+// Chart colors
+const CHART_COLORS = ['#8b5cf6', '#22c55e', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899'];
+const STATUS_COLORS = {
+  active: '#22c55e',
+  paused: '#f59e0b', 
+  pending_approval: '#3b82f6',
+  completed: '#6b7280'
+};
 
 const TIER_COLORS = {
   basic: "bg-gray-500/20 text-gray-300",
