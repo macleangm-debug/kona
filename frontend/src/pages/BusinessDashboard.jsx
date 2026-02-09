@@ -16,6 +16,7 @@ import {
   PieChart as RechartsPie, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
+import { CampaignAlerts } from "@/components/CampaignAlerts";
 import { API } from "@/config";
 import { toast } from "sonner";
 
