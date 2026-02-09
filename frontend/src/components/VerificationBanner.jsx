@@ -67,15 +67,12 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
     
     setLoading(true);
     try {
-      const endpoint = verifyType === "email" 
-        ? `${API}/auth/verify-email?code=${code}`
-        : `${API}/auth/verify-phone-code?code=${code}`;
-      
-      const res = await axios.post(endpoint, {}, {
+      // Email verification only for now
+      const res = await axios.post(`${API}/auth/verify-email?code=${code}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      toast.success(`${verifyType === "email" ? "Email" : "Phone"} verified! +${res.data.coins_awarded} coins!`);
+      toast.success(`Email verified! +${res.data.coins_awarded} coins!`);
       setShowModal(false);
       setShowBanner(false);
       setCode("");
@@ -91,8 +88,7 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
 
   if (!showBanner || dismissed) return null;
 
-  const hasEmail = user?.email && !user?.email_verified;
-  const hasPhone = user?.phone && !user?.phone_verified;
+  const hasUnverifiedEmail = user?.email && !user?.email_verified;
 
   return (
     <>
@@ -106,7 +102,7 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-white">
-                  Verify your account to unlock all features
+                  Verify your email to unlock all features
                 </p>
                 <p className="text-xs text-white/60">
                   Earn <span className="text-yellow-400 font-semibold">5 bonus coins</span> when you verify!
@@ -115,10 +111,10 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
             </div>
             
             <div className="flex items-center gap-2">
-              {hasEmail && (
+              {hasUnverifiedEmail && (
                 <Button
                   size="sm"
-                  onClick={() => { setVerifyType("email"); setShowModal(true); }}
+                  onClick={() => setShowModal(true)}
                   className="bg-purple-500 hover:bg-purple-600"
                   data-testid="verify-email-btn"
                 >
@@ -126,8 +122,6 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
                   Verify Email
                 </Button>
               )}
-              {hasPhone && (
-                <Button
                   size="sm"
                   variant="outline"
                   onClick={() => { setVerifyType("phone"); setShowModal(true); }}
