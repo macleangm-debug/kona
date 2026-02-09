@@ -2229,6 +2229,111 @@ const AdsApprovalTab = ({ token }) => {
         </div>
       )}
 
+      {/* Campaign Alerts Section */}
+      {activeSection === "alerts" && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-lg">Campaign Performance Alerts</h3>
+            {alertsUnread > 0 && (
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={async () => {
+                  try {
+                    await axios.post(`${API}/admin/ads/alerts/mark-all-read`, {}, {
+                      headers: { Authorization: `Bearer ${token}` }
+                    });
+                    fetchData();
+                    toast.success("All alerts marked as read");
+                  } catch (e) {
+                    toast.error("Failed to mark alerts as read");
+                  }
+                }}
+              >
+                Mark all as read
+              </Button>
+            )}
+          </div>
+          
+          {campaignAlerts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <AlertTriangle className="w-12 h-12 mx-auto mb-4 text-white/20" />
+              <p className="text-muted-foreground">No campaign alerts yet</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Alerts appear when campaigns reach view milestones or budget thresholds
+              </p>
+            </Card>
+          ) : (
+            <div className="space-y-3">
+              {campaignAlerts.map(alert => (
+                <Card 
+                  key={alert.id} 
+                  className={`p-4 border-white/10 ${
+                    !alert.is_read_admin 
+                      ? 'bg-primary/5 border-primary/20' 
+                      : 'bg-white/5'
+                  }`}
+                  data-testid={`admin-alert-${alert.id}`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${
+                        alert.alert_type === 'warning' 
+                          ? 'bg-yellow-500/20' 
+                          : 'bg-green-500/20'
+                      }`}>
+                        {alert.alert_type === 'warning' ? (
+                          <AlertTriangle className="w-5 h-5 text-yellow-400" />
+                        ) : alert.metric === 'views' ? (
+                          <Eye className="w-5 h-5 text-green-400" />
+                        ) : alert.metric === 'impressions' ? (
+                          <Target className="w-5 h-5 text-blue-400" />
+                        ) : (
+                          <DollarSign className="w-5 h-5 text-purple-400" />
+                        )}
+                      </div>
+                      <div>
+                        <p className={`text-sm ${!alert.is_read_admin ? 'text-white font-medium' : 'text-white/80'}`}>
+                          {alert.message}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1">
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(alert.created_at).toLocaleString()}
+                          </span>
+                          {alert.advertiser && (
+                            <Badge variant="outline" className="text-xs">
+                              {alert.advertiser.company_name}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {!alert.is_read_admin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            await axios.post(`${API}/admin/ads/alerts/${alert.id}/read`, {}, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            });
+                            fetchData();
+                          } catch (e) {
+                            toast.error("Failed to mark as read");
+                          }
+                        }}
+                      >
+                        <Check className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Info Card */}
       <Card className="p-4 bg-blue-500/10 border-blue-500/20">
         <p className="text-sm text-blue-300">
