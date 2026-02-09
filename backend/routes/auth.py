@@ -10,9 +10,8 @@ from models.schemas import (
     UserCreate, UserLogin, UserResponse, TokenResponse,
     SendOTPRequest, VerifyOTPRequest, OTPResponse
 )
-from services import db, hash_password, verify_password, create_token, generate_referral_code, get_current_user
+from services import db, hash_password, verify_password, create_token, generate_referral_code, get_current_user, detect_country_from_ip
 from config.settings import REFERRAL_REWARD_REFERRER, REFERRAL_REWARD_REFEREE
-from routes.payments import detect_country_from_ip
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
