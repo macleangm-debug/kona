@@ -286,14 +286,15 @@ class TestEmailPhoneVerification:
     
     def test_verification_status_unverified(self):
         """Test GET /api/auth/verification-status for unverified user"""
-        # Create fresh unverified user
+        # Create fresh unverified user with valid phone format
         unique_id = str(uuid.uuid4())[:8]
+        phone = f"714{unique_id[:6].replace('-', '').ljust(6, '0')}"
         
         reg_response = requests.post(f"{BASE_URL}/api/auth/register", json={
             "email": f"TEST_status_{unique_id}@example.com",
             "password": "TestPass123!",
             "name": f"Test Status {unique_id}",
-            "phone": f"6{unique_id[:7].replace('-', '')}",
+            "phone": phone,
             "country_code": "254"
         })
         
