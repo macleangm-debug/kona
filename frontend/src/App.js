@@ -54,7 +54,8 @@ import {
   CreatorsLandingPage,
   BusinessAuthPage,
   BusinessDashboard,
-  CampaignCreatePage
+  CampaignCreatePage,
+  CoinAnimationDemo
 } from "@/pages";
 
 // Swiper CSS
