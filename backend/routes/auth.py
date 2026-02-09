@@ -433,41 +433,16 @@ async def verify_email(code: str, user: dict = Depends(get_current_user)):
 
 @router.post("/verify-phone-code")
 async def verify_phone_code(code: str, user: dict = Depends(get_current_user)):
-    """Verify phone with OTP code (alternative to /verify-otp for logged-in users)"""
-    phone = user.get("phone")
-    country_code = user.get("country_code", "254")
-    
-    if not phone:
-        raise HTTPException(status_code=400, detail="No phone number associated with this account")
-    
-    if user.get("phone_verified"):
-        raise HTTPException(status_code=400, detail="Phone already verified")
-    
-    full_phone = format_phone(phone, country_code)
-    stored = otp_store.get(full_phone)
-    
-    if not stored:
-        raise HTTPException(status_code=400, detail="No OTP found. Please request a new one.")
-    
-    # Check expiry
-    if datetime.now(timezone.utc) > stored["expires_at"]:
-        del otp_store[full_phone]
-        raise HTTPException(status_code=400, detail="OTP expired. Please request a new one.")
-    
-    # Check attempts
-    stored["attempts"] += 1
-    if stored["attempts"] > 5:
-        del otp_store[full_phone]
-        raise HTTPException(status_code=400, detail="Too many attempts. Please request a new code.")
-    
-    # Verify OTP
-    if stored["otp"] != code:
-        raise HTTPException(status_code=400, detail=f"Invalid code. {5 - stored['attempts']} attempts remaining.")
-    
-    # Mark phone as verified and award coins
-    VERIFICATION_REWARD = 5
-    await db.users.update_one(
-        {"id": user["id"]},
+    """
+    Verify phone with OTP code.
+    NOTE: Phone verification is currently disabled until SMS provider (Africa's Talking/Twilio) is integrated.
+    Users should use email verification instead.
+    """
+    # Temporarily disabled until SMS provider is integrated
+    raise HTTPException(
+        status_code=503, 
+        detail="Phone verification temporarily unavailable. Please use email verification instead."
+    )
         {
             "$set": {
                 "phone_verified": True,
