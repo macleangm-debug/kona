@@ -290,7 +290,8 @@ class TestEmailPhoneVerification:
         """Test GET /api/auth/verification-status for unverified user"""
         # Create fresh unverified user with valid phone format
         unique_id = str(uuid.uuid4())[:8]
-        phone = f"714{unique_id[:6].replace('-', '').ljust(6, '0')}"
+        import random
+        phone = f"714{random.randint(100000, 999999)}"
         
         reg_response = requests.post(f"{BASE_URL}/api/auth/register", json={
             "email": f"TEST_status_{unique_id}@example.com",
