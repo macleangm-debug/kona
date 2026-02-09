@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
-  Mail, Phone, Shield, X, CheckCircle, 
+  Mail, Shield, X, CheckCircle, 
   Loader2, Gift, AlertTriangle, ChevronRight 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,6 @@ import { toast } from "sonner";
 export const VerificationBanner = ({ user, token, onVerified }) => {
   const [showBanner, setShowBanner] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [verifyType, setVerifyType] = useState("email"); // Email only for now
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
@@ -29,9 +28,8 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
     // Show banner only if user has unverified email
     // Phone verification disabled until SMS provider is integrated
     const hasUnverifiedEmail = user?.email && !user?.email_verified;
-    const isVerified = user?.email_verified; // Only email verification counts for now
+    const isVerified = user?.email_verified;
     
-    // Check if user dismissed the banner this session
     const wasDismissed = sessionStorage.getItem('verification_dismissed');
     
     setShowBanner(hasUnverifiedEmail && !isVerified && !wasDismissed);
@@ -47,7 +45,6 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
     setLoading(true);
     
     try {
-      // Email verification only for now
       await axios.post(`${API}/auth/send-email-verification`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -67,7 +64,6 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
     
     setLoading(true);
     try {
-      // Email verification only for now
       const res = await axios.post(`${API}/auth/verify-email?code=${code}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -78,7 +74,6 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
       setCode("");
       setCodeSent(false);
       
-      // Callback to refresh user data
       if (onVerified) onVerified();
     } catch (err) {
       toast.error(err.response?.data?.detail || "Invalid code");
@@ -87,8 +82,6 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
   };
 
   if (!showBanner || dismissed) return null;
-
-  const hasUnverifiedEmail = user?.email && !user?.email_verified;
 
   return (
     <>
@@ -111,27 +104,15 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
             </div>
             
             <div className="flex items-center gap-2">
-              {hasUnverifiedEmail && (
-                <Button
-                  size="sm"
-                  onClick={() => setShowModal(true)}
-                  className="bg-purple-500 hover:bg-purple-600"
-                  data-testid="verify-email-btn"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Verify Email
-                </Button>
-              )}
-                  size="sm"
-                  variant="outline"
-                  onClick={() => { setVerifyType("phone"); setShowModal(true); }}
-                  className="border-purple-500/50"
-                  data-testid="verify-phone-btn"
-                >
-                  <Phone className="w-4 h-4 mr-2" />
-                  Verify Phone
-                </Button>
-              )}
+              <Button
+                size="sm"
+                onClick={() => setShowModal(true)}
+                className="bg-purple-500 hover:bg-purple-600"
+                data-testid="verify-email-btn"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Verify Email
+              </Button>
               <button
                 onClick={dismissBanner}
                 className="p-1 text-white/40 hover:text-white/60 transition-colors"
@@ -149,17 +130,13 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
         <DialogContent className="sm:max-w-md bg-gray-900 border-white/10">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {verifyType === "email" ? (
-                <Mail className="w-5 h-5 text-purple-400" />
-              ) : (
-                <Phone className="w-5 h-5 text-purple-400" />
-              )}
-              Verify your {verifyType}
+              <Mail className="w-5 h-5 text-purple-400" />
+              Verify your email
             </DialogTitle>
             <DialogDescription>
               {!codeSent 
-                ? `We'll send a 6-digit code to your ${verifyType}.`
-                : `Enter the code sent to ${verifyType === "email" ? user?.email : user?.phone}`
+                ? "We'll send a 6-digit code to your email."
+                : `Enter the code sent to ${user?.email}`
               }
             </DialogDescription>
           </DialogHeader>
@@ -168,9 +145,7 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
             {!codeSent ? (
               <>
                 <div className="p-4 rounded-lg bg-purple-500/10 border border-purple-500/20">
-                  <p className="text-sm text-white/80">
-                    {verifyType === "email" ? user?.email : `+${user?.country_code || "254"} ${user?.phone}`}
-                  </p>
+                  <p className="text-sm text-white/80">{user?.email}</p>
                 </div>
                 
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
@@ -182,7 +157,7 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
 
                 <Button
                   className="w-full"
-                  onClick={() => sendVerificationCode(verifyType)}
+                  onClick={sendVerificationCode}
                   disabled={loading}
                 >
                   {loading ? (
@@ -223,7 +198,7 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
                 </Button>
 
                 <button
-                  onClick={() => sendVerificationCode(verifyType)}
+                  onClick={sendVerificationCode}
                   disabled={loading}
                   className="w-full text-sm text-purple-400 hover:text-purple-300"
                 >
@@ -248,7 +223,8 @@ export const FeatureGate = ({
 }) => {
   const [showPrompt, setShowPrompt] = useState(false);
   
-  const isVerified = user?.email_verified || user?.phone_verified;
+  // Email verification only for now (phone verification disabled until SMS provider integrated)
+  const isVerified = user?.email_verified;
   
   // Features that require verification
   const restrictedFeatures = {
@@ -264,7 +240,7 @@ export const FeatureGate = ({
       e.preventDefault();
       e.stopPropagation();
       setShowPrompt(true);
-      toast.error(`Please verify your account to ${restrictedFeatures[feature]}`);
+      toast.error(`Please verify your email to ${restrictedFeatures[feature]}`);
     }
   };
 
@@ -281,10 +257,10 @@ export const FeatureGate = ({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-yellow-400" />
-              Verification Required
+              Email Verification Required
             </DialogTitle>
             <DialogDescription>
-              You need to verify your email or phone to {restrictedFeatures[feature]}.
+              You need to verify your email to {restrictedFeatures[feature]}.
             </DialogDescription>
           </DialogHeader>
 
@@ -296,34 +272,16 @@ export const FeatureGate = ({
               </p>
             </div>
 
-            <div className="flex gap-2">
-              {user?.email && !user?.email_verified && (
-                <Button
-                  className="flex-1"
-                  onClick={() => {
-                    setShowPrompt(false);
-                    // Trigger email verification flow
-                    document.querySelector('[data-testid="verify-email-btn"]')?.click();
-                  }}
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Verify Email
-                </Button>
-              )}
-              {user?.phone && !user?.phone_verified && (
-                <Button
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => {
-                    setShowPrompt(false);
-                    document.querySelector('[data-testid="verify-phone-btn"]')?.click();
-                  }}
-                >
-                  <Phone className="w-4 h-4 mr-2" />
-                  Verify Phone
-                </Button>
-              )}
-            </div>
+            <Button
+              className="w-full"
+              onClick={() => {
+                setShowPrompt(false);
+                document.querySelector('[data-testid="verify-email-btn"]')?.click();
+              }}
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Verify Email
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
