@@ -1215,7 +1215,7 @@ async def reject_campaign(campaign_id: str, reason: str = "Does not meet platfor
             "created_at": datetime.now(timezone.utc).isoformat()
         })
     
-    result = await db.campaigns.update_one(
+    await db.campaigns.update_one(
         {"id": campaign_id},
         {"$set": {
             "status": "rejected",
