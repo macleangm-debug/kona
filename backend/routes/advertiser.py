@@ -1034,6 +1034,9 @@ async def track_ad_event(
                 {"$set": {"status": "completed", "paused_reason": "Budget exhausted"}}
             )
     
+    # Process milestone alerts asynchronously
+    await process_campaign_milestones(campaign_id)
+    
     return {
         "tracked": True,
         "event_type": event_type,
