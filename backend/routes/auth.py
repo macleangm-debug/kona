@@ -105,6 +105,7 @@ async def register(data: UserCreate, request: Request):
     if forwarded_for:
         client_ip = forwarded_for.split(",")[0].strip()
     geo_data = await detect_country_from_ip(client_ip)
+    print(f"[AUTH] Registration - IP: {client_ip}, Geo: {geo_data}")
     
     # Validate that either email or phone is provided
     if not data.email and not data.phone:
