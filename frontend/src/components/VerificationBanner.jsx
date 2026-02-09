@@ -19,22 +19,22 @@ import { toast } from "sonner";
 export const VerificationBanner = ({ user, token, onVerified }) => {
   const [showBanner, setShowBanner] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [verifyType, setVerifyType] = useState(null); // "email" or "phone"
+  const [verifyType, setVerifyType] = useState("email"); // Email only for now
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [codeSent, setCodeSent] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // Show banner if user has email/phone but not verified
+    // Show banner only if user has unverified email
+    // Phone verification disabled until SMS provider is integrated
     const hasUnverifiedEmail = user?.email && !user?.email_verified;
-    const hasUnverifiedPhone = user?.phone && !user?.phone_verified;
-    const isFullyVerified = user?.email_verified || user?.phone_verified;
+    const isVerified = user?.email_verified; // Only email verification counts for now
     
     // Check if user dismissed the banner this session
     const wasDismissed = sessionStorage.getItem('verification_dismissed');
     
-    setShowBanner((hasUnverifiedEmail || hasUnverifiedPhone) && !isFullyVerified && !wasDismissed);
+    setShowBanner(hasUnverifiedEmail && !isVerified && !wasDismissed);
   }, [user]);
 
   const dismissBanner = () => {
@@ -43,25 +43,15 @@ export const VerificationBanner = ({ user, token, onVerified }) => {
     sessionStorage.setItem('verification_dismissed', 'true');
   };
 
-  const sendVerificationCode = async (type) => {
+  const sendVerificationCode = async () => {
     setLoading(true);
-    setVerifyType(type);
     
     try {
-      if (type === "email") {
-        await axios.post(`${API}/auth/send-email-verification`, {}, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success("Verification code sent to your email!");
-      } else {
-        // For phone, use existing OTP endpoint
-        await axios.post(`${API}/auth/send-otp`, {
-          phone: user.phone,
-          country_code: user.country_code || "254",
-          verification_method: "sms"
-        });
-        toast.success("Verification code sent to your phone!");
-      }
+      // Email verification only for now
+      await axios.post(`${API}/auth/send-email-verification`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Verification code sent to your email!");
       setCodeSent(true);
     } catch (err) {
       toast.error(err.response?.data?.detail || "Failed to send verification code");
