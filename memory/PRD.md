@@ -202,20 +202,26 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [x] Like button fix - COMPLETED
 - [x] Phone/Email auth system - COMPLETED
 - [x] Cinematic splash screen with sound - COMPLETED
+- [x] Geo-location tracking for users - COMPLETED (Feb 9, 2026)
 - [ ] Re-deploy application to production
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
 
 ### P1 (High Priority)
+- [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
+- [ ] Vertical video validation in Creator Portal (check dimensions before upload for Episode 1/Stories)
 - [ ] Submit sitemap to Bing Webmaster Tools (after re-deploy)
 - [ ] Verify demo accounts on production
 
 ### P2 (Medium Priority)
 - [ ] Device limits/session management
-- [ ] Live payment gateway integration
+- [ ] Live payment gateway integration (Stripe for advertisers)
+- [ ] Enhanced Advertiser Analytics Dashboard (charts, reports)
+- [ ] Creator Monetization Dashboard (earnings, payouts)
 
 ### P3 (Low Priority/Enhancements)
 - [ ] Social media links in footer
 - [ ] Additional SEO optimizations
+- [ ] Advanced ad targeting using geo data
 
 ## API Endpoints
 
