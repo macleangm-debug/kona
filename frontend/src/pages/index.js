@@ -24,3 +24,4 @@ export { default as CreatorsLandingPage } from './CreatorsLandingPage';
 export { default as BusinessAuthPage } from './BusinessAuthPage';
 export { default as BusinessDashboard } from './BusinessDashboard';
 export { default as CampaignCreatePage } from './CampaignCreatePage';
+export { default as CoinAnimationDemo } from './CoinAnimationDemo';
