@@ -217,6 +217,8 @@ async def register(data: UserCreate, request: Request):
             "referral_earnings": user["referral_earnings"],
             "phone_verified": user.get("phone_verified", False),
             "email_verified": user.get("email_verified", False),
+            "is_admin": user.get("is_admin", False),
+            "is_super_admin": user.get("is_super_admin", False),
             "geo": user.get("geo")
         }
     }
