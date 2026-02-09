@@ -161,7 +161,8 @@ export const BusinessDashboard = () => {
             <p className="text-white/60">Manage your ad campaigns and track performance</p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
+            <CampaignAlerts token={token} isAdmin={false} />
             <Button variant="outline" onClick={() => navigate("/business/billing")}>
               <CreditCard className="w-4 h-4 mr-2" />
               Add Funds (${analytics?.balance?.toFixed(2) || "0.00"})
