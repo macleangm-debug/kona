@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { CoinBalance } from "@/components";
+import { CoinAnimation } from "@/components/CoinAnimation";
 
 export const StorePage = () => {
   const navigate = useNavigate();
@@ -19,6 +20,10 @@ export const StorePage = () => {
   const [loading, setLoading] = useState(true);
   const [checkingPayment, setCheckingPayment] = useState(false);
   const location = useLocation();
+  
+  // Coin animation state
+  const [showCoinAnimation, setShowCoinAnimation] = useState(false);
+  const [coinAnimationAmount, setCoinAnimationAmount] = useState(0);
   
   // Geo & Payment state
   const [geoData, setGeoData] = useState(null);
