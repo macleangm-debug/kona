@@ -57,6 +57,7 @@ import {
   BusinessDashboard,
   CampaignCreatePage
 } from "@/pages";
+import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
 
 // Swiper CSS
 import 'swiper/css';
