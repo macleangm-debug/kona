@@ -561,6 +561,17 @@ export const RewardsPage = ({ onAuthClick }) => {
         rewardType={rewardModalData.type}
         onConfirm={() => setShowRewardModal(false)}
       />
+      
+      {/* Coin Animation */}
+      <CoinAnimation
+        show={showCoinAnimation}
+        amount={coinAnimationAmount}
+        variant="reward"
+        onComplete={() => {
+          setShowCoinAnimation(false);
+          toast.success(`+${coinAnimationAmount} coins added!`);
+        }}
+      />
     </div>
   );
 };
