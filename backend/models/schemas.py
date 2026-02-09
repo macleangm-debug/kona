@@ -52,6 +52,14 @@ class OTPResponse(BaseModel):
     message: str
     expires_in: int = 300  # 5 minutes
 
+class GeoData(BaseModel):
+    country: Optional[str] = None
+    country_code: Optional[str] = None
+    is_african: bool = False
+    detected_at: Optional[str] = None
+    logged_in_at: Optional[str] = None
+    ip: Optional[str] = None
+
 class UserResponse(BaseModel):
     id: str
     email: Optional[str] = None
@@ -68,6 +76,8 @@ class UserResponse(BaseModel):
     is_super_admin: bool = False
     phone_verified: bool = False
     email_verified: bool = False
+    geo: Optional[GeoData] = None
+    last_login_geo: Optional[GeoData] = None
 
 class TokenResponse(BaseModel):
     token: str
