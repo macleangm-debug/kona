@@ -110,7 +110,7 @@ const AppContent = () => {
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page));
   
   // Pages that skip splash screen
-  const skipSplashPages = ["/business", "/creator/login", "/admin/login", "/demo"];
+  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo"];
   const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page));
 
   return (
