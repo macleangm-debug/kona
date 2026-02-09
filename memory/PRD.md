@@ -225,14 +225,14 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [x] Enhanced Advertiser Analytics Dashboard - COMPLETED (Feb 9, 2026)
 - [x] Creator Monetization Dashboard - VERIFIED EXISTING
 - [x] Advanced Ad Targeting using Geo Data - VERIFIED EXISTING
-- [ ] Vertical video validation in Creator Portal (check dimensions before upload for Episode 1/Stories)
+- [x] Vertical video validation in Creator Portal - COMPLETED (Feb 9, 2026)
+- [x] Live Campaign Performance Alerts - COMPLETED (Feb 9, 2026)
 - [ ] Submit sitemap to Bing Webmaster Tools (after re-deploy)
 - [ ] Verify demo accounts on production
 
 ### P2 (Medium Priority)
 - [ ] Device limits/session management
 - [ ] Stripe integration for wallet top-up (Advertisers)
-- [ ] Real-time ad performance notifications for admins
 
 ### P3 (Low Priority/Enhancements)
 - [ ] Social media links in footer
