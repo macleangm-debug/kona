@@ -110,15 +110,126 @@ export const BusinessAuthPage = () => {
         industry: registerForm.industry || null
       });
       
+      // Store token and go to verification
+      setAdvertiserToken(res.data.token);
       localStorage.setItem("advertiser_token", res.data.token);
-      localStorage.setItem("advertiser", JSON.stringify(res.data.advertiser));
-      toast.success("Account created! Welcome to Kona Ads");
-      navigate("/business/dashboard");
+      
+      // Send verification email
+      try {
+        const verifyRes = await axios.post(`${API}/advertiser/send-verification`, {}, {
+          headers: { Authorization: `Bearer ${res.data.token}` }
+        });
+        if (verifyRes.data.test_code) {
+          setTestCode(verifyRes.data.test_code);
+        }
+        toast.success("Account created! Please verify your email.");
+      } catch (err) {
+        toast.success("Account created! Check your email for verification code.");
+      }
+      
+      setMode("verify");
     } catch (err) {
       toast.error(err.response?.data?.detail || "Registration failed");
     }
     setLoading(false);
   };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (verificationCode.length !== 6) {
+      toast.error("Please enter the 6-digit code");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const token = advertiserToken || localStorage.getItem("advertiser_token");
+      await axios.post(`${API}/advertiser/verify-email?code=${verificationCode}`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      // Fetch updated advertiser data
+      const res = await axios.get(`${API}/advertiser/me`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      localStorage.setItem("advertiser", JSON.stringify(res.data));
+      toast.success("Email verified! Welcome to Kona Ads");
+      navigate("/business/dashboard");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Invalid verification code");
+    }
+    setLoading(false);
+  };
+
+  const resendVerification = async () => {
+    const token = advertiserToken || localStorage.getItem("advertiser_token");
+    if (!token) return;
+    
+    try {
+      const res = await axios.post(`${API}/advertiser/send-verification`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.data.test_code) {
+        setTestCode(res.data.test_code);
+      }
+      toast.success("Verification code sent!");
+    } catch (err) {
+      toast.error("Failed to resend code");
+    }
+  };
+
+  // Verification Screen
+  if (mode === "verify") {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md p-8 bg-gray-900/80 border-white/10">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/20 flex items-center justify-center">
+              <Shield className="w-8 h-8 text-purple-400" />
+            </div>
+            <h1 className="text-2xl font-bold text-white">Verify Your Email</h1>
+            <p className="text-white/60 mt-2">
+              We sent a 6-digit code to your email. Enter it below to access your dashboard.
+            </p>
+          </div>
+
+          <form onSubmit={handleVerify} className="space-y-4">
+            <div>
+              <Input
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="000000"
+                className="text-center text-2xl tracking-[0.5em] font-mono bg-secondary/50 border-white/10"
+                maxLength={6}
+              />
+            </div>
+
+            {testCode && (
+              <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                <p className="text-xs text-yellow-400">
+                  Test Mode - Use code: <span className="font-mono font-bold">{testCode}</span>
+                </p>
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={loading || verificationCode.length !== 6}>
+              {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <CheckCircle className="w-4 h-4 mr-2" />}
+              Verify Email
+            </Button>
+
+            <button
+              type="button"
+              onClick={resendVerification}
+              className="w-full text-sm text-purple-400 hover:text-purple-300"
+            >
+              Didn't receive code? Resend
+            </button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900">
