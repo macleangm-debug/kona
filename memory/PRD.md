@@ -164,7 +164,25 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Blurred backdrop overlay for focus
   - "Tap to continue" dismissal
   - Integrated into: Store page (top-ups), Rewards page (claims/spins)
-  - Demo page: `/demo/coins`
+- **Geo-location Tracking** (as of Feb 9, 2026):
+  - Detects user's country from IP address on registration and login
+  - Stores `geo` field on registration with country_name, country_code, is_african flag
+  - Updates `last_login_geo` on each login with login timestamp
+  - Data available in API responses for personalization and analytics
+  - Uses GeoJS.io public API for IP-based country detection
+- **Admin Ads Approval Tab** (as of Feb 9, 2026):
+  - New "Ads Approval" section in Admin Dashboard
+  - Stats cards showing pending ads, pending campaigns, active campaigns, total ad revenue
+  - Approve/Reject buttons for ad creatives with preview
+  - Approve/Reject buttons for campaigns with budget refund on rejection
+  - Campaign rejection automatically refunds reserved budget to advertiser wallet
+  - Backend endpoints: GET /api/admin/ads/pending, GET /api/admin/campaigns/pending, GET /api/admin/ads/stats
+  - Action endpoints: POST /api/admin/ads/{id}/approve, POST /api/admin/ads/{id}/reject
+  - Action endpoints: POST /api/admin/campaigns/{id}/approve, POST /api/admin/campaigns/{id}/reject
+
+## Code Cleanup Completed (Feb 9, 2026)
+- Removed temporary CoinAnimationDemo page (`/demo/coins` route and component)
+- CoinAnimation component still available in `/app/frontend/src/components/CoinAnimation.jsx` for use in Store and Rewards pages
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
