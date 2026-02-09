@@ -194,6 +194,89 @@ async def get_advertiser_profile(request: Request):
     advertiser = await require_advertiser(request)
     return advertiser
 
+
+# ============ ADVERTISER EMAIL VERIFICATION ============
+
+advertiser_verification_store = {}
+
+@router.post("/advertiser/send-verification")
+async def send_advertiser_verification(request: Request):
+    """Send email verification code to advertiser"""
+    from services.email_service import send_verification_email, generate_verification_token
+    
+    advertiser = await require_advertiser(request)
+    
+    if advertiser.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    code = generate_verification_token()
+    expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
+    
+    advertiser_verification_store[advertiser["id"]] = {
+        "code": code,
+        "email": advertiser["email"],
+        "expires_at": expires_at,
+        "attempts": 0
+    }
+    
+    result = await send_verification_email(
+        advertiser["email"], 
+        code, 
+        advertiser.get("contact_name", advertiser.get("company_name", "there"))
+    )
+    
+    response = {
+        "message": "Verification code sent",
+        "email_masked": f"{advertiser['email'][:3]}***{advertiser['email'][advertiser['email'].index('@'):]}"
+    }
+    
+    if result.get("test_mode"):
+        response["test_mode"] = True
+        response["test_code"] = code
+    elif not result.get("success"):
+        raise HTTPException(status_code=500, detail="Failed to send verification email")
+    
+    return response
+
+
+@router.post("/advertiser/verify-email")
+async def verify_advertiser_email(code: str, request: Request):
+    """Verify advertiser email with code"""
+    advertiser = await require_advertiser(request)
+    
+    if advertiser.get("email_verified"):
+        raise HTTPException(status_code=400, detail="Email already verified")
+    
+    stored = advertiser_verification_store.get(advertiser["id"])
+    if not stored:
+        raise HTTPException(status_code=400, detail="No verification code found. Please request a new one.")
+    
+    if datetime.now(timezone.utc) > stored["expires_at"]:
+        del advertiser_verification_store[advertiser["id"]]
+        raise HTTPException(status_code=400, detail="Code expired. Please request a new one.")
+    
+    stored["attempts"] += 1
+    if stored["attempts"] > 5:
+        del advertiser_verification_store[advertiser["id"]]
+        raise HTTPException(status_code=400, detail="Too many attempts. Please request a new code.")
+    
+    if stored["code"] != code:
+        raise HTTPException(status_code=400, detail=f"Invalid code. {5 - stored['attempts']} attempts remaining.")
+    
+    await db.advertisers.update_one(
+        {"id": advertiser["id"]},
+        {"$set": {
+            "email_verified": True,
+            "email_verified_at": datetime.now(timezone.utc).isoformat(),
+            "status": "active"
+        }}
+    )
+    
+    del advertiser_verification_store[advertiser["id"]]
+    
+    return {"message": "Email verified successfully!"}
+
+
 # ============ PRICING ROUTES ============
 
 @router.get("/advertiser/pricing")
