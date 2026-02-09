@@ -326,5 +326,7 @@ async def get_me(user: dict = Depends(get_current_user)):
         "is_admin": user.get("is_admin", False),
         "is_super_admin": user.get("is_super_admin", False),
         "phone_verified": user.get("phone_verified", False),
-        "email_verified": user.get("email_verified", False)
+        "email_verified": user.get("email_verified", False),
+        "geo": user.get("geo"),
+        "last_login_geo": user.get("last_login_geo")
     }
