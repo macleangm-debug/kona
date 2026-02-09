@@ -1055,3 +1055,163 @@ async def get_placement_rules():
             "premium_users": "No ads for premium subscribers"
         }
     }
+
+
+
+# ============ CAMPAIGN ALERTS / NOTIFICATIONS ============
+
+# Milestone thresholds for alerts
+VIEW_MILESTONES = [1000, 5000, 10000, 50000, 100000, 500000, 1000000]
+BUDGET_THRESHOLDS = [25, 50, 75, 90, 100]  # Percentage of budget spent
+
+async def check_and_create_milestone_alert(campaign: dict, metric: str, value: int):
+    """
+    Check if a milestone was reached and create alert if new.
+    Returns the alert if created, None otherwise.
+    """
+    milestones = VIEW_MILESTONES if metric in ["views", "impressions"] else BUDGET_THRESHOLDS
+    
+    for milestone in milestones:
+        if value >= milestone:
+            # Check if this alert already exists
+            existing = await db.campaign_alerts.find_one({
+                "campaign_id": campaign["id"],
+                "metric": metric,
+                "milestone": milestone
+            })
+            
+            if not existing:
+                alert = {
+                    "id": f"alert-{uuid.uuid4().hex[:12]}",
+                    "campaign_id": campaign["id"],
+                    "campaign_name": campaign.get("name"),
+                    "advertiser_id": campaign.get("advertiser_id"),
+                    "metric": metric,
+                    "milestone": milestone,
+                    "current_value": value,
+                    "alert_type": "milestone",
+                    "message": f"🎉 Campaign '{campaign.get('name')}' reached {milestone:,} {metric}!",
+                    "is_read_advertiser": False,
+                    "is_read_admin": False,
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                
+                await db.campaign_alerts.insert_one(alert)
+                return alert
+    
+    return None
+
+async def check_budget_threshold_alert(campaign: dict):
+    """Check if budget spent crossed a threshold"""
+    budget = campaign.get("budget", 0)
+    spent = campaign.get("spent", 0)
+    
+    if budget <= 0:
+        return None
+    
+    percent_spent = (spent / budget) * 100
+    
+    for threshold in BUDGET_THRESHOLDS:
+        if percent_spent >= threshold:
+            existing = await db.campaign_alerts.find_one({
+                "campaign_id": campaign["id"],
+                "metric": "budget_percent",
+                "milestone": threshold
+            })
+            
+            if not existing:
+                alert_type = "warning" if threshold >= 90 else "info"
+                message = (
+                    f"⚠️ Campaign '{campaign.get('name')}' has spent {threshold}% of budget (${spent:.2f}/${budget:.2f})"
+                    if threshold >= 90 else
+                    f"📊 Campaign '{campaign.get('name')}' reached {threshold}% budget utilization"
+                )
+                
+                alert = {
+                    "id": f"alert-{uuid.uuid4().hex[:12]}",
+                    "campaign_id": campaign["id"],
+                    "campaign_name": campaign.get("name"),
+                    "advertiser_id": campaign.get("advertiser_id"),
+                    "metric": "budget_percent",
+                    "milestone": threshold,
+                    "current_value": round(percent_spent, 1),
+                    "alert_type": alert_type,
+                    "message": message,
+                    "is_read_advertiser": False,
+                    "is_read_admin": False,
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                
+                await db.campaign_alerts.insert_one(alert)
+                return alert
+    
+    return None
+
+@router.get("/advertiser/alerts")
+async def get_advertiser_alerts(
+    request: Request,
+    unread_only: bool = False,
+    limit: int = 50
+):
+    """Get alerts for the current advertiser"""
+    advertiser = await require_advertiser(request)
+    
+    query = {"advertiser_id": advertiser["id"]}
+    if unread_only:
+        query["is_read_advertiser"] = False
+    
+    alerts = await db.campaign_alerts.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    unread_count = await db.campaign_alerts.count_documents({
+        "advertiser_id": advertiser["id"],
+        "is_read_advertiser": False
+    })
+    
+    return {
+        "alerts": alerts,
+        "unread_count": unread_count
+    }
+
+@router.post("/advertiser/alerts/{alert_id}/read")
+async def mark_alert_read(alert_id: str, request: Request):
+    """Mark an alert as read for the advertiser"""
+    advertiser = await require_advertiser(request)
+    
+    result = await db.campaign_alerts.update_one(
+        {"id": alert_id, "advertiser_id": advertiser["id"]},
+        {"$set": {"is_read_advertiser": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    
+    return {"message": "Alert marked as read"}
+
+@router.post("/advertiser/alerts/mark-all-read")
+async def mark_all_alerts_read(request: Request):
+    """Mark all alerts as read for the advertiser"""
+    advertiser = await require_advertiser(request)
+    
+    result = await db.campaign_alerts.update_many(
+        {"advertiser_id": advertiser["id"], "is_read_advertiser": False},
+        {"$set": {"is_read_advertiser": True}}
+    )
+    
+    return {"message": f"Marked {result.modified_count} alerts as read"}
+
+# Update the track_ad_event to check for milestones
+async def process_campaign_milestones(campaign_id: str):
+    """Process milestones after campaign stats update"""
+    campaign = await db.campaigns.find_one({"id": campaign_id})
+    if not campaign:
+        return
+    
+    # Check view milestones
+    await check_and_create_milestone_alert(campaign, "views", campaign.get("views", 0))
+    await check_and_create_milestone_alert(campaign, "impressions", campaign.get("impressions", 0))
+    
+    # Check budget thresholds
+    await check_budget_threshold_alert(campaign)
