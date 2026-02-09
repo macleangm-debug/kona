@@ -28,7 +28,8 @@ export const CreatorLoginPage = () => {
       const result = await login(email, password);
       
       // Check if user needs email verification for creator portal
-      if (!result.user.email_verified && !result.user.phone_verified) {
+      // Note: Phone verification disabled until SMS provider is integrated
+      if (!result.user.email_verified) {
         setUserToken(result.token);
         toast.info("Please verify your email to access Creator Studio");
         
