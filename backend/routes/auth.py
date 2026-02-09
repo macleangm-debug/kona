@@ -443,34 +443,21 @@ async def verify_phone_code(code: str, user: dict = Depends(get_current_user)):
         status_code=503, 
         detail="Phone verification temporarily unavailable. Please use email verification instead."
     )
-        {
-            "$set": {
-                "phone_verified": True,
-                "phone_verified_at": datetime.now(timezone.utc).isoformat()
-            },
-            "$inc": {"coins": VERIFICATION_REWARD}
-        }
-    )
-    
-    # Clean up
-    del otp_store[full_phone]
-    
-    return {
-        "message": "Phone verified successfully!",
-        "coins_awarded": VERIFICATION_REWARD
-    }
 
 
 @router.get("/verification-status")
 async def get_verification_status(user: dict = Depends(get_current_user)):
     """Get current verification status for the user"""
+    # Note: Phone verification disabled until SMS provider is integrated
+    # Only email verification counts for feature unlocking
     return {
         "email": user.get("email"),
         "email_verified": user.get("email_verified", False),
         "phone": user.get("phone"),
         "phone_verified": user.get("phone_verified", False),
         "verification_reward": 5,
-        "features_locked": not (user.get("email_verified") or user.get("phone_verified"))
+        "features_locked": not user.get("email_verified", False),
+        "note": "Phone verification temporarily disabled. Use email verification."
     }
 
 
