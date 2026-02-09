@@ -2891,6 +2891,11 @@ export const AdminDashboard = () => {
           </div>
         )}
 
+        {/* Ads Approval Tab */}
+        {activeTab === "ads" && (
+          <AdsApprovalTab token={token} />
+        )}
+
         {/* Launch Checklist Tab (Super Admin Only) */}
         {activeTab === "checklist" && user?.is_super_admin && (
           <LaunchChecklistTab token={token} />
