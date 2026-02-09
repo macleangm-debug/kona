@@ -97,8 +97,15 @@ async def verify_otp(data: VerifyOTPRequest):
     return {"success": True, "message": "Phone number verified", "verified": True}
 
 @router.post("/register", response_model=TokenResponse)
-async def register(data: UserCreate):
+async def register(data: UserCreate, request: Request):
     """Register with email or phone"""
+    
+    # Detect user's geo-location from IP
+    client_ip = request.client.host
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        client_ip = forwarded_for.split(",")[0].strip()
+    geo_data = await detect_country_from_ip(client_ip)
     
     # Validate that either email or phone is provided
     if not data.email and not data.phone:
