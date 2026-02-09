@@ -858,24 +858,39 @@ export const CreatorSeriesDetailPage = () => {
                   videoValidation.isVertical 
                     ? 'bg-green-500/10 border-green-500/30' 
                     : selectedEpisode?.episode_number === 1 
-                      ? 'bg-yellow-500/10 border-yellow-500/30'
+                      ? 'bg-red-500/10 border-red-500/30'
                       : 'bg-blue-500/10 border-blue-500/30'
                 }`}>
                   <div className="flex items-center gap-2">
                     {videoValidation.isVertical ? (
                       <CheckCircle className="w-4 h-4 text-green-400" />
+                    ) : selectedEpisode?.episode_number === 1 ? (
+                      <XCircle className="w-4 h-4 text-red-400" />
                     ) : (
-                      <AlertCircle className={`w-4 h-4 ${selectedEpisode?.episode_number === 1 ? 'text-yellow-400' : 'text-blue-400'}`} />
+                      <AlertCircle className="w-4 h-4 text-blue-400" />
                     )}
                     <span className={`text-xs ${
-                      videoValidation.isVertical ? 'text-green-400' : selectedEpisode?.episode_number === 1 ? 'text-yellow-400' : 'text-blue-400'
+                      videoValidation.isVertical ? 'text-green-400' : selectedEpisode?.episode_number === 1 ? 'text-red-400' : 'text-blue-400'
                     }`}>
                       {videoValidation.isVertical 
                         ? `✓ Vertical video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height}) - Perfect for Stories!`
-                        : `Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height})${selectedEpisode?.episode_number === 1 ? ' - Consider vertical for Stories feed' : ''}`
+                        : selectedEpisode?.episode_number === 1
+                          ? `✗ Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height}) - Episode 1 MUST be vertical for Stories feed`
+                          : `Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height})`
                       }
                     </span>
                   </div>
+                  {selectedEpisode?.episode_number === 1 && !videoValidation.isVertical && (
+                    <p className="text-xs text-red-400/80 mt-2 ml-6">
+                      Please upload a vertical video (9:16 aspect ratio) to proceed. You cannot save until the video is vertical.
+                    </p>
+                  )}
+                </div>
+              )}
+              
+              {videoValidation.error && !videoValidation.dimensions && (
+                <div className="mt-2 p-2 rounded-lg border bg-red-500/10 border-red-500/30">
+                  <p className="text-xs text-red-400">{videoValidation.error}</p>
                 </div>
               )}
               
