@@ -155,8 +155,9 @@ async def register_advertiser(data: AdvertiserRegister):
     
     await db.advertisers.insert_one(advertiser)
     
-    # Remove password from response
+    # Remove password and _id from response
     advertiser.pop("password", None)
+    advertiser.pop("_id", None)
     token = get_advertiser_token(advertiser_id, data.company_name)
     
     return {
