@@ -127,14 +127,9 @@ const AppContent = () => {
         />
       )}
 
-      {/* Verification Banner - Shows when user has unverified email/phone */}
-      {user && !isFullScreenPage && (
-        <VerificationBanner 
-          user={user} 
-          token={token} 
-          onVerified={refreshUser} 
-        />
-      )}
+      {/* NOTE: Verification banner removed for regular viewers
+          Viewers can watch, buy coins, but rewards/payouts require verification
+          Businesses and Creators have mandatory verification in their portals */}
 
       <Routes>
         <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
