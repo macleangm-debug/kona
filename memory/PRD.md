@@ -156,6 +156,15 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - "AD" badge and advertiser name shown during ad playback
   - Call-to-action button links to advertiser URL
   - Admin approval required before ads go live
+- **Catchy Coin Animation**: Beautiful reward celebration effects:
+  - 3D gold coins with "K" branding flying/falling
+  - Animated number counter with gold gradient
+  - Sparkle particles and radial glow effects
+  - Three variants: "reward" (daily rewards), "topup" (purchases), "burst" (big wins)
+  - Blurred backdrop overlay for focus
+  - "Tap to continue" dismissal
+  - Integrated into: Store page (top-ups), Rewards page (claims/spins)
+  - Demo page: `/demo/coins`
 
 ## Deployment Status
 - **Preview Environment**: Contains all latest changes
