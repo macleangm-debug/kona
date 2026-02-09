@@ -158,6 +158,10 @@ const AppContent = () => {
         <Route path="/advertisers" element={<AdvertisersPage />} />
         <Route path="/creators" element={<CreatorsLandingPage />} />
         
+        {/* Auth Routes */}
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ForgotPasswordPage />} />
+        
         {/* Business Portal Routes */}
         <Route path="/business/auth" element={<BusinessAuthPage />} />
         <Route path="/business/dashboard" element={<BusinessDashboard />} />
