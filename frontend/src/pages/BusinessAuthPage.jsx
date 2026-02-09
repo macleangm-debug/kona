@@ -20,8 +20,11 @@ const INDUSTRIES = [
 
 export const BusinessAuthPage = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("login"); // login or register
+  const [mode, setMode] = useState("login"); // login, register, or verify
   const [loading, setLoading] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [testCode, setTestCode] = useState(null); // For test mode
+  const [advertiserToken, setAdvertiserToken] = useState(null);
   
   const [loginForm, setLoginForm] = useState({
     email: "",
@@ -45,9 +48,35 @@ export const BusinessAuthPage = () => {
     
     try {
       const res = await axios.post(`${API}/advertiser/login`, loginForm);
+      const advertiser = res.data.advertiser;
+      
+      // Check if email is verified
+      if (!advertiser.email_verified) {
+        // Store token temporarily and go to verification
+        setAdvertiserToken(res.data.token);
+        localStorage.setItem("advertiser_token", res.data.token);
+        toast.info("Please verify your email to access the dashboard");
+        
+        // Send verification code
+        try {
+          const verifyRes = await axios.post(`${API}/advertiser/send-verification`, {}, {
+            headers: { Authorization: `Bearer ${res.data.token}` }
+          });
+          if (verifyRes.data.test_code) {
+            setTestCode(verifyRes.data.test_code);
+          }
+        } catch (err) {
+          console.log("Could not send verification:", err);
+        }
+        
+        setMode("verify");
+        setLoading(false);
+        return;
+      }
+      
       localStorage.setItem("advertiser_token", res.data.token);
-      localStorage.setItem("advertiser", JSON.stringify(res.data.advertiser));
-      toast.success(`Welcome back, ${res.data.advertiser.company_name}!`);
+      localStorage.setItem("advertiser", JSON.stringify(advertiser));
+      toast.success(`Welcome back, ${advertiser.company_name}!`);
       navigate("/business/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.detail || "Login failed");
