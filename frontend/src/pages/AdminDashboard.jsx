@@ -2403,6 +2403,7 @@ export const AdminDashboard = () => {
     { id: "submissions", label: "Submissions", icon: FileText },
     { id: "revenue", label: "Revenue", icon: DollarSign },
     { id: "creators", label: "Creators", icon: Crown },
+    { id: "ads", label: "Ads Approval", icon: Megaphone },
     ...(user?.is_super_admin ? [
       { id: "checklist", label: "Launch Checklist", icon: Check },
       { id: "seeding", label: "Engagement Seeding", icon: Sparkles },
