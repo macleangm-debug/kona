@@ -194,6 +194,19 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - PayoutHistory component with M-Pesa, Bank Transfer, PayPal payout methods
   - Payout request with minimum 100 coins threshold
 
+- **Vertical Video Validation** (as of Feb 9, 2026):
+  - "Validate" button in Episode Editor checks video dimensions from URL
+  - Episode 1 MUST be vertical (9:16) for Stories feed - save is blocked if horizontal
+  - Visual feedback: green checkmark for vertical, red X for horizontal on Episode 1
+  - Toast notifications guide creators on format requirements
+- **Live Campaign Performance Alerts** (as of Feb 9, 2026):
+  - Automatic alerts when campaigns hit view milestones: 1K, 5K, 10K, 50K, 100K, 500K, 1M views
+  - Budget threshold alerts at: 25%, 50%, 75%, 90%, 100% spent
+  - Advertiser Dashboard: Bell icon with popover showing alerts, mark-as-read
+  - Admin Dashboard: Alerts section in Ads tab showing all campaign alerts
+  - Polling every 30 seconds for real-time updates
+  - Backend endpoints: /api/advertiser/alerts, /api/admin/ads/alerts
+
 ## Code Cleanup Completed (Feb 9, 2026)
 - Removed temporary CoinAnimationDemo page (`/demo/coins` route and component)
 - CoinAnimation component still available in `/app/frontend/src/components/CoinAnimation.jsx` for use in Store and Rewards pages
