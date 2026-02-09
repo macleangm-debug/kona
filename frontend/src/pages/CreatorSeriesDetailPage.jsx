@@ -797,12 +797,39 @@ export const CreatorSeriesDetailPage = () => {
                   </Badge>
                 )}
               </label>
-              <Input 
-                value={episodeForm.video_url}
-                onChange={(e) => setEpisodeForm({...episodeForm, video_url: e.target.value})}
-                placeholder="https://example.com/video.mp4 or Bunny.net URL"
-                data-testid="episode-video-input"
-              />
+              <div className="flex gap-2">
+                <Input 
+                  value={episodeForm.video_url}
+                  onChange={(e) => {
+                    setEpisodeForm({...episodeForm, video_url: e.target.value});
+                    // Reset validation when URL changes
+                    setVideoValidation({ isValidating: false, isVertical: null, dimensions: null, error: null });
+                  }}
+                  placeholder="https://example.com/video.mp4 or Bunny.net URL"
+                  data-testid="episode-video-input"
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => validateVideoFromUrl(episodeForm.video_url)}
+                  disabled={videoValidation.isValidating || !episodeForm.video_url}
+                  data-testid="validate-video-btn"
+                  className="flex-shrink-0"
+                >
+                  {videoValidation.isValidating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Checking...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4 mr-2" />
+                      Validate
+                    </>
+                  )}
+                </Button>
+              </div>
               
               {/* Episode 1 vertical format guidance */}
               {selectedEpisode?.episode_number === 1 && (
