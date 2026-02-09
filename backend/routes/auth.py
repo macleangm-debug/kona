@@ -184,14 +184,11 @@ async def register(data: UserCreate, request: Request):
         "email_verified": False,
         # Geo-location data from IP
         "geo": {
-            "country": geo_data.get("country"),
+            "country": geo_data.get("country_name"),
             "country_code": geo_data.get("country_code"),
-            "city": geo_data.get("city"),
-            "region": geo_data.get("region"),
-            "timezone": geo_data.get("timezone"),
-            "currency": geo_data.get("currency"),
+            "is_african": geo_data.get("is_african", False),
             "detected_at": datetime.now(timezone.utc).isoformat(),
-            "ip": client_ip if client_ip != "127.0.0.1" else None
+            "ip": client_ip if client_ip not in ["127.0.0.1", "::1"] else None
         },
         "last_login_geo": None
     }
