@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Search, Gift, Star, Play, Loader2 } from "lucide-react";
+import { Search, Gift, Star, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination } from 'swiper/modules';
@@ -10,6 +10,7 @@ import 'swiper/css/effect-coverflow';
 import 'swiper/css/pagination';
 
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
