@@ -17,6 +17,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from "recharts";
 import { CampaignAlerts } from "@/components/CampaignAlerts";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 
