@@ -488,19 +488,18 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
               />
 
               {/* Forgot Password Link (login only) */}
-              {isLogin && (
+              {isLogin && !forgotPasswordMode && (
                 <div className="text-right -mt-2">
-                  <a 
-                    href="/forgot-password" 
+                  <button 
+                    type="button"
                     className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      onClose();
-                      window.location.href = "/forgot-password";
+                    onClick={() => {
+                      setForgotPasswordMode(true);
+                      setForgotPasswordEmail(email);
                     }}
                   >
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
               )}
 
