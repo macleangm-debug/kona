@@ -2512,11 +2512,7 @@ export const AdminDashboard = () => {
   }, [activeTab, user?.is_super_admin, activeDocId, token]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading admin dashboard..." />;
   }
 
   const tabs = [
