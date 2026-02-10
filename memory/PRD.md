@@ -27,7 +27,11 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [x] Phone number registration with OTP (WhatsApp/FlashCall/SMS)
 - [x] Email registration option
 - [x] Country selector with 15 African countries
-- [ ] Device limits/session management (future)
+- [x] Device limits/session management - COMPLETED (Feb 10, 2026)
+  - 5 devices per user (configurable per subscription tier)
+  - View all active sessions with device info (browser, OS, location)
+  - Logout from specific devices or all devices at once
+  - Session tracking with JWT tokens
 
 ### Content Management
 - [x] Series and episodes CRUD
