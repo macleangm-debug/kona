@@ -17,9 +17,49 @@ const SEO = ({
   section = null,
   tags = [],
   noindex = false,
+  breadcrumbs = null,
+  videoData = null,
 }) => {
   const siteName = "Stream Kona";
   const twitterHandle = "@streamkona";
+  
+  // Generate breadcrumb schema
+  const breadcrumbSchema = breadcrumbs ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbs.map((crumb, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "name": crumb.name,
+      "item": crumb.url
+    }))
+  } : null;
+
+  // Generate video schema if video data provided
+  const videoSchema = videoData ? {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": videoData.title,
+    "description": videoData.description,
+    "thumbnailUrl": videoData.thumbnail,
+    "uploadDate": videoData.uploadDate || new Date().toISOString(),
+    "duration": videoData.duration ? `PT${videoData.duration}M` : "PT10M",
+    "contentUrl": videoData.contentUrl,
+    "embedUrl": videoData.embedUrl,
+    "interactionStatistic": {
+      "@type": "InteractionCounter",
+      "interactionType": { "@type": "WatchAction" },
+      "userInteractionCount": videoData.views || 0
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Stream Kona",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.streamkona.com/logo.png"
+      }
+    }
+  } : null;
   
   return (
     <Helmet>
@@ -47,6 +87,16 @@ const SEO = ({
       <meta property="og:site_name" content={siteName} />
       <meta property="og:locale" content="en_US" />
       
+      {/* Video specific OG tags */}
+      {videoData && (
+        <>
+          <meta property="og:video" content={videoData.contentUrl} />
+          <meta property="og:video:type" content="video/mp4" />
+          <meta property="og:video:width" content="1280" />
+          <meta property="og:video:height" content="720" />
+        </>
+      )}
+      
       {/* Article specific (for blog/series pages) */}
       {type === "article" && publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
@@ -62,13 +112,34 @@ const SEO = ({
       ))}
       
       {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:card" content={videoData ? "player" : "summary_large_image"} />
       <meta name="twitter:url" content={url} />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
       <meta name="twitter:site" content={twitterHandle} />
       <meta name="twitter:creator" content={twitterHandle} />
+      {videoData && (
+        <>
+          <meta name="twitter:player" content={videoData.embedUrl} />
+          <meta name="twitter:player:width" content="1280" />
+          <meta name="twitter:player:height" content="720" />
+        </>
+      )}
+
+      {/* Structured Data - Breadcrumbs */}
+      {breadcrumbSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      )}
+
+      {/* Structured Data - Video */}
+      {videoSchema && (
+        <script type="application/ld+json">
+          {JSON.stringify(videoSchema)}
+        </script>
+      )}
     </Helmet>
   );
 };
