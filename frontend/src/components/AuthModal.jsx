@@ -10,24 +10,73 @@ import { toast } from "sonner";
 import axios from "axios";
 import { LoginSuccessModal, SignupSuccessModal } from "@/components/AnimatedModals";
 
-// African countries with phone codes
+// Global countries with phone codes (African countries first, then others)
 const COUNTRIES = [
-  { code: "KE", name: "Kenya", dialCode: "254", flag: "🇰🇪" },
-  { code: "TZ", name: "Tanzania", dialCode: "255", flag: "🇹🇿" },
-  { code: "UG", name: "Uganda", dialCode: "256", flag: "🇺🇬" },
-  { code: "NG", name: "Nigeria", dialCode: "234", flag: "🇳🇬" },
-  { code: "GH", name: "Ghana", dialCode: "233", flag: "🇬🇭" },
-  { code: "ZA", name: "South Africa", dialCode: "27", flag: "🇿🇦" },
-  { code: "RW", name: "Rwanda", dialCode: "250", flag: "🇷🇼" },
-  { code: "ET", name: "Ethiopia", dialCode: "251", flag: "🇪🇹" },
-  { code: "SN", name: "Senegal", dialCode: "221", flag: "🇸🇳" },
-  { code: "CI", name: "Ivory Coast", dialCode: "225", flag: "🇨🇮" },
-  { code: "CM", name: "Cameroon", dialCode: "237", flag: "🇨🇲" },
-  { code: "ZM", name: "Zambia", dialCode: "260", flag: "🇿🇲" },
-  { code: "ZW", name: "Zimbabwe", dialCode: "263", flag: "🇿🇼" },
-  { code: "MW", name: "Malawi", dialCode: "265", flag: "🇲🇼" },
-  { code: "BW", name: "Botswana", dialCode: "267", flag: "🇧🇼" },
+  // African countries
+  { code: "KE", name: "Kenya", dialCode: "254", flag: "🇰🇪", region: "africa" },
+  { code: "TZ", name: "Tanzania", dialCode: "255", flag: "🇹🇿", region: "africa" },
+  { code: "UG", name: "Uganda", dialCode: "256", flag: "🇺🇬", region: "africa" },
+  { code: "NG", name: "Nigeria", dialCode: "234", flag: "🇳🇬", region: "africa" },
+  { code: "GH", name: "Ghana", dialCode: "233", flag: "🇬🇭", region: "africa" },
+  { code: "ZA", name: "South Africa", dialCode: "27", flag: "🇿🇦", region: "africa" },
+  { code: "RW", name: "Rwanda", dialCode: "250", flag: "🇷🇼", region: "africa" },
+  { code: "ET", name: "Ethiopia", dialCode: "251", flag: "🇪🇹", region: "africa" },
+  { code: "SN", name: "Senegal", dialCode: "221", flag: "🇸🇳", region: "africa" },
+  { code: "CI", name: "Ivory Coast", dialCode: "225", flag: "🇨🇮", region: "africa" },
+  { code: "CM", name: "Cameroon", dialCode: "237", flag: "🇨🇲", region: "africa" },
+  { code: "ZM", name: "Zambia", dialCode: "260", flag: "🇿🇲", region: "africa" },
+  { code: "ZW", name: "Zimbabwe", dialCode: "263", flag: "🇿🇼", region: "africa" },
+  { code: "MW", name: "Malawi", dialCode: "265", flag: "🇲🇼", region: "africa" },
+  { code: "BW", name: "Botswana", dialCode: "267", flag: "🇧🇼", region: "africa" },
+  { code: "EG", name: "Egypt", dialCode: "20", flag: "🇪🇬", region: "africa" },
+  { code: "MA", name: "Morocco", dialCode: "212", flag: "🇲🇦", region: "africa" },
+  { code: "DZ", name: "Algeria", dialCode: "213", flag: "🇩🇿", region: "africa" },
+  { code: "TN", name: "Tunisia", dialCode: "216", flag: "🇹🇳", region: "africa" },
+  { code: "AO", name: "Angola", dialCode: "244", flag: "🇦🇴", region: "africa" },
+  { code: "MZ", name: "Mozambique", dialCode: "258", flag: "🇲🇿", region: "africa" },
+  { code: "CD", name: "DR Congo", dialCode: "243", flag: "🇨🇩", region: "africa" },
+  // Europe
+  { code: "GB", name: "United Kingdom", dialCode: "44", flag: "🇬🇧", region: "europe" },
+  { code: "DE", name: "Germany", dialCode: "49", flag: "🇩🇪", region: "europe" },
+  { code: "FR", name: "France", dialCode: "33", flag: "🇫🇷", region: "europe" },
+  { code: "IT", name: "Italy", dialCode: "39", flag: "🇮🇹", region: "europe" },
+  { code: "ES", name: "Spain", dialCode: "34", flag: "🇪🇸", region: "europe" },
+  { code: "NL", name: "Netherlands", dialCode: "31", flag: "🇳🇱", region: "europe" },
+  { code: "BE", name: "Belgium", dialCode: "32", flag: "🇧🇪", region: "europe" },
+  { code: "PT", name: "Portugal", dialCode: "351", flag: "🇵🇹", region: "europe" },
+  { code: "SE", name: "Sweden", dialCode: "46", flag: "🇸🇪", region: "europe" },
+  { code: "NO", name: "Norway", dialCode: "47", flag: "🇳🇴", region: "europe" },
+  { code: "CH", name: "Switzerland", dialCode: "41", flag: "🇨🇭", region: "europe" },
+  // Americas
+  { code: "US", name: "United States", dialCode: "1", flag: "🇺🇸", region: "americas" },
+  { code: "CA", name: "Canada", dialCode: "1", flag: "🇨🇦", region: "americas" },
+  { code: "BR", name: "Brazil", dialCode: "55", flag: "🇧🇷", region: "americas" },
+  { code: "MX", name: "Mexico", dialCode: "52", flag: "🇲🇽", region: "americas" },
+  { code: "AR", name: "Argentina", dialCode: "54", flag: "🇦🇷", region: "americas" },
+  { code: "CO", name: "Colombia", dialCode: "57", flag: "🇨🇴", region: "americas" },
+  { code: "CL", name: "Chile", dialCode: "56", flag: "🇨🇱", region: "americas" },
+  // Asia & Middle East
+  { code: "IN", name: "India", dialCode: "91", flag: "🇮🇳", region: "asia" },
+  { code: "CN", name: "China", dialCode: "86", flag: "🇨🇳", region: "asia" },
+  { code: "JP", name: "Japan", dialCode: "81", flag: "🇯🇵", region: "asia" },
+  { code: "KR", name: "South Korea", dialCode: "82", flag: "🇰🇷", region: "asia" },
+  { code: "SG", name: "Singapore", dialCode: "65", flag: "🇸🇬", region: "asia" },
+  { code: "AE", name: "UAE", dialCode: "971", flag: "🇦🇪", region: "asia" },
+  { code: "SA", name: "Saudi Arabia", dialCode: "966", flag: "🇸🇦", region: "asia" },
+  { code: "PK", name: "Pakistan", dialCode: "92", flag: "🇵🇰", region: "asia" },
+  { code: "PH", name: "Philippines", dialCode: "63", flag: "🇵🇭", region: "asia" },
+  { code: "ID", name: "Indonesia", dialCode: "62", flag: "🇮🇩", region: "asia" },
+  { code: "MY", name: "Malaysia", dialCode: "60", flag: "🇲🇾", region: "asia" },
+  { code: "TH", name: "Thailand", dialCode: "66", flag: "🇹🇭", region: "asia" },
+  // Oceania
+  { code: "AU", name: "Australia", dialCode: "61", flag: "🇦🇺", region: "oceania" },
+  { code: "NZ", name: "New Zealand", dialCode: "64", flag: "🇳🇿", region: "oceania" },
 ];
+
+// Find country by code
+const findCountryByCode = (code) => {
+  return COUNTRIES.find(c => c.code === code) || COUNTRIES[1]; // Default to Tanzania if not found
+};
 
 export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp = false }) => {
   const navigate = useNavigate();
