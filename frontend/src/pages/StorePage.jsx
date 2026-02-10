@@ -185,20 +185,11 @@ export const StorePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading store..." />;
   }
 
   if (checkingPayment) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[80vh] gap-4">
-        <Loader2 className="w-10 h-10 animate-spin text-primary" />
-        <p className="text-muted-foreground">Verifying payment...</p>
-      </div>
-    );
+    return <PageLoader message="Verifying payment..." />;
   }
 
   return (
