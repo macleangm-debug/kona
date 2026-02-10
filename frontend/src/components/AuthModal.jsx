@@ -500,24 +500,43 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                         <ChevronDown className="w-3 h-3 text-muted-foreground" />
                       </button>
                       
-                      {/* Country Dropdown */}
+                      {/* Country Dropdown with Search */}
                       {showCountryPicker && (
-                        <div className="absolute top-full left-0 mt-1 w-64 max-h-60 overflow-y-auto bg-card border border-white/10 rounded-lg shadow-xl z-50">
-                          {COUNTRIES.map((country) => (
-                            <button
-                              key={country.code}
-                              type="button"
-                              onClick={() => {
-                                setSelectedCountry(country);
-                                setShowCountryPicker(false);
-                              }}
-                              className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/5 transition-colors ${
-                                selectedCountry.code === country.code ? 'bg-primary/10' : ''
-                              }`}
-                            >
-                              <span className="text-lg">{country.flag}</span>
-                              <span className="flex-1 text-sm">{country.name}</span>
-                              <span className="text-xs text-muted-foreground">+{country.dialCode}</span>
+                        <div className="absolute top-full left-0 mt-1 w-72 bg-card border border-white/10 rounded-lg shadow-xl z-50">
+                          {/* Search Input */}
+                          <div className="p-2 border-b border-white/10">
+                            <Input
+                              type="text"
+                              placeholder="Search country..."
+                              value={countrySearch}
+                              onChange={(e) => setCountrySearch(e.target.value)}
+                              className="h-8 text-sm bg-secondary/50"
+                              autoFocus
+                            />
+                          </div>
+                          <div className="max-h-60 overflow-y-auto">
+                            {COUNTRIES
+                              .filter(c => 
+                                c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                                c.code.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                                c.dialCode.includes(countrySearch)
+                              )
+                              .map((country) => (
+                                <button
+                                  key={country.code}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedCountry(country);
+                                    setShowCountryPicker(false);
+                                    setCountrySearch("");
+                                  }}
+                                  className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/5 transition-colors ${
+                                    selectedCountry.code === country.code ? 'bg-primary/10' : ''
+                                  }`}
+                                >
+                                  <span className="text-lg">{country.flag}</span>
+                                  <span className="flex-1 text-sm">{country.name}</span>
+                                  <span className="text-xs text-muted-foreground">+{country.dialCode}</span>
                             </button>
                           ))}
                         </div>
