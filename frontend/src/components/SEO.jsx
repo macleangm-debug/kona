@@ -194,3 +194,81 @@ export const generateEpisodeSchema = (episode, series) => {
     }
   };
 };
+
+
+/**
+ * Generate FAQ structured data
+ * @param {Array} faqs - Array of {question, answer} objects
+ */
+export const generateFAQSchema = (faqs) => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+};
+
+/**
+ * Generate Organization structured data
+ */
+export const generateOrganizationSchema = () => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Stream Kona",
+    "alternateName": "Kona",
+    "url": "https://www.streamkona.com",
+    "logo": "https://www.streamkona.com/logo.png",
+    "description": "Africa's premier mini-series streaming platform. Watch exclusive romance, drama, thriller & action series.",
+    "foundingDate": "2024",
+    "sameAs": [
+      "https://twitter.com/streamkona",
+      "https://www.instagram.com/streamkona",
+      "https://www.facebook.com/streamkona"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer service",
+      "email": "support@streamkona.com"
+    }
+  };
+};
+
+/**
+ * Generate Website structured data with search action
+ */
+export const generateWebsiteSchema = () => {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Stream Kona",
+    "url": "https://www.streamkona.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://www.streamkona.com/discover?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  };
+};
+
+/**
+ * Generate breadcrumb items helper
+ */
+export const createBreadcrumbs = (...items) => {
+  const baseUrl = "https://www.streamkona.com";
+  return items.map(item => ({
+    name: item.name,
+    url: item.path ? `${baseUrl}${item.path}` : baseUrl
+  }));
+};
+
