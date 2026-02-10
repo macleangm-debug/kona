@@ -627,61 +627,16 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                 <div className="space-y-3">
                   <div className="flex gap-2">
                     {/* Country Selector */}
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setShowCountryPicker(!showCountryPicker)}
-                        className="flex items-center gap-1 h-10 px-3 rounded-lg bg-secondary/50 border border-white/10 hover:border-white/20 transition-colors"
-                        data-testid="country-selector"
-                      >
-                        <span className="text-lg">{selectedCountry.flag}</span>
-                        <span className="text-sm text-muted-foreground">+{selectedCountry.dialCode}</span>
-                        <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                      </button>
-                      
-                      {/* Country Dropdown with Search */}
-                      {showCountryPicker && (
-                        <div className="absolute top-full left-0 mt-1 w-72 bg-card border border-white/10 rounded-lg shadow-xl z-50">
-                          {/* Search Input */}
-                          <div className="p-2 border-b border-white/10">
-                            <Input
-                              type="text"
-                              placeholder="Search country..."
-                              value={countrySearch}
-                              onChange={(e) => setCountrySearch(e.target.value)}
-                              className="h-8 text-sm bg-secondary/50"
-                              autoFocus
-                            />
-                          </div>
-                          <div className="max-h-60 overflow-y-auto">
-                            {COUNTRIES
-                              .filter(c => 
-                                c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
-                                c.code.toLowerCase().includes(countrySearch.toLowerCase()) ||
-                                c.dialCode.includes(countrySearch)
-                              )
-                              .map((country) => (
-                                <button
-                                  key={country.code}
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedCountry(country);
-                                    setShowCountryPicker(false);
-                                    setCountrySearch("");
-                                  }}
-                                  className={`w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-white/5 transition-colors ${
-                                    selectedCountry.code === country.code ? 'bg-primary/10' : ''
-                                  }`}
-                                >
-                                  <span className="text-lg">{country.flag}</span>
-                                  <span className="flex-1 text-sm">{country.name}</span>
-                                  <span className="text-xs text-muted-foreground">+{country.dialCode}</span>
-                                </button>
-                              ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowCountryPicker(true)}
+                      className="flex items-center gap-1 h-10 px-3 rounded-lg bg-secondary/50 border border-white/10 hover:border-white/20 transition-colors"
+                      data-testid="country-selector"
+                    >
+                      <span className="text-lg">{selectedCountry.flag}</span>
+                      <span className="text-sm text-muted-foreground">+{selectedCountry.dialCode}</span>
+                      <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                    </button>
                     
                     {/* Phone Input */}
                     <Input
@@ -693,6 +648,53 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                       data-testid="auth-phone-input"
                       required
                     />
+                  </div>
+
+                  {/* Country Picker Dialog */}
+                  <Dialog open={showCountryPicker} onOpenChange={setShowCountryPicker}>
+                    <DialogContent className="max-w-md max-h-[80vh] p-0">
+                      <DialogHeader className="p-4 pb-2">
+                        <DialogTitle>Select Country</DialogTitle>
+                        <Input
+                          type="text"
+                          placeholder="Search country..."
+                          value={countrySearch}
+                          onChange={(e) => setCountrySearch(e.target.value)}
+                          className="mt-2 bg-secondary/50"
+                          autoFocus
+                        />
+                      </DialogHeader>
+                      <div className="overflow-y-auto max-h-[50vh] px-2 pb-4">
+                        {COUNTRIES
+                          .filter(c => 
+                            c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                            c.code.toLowerCase().includes(countrySearch.toLowerCase()) ||
+                            c.dialCode.includes(countrySearch)
+                          )
+                          .map((country) => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setSelectedCountry(country);
+                                setShowCountryPicker(false);
+                                setCountrySearch("");
+                              }}
+                              className={`w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5 rounded-lg transition-colors ${
+                                selectedCountry.code === country.code ? 'bg-primary/10 border border-primary/30' : ''
+                              }`}
+                            >
+                              <span className="text-xl">{country.flag}</span>
+                              <span className="flex-1">{country.name}</span>
+                              <span className="text-sm text-muted-foreground">+{country.dialCode}</span>
+                              {selectedCountry.code === country.code && (
+                                <Check className="w-4 h-4 text-primary" />
+                              )}
+                            </button>
+                          ))}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                   </div>
 
                   {/* Verification Method (signup only) */}
