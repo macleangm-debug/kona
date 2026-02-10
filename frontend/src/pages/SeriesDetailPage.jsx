@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { ChevronLeft, Star, Eye, Lock, Clock, Play, Coins, Loader2, Users } from "lucide-react";
+import { ChevronLeft, Star, Eye, Lock, Clock, Play, Coins, Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { CoinBalance, UnlockSheet } from "@/components";
