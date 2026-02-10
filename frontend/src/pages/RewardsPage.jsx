@@ -4,12 +4,13 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { 
   Gift, Coins, Trophy, Target, CheckCircle2, Lock,
-  Loader2, Sparkles, Calendar, Users, Play, Star
+  Sparkles, Calendar, Users, Play, Star, Loader2
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { WatchStreak } from "@/components/WatchStreak";
