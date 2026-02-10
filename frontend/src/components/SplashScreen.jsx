@@ -305,37 +305,37 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
             </svg>
           </div>
 
-          {/* KONA text with dramatic reveal */}
+          {/* KONA text with typewriter effect */}
           <div 
             className="mt-10 overflow-hidden"
             style={{
               opacity: phase >= 4 ? 1 : 0,
-              transform: phase >= 4 ? 'translateY(0)' : 'translateY(40px)',
-              transition: 'all 1s cubic-bezier(0.16, 1, 0.3, 1)'
+              transition: 'opacity 0.5s ease-out'
             }}
           >
             <h1 
-              className="text-8xl font-black tracking-[0.25em] relative"
+              className="text-8xl font-black tracking-[0.25em] relative flex"
               style={{
-                background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 30%, #C084FC 60%, #E879F9 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
                 filter: phase >= 4 ? 'drop-shadow(0 0 40px rgba(139, 92, 246, 0.6))' : 'none'
               }}
             >
-              KONA
+              {['K', 'O', 'N', 'A'].map((letter, index) => (
+                <span
+                  key={index}
+                  className="typewriter-letter"
+                  style={{
+                    background: 'linear-gradient(135deg, #8B5CF6 0%, #A855F7 30%, #C084FC 60%, #E879F9 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                    opacity: 0,
+                    animation: phase >= 4 ? `typewriterFade 0.15s ease-out ${index * 0.18}s forwards` : 'none',
+                    display: 'inline-block'
+                  }}
+                >
+                  {letter}
+                </span>
+              ))}
             </h1>
-            
-            {/* Animated underline */}
-            <div 
-              className="h-1 mx-auto mt-3 rounded-full"
-              style={{
-                background: 'linear-gradient(90deg, transparent, #8B5CF6, #A855F7, #C084FC, #A855F7, #8B5CF6, transparent)',
-                width: phase >= 4 ? '100%' : '0%',
-                opacity: phase >= 4 ? 1 : 0,
-                transition: 'all 0.8s ease-out 0.4s'
-              }}
-            />
           </div>
 
           {/* Tagline removed */}
