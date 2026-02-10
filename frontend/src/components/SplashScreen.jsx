@@ -307,16 +307,17 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
 
           {/* KONA text with typewriter effect */}
           <div 
-            className="mt-10 overflow-hidden"
+            className="mt-8 overflow-hidden"
             style={{
               opacity: phase >= 4 ? 1 : 0,
-              transition: 'opacity 0.5s ease-out'
+              transition: 'opacity 0.5s ease-out',
+              width: '220px' // Match icon width
             }}
           >
             <h1 
-              className="text-8xl font-black tracking-[0.25em] relative flex"
+              className="text-5xl font-black tracking-[0.2em] relative flex justify-center"
               style={{
-                filter: phase >= 4 ? 'drop-shadow(0 0 40px rgba(139, 92, 246, 0.6))' : 'none'
+                filter: phase >= 4 ? 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.6))' : 'none'
               }}
             >
               {['K', 'O', 'N', 'A'].map((letter, index) => (
