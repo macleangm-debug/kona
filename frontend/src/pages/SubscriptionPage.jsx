@@ -67,19 +67,8 @@ export const SubscriptionPage = () => {
   const [checkingPayment, setCheckingPayment] = useState(false);
 
   const fetchData = async () => {
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Get user's subscription
-      const subRes = await axios.get(`${API}/subscriptions/my-subscription`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSubscription(subRes.data);
-
-      // Get tiers with local pricing
+      // Get tiers with local pricing (always fetch, even when not logged in)
       const countryCode = user?.geo?.country_code || user?.country_code || "KE";
       const tiersRes = await axios.get(`${API}/subscriptions/tiers?country_code=${countryCode}`);
       setTiers(tiersRes.data.tiers);
@@ -90,6 +79,14 @@ export const SubscriptionPage = () => {
       
       if (providersRes.data.providers?.length > 0) {
         setSelectedProvider(providersRes.data.providers[0].id);
+      }
+
+      // Get user's subscription only if logged in
+      if (token) {
+        const subRes = await axios.get(`${API}/subscriptions/my-subscription`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSubscription(subRes.data);
       }
     } catch (e) {
       console.error("Failed to fetch subscription data:", e);
