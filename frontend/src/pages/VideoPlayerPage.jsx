@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
+import { initContentProtection, removeContentProtection } from "@/services/contentProtection";
 
 // ============ SUBTITLE LANGUAGES ============
 const SUBTITLE_LANGUAGES = [
