@@ -11,11 +11,12 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from user_agents import parse as parse_user_agent
 
 from config.settings import JWT_SECRET
+from config.subscriptions import get_device_limit, SUBSCRIPTION_TIERS
 
 security = HTTPBearer(auto_error=False)
 
-# Device limit per user (can be configured per subscription tier)
-DEFAULT_DEVICE_LIMIT = 5
+# Default device limit for free users
+DEFAULT_DEVICE_LIMIT = 3
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
