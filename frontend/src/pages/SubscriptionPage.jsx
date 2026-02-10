@@ -237,6 +237,107 @@ export const SubscriptionPage = () => {
           </Card>
         )}
 
+        {/* All Plans - Show even when not logged in */}
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Choose Your Plan</h3>
+          <div className="grid gap-4">
+            {["free", "basic", "premium", "vip"].map((tierId) => {
+              const tier = tiers[tierId];
+              if (!tier) return null;
+              
+              const TierIcon = tierIcons[tierId];
+              const isCurrentTier = user && currentTier === tierId;
+              const canUpgrade = user && ["free", "basic", "premium", "vip"].indexOf(tierId) > 
+                                 ["free", "basic", "premium", "vip"].indexOf(currentTier);
+
+              return (
+                <Card 
+                  key={tierId}
+                  className={`p-4 ${isCurrentTier ? tierBgColors[tierId] : 'bg-card'} ${
+                    tierId === "vip" ? 'ring-1 ring-yellow-500/30' : ''
+                  }`}
+                  data-testid={`tier-card-${tierId}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full bg-black/20 ${tierColors[tierId]}`}>
+                        <TierIcon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-semibold">{tier.name}</h4>
+                          {isCurrentTier && (
+                            <Badge variant="outline" className="text-xs">Current</Badge>
+                          )}
+                          {tierId === "vip" && (
+                            <Badge className="bg-yellow-500/20 text-yellow-400 text-xs">Popular</Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {tier.device_limit} devices - {tier.video_quality}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      {tier.price_usd > 0 ? (
+                        <>
+                          <p className="font-bold">
+                            ${tier.price_usd}
+                            <span className="text-xs text-muted-foreground font-normal">/mo</span>
+                          </p>
+                          {tier.local_price && (
+                            <p className="text-xs text-muted-foreground">
+                              {tier.local_price.formatted}
+                            </p>
+                          )}
+                        </>
+                      ) : (
+                        <p className="font-bold text-green-400">Free</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Features */}
+                  <div className="mt-3 grid grid-cols-2 gap-1">
+                    {tier.features?.slice(0, 4).map((feature, idx) => (
+                      <div key={idx} className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Check className="w-3 h-3 text-green-400 flex-shrink-0" />
+                        <span className="truncate">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Upgrade Button */}
+                  {!user && tierId !== "free" && (
+                    <Button
+                      size="sm"
+                      className="w-full mt-3"
+                      variant={tierId === "vip" ? "default" : "outline"}
+                      onClick={() => navigate("/")}
+                    >
+                      Sign in to upgrade
+                    </Button>
+                  )}
+                  {canUpgrade && (
+                    <Button
+                      size="sm"
+                      className="w-full mt-3"
+                      variant={tierId === "vip" ? "default" : "outline"}
+                      onClick={() => {
+                        setSelectedTier({ id: tierId, ...tier });
+                        setShowUpgradeModal(true);
+                      }}
+                      data-testid={`upgrade-to-${tierId}-btn`}
+                    >
+                      Upgrade to {tier.name}
+                    </Button>
+                  )}
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
         {user && (
           <>
             {/* Pending Payment Banner */}
