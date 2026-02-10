@@ -283,10 +283,17 @@ export const DeviceManagement = () => {
               </div>
             )}
 
-            {/* Info */}
-            <p className="text-[10px] text-muted-foreground text-center pt-2">
-              VIP subscribers can have up to 10 devices
-            </p>
+            {/* Info with upgrade options */}
+            <div className="text-center pt-2 space-y-2">
+              <p className="text-xs text-muted-foreground capitalize">
+                Current plan: <span className="text-primary font-medium">{subscriptionTier}</span> ({deviceLimit} devices)
+              </p>
+              {upgradeOptions.length > 0 && (
+                <div className="text-[10px] text-muted-foreground">
+                  Upgrade to <span className="text-cyan-400">{upgradeOptions[0]?.name}</span> for {upgradeOptions[0]?.device_limit} devices (${upgradeOptions[0]?.price_usd}/mo)
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
