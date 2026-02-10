@@ -101,17 +101,26 @@ class TestDeviceLimit:
     
     @pytest.fixture
     def test_user(self):
-        """Create a test user and return token"""
+        """Create a test user via register then login to get valid session token"""
         unique_email = f"test_device_limit_{uuid.uuid4().hex[:8]}@test.com"
+        password = "testpass123"
+        
+        # Step 1: Register user
         register_data = {
             "email": unique_email,
-            "password": "testpass123",
+            "password": password,
             "name": "Test User"
         }
-        response = requests.post(f"{BASE_URL}/api/auth/register", json=register_data)
-        if response.status_code == 200:
-            return response.json()["token"]
-        pytest.skip(f"Could not create test user: {response.text}")
+        reg_response = requests.post(f"{BASE_URL}/api/auth/register", json=register_data)
+        if reg_response.status_code != 200:
+            pytest.skip(f"Could not create test user: {reg_response.text}")
+        
+        # Step 2: Login to get valid session token
+        login_data = {"email": unique_email, "password": password}
+        login_response = requests.post(f"{BASE_URL}/api/auth/login", json=login_data)
+        if login_response.status_code == 200:
+            return login_response.json()["token"]
+        pytest.skip(f"Could not login test user: {login_response.text}")
     
     def test_device_limit_requires_auth(self):
         """Test device-limit endpoint requires authentication"""
