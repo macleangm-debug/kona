@@ -33,6 +33,10 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(initialReferralCode || forceSignUp ? false : true);
   const [authMethod, setAuthMethod] = useState("phone"); // "phone" or "email"
+  const [forgotPasswordMode, setForgotPasswordMode] = useState(false); // Forgot password inline mode
+  const [forgotPasswordSent, setForgotPasswordSent] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   
   // Form fields
   const [email, setEmail] = useState("");
