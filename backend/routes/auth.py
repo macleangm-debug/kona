@@ -539,3 +539,92 @@ async def reset_password(token: str, new_password: str):
     await db.password_resets.delete_one({"token": token})
     
     return {"message": "Password reset successfully. You can now log in with your new password."}
+
+
+
+# ============ SESSION/DEVICE MANAGEMENT ============
+
+@router.get("/sessions")
+async def get_sessions(user: dict = Depends(get_current_user)):
+    """Get all active sessions for the current user"""
+    from services import DEFAULT_DEVICE_LIMIT
+    
+    sessions = await db.sessions.find(
+        {"user_id": user["id"]},
+        {"_id": 0}
+    ).sort("last_active", -1).to_list(100)
+    
+    # Mark current session
+    current_session_id = user.get("_current_session_id")
+    for session in sessions:
+        session["is_current"] = session["id"] == current_session_id
+    
+    device_limit = user.get("device_limit", DEFAULT_DEVICE_LIMIT)
+    
+    return {
+        "sessions": sessions,
+        "total": len(sessions),
+        "device_limit": device_limit,
+        "remaining_slots": max(0, device_limit - len(sessions))
+    }
+
+@router.delete("/sessions/{session_id}")
+async def logout_session(session_id: str, user: dict = Depends(get_current_user)):
+    """Log out from a specific device/session"""
+    from services import invalidate_session
+    
+    # Prevent logging out current session via this endpoint
+    current_session_id = user.get("_current_session_id")
+    if session_id == current_session_id:
+        raise HTTPException(
+            status_code=400, 
+            detail="Cannot log out current session. Use /auth/logout instead."
+        )
+    
+    success = await invalidate_session(session_id, user["id"])
+    if not success:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    return {"message": "Device logged out successfully"}
+
+@router.post("/sessions/logout-all")
+async def logout_all_sessions(keep_current: bool = True, user: dict = Depends(get_current_user)):
+    """Log out from all devices (optionally keep current session)"""
+    from services import invalidate_all_sessions
+    
+    current_session_id = user.get("_current_session_id") if keep_current else None
+    
+    count = await invalidate_all_sessions(user["id"], except_session_id=current_session_id)
+    
+    return {
+        "message": f"Logged out from {count} device(s)",
+        "devices_logged_out": count,
+        "current_session_kept": keep_current
+    }
+
+@router.post("/logout")
+async def logout(user: dict = Depends(get_current_user)):
+    """Log out current session"""
+    from services import invalidate_session
+    
+    current_session_id = user.get("_current_session_id")
+    if current_session_id:
+        await invalidate_session(current_session_id, user["id"])
+    
+    return {"message": "Logged out successfully"}
+
+@router.get("/device-limit")
+async def get_device_limit(user: dict = Depends(get_current_user)):
+    """Get current device limit and usage"""
+    from services import check_device_limit, DEFAULT_DEVICE_LIMIT
+    
+    device_limit = user.get("device_limit", DEFAULT_DEVICE_LIMIT)
+    status = await check_device_limit(user["id"], device_limit)
+    
+    return {
+        "current_devices": status["current_devices"],
+        "max_devices": status["max_devices"],
+        "remaining_slots": max(0, status["max_devices"] - status["current_devices"]),
+        "subscription_tier": user.get("subscription_tier", "free"),
+        "note": "VIP subscribers can have more devices"
+    }
