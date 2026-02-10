@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { offlineManager } from "@/services/offlineManager";
