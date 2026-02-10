@@ -82,11 +82,7 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
   };
 
   if (loading || !series) {
-    return (
-      <div className="flex items-center justify-center h-[80vh]">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
+    return <PageLoader message="Loading series..." />;
   }
 
   return (
