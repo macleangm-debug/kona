@@ -97,15 +97,19 @@ async def create_session(user_id: str, request: Request, geo_data: dict = None) 
     
     return session
 
-async def check_device_limit(user_id: str, device_limit: int = DEFAULT_DEVICE_LIMIT) -> dict:
-    """Check if user has exceeded device limit"""
+async def check_device_limit(user_id: str, subscription_tier: str = "free") -> dict:
+    """Check if user has exceeded device limit based on subscription tier"""
     from services.database import db
+    
+    # Get device limit based on subscription tier
+    device_limit = get_device_limit(subscription_tier)
     
     active_sessions = await db.sessions.count_documents({"user_id": user_id})
     
     return {
         "current_devices": active_sessions,
         "max_devices": device_limit,
+        "subscription_tier": subscription_tier,
         "can_login": active_sessions < device_limit,
         "exceeded": active_sessions >= device_limit
     }
