@@ -643,3 +643,16 @@ async def get_device_limit_info(user: dict = Depends(get_current_user)):
         "subscription_tier": subscription_tier,
         "upgrade_options": upgrade_options
     }
+
+
+@router.get("/subscription-tiers")
+async def get_subscription_tiers():
+    """Get all available subscription tiers and their features"""
+    from services import SUBSCRIPTION_TIERS
+    
+    return {
+        "tiers": SUBSCRIPTION_TIERS,
+        "tier_order": ["free", "basic", "premium", "vip"],
+        "currency": "USD"
+    }
+
