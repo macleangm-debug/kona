@@ -335,13 +335,19 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                             toast.error("Please enter your email");
                             return;
                           }
+                          // Basic email validation
+                          if (!forgotPasswordEmail.includes("@")) {
+                            toast.error("Please enter a valid email address");
+                            return;
+                          }
                           setForgotPasswordLoading(true);
                           try {
                             await axios.post(`${API}/auth/request-password-reset?email=${encodeURIComponent(forgotPasswordEmail)}`);
                             setForgotPasswordSent(true);
                             toast.success("Reset link sent!");
                           } catch (err) {
-                            toast.error("Failed to send reset link");
+                            const errorMsg = err.response?.data?.detail || "Failed to send reset link";
+                            toast.error(errorMsg);
                           }
                           setForgotPasswordLoading(false);
                         }}
