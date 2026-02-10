@@ -94,9 +94,28 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const [name, setName] = useState("");
   const [referralCode, setReferralCode] = useState(initialReferralCode);
   
-  // Country selection
-  const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]); // Default to Kenya
+  // Country selection - default to Tanzania, but will try to auto-detect
+  const [selectedCountry, setSelectedCountry] = useState(findCountryByCode("TZ"));
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  
+  // Auto-detect country on mount
+  useEffect(() => {
+    const detectCountry = async () => {
+      try {
+        const res = await axios.get("https://ipapi.co/json/", { timeout: 3000 });
+        if (res.data?.country_code) {
+          const detected = findCountryByCode(res.data.country_code);
+          if (detected) {
+            setSelectedCountry(detected);
+          }
+        }
+      } catch (e) {
+        // Silently fail - keep default
+      }
+    };
+    detectCountry();
+  }, []);
   
   // OTP verification
   const [showOTPInput, setShowOTPInput] = useState(false);
