@@ -21,3 +21,13 @@ from .bunny import bunny_service, BunnyStreamService
 from .payouts import payout_service, flutterwave_payout, kwikpay_service
 from .cache import cache, CACHE_TTL, series_key, user_key, leaderboard_key
 from .rate_limiter import limiter, custom_rate_limit_handler, RATE_LIMITS
+
+# Subscription helpers
+from config.subscriptions import (
+    SUBSCRIPTION_TIERS,
+    get_device_limit,
+    get_tier_features,
+    can_download,
+    get_download_limit,
+    is_ad_free
+)
