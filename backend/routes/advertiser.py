@@ -364,6 +364,100 @@ AD_PLACEMENT_RULES = {
 # Minimum wallet balance to create/run campaigns
 MIN_WALLET_BALANCE = 50.0
 
+# ============ GEO TARGETING ROUTES ============
+
+@router.get("/advertiser/targeting-options")
+async def get_targeting_options():
+    """Get all available targeting options for ad campaigns"""
+    from services import get_geo_targeting_options, AFRICAN_REGIONS, AFRICAN_CITIES, AFRICAN_LANGUAGES
+    
+    geo_options = get_geo_targeting_options()
+    
+    return {
+        "geo_targeting": geo_options,
+        "demographic_targeting": {
+            "age_ranges": [
+                {"id": "13-17", "name": "Teen (13-17)"},
+                {"id": "18-24", "name": "Young Adult (18-24)"},
+                {"id": "25-34", "name": "Adult (25-34)"},
+                {"id": "35-44", "name": "Middle Age (35-44)"},
+                {"id": "45-54", "name": "Mature (45-54)"},
+                {"id": "55+", "name": "Senior (55+)"}
+            ],
+            "genders": [
+                {"id": "all", "name": "All"},
+                {"id": "male", "name": "Male"},
+                {"id": "female", "name": "Female"}
+            ]
+        },
+        "content_targeting": {
+            "genres": [
+                "Romance", "Drama", "Thriller", "Action", 
+                "Comedy", "Horror", "Mystery", "Sci-Fi"
+            ],
+            "content_types": [
+                {"id": "series", "name": "Series Content"},
+                {"id": "stories", "name": "Stories (Vertical)"}
+            ]
+        },
+        "device_targeting": {
+            "devices": [
+                {"id": "mobile", "name": "Mobile"},
+                {"id": "tablet", "name": "Tablet"},
+                {"id": "desktop", "name": "Desktop"}
+            ],
+            "os": [
+                {"id": "android", "name": "Android"},
+                {"id": "ios", "name": "iOS"},
+                {"id": "windows", "name": "Windows"},
+                {"id": "macos", "name": "macOS"}
+            ]
+        },
+        "time_targeting": {
+            "days_of_week": [
+                {"id": "weekdays", "name": "Weekdays"},
+                {"id": "weekends", "name": "Weekends"},
+                {"id": "all", "name": "All Days"}
+            ],
+            "time_slots": [
+                {"id": "morning", "name": "Morning (6am-12pm)"},
+                {"id": "afternoon", "name": "Afternoon (12pm-6pm)"},
+                {"id": "evening", "name": "Evening (6pm-12am)"},
+                {"id": "night", "name": "Night (12am-6am)"},
+                {"id": "all", "name": "All Day"}
+            ]
+        },
+        "example_targeting": {
+            "description": "Example targeting configuration for a campaign",
+            "config": {
+                "geo": {
+                    "countries": ["NG", "KE", "GH"],
+                    "regions": ["west_africa"],
+                    "cities": ["lagos", "nairobi"],
+                    "radius": {"city": "lagos", "km": 100},
+                    "exclude_countries": ["ZA"],
+                    "languages": ["english", "hausa"]
+                },
+                "demographic": {
+                    "age_ranges": ["18-24", "25-34"],
+                    "gender": "all"
+                },
+                "content": {
+                    "genres": ["Romance", "Drama"],
+                    "types": ["series"]
+                },
+                "device": {
+                    "devices": ["mobile"],
+                    "os": ["android", "ios"]
+                },
+                "time": {
+                    "days": "all",
+                    "slots": ["evening", "night"]
+                }
+            }
+        }
+    }
+
 # ============ CAMPAIGN ROUTES ============
 
 @router.post("/advertiser/campaigns")
