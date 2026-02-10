@@ -3,11 +3,18 @@ from .database import db, client, create_indexes, check_db_health
 from .auth import (
     hash_password, 
     verify_password, 
-    create_token, 
+    create_token,
+    decode_token,
     generate_referral_code,
     get_current_user,
     get_optional_user,
-    security
+    security,
+    create_session,
+    check_device_limit,
+    invalidate_session,
+    invalidate_all_sessions,
+    parse_device_info,
+    DEFAULT_DEVICE_LIMIT
 )
 from .geo import detect_country_from_ip, get_payment_config, convert_price
 from .bunny import bunny_service, BunnyStreamService
