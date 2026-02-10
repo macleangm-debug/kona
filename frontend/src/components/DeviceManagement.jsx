@@ -61,6 +61,8 @@ export const DeviceManagement = () => {
   const [sessions, setSessions] = useState([]);
   const [deviceLimit, setDeviceLimit] = useState(5);
   const [remainingSlots, setRemainingSlots] = useState(5);
+  const [subscriptionTier, setSubscriptionTier] = useState("free");
+  const [upgradeOptions, setUpgradeOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [logoutLoading, setLogoutLoading] = useState(null);
   const [logoutAllLoading, setLogoutAllLoading] = useState(false);
