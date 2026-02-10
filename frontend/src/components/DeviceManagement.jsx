@@ -76,6 +76,13 @@ export const DeviceManagement = () => {
       setSessions(res.data.sessions || []);
       setDeviceLimit(res.data.device_limit || 5);
       setRemainingSlots(res.data.remaining_slots || 0);
+      
+      // Fetch upgrade options
+      const limitRes = await axios.get(`${API}/auth/device-limit`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSubscriptionTier(limitRes.data.subscription_tier || "free");
+      setUpgradeOptions(limitRes.data.upgrade_options || []);
     } catch (e) {
       console.error("Failed to fetch sessions:", e);
     }
