@@ -33,6 +33,43 @@ class AdvertiserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class GeoTargeting(BaseModel):
+    """Advanced geo targeting options"""
+    countries: Optional[List[str]] = None  # ["NG", "KE", "GH"]
+    exclude_countries: Optional[List[str]] = None  # Countries to exclude
+    regions: Optional[List[str]] = None  # ["west_africa", "east_africa"]
+    cities: Optional[List[str]] = None  # ["lagos", "nairobi"]
+    radius: Optional[dict] = None  # {"city": "lagos", "km": 100}
+    languages: Optional[List[str]] = None  # ["english", "french"]
+
+class DemographicTargeting(BaseModel):
+    """Demographic targeting options"""
+    age_ranges: Optional[List[str]] = None  # ["18-24", "25-34"]
+    gender: Optional[str] = "all"  # "all", "male", "female"
+
+class ContentTargeting(BaseModel):
+    """Content targeting options"""
+    genres: Optional[List[str]] = None  # ["Romance", "Drama"]
+    types: Optional[List[str]] = None  # ["series", "stories"]
+
+class DeviceTargeting(BaseModel):
+    """Device targeting options"""
+    devices: Optional[List[str]] = None  # ["mobile", "tablet", "desktop"]
+    os: Optional[List[str]] = None  # ["android", "ios"]
+
+class TimeTargeting(BaseModel):
+    """Time-based targeting options"""
+    days: Optional[str] = "all"  # "weekdays", "weekends", "all"
+    slots: Optional[List[str]] = None  # ["morning", "evening"]
+
+class AdvancedTargeting(BaseModel):
+    """Complete targeting configuration"""
+    geo: Optional[GeoTargeting] = None
+    demographic: Optional[DemographicTargeting] = None
+    content: Optional[ContentTargeting] = None
+    device: Optional[DeviceTargeting] = None
+    time: Optional[TimeTargeting] = None
+
 class CampaignCreate(BaseModel):
     name: str
     campaign_type: str  # "cpv", "monthly", "sponsorship", "takeover"
@@ -40,7 +77,8 @@ class CampaignCreate(BaseModel):
     daily_budget: Optional[float] = None
     start_date: str
     end_date: Optional[str] = None
-    targeting: Optional[dict] = None  # { genre: [], age_range: [], countries: [] }
+    targeting: Optional[AdvancedTargeting] = None  # New advanced targeting
+    legacy_targeting: Optional[dict] = None  # Backward compatibility { genre: [], age_range: [], countries: [] }
     ad_placements: List[str] = ["pre_roll"]  # pre_roll, mid_roll, overlay, story
 
 class AdCreativeCreate(BaseModel):
