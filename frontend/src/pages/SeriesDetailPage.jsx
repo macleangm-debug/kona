@@ -97,6 +97,12 @@ export const SeriesDetailPage = ({ onAuthClick }) => {
             url={`https://www.streamkona.com/series/${id}`}
             type="video.tv_show"
             keywords={`${series.title}, ${series.genre}, African series, watch online, streaming`}
+            breadcrumbs={createBreadcrumbs(
+              { name: "Home", path: "/" },
+              { name: "Discover", path: "/discover" },
+              { name: series.genre, path: `/discover?genre=${series.genre}` },
+              { name: series.title, path: `/series/${id}` }
+            )}
           />
           <Helmet>
             <script type="application/ld+json">
