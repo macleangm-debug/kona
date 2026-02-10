@@ -695,7 +695,6 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                       </div>
                     </DialogContent>
                   </Dialog>
-                  </div>
 
                   {/* Verification Method (signup only) */}
                   {!isLogin && !otpVerified && (
