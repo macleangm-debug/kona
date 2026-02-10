@@ -307,15 +307,14 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
 
           {/* KONA text with typewriter effect */}
           <div 
-            className="mt-8 overflow-hidden"
+            className="mt-8 overflow-hidden flex justify-center"
             style={{
               opacity: phase >= 4 ? 1 : 0,
-              transition: 'opacity 0.5s ease-out',
-              width: '220px' // Match icon width
+              transition: 'opacity 0.5s ease-out'
             }}
           >
             <h1 
-              className="text-5xl font-black tracking-[0.2em] relative flex justify-center"
+              className="text-5xl font-black relative flex"
               style={{
                 filter: phase >= 4 ? 'drop-shadow(0 0 30px rgba(139, 92, 246, 0.6))' : 'none'
               }}
@@ -330,7 +329,8 @@ export const SplashScreen = ({ onComplete, minDuration = 5000 }) => {
                     WebkitTextFillColor: 'transparent',
                     opacity: 0,
                     animation: phase >= 4 ? `typewriterFade 0.15s ease-out ${index * 0.18}s forwards` : 'none',
-                    display: 'inline-block'
+                    display: 'inline-block',
+                    marginRight: index < 3 ? '0.15em' : '0' // Letter spacing except for last letter
                   }}
                 >
                   {letter}
