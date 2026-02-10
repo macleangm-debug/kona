@@ -55,7 +55,7 @@ def parse_device_info(user_agent_string: str) -> dict:
             "os": f"{ua.os.family} {ua.os.version_string}",
             "device": ua.device.family if ua.device.family != "Other" else device_type.capitalize()
         }
-    except:
+    except Exception:
         return {
             "device_type": "unknown",
             "browser": "Unknown",
