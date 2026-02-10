@@ -481,11 +481,18 @@ async def request_password_reset(email: str):
     """Request password reset email"""
     from services.email_service import send_password_reset_email, generate_secure_token
     
+    # Validate email format
+    if not email or "@" not in email:
+        raise HTTPException(status_code=400, detail="Please enter a valid email address")
+    
     # Find user by email
     user = await db.users.find_one({"email": email.lower()})
     if not user:
-        # Don't reveal if user exists - return success anyway
-        return {"message": "If an account exists with this email, a reset link has been sent."}
+        # User wants explicit validation - return error if email not found
+        raise HTTPException(
+            status_code=404, 
+            detail="No account found with this email address. Please check the email or create a new account."
+        )
     
     # Generate reset token
     reset_token = generate_secure_token()
