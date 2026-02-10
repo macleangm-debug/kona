@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { Coins, Plus, Minus, Loader2 } from "lucide-react";
+import { Coins, Plus, Minus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { CoinBalance } from "@/components";
