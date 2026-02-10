@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Loader2, Star, AlertCircle } from "lucide-react";
+import { Star, AlertCircle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { PageLoader, KonaLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { SeriesSubmissionForm } from "@/components/SeriesSubmissionForm";
