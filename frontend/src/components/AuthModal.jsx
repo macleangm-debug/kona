@@ -230,6 +230,7 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [referralCode, setReferralCode] = useState(initialReferralCode);
   
