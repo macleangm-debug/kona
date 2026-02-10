@@ -3,7 +3,7 @@ Kona Mini-Series Backend - Refactored Main Server
 """
 # Load environment variables FIRST
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv('/app/backend/.env')
 
 import logging
 from contextlib import asynccontextmanager
