@@ -515,7 +515,7 @@ Use my referral code: *${user?.referral_code}*
         </div>
         
         {/* Notifications Setting */}
-        <div className="py-3">
+        <div className="py-3 border-b border-white/10">
           <button 
             onClick={() => setShowNotificationSettings(!showNotificationSettings)}
             className="w-full flex items-center justify-between"
@@ -536,6 +536,11 @@ Use my referral code: *${user?.referral_code}*
               <NotificationSettings />
             </div>
           )}
+        </div>
+
+        {/* Device Management */}
+        <div className="py-3">
+          <DeviceManagement />
         </div>
       </Card>
 
