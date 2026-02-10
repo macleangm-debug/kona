@@ -537,8 +537,9 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                                   <span className="text-lg">{country.flag}</span>
                                   <span className="flex-1 text-sm">{country.name}</span>
                                   <span className="text-xs text-muted-foreground">+{country.dialCode}</span>
-                            </button>
-                          ))}
+                                </button>
+                              ))}
+                          </div>
                         </div>
                       )}
                     </div>
