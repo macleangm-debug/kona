@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Mail, Lock, ArrowLeft, CheckCircle, Loader2, KeyRound } from "lucide-react";
+import { Mail, Lock, ArrowLeft, CheckCircle, Loader2, KeyRound, Eye, EyeOff } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,8 @@ export const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
