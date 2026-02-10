@@ -541,6 +541,18 @@ async def create_campaign(data: CampaignCreate, request: "Request"):
     
     campaign_id = f"camp-{uuid.uuid4().hex[:12]}"
     
+    # Process targeting - support both new and legacy formats
+    targeting_config = {}
+    if data.targeting:
+        targeting_config = data.targeting.dict(exclude_none=True) if hasattr(data.targeting, 'dict') else data.targeting
+    elif data.legacy_targeting:
+        # Convert legacy format to new format
+        targeting_config = {
+            "geo": {"countries": data.legacy_targeting.get("countries", [])},
+            "demographic": {"age_ranges": data.legacy_targeting.get("age_range", [])},
+            "content": {"genres": data.legacy_targeting.get("genre", [])}
+        }
+    
     campaign = {
         "id": campaign_id,
         "advertiser_id": advertiser["id"],
@@ -553,7 +565,7 @@ async def create_campaign(data: CampaignCreate, request: "Request"):
         "spent": 0.0,
         "start_date": data.start_date,
         "end_date": data.end_date,
-        "targeting": data.targeting or {},
+        "targeting": targeting_config,
         "ad_placements": valid_placements,
         "placement_preference": data.ad_placements,  # What advertiser wanted
         "status": "pending_approval",  # pending_approval, active, paused, completed, rejected, insufficient_funds
