@@ -663,6 +663,8 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                 {isLogin ? "Sign up" : "Sign in"}
               </button>
             </p>
+            </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
