@@ -385,6 +385,31 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   }, [user]);
 
+  // ============ CONTENT PROTECTION ============
+  useEffect(() => {
+    const videoContainer = document.getElementById('video-player-container');
+    const video = videoRef.current;
+    
+    if (videoContainer && video && episode) {
+      const protection = initContentProtection(videoContainer, video, user, {
+        enableWatermark: true,
+        enableBlurOnHidden: true,
+        enableContextMenuBlock: true,
+        onViolation: (type) => {
+          console.log('Content protection violation:', type);
+          // Optionally log to analytics or show warning
+          if (type === 'printscreen' || type === 'screenshot_shortcut') {
+            toast.error('Screenshots are not allowed');
+          }
+        }
+      });
+      
+      return () => {
+        removeContentProtection(video);
+      };
+    }
+  }, [episode, user]);
+
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
     // Show pre-roll ad when video loads (if applicable)
