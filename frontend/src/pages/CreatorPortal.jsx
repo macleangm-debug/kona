@@ -153,7 +153,7 @@ export const CreatorPortal = () => {
 
           {creatorStatus?.application_status === "pending" ? (
             <Card className="p-6 text-center">
-              <Loader2 className="w-12 h-12 mx-auto mb-4 animate-spin text-primary" />
+              <KonaLoader size={48} className="mx-auto mb-4" />
               <h3 className="font-semibold mb-2">Application Under Review</h3>
               <p className="text-sm text-muted-foreground">
                 We are reviewing your application. You will be notified once approved.
