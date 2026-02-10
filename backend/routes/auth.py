@@ -259,14 +259,14 @@ async def login(data: UserLogin, request: Request):
     if not password_hash or not verify_password(data.password, password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Check device limit
-    device_limit = user.get("device_limit", DEFAULT_DEVICE_LIMIT)
-    limit_status = await check_device_limit(user["id"], device_limit)
+    # Check device limit based on subscription tier
+    subscription_tier = user.get("subscription_tier", "free")
+    limit_status = await check_device_limit(user["id"], subscription_tier)
     
     if limit_status["exceeded"]:
         raise HTTPException(
             status_code=403, 
-            detail=f"Device limit reached ({limit_status['max_devices']} devices). Please log out from another device first."
+            detail=f"Device limit reached ({limit_status['max_devices']} devices for {subscription_tier} tier). Upgrade your subscription or log out from another device."
         )
     
     # Create session for this login
