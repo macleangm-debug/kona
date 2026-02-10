@@ -177,5 +177,5 @@ async def get_optional_user(credentials: HTTPAuthorizationCredentials = Depends(
         user_id = payload.get("user_id")
         user = await db.users.find_one({"id": user_id}, {"_id": 0})
         return user
-    except:
+    except Exception:
         return None
