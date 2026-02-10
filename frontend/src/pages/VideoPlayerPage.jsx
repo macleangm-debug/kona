@@ -1324,6 +1324,42 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         transition: swipeDistance === 0 ? 'transform 0.3s, opacity 0.3s' : 'none'
       }}
     >
+      {/* Video SEO Tags */}
+      {episode && series && (
+        <Helmet>
+          <title>{`${episode.title || `Episode ${episode.episode_number}`} - ${series.title} | Stream Kona`}</title>
+          <meta name="description" content={episode.description || `Watch ${series.title} Episode ${episode.episode_number} on Stream Kona`} />
+          <link rel="canonical" href={`https://www.streamkona.com/watch/${id}`} />
+          <meta property="og:type" content="video.episode" />
+          <meta property="og:title" content={`${series.title} - Episode ${episode.episode_number}`} />
+          <meta property="og:image" content={episode.thumbnail || series.thumbnail} />
+          <meta property="og:video" content={episode.video_url} />
+          <meta property="og:video:type" content="video/mp4" />
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "VideoObject",
+              "name": `${series.title} - Episode ${episode.episode_number}`,
+              "description": episode.description || `Watch ${series.title} on Stream Kona`,
+              "thumbnailUrl": episode.thumbnail || series.thumbnail,
+              "uploadDate": episode.created_at || new Date().toISOString(),
+              "duration": episode.duration ? `PT${episode.duration}M` : "PT10M",
+              "contentUrl": episode.video_url,
+              "embedUrl": `https://www.streamkona.com/watch/${id}`,
+              "interactionStatistic": {
+                "@type": "InteractionCounter",
+                "interactionType": { "@type": "WatchAction" },
+                "userInteractionCount": episode.views || 0
+              },
+              "partOfSeries": {
+                "@type": "TVSeries",
+                "name": series.title
+              }
+            })}
+          </script>
+        </Helmet>
+      )}
+
       {/* Swipe down indicator */}
       {swipeDistance > 50 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center animate-pulse">
