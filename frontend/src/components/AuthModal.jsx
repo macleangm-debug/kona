@@ -294,6 +294,96 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
           </div>
 
           <div className="p-6">
+            {/* Forgot Password Mode */}
+            {forgotPasswordMode ? (
+              <div className="space-y-4">
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setForgotPasswordMode(false);
+                    setForgotPasswordSent(false);
+                  }}
+                  className="flex items-center gap-1 text-sm text-muted-foreground hover:text-white"
+                >
+                  ← Back to login
+                </button>
+                
+                {!forgotPasswordSent ? (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="font-heading text-2xl">
+                        Forgot Password?
+                      </DialogTitle>
+                      <DialogDescription>
+                        Enter your email and we'll send you a reset link.
+                      </DialogDescription>
+                    </DialogHeader>
+                    
+                    <div className="space-y-4">
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={forgotPasswordEmail}
+                        onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                        className="bg-secondary/50 border-white/10"
+                      />
+                      
+                      <Button
+                        className="w-full"
+                        onClick={async () => {
+                          if (!forgotPasswordEmail) {
+                            toast.error("Please enter your email");
+                            return;
+                          }
+                          setForgotPasswordLoading(true);
+                          try {
+                            await axios.post(`${API}/auth/request-password-reset?email=${encodeURIComponent(forgotPasswordEmail)}`);
+                            setForgotPasswordSent(true);
+                            toast.success("Reset link sent!");
+                          } catch (err) {
+                            toast.error("Failed to send reset link");
+                          }
+                          setForgotPasswordLoading(false);
+                        }}
+                        disabled={forgotPasswordLoading}
+                      >
+                        {forgotPasswordLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Mail className="w-4 h-4 mr-2" />
+                        )}
+                        Send Reset Link
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+                      <Check className="w-8 h-8 text-green-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white mb-2">Check Your Email</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      We sent a password reset link to<br />
+                      <span className="text-white">{forgotPasswordEmail}</span>
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Link expires in 1 hour. Check spam folder if not found.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="mt-4"
+                      onClick={() => {
+                        setForgotPasswordSent(false);
+                        setForgotPasswordEmail("");
+                      }}
+                    >
+                      Try Another Email
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+            <>
             <DialogHeader className="mb-4">
               <DialogTitle className="font-heading text-2xl">
                 {isLogin ? "Welcome Back" : "Join Kona"}
