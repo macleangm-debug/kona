@@ -275,6 +275,16 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [x] Standardized loading indicators with Kona branding - COMPLETED (Feb 10, 2026)
 - [x] Device limits/session management - COMPLETED (Feb 10, 2026)
 - [x] Enhanced SEO with breadcrumbs and video schema - COMPLETED (Feb 10, 2026)
+- [x] Advanced geo-targeting for ad campaigns - COMPLETED (Feb 10, 2026)
+  - 5 African regions (East, West, Southern, Central, North Africa)
+  - 20 major African cities with coordinates for radius targeting
+  - 10 African languages for language targeting
+  - Device, demographic, content, and time-based targeting
+- [x] VIP subscription tiers with variable device limits - COMPLETED (Feb 10, 2026)
+  - Free: 3 devices, $0
+  - Basic: 5 devices, $2.99/mo
+  - Premium: 7 devices, $5.99/mo
+  - VIP: 10 devices, $9.99/mo
 - [ ] Re-deploy application to production
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
 
