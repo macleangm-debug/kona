@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import axios from "axios";
+import { Helmet } from "react-helmet-async";
 import { ChevronLeft, ChevronDown, Play, Pause, Lock, Heart, Crown, Coins, PictureInPicture2, Wifi, WifiOff, Settings2, Zap, Check, X, SkipForward, Volume2, VolumeX, Maximize2, Minimize2, Subtitles } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
