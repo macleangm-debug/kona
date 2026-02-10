@@ -259,7 +259,21 @@ async def login(data: UserLogin, request: Request):
     if not password_hash or not verify_password(data.password, password_hash):
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    token = create_token(user["id"])
+    # Check device limit
+    device_limit = user.get("device_limit", DEFAULT_DEVICE_LIMIT)
+    limit_status = await check_device_limit(user["id"], device_limit)
+    
+    if limit_status["exceeded"]:
+        raise HTTPException(
+            status_code=403, 
+            detail=f"Device limit reached ({limit_status['max_devices']} devices). Please log out from another device first."
+        )
+    
+    # Create session for this login
+    session = await create_session(user["id"], request, geo_data)
+    
+    # Create token with session ID
+    token = create_token(user["id"], session["id"])
     
     # Generate referral code if user doesn't have one
     if not user.get("referral_code"):
