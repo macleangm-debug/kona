@@ -52,6 +52,19 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [ ] Live payment gateway (Stripe/Flutterwave) - UI only, not connected
 
 ### SEO
+- [x] Dynamic meta tags per page
+- [x] Open Graph tags for social sharing
+- [x] Twitter Card support
+- [x] Sitemap.xml
+- [x] Robots.txt
+- [x] JSON-LD structured data for series/episodes
+- [x] PWA manifest and icons
+- [x] Custom 404 page
+- [x] Breadcrumb schema for navigation - COMPLETED (Feb 10, 2026)
+- [x] Video schema for episodes - COMPLETED (Feb 10, 2026)
+- [x] Organization schema - COMPLETED (Feb 10, 2026)
+- [x] Website search action schema - COMPLETED (Feb 10, 2026)
+- [ ] Submit sitemap to Bing Webmaster Tools
 - [x] Meta tags in index.html
 - [x] sitemap.xml
 - [x] robots.txt
