@@ -226,6 +226,7 @@ async def register(data: UserCreate, request: Request):
 @router.post("/login", response_model=TokenResponse)
 async def login(data: UserLogin, request: Request):
     """Login with email or phone"""
+    from services import create_session, check_device_limit, DEFAULT_DEVICE_LIMIT
     
     # Detect user's geo-location from IP
     client_ip = request.client.host
