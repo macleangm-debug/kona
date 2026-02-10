@@ -614,17 +614,32 @@ async def logout(user: dict = Depends(get_current_user)):
     return {"message": "Logged out successfully"}
 
 @router.get("/device-limit")
-async def get_device_limit(user: dict = Depends(get_current_user)):
-    """Get current device limit and usage"""
-    from services import check_device_limit, DEFAULT_DEVICE_LIMIT
+async def get_device_limit_info(user: dict = Depends(get_current_user)):
+    """Get current device limit and usage based on subscription tier"""
+    from services import check_device_limit, SUBSCRIPTION_TIERS
     
-    device_limit = user.get("device_limit", DEFAULT_DEVICE_LIMIT)
-    status = await check_device_limit(user["id"], device_limit)
+    subscription_tier = user.get("subscription_tier", "free")
+    status = await check_device_limit(user["id"], subscription_tier)
+    
+    # Get upgrade options
+    tier_order = ["free", "basic", "premium", "vip"]
+    current_index = tier_order.index(subscription_tier) if subscription_tier in tier_order else 0
+    upgrade_options = []
+    
+    for tier_name in tier_order[current_index + 1:]:
+        tier_info = SUBSCRIPTION_TIERS[tier_name]
+        upgrade_options.append({
+            "tier": tier_name,
+            "name": tier_info["name"],
+            "device_limit": tier_info["device_limit"],
+            "price_usd": tier_info["price_usd"],
+            "extra_devices": tier_info["device_limit"] - status["max_devices"]
+        })
     
     return {
         "current_devices": status["current_devices"],
         "max_devices": status["max_devices"],
         "remaining_slots": max(0, status["max_devices"] - status["current_devices"]),
-        "subscription_tier": user.get("subscription_tier", "free"),
-        "note": "VIP subscribers can have more devices"
+        "subscription_tier": subscription_tier,
+        "upgrade_options": upgrade_options
     }
