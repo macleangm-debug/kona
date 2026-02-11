@@ -3024,6 +3024,11 @@ export const AdminDashboard = () => {
           <AdsApprovalTab token={token} />
         )}
 
+        {/* Support Tickets Tab */}
+        {activeTab === "support" && (
+          <SupportTicketsModule />
+        )}
+
         {/* Launch Checklist Tab (Super Admin Only) */}
         {activeTab === "checklist" && user?.is_super_admin && (
           <LaunchChecklistTab token={token} />
