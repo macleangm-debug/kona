@@ -161,18 +161,18 @@ const LandingPage = ({ onAuthClick }) => {
         </div>
 
         {/* Header */}
-        <header className="relative z-10 px-6 lg:px-12 py-6 flex items-center justify-between">
-          <KonaLogo2Full height={36} />
-          <div className="flex items-center gap-3">
+        <header className="relative z-10 px-4 sm:px-6 lg:px-12 py-4 sm:py-6 flex items-center justify-between">
+          <KonaLogo2Full height={28} className="sm:h-9" />
+          <div className="flex items-center gap-2 sm:gap-3">
             <Button 
               variant="ghost" 
-              className="text-white/80 hover:text-white hover:bg-white/10"
+              className="text-white/80 hover:text-white hover:bg-white/10 text-sm sm:text-base px-3 sm:px-4"
               onClick={onAuthClick}
             >
               Sign In
             </Button>
             <Button 
-              className="bg-primary hover:bg-primary/90 rounded-full px-6"
+              className="bg-primary hover:bg-primary/90 rounded-full px-4 sm:px-6 text-sm sm:text-base"
               onClick={onAuthClick}
             >
               Get Started
