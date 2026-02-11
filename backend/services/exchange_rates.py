@@ -459,7 +459,7 @@ class ExchangeRateService:
         }
     
     async def get_current_rates_display(self) -> Dict[str, Any]:
-        """Get current rates for display in admin UI"""
+        """Get current rates for display in admin UI with rounding examples"""
         
         rates = await self.get_rates()
         config = await self.get_admin_config()
@@ -478,6 +478,13 @@ class ExchangeRateService:
             # Calculate effective rate (with margin)
             effective_rate = rate * (1 + margin / 100)
             
+            # Calculate $10 example with nice rounding
+            exact_amount_10 = 10 * effective_rate
+            nice_amount_10 = self._round_to_nice_number(exact_amount_10, currency.lower())
+            rounding_profit_10 = nice_amount_10 - exact_amount_10
+            margin_profit_10 = 10 * rate * margin / 100
+            total_profit_10 = margin_profit_10 + rounding_profit_10
+            
             display_rates.append({
                 "country_code": country_code,
                 "currency": currency.upper(),
@@ -486,8 +493,12 @@ class ExchangeRateService:
                 "effective_rate": round(effective_rate, 4),
                 "example_10_usd": {
                     "market": round(10 * rate, 0),
-                    "with_margin": round(10 * effective_rate, 0),
-                    "kona_profit": round(10 * rate * margin / 100, 2)
+                    "with_margin_exact": round(exact_amount_10, 0),
+                    "with_margin": nice_amount_10,  # Nicely rounded
+                    "formatted": f"{currency.upper()} {nice_amount_10:,.0f} (~$10.00 USD)",
+                    "margin_profit": round(margin_profit_10, 2),
+                    "rounding_profit": round(rounding_profit_10, 2),
+                    "kona_profit": round(total_profit_10, 2)  # Total: margin + rounding
                 }
             })
         
