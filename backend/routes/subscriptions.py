@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from services.database import db
 from services.auth import get_current_user
 from services.subscriptions import kwikpay_subscription, SubscriptionStatus, PaymentStatus, PAYMENT_PROVIDERS
+from services.ab_testing import ab_testing_service
 from config.subscriptions import SUBSCRIPTION_TIERS, get_device_limit, get_tier_features
 
 router = APIRouter(prefix="/subscriptions", tags=["subscriptions"])
@@ -31,7 +32,10 @@ class CancelSubscriptionRequest(BaseModel):
 # ============ PUBLIC ROUTES ============
 
 @router.get("/tiers")
-async def get_subscription_tiers(country_code: Optional[str] = None):
+async def get_subscription_tiers(
+    country_code: Optional[str] = None,
+    user_id: Optional[str] = None
+):
     """Get all subscription tiers with pricing in local currency if country provided"""
     
     tiers_response = {}
