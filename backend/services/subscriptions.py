@@ -106,17 +106,26 @@ class KwikPaySubscriptionService:
         self.is_configured = bool(self.api_key and self.secret_key)
         self.mock_mode = True  # Always mock until KwikPay is ready
     
-    async def convert_usd_to_local(self, usd_amount: float, country_code: str) -> Dict[str, Any]:
+    async def convert_usd_to_local(
+        self, 
+        usd_amount: float, 
+        country_code: str,
+        pricing_style: str = "value"
+    ) -> Dict[str, Any]:
         """
         Convert USD price to local currency using dynamic rates with margin and nice rounding
         Returns both display amount (for users) and exact amount (for creators)
+        
+        Args:
+            pricing_style: "value" (ends in 9), "premium" (ends in 0), or "exact"
         """
         # Use the dynamic exchange rate service
         result = await exchange_rate_service.convert_usd_to_local(
             usd_amount, 
             country_code,
             include_margin=True,
-            apply_nice_rounding=True
+            apply_nice_rounding=True,
+            pricing_style=pricing_style
         )
         
         return {
@@ -130,7 +139,8 @@ class KwikPaySubscriptionService:
             "rounding_amount": result["rounding_amount"],
             "kona_total_revenue_local": result["kona_total_revenue_local"],
             "kona_total_revenue_usd": result["kona_total_revenue_usd"],
-            "formatted": result["formatted"],  # "KES 400 (~$2.99 USD)"
+            "formatted": result["formatted"],  # "KES 399 (~$2.99 USD)"
+            "pricing_style": pricing_style,
             "rate_source": result["rate_source"]
         }
     
