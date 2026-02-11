@@ -22,6 +22,7 @@ from .revenue import router as revenue_router
 from .streaming import router as streaming_router
 from .advertiser import router as advertiser_router
 from .subscriptions import router as subscriptions_router
+from .exchange_rates import router as exchange_rates_router
 
 # Create main API router
 api_router = APIRouter()
@@ -48,3 +49,4 @@ api_router.include_router(revenue_router)
 api_router.include_router(streaming_router)
 api_router.include_router(advertiser_router)
 api_router.include_router(subscriptions_router)
+api_router.include_router(exchange_rates_router)
