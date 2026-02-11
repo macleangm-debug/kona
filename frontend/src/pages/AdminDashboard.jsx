@@ -3033,6 +3033,11 @@ export const AdminDashboard = () => {
           <RevenueSettingsTab token={token} />
         )}
 
+        {/* Exchange Rates Tab (Super Admin Only) */}
+        {activeTab === "exchange-rates" && user?.is_super_admin && (
+          <ExchangeRateManager token={token} />
+        )}
+
         {/* Investment Calculator Tab (Super Admin Only) */}
         {activeTab === "investment" && user?.is_super_admin && (
           <InvestmentCalculatorTab token={token} />
