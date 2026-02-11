@@ -376,6 +376,21 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
 
+- [x] **AI Support Icon Positioning Fix** - COMPLETED (Feb 11, 2026)
+  - Repositioned support chat widget to avoid overlap with bottom navigation
+  - Mobile: `bottom-[72px]` places button 8px above the 64px bottom nav
+  - Desktop: `bottom-6` (standard positioning)
+  - Increased z-index to `z-[60]` to ensure visibility
+  - Chat window opens above the button with proper spacing
+- [x] **Landing Page Mobile Optimization** - COMPLETED (Feb 11, 2026)
+  - Header: Responsive sizing with `sm:` breakpoints for logo and buttons
+  - Hero section: Smaller text on mobile (`text-3xl`), full-width buttons
+  - How It Works: 2x2 grid on mobile (`grid-cols-2`), smaller cards and icons
+  - Features section: Single column on mobile, stacked cards
+  - Testimonials: Single column on mobile
+  - FAQ: Smaller padding and text on mobile
+  - Footer: Better grid layout, locations wrap properly, reduced payment methods on mobile
+
 ### P1 (High Priority)
 - [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
 - [x] Enhanced Advertiser Analytics Dashboard - COMPLETED (Feb 9, 2026)
