@@ -2531,6 +2531,7 @@ export const AdminDashboard = () => {
       { id: "seeding", label: "Engagement Seeding", icon: Sparkles },
       { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard },
       { id: "exchange-rates", label: "Exchange Rates", icon: Globe },
+      { id: "ab-testing", label: "A/B Testing", icon: FlaskConical },
       { id: "investment", label: "Investment Calculator", icon: Calculator },
       { id: "infrastructure", label: "Infrastructure Calculator", icon: Server },
       { id: "docs", label: "Docs & System", icon: FileText }
