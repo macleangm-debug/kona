@@ -202,8 +202,8 @@ const AppContent = () => {
         <Route path="/business/campaigns/new" element={<CampaignCreatePage />} />
       </Routes>
 
-      {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
-      {!isDesktop && !isFullScreenPage && (
+      {/* Bottom Navigation - Only on mobile and not on full-screen pages and not on landing page */}
+      {!isDesktop && !isFullScreenPage && !isLandingPage && (
         <BottomNav onAuthClick={() => handleAuthClick()} />
       )}
 
@@ -224,12 +224,14 @@ const AppContent = () => {
         onClose={() => setShowSearch(false)}
       />
 
-      {/* Promotional Popup */}
-      <PromoPopup
-        promo={activePromo}
-        open={showPromo}
-        onClose={closePromo}
-      />
+      {/* Promotional Popup - Only in app area */}
+      {isInApp && (
+        <PromoPopup
+          promo={activePromo}
+          open={showPromo}
+          onClose={closePromo}
+        />
+      )}
 
       {/* Milestone Notification Alert */}
       <MilestoneAlert
@@ -238,11 +240,11 @@ const AppContent = () => {
         onDismiss={dismissAlert}
       />
 
-      {/* PWA Install Banner - Mobile only (old) */}
-      {!isDesktop && <InstallAppBanner />}
+      {/* PWA Install Banner - Mobile only, only in app area (not landing page) */}
+      {!isDesktop && isInApp && <InstallAppBanner />}
       
-      {/* PWA Install Prompt - New enhanced version */}
-      <InstallPrompt />
+      {/* PWA Install Prompt - Only show in app area (watching pages), not on landing page */}
+      {isInApp && <InstallPrompt />}
 
       {/* Toast Notifications */}
       <Toaster position="top-center" richColors />
