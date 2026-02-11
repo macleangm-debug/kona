@@ -74,7 +74,12 @@ const AppContent = () => {
   const [referralCode, setReferralCode] = useState("");
   const [forceSignUp, setForceSignUp] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  const [showSplash, setShowSplash] = useState(true); // Always show splash on page load
+  
+  // Only show splash screen once per session using sessionStorage
+  const [showSplash, setShowSplash] = useState(() => {
+    const hasSeenSplash = sessionStorage.getItem('kona_splash_seen');
+    return !hasSeenSplash;
+  });
   
   const { user, token, refreshUser } = useAuth();
   const { activePromo, showPromo, closePromo } = usePromoManager();
