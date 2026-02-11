@@ -105,7 +105,7 @@ const SupportChatWidget = () => {
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "fixed z-[60] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
-          "right-4 bottom-[72px] sm:bottom-6 sm:right-6",
+          "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
           isOpen 
             ? "bg-gray-700 hover:bg-gray-600" 
             : "bg-purple-600 hover:bg-purple-500 hover:scale-105"
@@ -123,7 +123,7 @@ const SupportChatWidget = () => {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="fixed z-[60] w-[340px] max-w-[calc(100vw-2rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden right-4 bottom-[130px] sm:bottom-20 sm:right-6"
+          className="fixed z-[60] w-[340px] max-w-[calc(100vw-1.5rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden right-3 bottom-[130px] sm:bottom-20 sm:right-6"
           style={{ height: "400px", maxHeight: "calc(100vh - 180px)" }}
           data-testid="support-chat-window"
         >
