@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 
 class MiniSeriesAPITester:
-    def __init__(self, base_url="https://kona-streaming-ads.preview.emergentagent.com"):
+    def __init__(self, base_url="https://kona-content-protect.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
