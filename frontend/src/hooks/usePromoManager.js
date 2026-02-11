@@ -76,10 +76,13 @@ export const usePromoManager = () => {
     const hasEngaged = hasScrolled && timeOnPage >= 5000; // 5 sec minimum + scroll
     if (!hasEngaged) return;
 
-    // Find a promo with app_open or both trigger type
-    const appOpenPromo = promos.find(p => p.trigger_type === 'app_open' || p.trigger_type === 'both');
-    if (appOpenPromo) {
-      setActivePromo(appOpenPromo);
+    // Find all promos with app_open or both trigger type and randomly select one
+    const eligiblePromos = promos.filter(p => p.trigger_type === 'app_open' || p.trigger_type === 'both');
+    if (eligiblePromos.length > 0) {
+      // Randomly select a promo for variety
+      const randomIndex = Math.floor(Math.random() * eligiblePromos.length);
+      const selectedPromo = eligiblePromos[randomIndex];
+      setActivePromo(selectedPromo);
       setShowPromo(true);
       setHasShownAppOpen(true);
       sessionStorage.setItem('kona-promo-shown', 'true');
