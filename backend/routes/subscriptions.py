@@ -42,16 +42,17 @@ async def get_subscription_tiers(country_code: Optional[str] = None):
             **tier_info
         }
         
-        # Add local pricing if country code provided
+        # Add local pricing if country code provided (with dynamic rates + margin)
         if country_code:
-            price_info = kwikpay_subscription.convert_usd_to_local(
+            price_info = await kwikpay_subscription.convert_usd_to_local(
                 tier_info["price_usd"], 
                 country_code
             )
             tier_data["local_price"] = {
                 "amount": price_info["local_amount"],
                 "currency": price_info["currency"],
-                "formatted": f"{price_info['currency']} {price_info['local_amount']:,.0f}"
+                "formatted": f"{price_info['currency']} {price_info['local_amount']:,.0f}",
+                "rate_source": price_info.get("rate_source", "live")
             }
         
         tiers_response[tier_id] = tier_data
