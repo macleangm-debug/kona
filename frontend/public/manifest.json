@@ -2,7 +2,7 @@
   "name": "Stream Kona - African Mini-Series",
   "short_name": "Stream Kona",
   "description": "Africa's premier mini-series streaming platform. Watch exclusive romance, drama, thriller & action series. New episodes daily!",
-  "start_url": "/",
+  "start_url": "/home",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#7c3aed",
