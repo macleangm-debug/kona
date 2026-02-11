@@ -1,9 +1,10 @@
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Mail, MapPin, Users, Heart, Shield, Globe, Briefcase, Scale, Cookie, FileWarning, DollarSign, BookOpen, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import SEO from "@/components/SEO";
+import ReactMarkdown from "react-markdown";
 
 // Page content definitions
 const PAGE_CONTENT = {
