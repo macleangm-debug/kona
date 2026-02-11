@@ -311,6 +311,14 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Admin UI to override per tier (Admin → Exchange Rates → Pricing Styles)
   - APIs: GET/PUT/DELETE `/admin/exchange-rates/pricing-styles/{tier_id}`
   - Rounding profit tracked and displayed in admin dashboard
+- [x] A/B Testing for Pricing Styles - COMPLETED (Feb 11, 2026)
+  - Create experiments with multiple pricing style variants
+  - Consistent user assignment via MD5 hashing
+  - Impression and conversion tracking per variant
+  - Statistical analysis with z-score and confidence levels (90%, 95%, 99%)
+  - Admin UI: Admin → A/B Testing tab
+  - Features: Create test, view live results, declare winner, apply winner as default
+  - Integration: `/subscriptions/tiers?user_id=xxx` returns user's assigned variant
 - [ ] Re-deploy application to production
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
