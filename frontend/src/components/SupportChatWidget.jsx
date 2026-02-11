@@ -100,29 +100,30 @@ const SupportChatWidget = () => {
 
   return (
     <>
-      {/* Chat Widget Button */}
+      {/* Chat Widget Button - positioned above bottom nav */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
+          "fixed bottom-24 right-4 z-40 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
           isOpen 
             ? "bg-gray-700 hover:bg-gray-600" 
-            : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 animate-pulse"
+            : "bg-purple-600 hover:bg-purple-500"
         )}
         data-testid="support-chat-button"
+        aria-label="Open support chat"
       >
         {isOpen ? (
-          <X className="w-6 h-6 text-white" />
+          <X className="w-5 h-5 text-white" />
         ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
+          <MessageCircle className="w-5 h-5 text-white" />
         )}
       </button>
 
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="fixed bottom-36 right-4 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden"
-          style={{ height: "500px", maxHeight: "calc(100vh - 200px)" }}
+          className="fixed bottom-40 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden"
+          style={{ height: "450px", maxHeight: "calc(100vh - 200px)" }}
           data-testid="support-chat-window"
         >
           {/* Header */}
