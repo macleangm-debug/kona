@@ -85,8 +85,9 @@ const AppContent = () => {
   const { activePromo, showPromo, closePromo } = usePromoManager();
   const { notification, showAlert, dismissAlert } = useMilestoneNotifications();
 
-  // Handle splash screen completion
+  // Handle splash screen completion - persist to sessionStorage
   const handleSplashComplete = useCallback(() => {
+    sessionStorage.setItem('kona_splash_seen', 'true');
     setShowSplash(false);
   }, []);
 
