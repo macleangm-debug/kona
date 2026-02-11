@@ -322,6 +322,94 @@ export const ExchangeRateManager = ({ token }) => {
         </div>
       </Card>
 
+      {/* Pricing Styles Configuration */}
+      {pricingStyles && (
+        <Card className="p-4 bg-gray-800/50 border-white/10">
+          <h3 className="font-semibold mb-4 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-yellow-400" />
+            Psychological Pricing Styles
+          </h3>
+          <p className="text-sm text-gray-400 mb-4">
+            Configure how prices are rounded for each subscription tier. 
+            <strong className="text-green-400"> Value pricing (ends in 9)</strong> feels like a deal, 
+            <strong className="text-yellow-400"> Premium pricing (ends in 0)</strong> signals quality.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {pricingStyles.tiers?.filter(t => t.price_usd > 0).map((tier) => {
+              const StyleIcon = pricingStyleIcons[tier.current_style] || Tag;
+              const colorClass = pricingStyleColors[tier.current_style] || pricingStyleColors.value;
+              
+              return (
+                <div 
+                  key={tier.tier_id}
+                  className="p-4 rounded-lg bg-gray-900/50 border border-white/10"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="font-medium text-white">{tier.tier_name}</p>
+                      <p className="text-xs text-gray-500">${tier.price_usd}/mo</p>
+                    </div>
+                    <div className={`p-2 rounded-full ${colorClass}`}>
+                      <StyleIcon className="w-4 h-4" />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Select
+                      value={tier.current_style}
+                      onValueChange={(value) => updatePricingStyle(tier.tier_id, value)}
+                      disabled={saving}
+                    >
+                      <SelectTrigger className="bg-gray-800 border-gray-700">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {pricingStyles.available_styles?.map((style) => (
+                          <SelectItem key={style.id} value={style.id}>
+                            <div className="flex items-center gap-2">
+                              {style.id === "value" && <Tag className="w-3 h-3 text-green-400" />}
+                              {style.id === "premium" && <Crown className="w-3 h-3 text-yellow-400" />}
+                              {style.id === "exact" && <Settings className="w-3 h-3 text-gray-400" />}
+                              {style.name}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-gray-500">
+                        {tier.current_style === "value" && "Ends in 9 (e.g., 399)"}
+                        {tier.current_style === "premium" && "Ends in 0 (e.g., 400)"}
+                        {tier.current_style === "exact" && "No rounding"}
+                      </p>
+                      {tier.is_overridden && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-6 px-2 text-xs text-gray-500 hover:text-white"
+                          onClick={() => resetPricingStyle(tier.tier_id)}
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" />
+                          Reset
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {tier.is_overridden && (
+                      <Badge className="text-[10px] bg-purple-500/20 text-purple-400">
+                        Custom (default: {tier.default_style})
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* Exchange Rates Table */}
       <Card className="p-4 bg-gray-800/50 border-white/10">
         <h3 className="font-semibold mb-4 flex items-center gap-2">
