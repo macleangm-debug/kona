@@ -289,6 +289,15 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - New `EmailVerificationGate` component with soft prompt modal
   - Shows blurred overlay with "Verify Email to Unlock" + "Verify Now" button
   - Verification flow: send 6-digit code → enter code → unlock features + earn 5 bonus coins
+- [x] Dynamic Exchange Rate System with Configurable Margins - COMPLETED (Feb 11, 2026)
+  - Live rates from free fawazahmed0/exchange-api (no API key needed)
+  - Supports 7 African currencies: KES, TZS, UGX, RWF, GHS, NGN, ZAR
+  - **Admin-configurable margin** (default 5%) - goes to Kona as revenue
+  - Per-country margin overrides for custom pricing strategies
+  - Admin UI: `/admin` → "Exchange Rates" tab
+  - Shows market rate, effective rate, $10 example, Kona profit per transaction
+  - **Creators see payout amounts WITHOUT margin info** (hidden from their view)
+  - Revenue tracking and analytics for margin income
 - [ ] Re-deploy application to production
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
