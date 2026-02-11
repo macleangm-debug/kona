@@ -493,14 +493,20 @@ export const RewardsPage = ({ onAuthClick }) => {
               </div>
             </Card>
 
-            {/* Mystery Box - Compact */}
-            <MysteryBox token={token} onUpdate={refreshUser} />
+            {/* Mystery Box - Requires verification */}
+            <EmailVerificationGate featureName="Mystery Box">
+              <MysteryBox token={token} onUpdate={refreshUser} />
+            </EmailVerificationGate>
 
-            {/* Watch Streak - Compact */}
-            <WatchStreak token={token} onUpdate={refreshUser} />
+            {/* Watch Streak - Requires verification */}
+            <EmailVerificationGate featureName="Watch Streak">
+              <WatchStreak token={token} onUpdate={refreshUser} />
+            </EmailVerificationGate>
             
-            {/* Streak Shield */}
-            <StreakShield token={token} onUpdate={refreshUser} />
+            {/* Streak Shield - Requires verification */}
+            <EmailVerificationGate featureName="Streak Shield">
+              <StreakShield token={token} onUpdate={refreshUser} />
+            </EmailVerificationGate>
           </div>
         </div>
 
