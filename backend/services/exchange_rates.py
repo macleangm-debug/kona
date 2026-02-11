@@ -172,10 +172,17 @@ class ExchangeRateService:
         self, 
         usd_amount: float, 
         country_code: str,
-        include_margin: bool = True
+        include_margin: bool = True,
+        apply_nice_rounding: bool = True
     ) -> Dict[str, Any]:
         """
-        Convert USD to local currency with optional margin
+        Convert USD to local currency with optional margin and smart rounding
+        
+        Args:
+            usd_amount: Amount in USD
+            country_code: Country code (KE, TZ, etc.)
+            include_margin: Whether to apply Kona's margin
+            apply_nice_rounding: Whether to round to nice numbers (for display)
         
         Returns:
             {
@@ -183,10 +190,12 @@ class ExchangeRateService:
                 "base_rate": market exchange rate,
                 "margin_percent": applied margin,
                 "margin_amount": margin in local currency,
-                "kona_revenue": Kona's revenue from margin,
-                "local_amount": final amount user pays,
+                "rounding_amount": additional profit from nice rounding,
+                "kona_total_revenue": total Kona revenue (margin + rounding),
+                "local_amount_exact": exact conversion (for creator payouts),
+                "local_amount_display": nicely rounded (for user display),
                 "currency": currency code,
-                "rate_source": "live" or "fallback"
+                "formatted": "KES 400 (~$2.99 USD)" format
             }
         """
         
@@ -197,13 +206,12 @@ class ExchangeRateService:
         currency_code = COUNTRY_CURRENCIES.get(country_code, "usd").lower()
         base_rate = rates.get(currency_code, FALLBACK_RATES.get(currency_code, 1))
         
-        # Calculate base amount
+        # Calculate base amount (exact conversion)
         base_local_amount = usd_amount * base_rate
         
         # Apply margin if requested
         margin_percent = 0
         margin_amount = 0
-        kona_revenue = 0
         
         if include_margin:
             config = await self.get_admin_config()
@@ -217,10 +225,84 @@ class ExchangeRateService:
             
             # Calculate margin
             margin_amount = base_local_amount * (margin_percent / 100)
-            kona_revenue = margin_amount  # In local currency
         
-        # Final amount (rounded to whole number for local currency)
-        final_amount = round(base_local_amount + margin_amount, 0)
+        # Exact amount (for creator payouts - no rounding profit included)
+        exact_amount = base_local_amount + margin_amount
+        
+        # Apply nice rounding for display
+        rounding_amount = 0
+        if apply_nice_rounding and usd_amount > 0:
+            display_amount = self._round_to_nice_number(exact_amount, currency_code)
+            rounding_amount = display_amount - exact_amount
+            if rounding_amount < 0:
+                rounding_amount = 0  # Never round down
+                display_amount = exact_amount
+        else:
+            display_amount = round(exact_amount, 0)
+        
+        # Total Kona revenue = margin + rounding profit
+        kona_total_revenue_local = margin_amount + rounding_amount
+        kona_total_revenue_usd = kona_total_revenue_local / base_rate if base_rate > 0 else 0
+        
+        # Format for display: "KES 400 (~$2.99 USD)"
+        currency_upper = currency_code.upper()
+        formatted = f"{currency_upper} {display_amount:,.0f} (~${usd_amount:.2f} USD)"
+        
+        return {
+            "usd_amount": usd_amount,
+            "base_rate": round(base_rate, 4),
+            "base_local_amount": round(base_local_amount, 2),
+            "margin_percent": margin_percent,
+            "margin_amount": round(margin_amount, 2),
+            "margin_usd": round(margin_amount / base_rate, 4) if base_rate > 0 else 0,
+            "rounding_amount": round(rounding_amount, 2),
+            "rounding_usd": round(rounding_amount / base_rate, 4) if base_rate > 0 else 0,
+            "kona_total_revenue_local": round(kona_total_revenue_local, 2),
+            "kona_total_revenue_usd": round(kona_total_revenue_usd, 4),
+            "local_amount_exact": round(exact_amount, 2),  # For creator payouts
+            "local_amount_display": display_amount,  # For user display (nicely rounded)
+            "currency": currency_upper,
+            "formatted": formatted,
+            "rate_source": "live" if currency_code in rates else "fallback",
+            "rate_timestamp": self._cache_time.isoformat() if self._cache_time else None
+        }
+    
+    def _round_to_nice_number(self, amount: float, currency: str) -> float:
+        """
+        Round to psychologically appealing numbers
+        Examples:
+        - 389 -> 399 or 400
+        - 1,287 -> 1,299 or 1,300
+        - 25,830 -> 25,999 or 26,000
+        """
+        if amount <= 0:
+            return 0
+        
+        # Determine the rounding increment based on amount size
+        if amount < 100:
+            # Round to nearest 5 or 9 (e.g., 45, 49, 50)
+            base = round(amount / 10) * 10
+            options = [base - 1, base, base + 4, base + 5, base + 9]
+        elif amount < 1000:
+            # Round to nearest 49, 50, 99, 100 (e.g., 399, 400, 449, 500)
+            base = round(amount / 50) * 50
+            options = [base - 1, base, base + 49, base + 50, base + 99]
+        elif amount < 10000:
+            # Round to nearest 99 or 00 (e.g., 1,299, 1,300, 1,499, 1,500)
+            base = round(amount / 100) * 100
+            options = [base - 1, base, base + 99, base + 100, base + 199]
+        else:
+            # Round to nearest 999 or 000 (e.g., 25,999, 26,000)
+            base = round(amount / 1000) * 1000
+            options = [base - 1, base, base + 499, base + 500, base + 999]
+        
+        # Find the smallest option that's >= amount (never round down)
+        valid_options = [opt for opt in options if opt >= amount]
+        if valid_options:
+            return min(valid_options)
+        
+        # Fallback: round up to next nice number
+        return base + (100 if amount < 1000 else 1000)
         
         return {
             "usd_amount": usd_amount,
