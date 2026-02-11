@@ -64,7 +64,10 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
             <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
                 if (item.requiresAuth && !user) return null;
-                const isActive = location.pathname === item.path;
+                // Consider both /home and / as "home" for active state
+                const isActive = item.path === "/home" 
+                  ? (location.pathname === "/home" || location.pathname === "/")
+                  : location.pathname === item.path;
                 const Icon = item.icon;
                 return (
                   <button
