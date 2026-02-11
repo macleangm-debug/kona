@@ -108,25 +108,29 @@ class KwikPaySubscriptionService:
     
     async def convert_usd_to_local(self, usd_amount: float, country_code: str) -> Dict[str, Any]:
         """
-        Convert USD price to local currency using dynamic rates with margin
-        The margin is Kona's revenue and is NOT shown to creators
+        Convert USD price to local currency using dynamic rates with margin and nice rounding
+        Returns both display amount (for users) and exact amount (for creators)
         """
         # Use the dynamic exchange rate service
         result = await exchange_rate_service.convert_usd_to_local(
             usd_amount, 
             country_code,
-            include_margin=True
+            include_margin=True,
+            apply_nice_rounding=True
         )
         
         return {
             "usd_amount": result["usd_amount"],
-            "local_amount": result["local_amount"],
+            "local_amount": result["local_amount_display"],  # Nicely rounded for display
+            "local_amount_exact": result["local_amount_exact"],  # Exact for distribution
             "currency": result["currency"],
             "exchange_rate": result["base_rate"],
             "effective_rate": result["base_rate"] * (1 + result["margin_percent"] / 100),
             "margin_percent": result["margin_percent"],
-            "kona_revenue_local": result["kona_revenue_local"],
-            "kona_revenue_usd": result["kona_revenue_usd"],
+            "rounding_amount": result["rounding_amount"],
+            "kona_total_revenue_local": result["kona_total_revenue_local"],
+            "kona_total_revenue_usd": result["kona_total_revenue_usd"],
+            "formatted": result["formatted"],  # "KES 400 (~$2.99 USD)"
             "rate_source": result["rate_source"]
         }
     
