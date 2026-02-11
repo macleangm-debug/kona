@@ -2,12 +2,40 @@
 Subscription tiers and benefits configuration
 """
 
+# Pricing styles for psychological pricing
+PRICING_STYLES = {
+    "value": {
+        "name": "Value",
+        "description": "Ends in 9 - feels like a deal (e.g., KES 399)",
+        "target_endings": [9, 49, 99, 499, 999]
+    },
+    "premium": {
+        "name": "Premium", 
+        "description": "Ends in 0 - signals quality (e.g., KES 400)",
+        "target_endings": [0, 50, 100, 500, 1000]
+    },
+    "exact": {
+        "name": "Exact",
+        "description": "No rounding - exact conversion",
+        "target_endings": None
+    }
+}
+
+# Default pricing styles per tier (admin can override)
+DEFAULT_PRICING_STYLES = {
+    "free": "exact",      # N/A - no price
+    "basic": "value",     # Ends in 9 - appeals to price-sensitive users
+    "premium": "value",   # Ends in 9 - mass-market tier
+    "vip": "premium"      # Ends in 0 - signals exclusivity
+}
+
 # Subscription tiers with device limits and features
 SUBSCRIPTION_TIERS = {
     "free": {
         "name": "Free",
         "price_usd": 0,
         "device_limit": 3,
+        "pricing_style": "exact",
         "features": [
             "Watch free episodes",
             "Earn coins via daily rewards",
@@ -24,6 +52,7 @@ SUBSCRIPTION_TIERS = {
         "name": "Basic",
         "price_usd": 2.99,
         "device_limit": 5,
+        "pricing_style": "value",
         "features": [
             "Watch free episodes",
             "HD video quality (1080p)",
@@ -41,6 +70,7 @@ SUBSCRIPTION_TIERS = {
         "name": "Premium",
         "price_usd": 5.99,
         "device_limit": 7,
+        "pricing_style": "value",
         "features": [
             "All Basic features",
             "Ad-free viewing",
@@ -59,6 +89,7 @@ SUBSCRIPTION_TIERS = {
         "name": "VIP",
         "price_usd": 9.99,
         "device_limit": 10,
+        "pricing_style": "premium",
         "features": [
             "All Premium features",
             "10 devices",
