@@ -2527,6 +2527,7 @@ export const AdminDashboard = () => {
       { id: "checklist", label: "Launch Checklist", icon: Check },
       { id: "seeding", label: "Engagement Seeding", icon: Sparkles },
       { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard },
+      { id: "exchange-rates", label: "Exchange Rates", icon: Globe },
       { id: "investment", label: "Investment Calculator", icon: Calculator },
       { id: "infrastructure", label: "Infrastructure Calculator", icon: Server },
       { id: "docs", label: "Docs & System", icon: FileText }
