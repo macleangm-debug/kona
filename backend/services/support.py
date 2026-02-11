@@ -1,14 +1,23 @@
 """
 AI Support Chatbot Service - Kona Assistant
 Handles customer support queries using LLM
+Stores tickets in MongoDB
 """
 import os
 import uuid
 from datetime import datetime, timezone
 from typing import Optional, List, Dict
 from dotenv import load_dotenv
+from motor.motor_asyncio import AsyncIOMotorClient
+import logging
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+# MongoDB connection
+MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+DB_NAME = os.environ.get('DB_NAME', 'test_database')
 
 # Knowledge base for the AI to reference
 KONA_KNOWLEDGE_BASE = """
@@ -81,6 +90,7 @@ Kona is Africa's premier mini-series streaming platform featuring exclusive Afri
 - Support Tickets: For complex issues requiring human review
 - Response time: Most tickets resolved within 24 hours
 """
+
 
 class SupportChatService:
     def __init__(self):
@@ -548,40 +558,212 @@ Share your stories with millions of viewers and earn money!
     }
 ]
 
-# Support ticket storage (in production, use database)
-support_tickets = []
 
 class SupportTicketService:
-    @staticmethod
-    async def create_ticket(user_id: Optional[str], email: str, subject: str, description: str, category: str) -> dict:
+    def __init__(self):
+        self.client = AsyncIOMotorClient(MONGO_URL)
+        self.db = self.client[DB_NAME]
+        self.tickets = self.db.support_tickets
+    
+    async def create_ticket(self, user_id: Optional[str], email: str, subject: str, description: str, category: str) -> dict:
         """Create a new support ticket"""
         ticket = {
-            "id": str(uuid.uuid4())[:8].upper(),
+            "ticket_id": str(uuid.uuid4())[:8].upper(),
             "user_id": user_id,
             "email": email,
             "subject": subject,
             "description": description,
             "category": category,
             "status": "open",
-            "created_at": datetime.now(timezone.utc).isoformat(),
-            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "priority": "normal",
+            "created_at": datetime.now(timezone.utc),
+            "updated_at": datetime.now(timezone.utc),
+            "closed_at": None,
+            "resolution": None,
             "responses": []
         }
-        support_tickets.append(ticket)
+        
+        result = await self.tickets.insert_one(ticket)
+        ticket["_id"] = str(result.inserted_id)
+        
+        logger.info(f"Created support ticket {ticket['ticket_id']} for {email}")
         return ticket
     
-    @staticmethod
-    async def get_user_tickets(user_id: str) -> List[dict]:
-        """Get all tickets for a user"""
-        return [t for t in support_tickets if t.get("user_id") == user_id]
+    async def get_all_tickets(self, status: Optional[str] = None, limit: int = 50) -> List[dict]:
+        """Get all tickets (for admin)"""
+        query = {}
+        if status:
+            query["status"] = status
+        
+        cursor = self.tickets.find(query, {"_id": 0}).sort("created_at", -1).limit(limit)
+        return await cursor.to_list(length=limit)
     
-    @staticmethod
-    async def get_ticket(ticket_id: str) -> Optional[dict]:
+    async def get_user_tickets(self, user_id: str) -> List[dict]:
+        """Get all tickets for a user"""
+        cursor = self.tickets.find({"user_id": user_id}, {"_id": 0}).sort("created_at", -1)
+        return await cursor.to_list(length=100)
+    
+    async def get_ticket(self, ticket_id: str) -> Optional[dict]:
         """Get a specific ticket"""
-        for ticket in support_tickets:
-            if ticket["id"] == ticket_id:
-                return ticket
+        ticket = await self.tickets.find_one({"ticket_id": ticket_id}, {"_id": 0})
+        return ticket
+    
+    async def add_response(self, ticket_id: str, response_text: str, responder: str = "Support Team") -> Optional[dict]:
+        """Add a response to a ticket"""
+        response = {
+            "id": str(uuid.uuid4())[:8],
+            "text": response_text,
+            "responder": responder,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        result = await self.tickets.update_one(
+            {"ticket_id": ticket_id},
+            {
+                "$push": {"responses": response},
+                "$set": {"updated_at": datetime.now(timezone.utc)}
+            }
+        )
+        
+        if result.modified_count > 0:
+            return await self.get_ticket(ticket_id)
         return None
+    
+    async def close_ticket(self, ticket_id: str, resolution: str) -> Optional[dict]:
+        """Close a ticket and trigger email notification"""
+        from services.email_service import send_email
+        
+        # Get ticket first
+        ticket = await self.get_ticket(ticket_id)
+        if not ticket:
+            return None
+        
+        # Update ticket status
+        result = await self.tickets.update_one(
+            {"ticket_id": ticket_id},
+            {
+                "$set": {
+                    "status": "closed",
+                    "resolution": resolution,
+                    "closed_at": datetime.now(timezone.utc),
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        if result.modified_count > 0:
+            # Send resolution email to user
+            await self._send_resolution_email(ticket, resolution)
+            
+            logger.info(f"Closed support ticket {ticket_id}")
+            return await self.get_ticket(ticket_id)
+        
+        return None
+    
+    async def update_priority(self, ticket_id: str, priority: str) -> Optional[dict]:
+        """Update ticket priority"""
+        result = await self.tickets.update_one(
+            {"ticket_id": ticket_id},
+            {
+                "$set": {
+                    "priority": priority,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+            }
+        )
+        
+        if result.modified_count > 0:
+            return await self.get_ticket(ticket_id)
+        return None
+    
+    async def get_ticket_stats(self) -> dict:
+        """Get ticket statistics for admin dashboard"""
+        pipeline = [
+            {
+                "$group": {
+                    "_id": "$status",
+                    "count": {"$sum": 1}
+                }
+            }
+        ]
+        
+        stats = {"open": 0, "in_progress": 0, "closed": 0, "total": 0}
+        async for doc in self.tickets.aggregate(pipeline):
+            stats[doc["_id"]] = doc["count"]
+            stats["total"] += doc["count"]
+        
+        return stats
+    
+    async def _send_resolution_email(self, ticket: dict, resolution: str):
+        """Send email notification when ticket is resolved"""
+        from services.email_service import send_email
+        
+        subject = f"Your Support Ticket #{ticket['ticket_id']} Has Been Resolved - Kona"
+        
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #0a0a0a; color: #ffffff; margin: 0; padding: 0; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 40px 20px; }}
+                .header {{ text-align: center; margin-bottom: 30px; }}
+                .logo {{ font-size: 32px; font-weight: bold; color: #a855f7; }}
+                .card {{ background: linear-gradient(135deg, #1a1a2e 0%, #16162a 100%); border-radius: 16px; padding: 30px; margin-bottom: 20px; border: 1px solid rgba(168, 85, 247, 0.2); }}
+                .ticket-id {{ font-size: 14px; color: #a855f7; margin-bottom: 10px; }}
+                .subject {{ font-size: 20px; font-weight: 600; margin-bottom: 20px; }}
+                .label {{ font-size: 12px; color: #888; text-transform: uppercase; margin-bottom: 5px; }}
+                .content {{ font-size: 15px; line-height: 1.6; color: #ccc; }}
+                .resolution {{ background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 12px; padding: 20px; margin-top: 20px; }}
+                .resolution-header {{ color: #22c55e; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }}
+                .footer {{ text-align: center; color: #666; font-size: 13px; margin-top: 30px; }}
+                .btn {{ display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: white; padding: 12px 30px; border-radius: 25px; text-decoration: none; font-weight: 600; margin-top: 20px; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <div class="logo">KONA</div>
+                </div>
+                
+                <div class="card">
+                    <div class="ticket-id">Ticket #{ticket['ticket_id']}</div>
+                    <div class="subject">{ticket['subject']}</div>
+                    
+                    <div class="label">Your Original Request</div>
+                    <div class="content">{ticket['description'][:300]}{'...' if len(ticket['description']) > 300 else ''}</div>
+                    
+                    <div class="resolution">
+                        <div class="resolution-header">
+                            ✓ Resolution
+                        </div>
+                        <div class="content">{resolution}</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <a href="https://www.streamkona.com/home" class="btn">Continue Watching</a>
+                </div>
+                
+                <div class="footer">
+                    <p>If you have any further questions, feel free to open a new ticket or chat with our AI assistant.</p>
+                    <p>© 2026 Kona Entertainment Ltd. All rights reserved.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        try:
+            result = await send_email(ticket['email'], subject, html_content)
+            if result.get("success"):
+                logger.info(f"Resolution email sent to {ticket['email']} for ticket {ticket['ticket_id']}")
+            else:
+                logger.warning(f"Failed to send resolution email: {result.get('error')}")
+        except Exception as e:
+            logger.error(f"Error sending resolution email: {str(e)}")
+
 
 # Initialize services
 support_chat_service = SupportChatService()
