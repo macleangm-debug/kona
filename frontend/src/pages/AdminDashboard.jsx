@@ -2658,6 +2658,7 @@ export const AdminDashboard = () => {
                 {activeTab === "seeding" && "Boost engagement for launch traction"}
                 {activeTab === "revenue-settings" && "Configure revenue distribution"}
                 {activeTab === "exchange-rates" && "Dynamic exchange rates and margin revenue"}
+                {activeTab === "ab-testing" && "Test pricing styles to optimize conversions"}
                 {activeTab === "investment" && "Financial projections and ROI"}
                 {activeTab === "infrastructure" && "Server and hosting requirements"}
                 {activeTab === "docs" && "Platform documentation and guides"}
