@@ -275,6 +275,10 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Now uses `sessionStorage` to show splash only once per browser session
   - Splash shows on first visit, then bypassed for all subsequent navigations
   - Clears on browser/tab close (new sessions will see splash again - intentional)
+- [x] **Promo Popup Rotation & Cleanup** - COMPLETED (Feb 11, 2026)
+  - Removed "CHRISTMAS" placeholder text from promo popups
+  - Added 5 different promos that rotate randomly: Love in the City (FEATURED), Revenge of the Rejected (TRENDING), The Secret Heir (MUST WATCH), My CEO Husband (FAN FAVORITE), The Dragon Prince (EPIC SERIES)
+  - Updated usePromoManager hook to randomly select from eligible promos
 - [x] Geo-location tracking for users - COMPLETED (Feb 9, 2026)
 - [x] Typewriter animation for KONA splash screen - COMPLETED (Feb 10, 2026)
 - [x] Standardized loading indicators with Kona branding - COMPLETED (Feb 10, 2026)
