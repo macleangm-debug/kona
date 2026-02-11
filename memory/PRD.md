@@ -279,6 +279,15 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Removed "CHRISTMAS" placeholder text from promo popups
   - Added 5 different promos that rotate randomly: Love in the City (FEATURED), Revenge of the Rejected (TRENDING), The Secret Heir (MUST WATCH), My CEO Husband (FAN FAVORITE), The Dragon Prince (EPIC SERIES)
   - Updated usePromoManager hook to randomly select from eligible promos
+  - Made promo title labels visible with white pill/badge styling
+- [x] **Landing Page + PWA Flow** - COMPLETED (Feb 11, 2026)
+  - Created new marketing landing page at `/` for first-time web visitors
+  - Landing page shows hero section, features, stats, testimonials, and CTAs
+  - Clicking "Start Watching Free" navigates to `/home` (app area) with splash screen
+  - PWA install prompt only shows in app area (not on landing page)
+  - Returning visitors (who clicked "Start Watching") go directly to `/home`, skip landing
+  - PWA manifest `start_url` set to `/home` so installed PWA opens directly to watching area
+  - Header and bottom navigation only show in app area, not on landing page
 - [x] Geo-location tracking for users - COMPLETED (Feb 9, 2026)
 - [x] Typewriter animation for KONA splash screen - COMPLETED (Feb 10, 2026)
 - [x] Standardized loading indicators with Kona branding - COMPLETED (Feb 10, 2026)
