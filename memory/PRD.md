@@ -270,6 +270,11 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
 - [x] Like button fix - COMPLETED
 - [x] Phone/Email auth system - COMPLETED
 - [x] Cinematic splash screen with sound - COMPLETED
+- [x] **Splash Screen Persistence Fix** - COMPLETED (Feb 11, 2026)
+  - Fixed bug where splash screen appeared on every page navigation
+  - Now uses `sessionStorage` to show splash only once per browser session
+  - Splash shows on first visit, then bypassed for all subsequent navigations
+  - Clears on browser/tab close (new sessions will see splash again - intentional)
 - [x] Geo-location tracking for users - COMPLETED (Feb 9, 2026)
 - [x] Typewriter animation for KONA splash screen - COMPLETED (Feb 10, 2026)
 - [x] Standardized loading indicators with Kona branding - COMPLETED (Feb 10, 2026)
