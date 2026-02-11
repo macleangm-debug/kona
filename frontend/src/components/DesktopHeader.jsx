@@ -33,14 +33,14 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
   }, []);
 
   const navItems = [
-    { label: t("nav.home"), path: "/", icon: Home },
+    { label: t("nav.home"), path: "/home", icon: Home },
     { label: t("nav.discover"), path: "/discover", icon: Compass },
     { label: t("nav.rewards"), path: "/rewards", icon: Gift, highlight: true },
   ];
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    navigate("/home");
   };
 
   return (
@@ -56,7 +56,7 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Left: Logo + Nav */}
           <div className="flex items-center gap-8">
-            <button onClick={() => navigate("/")} className="flex-shrink-0">
+            <button onClick={() => navigate("/home")} className="flex-shrink-0">
               <KonaLogo2Full height={32} />
             </button>
             
