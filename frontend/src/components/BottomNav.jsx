@@ -16,7 +16,7 @@ export const BottomNav = ({ onAuthClick }) => {
   }
   
   const navItems = [
-    { icon: Home, label: t("nav.home"), path: "/" },
+    { icon: Home, label: t("nav.home"), path: "/home" },
     { icon: Compass, label: t("nav.discover"), path: "/discover" },
     { icon: Gift, label: t("nav.rewards"), path: "/rewards", requiresAuth: false, highlight: true },
     { icon: ShoppingCart, label: t("nav.store"), path: "/store" },
@@ -34,7 +34,10 @@ export const BottomNav = ({ onAuthClick }) => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 h-16 bg-black/95 backdrop-blur-xl border-t border-white/10 flex items-center justify-around z-50 max-w-md mx-auto" data-testid="bottom-nav">
       {navItems.map((item) => {
-        const isActive = location.pathname === item.path;
+        // Consider both /home and / as "home" for active state
+        const isActive = item.path === "/home" 
+          ? (location.pathname === "/home" || location.pathname === "/")
+          : location.pathname === item.path;
         return (
           <button
             key={item.path}
