@@ -444,26 +444,26 @@ const LandingPage = ({ onAuthClick }) => {
       {/* Footer */}
       <footer className="bg-black/50 border-t border-white/10">
         {/* Main Footer */}
-        <div className="max-w-6xl mx-auto px-6 lg:px-12 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-10 sm:py-16">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-5 gap-6 sm:gap-8">
             {/* Brand Column */}
-            <div className="col-span-2 md:col-span-1">
-              <KonaLogo2Full height={28} />
-              <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+            <div className="col-span-2">
+              <KonaLogo2Full height={24} className="sm:h-7" />
+              <p className="text-gray-400 text-sm mt-3 sm:mt-4 leading-relaxed max-w-xs">
                 Africa's premier mini-series streaming platform. Stories that move Africa forward.
               </p>
               {/* Social Links */}
-              <div className="flex items-center gap-3 mt-6">
-                <a href="https://twitter.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 mt-4 sm:mt-6">
+                <a href="https://twitter.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
                   <Twitter className="w-4 h-4" />
                 </a>
-                <a href="https://instagram.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                <a href="https://instagram.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
                   <Instagram className="w-4 h-4" />
                 </a>
-                <a href="https://facebook.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                <a href="https://facebook.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
                   <Facebook className="w-4 h-4" />
                 </a>
-                <a href="https://youtube.com/@streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                <a href="https://youtube.com/@streamkona" target="_blank" rel="noopener noreferrer" className="w-9 h-9 sm:w-10 sm:h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
                   <Youtube className="w-4 h-4" />
                 </a>
               </div>
@@ -471,8 +471,8 @@ const LandingPage = ({ onAuthClick }) => {
 
             {/* Company */}
             <div>
-              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Company</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider text-gray-300">Company</h4>
+              <ul className="space-y-2 sm:space-y-3">
                 {footerLinks.company.map((link, i) => (
                   <li key={i}>
                     <button 
@@ -488,8 +488,8 @@ const LandingPage = ({ onAuthClick }) => {
 
             {/* Support */}
             <div>
-              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Support</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider text-gray-300">Support</h4>
+              <ul className="space-y-2 sm:space-y-3">
                 {footerLinks.support.map((link, i) => (
                   <li key={i}>
                     <button 
@@ -505,8 +505,8 @@ const LandingPage = ({ onAuthClick }) => {
 
             {/* Legal */}
             <div>
-              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Legal</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider text-gray-300">Legal</h4>
+              <ul className="space-y-2 sm:space-y-3">
                 {footerLinks.legal.map((link, i) => (
                   <li key={i}>
                     <button 
@@ -522,8 +522,8 @@ const LandingPage = ({ onAuthClick }) => {
 
             {/* Creators */}
             <div>
-              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Creators</h4>
-              <ul className="space-y-3">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-xs sm:text-sm uppercase tracking-wider text-gray-300">Creators</h4>
+              <ul className="space-y-2 sm:space-y-3">
                 {footerLinks.creators.map((link, i) => (
                   <li key={i}>
                     <button 
@@ -541,35 +541,39 @@ const LandingPage = ({ onAuthClick }) => {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/10">
-          <div className="max-w-6xl mx-auto px-6 lg:px-12 py-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <MapPin className="w-4 h-4" />
-                <span>Nairobi, Kenya</span>
-                <span className="mx-2">|</span>
-                <span>Lagos, Nigeria</span>
-                <span className="mx-2">|</span>
-                <span>Johannesburg, South Africa</span>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12 py-4 sm:py-6">
+            <div className="flex flex-col items-center gap-3 sm:gap-4 text-center">
+              {/* Locations - stack on mobile */}
+              <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500">
+                <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span>Nairobi</span>
+                <span className="mx-1 hidden sm:inline">|</span>
+                <span className="sm:hidden">,</span>
+                <span>Lagos</span>
+                <span className="mx-1 hidden sm:inline">|</span>
+                <span className="sm:hidden">,</span>
+                <span>Johannesburg</span>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>© 2026 Kona Entertainment Ltd. All rights reserved.</span>
+              {/* Copyright */}
+              <div className="text-xs sm:text-sm text-gray-500">
+                © 2026 Kona Entertainment Ltd. All rights reserved.
               </div>
             </div>
             
             {/* Payment Methods & Trust Badges */}
-            <div className="flex flex-wrap items-center justify-center gap-4 mt-6 pt-6 border-t border-white/5">
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Shield className="w-4 h-4 text-green-500" />
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-4 mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-white/5">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs text-gray-500">
+                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" />
                 <span>Secure Payments</span>
               </div>
-              <span className="text-gray-600">|</span>
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <span className="text-gray-600 hidden sm:inline">|</span>
+              <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-gray-500">
                 <span>M-Pesa</span>
                 <span>Airtel Money</span>
                 <span>Visa</span>
                 <span>Mastercard</span>
-                <span>PayPal</span>
-                <span>Crypto</span>
+                <span className="hidden sm:inline">PayPal</span>
+                <span className="hidden sm:inline">Crypto</span>
               </div>
             </div>
           </div>
