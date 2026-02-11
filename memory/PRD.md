@@ -283,6 +283,12 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Payment providers: M-Pesa, Airtel Money, MTN Mobile Money, Card, Bank
   - Full upgrade flow with simulate-success demo endpoint
 - [x] Subscription Management UI - COMPLETED (Feb 10, 2026)
+- [x] Email Verification Gating for Gamification - COMPLETED (Feb 11, 2026)
+  - **Ungated features** (accessible to unverified users): Daily Rewards, Spin Wheel, Referral (share + claim)
+  - **Gated features** (require email verification): Scratch Card, Mystery Box, Watch Streak, Streak Shield, Daily Challenges, Character Cards, Prediction Games
+  - New `EmailVerificationGate` component with soft prompt modal
+  - Shows blurred overlay with "Verify Email to Unlock" + "Verify Now" button
+  - Verification flow: send 6-digit code → enter code → unlock features + earn 5 bonus coins
 - [ ] Re-deploy application to production
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
