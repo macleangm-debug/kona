@@ -30,6 +30,7 @@ import { VerificationBanner } from "@/components/VerificationBanner";
 
 // Pages
 import HomePageResponsive from "@/pages/HomePageResponsive";
+import LandingPage from "@/pages/LandingPage";
 import WatchPartyPage from "@/pages/WatchPartyPage";
 import DownloadsPage from "@/pages/DownloadsPage";
 import StoriesPage from "@/pages/StoriesPage";
