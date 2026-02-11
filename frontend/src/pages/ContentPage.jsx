@@ -1,1354 +1,638 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Mail, MapPin, Users, Heart, Shield, Globe, Briefcase, Scale, Cookie, FileWarning, DollarSign, BookOpen, Star } from "lucide-react";
+import { 
+  ArrowLeft, Mail, MapPin, Users, Heart, Shield, Globe, Briefcase, 
+  Scale, Cookie, FileWarning, DollarSign, BookOpen, Star, ChevronRight,
+  Check, Zap, Building, Clock, Coffee, Laptop, Gift, Award, TrendingUp,
+  Play, Download, Eye, Lock, AlertTriangle, Flag, UserCheck, Accessibility,
+  FileText, ExternalLink, Phone, MessageCircle
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import SEO from "@/components/SEO";
-import ReactMarkdown from "react-markdown";
 
-// Page content definitions
-const PAGE_CONTENT = {
-  about: {
-    title: "About Kona",
-    icon: Heart,
-    description: "Africa's premier mini-series streaming platform",
-    content: `
-# Our Story
-
-Kona was founded in 2024 with a simple mission: **to bring African stories to the world**.
-
-We noticed that while streaming platforms were booming globally, African content remained underrepresented. Local creators had incredible stories to tell but lacked the platform to reach audiences. Viewers craved content that reflected their experiences, cultures, and dreams.
-
-So we built Kona.
-
-## Our Mission
-
-**To empower African storytellers and connect them with audiences worldwide through compelling short-form video content.**
-
-We believe that:
-- Every story deserves to be told
-- African creators deserve fair compensation
-- Viewers deserve content that resonates with their lives
-- Entertainment should be accessible to everyone
-
-## What We Offer
-
-### For Viewers
-- **500+ episodes** of exclusive African content
-- **Diverse genres**: Romance, Drama, Thriller, Action, Comedy, Fantasy
-- **Bite-sized entertainment**: Episodes are 3-15 minutes
-- **Gamified experience**: Earn coins, compete, unlock rewards
-- **Watch anywhere**: Mobile, tablet, desktop, offline
-
-### For Creators
-- **70% revenue share** - among the highest in the industry
-- **Production support** and resources
-- **Massive audience** - 1M+ active viewers
-- **Analytics dashboard** to track performance
-- **Creative freedom** to tell your stories
-
-## Our Impact
-
-Since launch, we've:
-- Paid out **$500,000+** to African creators
-- Produced **50+ original series**
-- Reached viewers in **30+ countries**
-- Created jobs for **200+ crew members**
-- Supported **100+ independent creators**
-
-## Leadership Team
-
-Our team combines deep expertise in media, technology, and African markets:
-
-- **CEO**: Former Netflix executive with 15 years in streaming
-- **CTO**: Built scalable platforms serving 100M+ users
-- **Creative Director**: Award-winning African filmmaker
-- **Head of Creator Relations**: 10+ years supporting independent creators
-
-## Our Values
-
-1. **Creator First**: We exist to serve creators
-2. **Authenticity**: Real African stories, not stereotypes
-3. **Accessibility**: Entertainment for everyone, regardless of income
-4. **Innovation**: Always improving the experience
-5. **Community**: Building connections through shared stories
-
-## Join Us
-
-Whether you're a viewer looking for fresh content or a creator with stories to share, we'd love to have you.
-
-**Start watching free today** or **apply to become a creator**.
-    `,
-  },
-  careers: {
-    title: "Careers at Kona",
-    icon: Briefcase,
-    description: "Join us in revolutionizing African entertainment",
-    content: `
-# Join Our Team
-
-We're building the future of African entertainment, and we need passionate people to help us get there.
-
-## Why Work at Kona?
-
-### Impact
-Your work will directly impact millions of viewers and hundreds of creators across Africa and beyond.
-
-### Growth
-We're growing fast. Join early and grow with us. Many of our early employees now lead major departments.
-
-### Culture
-We're remote-first, diverse, and believe in work-life balance. We judge by results, not hours.
-
-### Compensation
-Competitive salaries, equity options, health insurance, and generous PTO.
-
-## Open Positions
-
-### Engineering
-- **Senior Backend Engineer** (Python/FastAPI) - Remote
-- **Frontend Engineer** (React) - Remote
-- **Mobile Engineer** (React Native) - Remote
-- **DevOps Engineer** - Remote
-- **Data Engineer** - Remote
-
-### Product
-- **Product Manager** - Nairobi/Remote
-- **UX Designer** - Remote
-- **UX Researcher** - Remote
-
-### Content
-- **Content Acquisitions Manager** - Lagos
-- **Creator Success Manager** - Nairobi
-- **Content Moderator** - Remote
-
-### Marketing
-- **Growth Marketing Manager** - Remote
-- **Social Media Manager** - Remote
-- **Influencer Partnerships** - Lagos/Nairobi
-
-### Operations
-- **Customer Support Lead** - Nairobi
-- **Finance Manager** - Nairobi
-- **HR Manager** - Remote
-
-## Benefits
-
-- 💰 Competitive salary + equity
-- 🏥 Health insurance (medical, dental, vision)
-- 🏖️ Unlimited PTO
-- 🏠 Remote-first culture
-- 💻 Home office budget
-- 📚 Learning & development budget
-- 👶 Parental leave
-- 🎬 Free VIP subscription
-
-## Our Hiring Process
-
-1. **Application Review** (1 week)
-2. **Initial Call** with recruiter (30 min)
-3. **Skills Assessment** - Take-home or live (1-2 hours)
-4. **Team Interviews** (2-3 rounds)
-5. **Final Interview** with leadership
-6. **Offer!**
-
-We aim to complete the process in 2-3 weeks.
-
-## How to Apply
-
-Send your resume and a brief note about why you're excited about Kona to:
-
-**careers@streamkona.com**
-
-Don't see a perfect fit? Send us your info anyway - we're always looking for exceptional people.
-    `,
-  },
-  press: {
-    title: "Press & Media",
-    icon: Globe,
-    description: "News, press releases, and media resources",
-    content: `
-# Press & Media
-
-## About Kona
-
-Kona is Africa's premier mini-series streaming platform, offering exclusive short-form content created by African filmmakers for global audiences.
-
-## Quick Facts
-
-- **Founded**: 2024
-- **Headquarters**: Nairobi, Kenya
-- **Offices**: Lagos, Nigeria | Johannesburg, South Africa
-- **Users**: 1M+ active viewers
-- **Content**: 500+ episodes, 50+ original series
-- **Creators**: 100+ independent filmmakers
-- **Countries**: Available in 30+ countries
-
-## Recent News
-
-### February 2026
-**Kona Raises $10M Series A**
-Led by African-focused VC firm with participation from global media investors.
-
-### January 2026
-**Kona Launches VIP Tier**
-Premium subscription offering offline viewing and exclusive content.
-
-### December 2025
-**Creator Payouts Exceed $500K**
-Milestone reached in payments to African content creators.
-
-## Press Releases
-
-- [Kona Series A Announcement](/press/series-a)
-- [2025 Year in Review](/press/2025-review)
-- [Creator Fund Launch](/press/creator-fund)
-
-## Media Kit
-
-Download our media kit including:
-- High-resolution logos
-- Executive headshots
-- Product screenshots
-- Brand guidelines
-
-[Download Media Kit](#)
-
-## Press Contact
-
-For press inquiries:
-
-**Email**: press@streamkona.com
-
-**Response Time**: 24-48 hours
-
-Please include:
-- Your publication/outlet
-- Story deadline
-- Specific questions or interview requests
-
-## Speaking & Events
-
-Our leadership team is available for:
-- Industry conferences
-- Podcast interviews
-- Panel discussions
-- University talks
-
-Contact: events@streamkona.com
-    `,
-  },
-  safety: {
-    title: "Safety Center",
-    icon: Shield,
-    description: "Your safety is our priority",
-    content: `
-# Safety Center
-
-At Kona, your safety is our top priority. We've built multiple layers of protection to ensure a safe viewing experience.
-
-## Content Safety
-
-### Age Ratings
-All content is rated to help you make informed viewing choices:
-- **G** - General audiences
-- **PG** - Parental guidance suggested
-- **13+** - Teen and above
-- **16+** - Mature content
-- **18+** - Adult content (requires age verification)
-
-### Content Moderation
-- All content reviewed before publishing
-- AI-powered detection of harmful content
-- 24/7 human moderation team
-- Quick response to user reports
-
-### Parental Controls
-- Set PIN for mature content
-- Create kids profiles with restricted content
-- View watch history
-- Set daily viewing limits
-
-## Account Safety
-
-### Secure Authentication
-- Email and phone verification
-- Two-factor authentication (2FA)
-- Secure password requirements
-- Session management
-
-### Privacy Controls
-- Control who sees your profile
-- Manage watch history visibility
-- Data download available
-- Account deletion option
-
-## Reporting Issues
-
-### Report Content
-See something concerning? Report it:
-1. Tap the flag icon on any content
-2. Select the reason
-3. Add details (optional)
-4. Submit
-
-We review all reports within 24 hours.
-
-### Report Users
-If another user is behaving inappropriately:
-1. Go to their profile
-2. Tap "Report User"
-3. Select the violation type
-4. Submit
-
-### Emergency Situations
-If you see content depicting:
-- Child exploitation
-- Imminent violence
-- Self-harm
-
-Please report immediately AND contact local authorities.
-
-## Our Commitments
-
-1. **No tolerance** for illegal content
-2. **24-hour response** to safety reports
-3. **Transparent** moderation policies
-4. **User privacy** protection
-5. **Regular safety** audits
-
-## Resources
-
-- [Community Guidelines](/guidelines)
-- [Privacy Policy](/privacy)
-- [Terms of Service](/terms)
-- [Contact Safety Team](mailto:safety@streamkona.com)
-    `,
-  },
-  guidelines: {
-    title: "Community Guidelines",
-    icon: Users,
-    description: "Rules for a positive community experience",
-    content: `
-# Community Guidelines
-
-Kona is a community of millions of viewers and creators. These guidelines help us maintain a positive, safe, and welcoming environment for everyone.
-
-## For All Users
-
-### Be Respectful
-- Treat others with kindness
-- No harassment, bullying, or hate speech
-- Respect diverse perspectives and cultures
-- Keep discussions constructive
-
-### Be Honest
-- Don't impersonate others
-- Don't spread misinformation
-- Don't manipulate ratings or reviews
-- Don't create fake accounts
-
-### Be Safe
-- Don't share personal information publicly
-- Report suspicious activity
-- Keep your account secure
-- Protect minors
-
-## Content Guidelines (Creators)
-
-### Allowed Content
-- Original creative works
-- Licensed or public domain content
-- Educational and informative content
-- Entertainment across all genres
-
-### Prohibited Content
-- **Violence**: Graphic violence, gore, torture
-- **Sexual content**: Pornography, explicit sexual acts
-- **Hate**: Content promoting hatred against groups
-- **Illegal**: Drug trafficking, weapons, fraud
-- **Harmful**: Self-harm promotion, dangerous challenges
-- **Misinformation**: Medical or election misinformation
-- **Copyright**: Unauthorized use of others' content
-- **Spam**: Repetitive, misleading, or low-quality content
-
-### Age-Restricted Content
-Content with the following may be age-restricted:
-- Moderate violence
-- Sexual themes (non-explicit)
-- Drug or alcohol references
-- Strong language
-
-## Engagement Guidelines
-
-### Comments & Reviews
-- Stay on topic
-- Be constructive, not destructive
-- No spam or self-promotion
-- No spoilers without warnings
-
-### Watch Parties
-- Follow the host's rules
-- Keep chat family-friendly unless marked otherwise
-- Don't share party links publicly
-
-## Enforcement
-
-Violations result in:
-
-1. **Warning** - First minor offense
-2. **Content Removal** - Violating content removed
-3. **Temporary Suspension** - Repeated violations
-4. **Permanent Ban** - Severe or continued violations
-
-Severe violations (illegal content, exploitation) result in immediate permanent ban and may be reported to authorities.
-
-## Appeals
-
-Disagree with an enforcement action?
-1. Go to Settings > Appeals
-2. Explain your case
-3. We'll review within 7 days
-
-## Updates
-
-These guidelines may be updated. We'll notify users of significant changes.
-
-*Last updated: February 2026*
-    `,
-  },
-  accessibility: {
-    title: "Accessibility",
-    icon: Star,
-    description: "Kona for everyone",
-    content: `
-# Accessibility at Kona
-
-We believe entertainment should be accessible to everyone. We're committed to making Kona usable for people of all abilities.
-
-## Current Features
-
-### Visual Accessibility
-- **High contrast mode**: Enhanced visibility
-- **Font size controls**: Adjust text size
-- **Screen reader support**: Compatible with VoiceOver, TalkBack
-- **Alt text**: Descriptions for images
-- **Color blind modes**: Deuteranopia, protanopia, tritanopia
-
-### Audio Accessibility
-- **Subtitles**: Available on all content
-- **Closed captions**: Including sound descriptions
-- **Audio descriptions**: Narration of visual elements
-- **Volume controls**: Per-content volume adjustment
-
-### Motor Accessibility
-- **Keyboard navigation**: Full keyboard support
-- **Voice commands**: Control playback by voice
-- **Large touch targets**: Easy to tap on mobile
-- **Reduced motion**: Option to minimize animations
-
-### Cognitive Accessibility
-- **Simple navigation**: Intuitive interface
-- **Clear labels**: Descriptive buttons and links
-- **Consistent layout**: Predictable structure
-- **Reading level**: Plain language used
-
-## How to Enable
-
-### On Mobile App
-1. Go to Profile > Settings
-2. Tap "Accessibility"
-3. Enable desired features
-
-### On Web
-1. Click your profile icon
-2. Select "Settings"
-3. Go to "Accessibility"
-4. Customize your experience
-
-## Requesting Accommodations
-
-Need an accommodation we don't currently offer?
-
-Email: accessibility@streamkona.com
-
-We review all requests and prioritize based on impact.
-
-## Feedback
-
-We're always improving. Tell us how we can do better:
-
-- What's working well?
-- What's difficult to use?
-- What features would help?
-
-Your feedback directly shapes our roadmap.
-
-## Standards
-
-We aim to meet:
-- WCAG 2.1 Level AA
-- Section 508 compliance
-- EN 301 549 (EU)
-
-## Roadmap
-
-Coming soon:
-- Sign language interpretation for select content
-- Enhanced audio description library
-- Customizable playback speeds
-- Dyslexia-friendly font option
-
-*This page is regularly updated as we improve accessibility.*
-    `,
-  },
-  terms: {
-    title: "Terms of Service",
-    icon: Scale,
-    description: "Terms governing your use of Kona",
-    content: `
-# Terms of Service
-
-*Last Updated: February 1, 2026*
-
-Welcome to Kona! These Terms of Service ("Terms") govern your use of the Kona streaming platform.
-
-## 1. Acceptance of Terms
-
-By accessing or using Kona, you agree to be bound by these Terms. If you disagree, please do not use our service.
-
-## 2. Eligibility
-
-- You must be at least 13 years old
-- If under 18, you need parental consent
-- You must not be prohibited from using our service by law
-
-## 3. Account Registration
-
-- Provide accurate information
-- Keep your password secure
-- You're responsible for all activity on your account
-- One account per person
-
-## 4. Subscriptions and Payments
-
-### Free Tier
-- Access to first episodes
-- Earn coins through rewards
-- Ad-supported viewing
-
-### Paid Subscriptions
-- Billed monthly
-- Auto-renews unless cancelled
-- Cancel anytime
-- No refunds for partial months
-
-### Coins
-- Virtual currency for unlocking content
-- No cash value
-- Non-transferable
-- May expire (see coin terms)
-
-## 5. Content and Conduct
-
-### You May
-- Stream content for personal use
-- Share your opinion in reviews
-- Participate in community features
-
-### You May Not
-- Download content without permission
-- Share your account
-- Circumvent access controls
-- Use VPN to access geo-restricted content
-- Scrape or data mine our platform
-- Harass other users
-- Post illegal content
-
-## 6. Intellectual Property
-
-- All content is owned by Kona or our licensors
-- You receive a limited license to stream
-- You may not reproduce, distribute, or create derivative works
-
-## 7. User Content
-
-- You retain rights to content you upload
-- You grant us license to display your content
-- You're responsible for your content
-- We may remove violating content
-
-## 8. Disclaimers
-
-- Service provided "as is"
-- We don't guarantee uninterrupted access
-- Content may be added or removed
-- Prices may change
-
-## 9. Limitation of Liability
-
-To the maximum extent permitted by law, Kona is not liable for:
-- Indirect or consequential damages
-- Loss of data or profits
-- Service interruptions
-
-## 10. Termination
-
-- You may close your account anytime
-- We may suspend or terminate for violations
-- Upon termination, your licenses end
-
-## 11. Changes to Terms
-
-- We may update these Terms
-- Continued use means acceptance
-- Material changes will be notified
-
-## 12. Governing Law
-
-These Terms are governed by the laws of Kenya. Disputes will be resolved in Nairobi courts.
-
-## 13. Contact
-
-Questions about these Terms?
-
-Email: legal@streamkona.com
-
----
-
-By using Kona, you acknowledge that you have read and understood these Terms.
-    `,
-  },
-  privacy: {
-    title: "Privacy Policy",
-    icon: Shield,
-    description: "How we collect, use, and protect your data",
-    content: `
-# Privacy Policy
-
-*Last Updated: February 1, 2026*
-
-This Privacy Policy explains how Kona Entertainment Ltd. ("Kona," "we," "us") collects, uses, and protects your personal information.
-
-## 1. Information We Collect
-
-### Information You Provide
-- Account info (email, phone, name)
-- Payment information
-- Profile details
-- Communications with us
-- User-generated content
-
-### Information Collected Automatically
-- Device information
-- IP address and location
-- Viewing history
-- Interaction data
-- Cookies and similar technologies
-
-### Information from Third Parties
-- Social media (if you connect accounts)
-- Payment processors
-- Analytics providers
-
-## 2. How We Use Your Information
-
-- Provide and improve our service
-- Process payments
-- Personalize recommendations
-- Send notifications and updates
-- Prevent fraud and abuse
-- Comply with legal obligations
-- Analyze usage patterns
-- Marketing (with your consent)
-
-## 3. How We Share Your Information
-
-### We May Share With
-- **Service providers**: Payment, hosting, analytics
-- **Business partners**: Content partners (aggregated data only)
-- **Legal authorities**: When required by law
-- **Affiliates**: Within Kona group companies
-
-### We Never
-- Sell your personal data
-- Share viewing history with advertisers
-- Give third parties direct access to your data
-
-## 4. Data Retention
-
-- Account data: Until you delete your account
-- Viewing history: 2 years
-- Payment records: 7 years (legal requirement)
-- Anonymous analytics: Indefinitely
-
-## 5. Your Rights
-
-You have the right to:
-- **Access** your data
-- **Correct** inaccurate data
-- **Delete** your data
-- **Export** your data
-- **Opt out** of marketing
-- **Withdraw consent**
-
-To exercise these rights, go to Settings > Privacy or contact privacy@streamkona.com
-
-## 6. Cookies
-
-We use cookies for:
-- Essential functionality
-- Remembering preferences
-- Analytics
-- Personalization
-
-Manage cookies in Settings > Privacy > Cookie Preferences
-
-## 7. Security
-
-We protect your data with:
-- Encryption in transit and at rest
-- Regular security audits
-- Access controls
-- Employee training
-
-## 8. Children's Privacy
-
-- Service not intended for under 13
-- We don't knowingly collect children's data
-- Parents can request deletion of child's data
-
-## 9. International Transfers
-
-Your data may be processed in:
-- Kenya (primary)
-- United States (cloud services)
-- European Union (backup)
-
-We use appropriate safeguards for transfers.
-
-## 10. Changes to This Policy
-
-We may update this policy. Material changes will be notified via email or in-app notification.
-
-## 11. Contact Us
-
-**Data Protection Officer**
-Email: privacy@streamkona.com
-Address: Kona Entertainment Ltd., Westlands, Nairobi, Kenya
-
-For EU residents: You may contact our EU representative at eu-privacy@streamkona.com
-    `,
-  },
-  cookies: {
-    title: "Cookie Policy",
-    icon: Cookie,
-    description: "How we use cookies and similar technologies",
-    content: `
-# Cookie Policy
-
-*Last Updated: February 1, 2026*
-
-This policy explains how Kona uses cookies and similar technologies.
-
-## What Are Cookies?
-
-Cookies are small text files stored on your device when you visit websites. They help us:
-- Remember your preferences
-- Keep you signed in
-- Understand how you use our service
-- Improve your experience
-
-## Types of Cookies We Use
-
-### Essential Cookies
-**Required for the service to function**
-- Authentication
-- Security
-- Load balancing
-- Accessibility preferences
-
-*Cannot be disabled*
-
-### Functional Cookies
-**Remember your choices**
-- Language preference
-- Video quality settings
-- Playback position
-- UI preferences
-
-*Can be disabled, may affect functionality*
-
-### Analytics Cookies
-**Help us understand usage**
-- Pages visited
-- Time on site
-- Click patterns
-- Error occurrences
-
-*Can be disabled*
-
-### Marketing Cookies
-**Used for relevant content suggestions**
-- Viewing history
-- Genre preferences
-- Search queries
-
-*Can be disabled*
-
-## Similar Technologies
-
-### Local Storage
-Stores data in your browser:
-- Offline content
-- Cache data
-- Session information
-
-### Pixels/Beacons
-Small images that track:
-- Email opens
-- Page visits
-
-### Device Fingerprinting
-We do NOT use device fingerprinting.
-
-## Third-Party Cookies
-
-Some third parties may set cookies:
-- **Google Analytics**: Usage statistics
-- **Payment providers**: Transaction security
-- **Social media**: Share buttons (only if you interact)
-
-## Managing Cookies
-
-### In Kona App
-Settings > Privacy > Cookie Preferences
-
-### In Browser
-- **Chrome**: Settings > Privacy > Cookies
-- **Safari**: Preferences > Privacy
-- **Firefox**: Options > Privacy
-- **Edge**: Settings > Privacy
-
-### Opt-Out Links
-- [Google Analytics Opt-Out](https://tools.google.com/dlpage/gaoptout)
-
-## Cookie Duration
-
-- **Session cookies**: Deleted when you close browser
-- **Persistent cookies**: Up to 2 years
-
-## Changes
-
-We may update this policy. Check back periodically.
-
-## Contact
-
-Questions? Email: privacy@streamkona.com
-    `,
-  },
-  dmca: {
-    title: "DMCA & Copyright",
-    icon: FileWarning,
-    description: "Copyright infringement reporting",
-    content: `
-# DMCA & Copyright Policy
-
-Kona respects intellectual property rights and expects our users to do the same.
-
-## Copyright Infringement
-
-If you believe content on Kona infringes your copyright, you may submit a DMCA takedown notice.
-
-## Filing a DMCA Notice
-
-To file a notice, provide:
-
-1. **Your contact information**
-   - Full legal name
-   - Address
-   - Phone number
-   - Email address
-
-2. **Identification of copyrighted work**
-   - Description of the work
-   - Link to original (if online)
-   - Registration number (if registered)
-
-3. **Identification of infringing content**
-   - URL of content on Kona
-   - Description of where it appears
-
-4. **Statements**
-   - "I have a good faith belief that use of the material is not authorized by the copyright owner, its agent, or the law."
-   - "The information in this notification is accurate, and under penalty of perjury, I am authorized to act on behalf of the copyright owner."
-
-5. **Your signature**
-   - Electronic or physical
-
-## Where to Send
-
-**Email**: dmca@streamkona.com
-
-**Mail**:
-Kona Entertainment Ltd.
-Attn: DMCA Agent
-P.O. Box 12345
-Nairobi, Kenya
-
-## Counter-Notification
-
-If you believe your content was wrongly removed, you may file a counter-notification including:
-
-1. Your contact information
-2. Identification of removed content and its location
-3. Statement under penalty of perjury that you have good faith belief the content was removed by mistake
-4. Consent to jurisdiction of Nairobi courts
-5. Your signature
-
-## Repeat Infringers
-
-We terminate accounts of repeat infringers:
-- First offense: Warning
-- Second offense: Account suspension
-- Third offense: Permanent termination
-
-## Creator Guidelines
-
-For creators uploading content:
-- Only upload content you own or have rights to
-- Don't use copyrighted music without license
-- Don't use footage from other films/shows
-- Credit sources appropriately
-- Obtain model/actor releases
-
-## Resources
-
-- [U.S. Copyright Office](https://www.copyright.gov)
-- [WIPO](https://www.wipo.int)
-- [Creative Commons](https://creativecommons.org)
-
-## Questions
-
-For copyright questions: copyright@streamkona.com
-    `,
-  },
-  creators: {
-    title: "Creator Portal",
-    icon: Users,
-    description: "Upload content and earn money",
-    content: `
-# Creator Portal
-
-Share your stories with millions and earn money doing what you love.
-
-## Why Create on Kona?
-
-### Massive Reach
-- **1M+ active viewers** hungry for African content
-- **30+ countries** worldwide
-- **Growing 20%** month over month
-
-### Fair Compensation
-- **70% revenue share** - highest in the industry
-- **Monthly payouts** via M-Pesa, bank, or PayPal
-- **Transparent analytics** - see exactly what you earn
-
-### Full Support
-- **Production resources** and guidance
-- **Marketing support** for top performers
-- **Creator community** to learn and connect
-- **Dedicated success manager** for top creators
-
-## Revenue Model
-
-### How You Earn
-
-1. **Coin Purchases**: When viewers buy coins to watch your content
-2. **Subscriptions**: Share of subscriber revenue based on watch time
-3. **Tips**: Direct tips from appreciative viewers
-4. **Bonuses**: Performance bonuses for top content
-
-### Example Earnings
-
-| Views | Estimated Monthly Earnings |
-|-------|---------------------------|
-| 10,000 | $100 - $300 |
-| 100,000 | $1,000 - $3,000 |
-| 1,000,000 | $10,000 - $30,000 |
-
-*Actual earnings vary based on viewer engagement and geography*
-
-## Content Requirements
-
-### Format
-- **Video quality**: Minimum 720p HD
-- **Audio**: Clear, balanced sound
-- **Length**: 3-15 minutes per episode
-- **Series**: Minimum 3 episodes
-
-### Genres
-We accept all genres:
-- Romance
-- Drama
-- Thriller
-- Action
-- Comedy
-- Fantasy
-- Horror
-- Documentary
-
-### Standards
-- Original content only
-- No copyright violations
-- No explicit sexual content
-- No extreme violence
-- Professional quality
-
-## Application Process
-
-### Step 1: Apply
-Fill out the creator application form with:
-- Your background and experience
-- Series concept and synopsis
-- Sample content (trailer or episode)
-
-### Step 2: Review
-Our team reviews applications weekly:
-- Content quality assessment
-- Concept evaluation
-- Audience potential analysis
-
-### Step 3: Onboarding
-If approved:
-- Sign creator agreement
-- Set up payment details
-- Access creator dashboard
-- Upload your content
-
-### Step 4: Launch
-We help you launch:
-- Optimize thumbnails and descriptions
-- Feature in discovery sections
-- Promote to relevant audiences
-
-## Creator Dashboard
-
-Track everything in your dashboard:
-- **Views** and watch time
-- **Revenue** and payouts
-- **Audience** demographics
-- **Content** performance
-- **Comments** and engagement
-
-## Success Stories
-
-> "Kona changed my life. I was making content for YouTube with little return. On Kona, my first series earned $5,000 in the first month." - Amina K., Kenya
-
-> "The support from Kona's team helped me improve my production quality. Now I create full-time." - Chidi O., Nigeria
-
-## Ready to Start?
-
-[Apply Now](/business/apply)
-
-Questions? Email: creators@streamkona.com
-    `,
-  },
-  "creator-guidelines": {
-    title: "Creator Guidelines",
-    icon: BookOpen,
-    description: "Best practices for Kona creators",
-    content: `
-# Creator Guidelines
-
-These guidelines help you create successful content on Kona.
-
-## Content Quality
-
-### Video
-- **Resolution**: 1080p recommended, 720p minimum
-- **Frame rate**: 24-30 fps
-- **Format**: MP4 (H.264) preferred
-- **Bitrate**: 5-10 Mbps
-
-### Audio
-- **Format**: AAC or MP3
-- **Sample rate**: 48kHz
-- **Bitrate**: 192kbps minimum
-- **Levels**: -14 to -10 dB average
-
-### Lighting
-- Well-lit scenes
-- Consistent lighting
-- Avoid harsh shadows
-- Natural light works great
-
-## Storytelling Tips
-
-### Hook Early
-- Capture attention in first 30 seconds
-- Start with action or intrigue
-- Don't bury the lead
-
-### Episode Structure
-- Clear beginning, middle, end
-- End with a hook for next episode
-- Consistent episode length
-
-### Characters
-- Relatable protagonists
-- Clear motivations
-- Character development across series
-
-### Pacing
-- Keep it moving
-- Every scene should advance story
-- Cut unnecessary content
-
-## Optimization
-
-### Thumbnails
-- High contrast
-- Faces perform well
-- Text should be readable
-- Avoid clutter
-
-### Titles
-- Clear and descriptive
-- Include genre keywords
-- Avoid clickbait
-
-### Descriptions
-- Synopsis of episode
-- No spoilers
-- Include relevant tags
-
-### Tags
-- Genre tags
-- Theme tags
-- Mood tags
-- 5-10 tags per episode
-
-## Community Engagement
-
-### Respond to Comments
-- Engage with your audience
-- Thank supporters
-- Address concerns professionally
-
-### Build Following
-- Consistent upload schedule
-- Tease upcoming content
-- Cross-promote on social media
-
-### Collaborate
-- Work with other creators
-- Cross-promote series
-- Appear in each other's content
-
-## What to Avoid
-
-### Content
-- Copyright violations
-- Explicit content
-- Hate speech
-- Misinformation
-- Low effort content
-
-### Practices
-- Sub4sub or artificial engagement
-- Misleading thumbnails
-- Spam
-- Harassment
-
-## Resources
-
-- [Video Production Guide](#)
-- [Thumbnail Templates](#)
-- [Creator Community Forum](#)
-- [Monthly Creator Webinars](#)
-
-## Support
-
-Need help? Contact your creator success manager or email creators@streamkona.com
-    `,
-  },
-  revenue: {
-    title: "Revenue Sharing",
-    icon: DollarSign,
-    description: "How creators earn on Kona",
-    content: `
-# Revenue Sharing
-
-Transparent, fair compensation for creators.
-
-## Revenue Split
-
-### Standard Split
-- **Creators**: 70%
-- **Kona**: 30%
-
-This is among the highest creator share in the industry.
-
-### What Kona's 30% Covers
-- Platform infrastructure
-- Payment processing (3-5%)
-- Content delivery
-- Marketing and promotion
-- Customer support
-- Moderation and safety
-
-## Revenue Sources
-
-### 1. Coin Purchases (Primary)
-When viewers spend coins on your content:
-- You earn 70% of the coin value
-- Tracked per-episode
-
-### 2. Subscription Share
-For Premium/VIP subscribers:
-- Revenue pooled monthly
-- Distributed based on watch time
-- More watch time = higher share
-
-### 3. Tips
-Viewers can tip directly:
-- You keep 85% of tips
-- 15% for payment processing
-
-### 4. Bonuses
-Performance rewards:
-- Top 10 series monthly bonus
-- Viral content bonus
-- New creator launch bonus
-
-## Payment Schedule
-
-### Timing
-- Payouts processed **1st of each month**
-- For previous month's earnings
-- Arrives within 3-5 business days
-
-### Minimum Payout
-- **$50 USD** minimum
-- Below minimum rolls over to next month
-
-### Payment Methods
-- M-Pesa (Kenya, Tanzania)
-- Bank transfer (all countries)
-- PayPal (all countries)
-- Wise (international)
-
-## Tracking Earnings
-
-### Creator Dashboard
-View in real-time:
-- Daily/weekly/monthly revenue
-- Revenue by episode
-- Revenue by source
-- Pending vs. paid
-
-### Reports
-Download detailed reports:
-- Transaction history
-- Tax documents (1099/W-8)
-- Revenue breakdowns
-
-## Tax Information
-
-### Your Responsibility
-- You're responsible for your taxes
-- We provide necessary documentation
-- Consult a tax professional
-
-### Documents We Provide
-- Annual earnings summary
-- Transaction records
-- Tax forms (where required)
-
-## FAQs
-
-**Q: When do I start earning?**
-A: As soon as your content is live and viewers watch/purchase.
-
-**Q: Why is my payout less than expected?**
-A: Payment fees (3-5%) and tax withholding (if applicable) may apply.
-
-**Q: Can I earn from old content?**
-A: Yes! Your content continues earning as long as it's on the platform.
-
-**Q: What if I don't reach minimum payout?**
-A: Balance rolls over until you reach $50.
-
-## Support
-
-Payment questions? Email: payments@streamkona.com
-    `,
-  },
+// ============ CAREERS PAGE ============
+const CareersPage = ({ navigate }) => {
+  const departments = [
+    { name: "Engineering", openings: 5, icon: Laptop },
+    { name: "Product", openings: 3, icon: Zap },
+    { name: "Content", openings: 4, icon: Play },
+    { name: "Marketing", openings: 3, icon: TrendingUp },
+    { name: "Operations", openings: 2, icon: Building },
+  ];
+
+  const benefits = [
+    { icon: DollarSign, title: "Competitive Salary", desc: "Top-tier compensation + equity" },
+    { icon: Heart, title: "Health Insurance", desc: "Medical, dental & vision coverage" },
+    { icon: Coffee, title: "Unlimited PTO", desc: "Take the time you need" },
+    { icon: Laptop, title: "Remote First", desc: "Work from anywhere" },
+    { icon: Gift, title: "Home Office Budget", desc: "$1,000 setup allowance" },
+    { icon: BookOpen, title: "Learning Budget", desc: "Annual development fund" },
+  ];
+
+  const jobs = [
+    { title: "Senior Backend Engineer", dept: "Engineering", location: "Remote", type: "Full-time" },
+    { title: "Frontend Engineer", dept: "Engineering", location: "Remote", type: "Full-time" },
+    { title: "Mobile Engineer (React Native)", dept: "Engineering", location: "Remote", type: "Full-time" },
+    { title: "Product Manager", dept: "Product", location: "Nairobi/Remote", type: "Full-time" },
+    { title: "UX Designer", dept: "Product", location: "Remote", type: "Full-time" },
+    { title: "Content Acquisitions Manager", dept: "Content", location: "Lagos", type: "Full-time" },
+    { title: "Creator Success Manager", dept: "Content", location: "Nairobi", type: "Full-time" },
+    { title: "Growth Marketing Manager", dept: "Marketing", location: "Remote", type: "Full-time" },
+    { title: "Customer Support Lead", dept: "Operations", location: "Nairobi", type: "Full-time" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#030014]">
+      {/* Hero */}
+      <div className="relative bg-gradient-to-b from-purple-900/30 to-transparent py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full mb-6">
+            <Briefcase className="w-4 h-4 text-green-400" />
+            <span className="text-sm text-green-400">We're Hiring!</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Build the Future of African Entertainment</h1>
+          <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+            Join a team of passionate builders creating Africa's premier streaming platform.
+          </p>
+          <Button size="lg" className="bg-purple-600 hover:bg-purple-500 rounded-full px-8">
+            View Open Positions
+            <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="max-w-5xl mx-auto px-6 -mt-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { value: "50+", label: "Team Members" },
+            { value: "10+", label: "Countries" },
+            { value: "70%", label: "Remote" },
+            { value: "4.8", label: "Glassdoor Rating" },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white/5 backdrop-blur rounded-xl p-4 text-center border border-white/10">
+              <div className="text-2xl font-bold text-purple-400">{stat.value}</div>
+              <div className="text-sm text-gray-400">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Benefits */}
+      <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl font-bold text-center mb-12">Why Join Kona?</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {benefits.map((benefit, i) => (
+              <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10 hover:border-purple-500/50 transition-colors">
+                <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4">
+                  <benefit.icon className="w-6 h-6 text-purple-400" />
+                </div>
+                <h3 className="font-semibold mb-2">{benefit.title}</h3>
+                <p className="text-sm text-gray-400">{benefit.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Departments */}
+      <section className="py-12 px-6 bg-white/5">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8">Open by Department</h2>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {departments.map((dept, i) => (
+              <div key={i} className="bg-[#0a0a1a] rounded-xl p-4 text-center border border-white/10">
+                <dept.icon className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+                <div className="font-medium">{dept.name}</div>
+                <div className="text-sm text-purple-400">{dept.openings} roles</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Job Listings */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl font-bold mb-8">Open Positions</h2>
+          <div className="space-y-4">
+            {jobs.map((job, i) => (
+              <div 
+                key={i} 
+                className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-purple-500/50 transition-all cursor-pointer group flex items-center justify-between"
+              >
+                <div>
+                  <h3 className="font-semibold group-hover:text-purple-400 transition-colors">{job.title}</h3>
+                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-400">
+                    <span className="flex items-center gap-1">
+                      <Building className="w-3 h-3" /> {job.dept}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" /> {job.location}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" /> {job.type}
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-400 transition-colors" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 bg-gradient-to-r from-purple-900/30 to-pink-900/30">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4">Don't See Your Role?</h2>
+          <p className="text-gray-400 mb-6">We're always looking for exceptional talent. Send us your info!</p>
+          <Button variant="outline" className="border-white/30 hover:bg-white/10">
+            <Mail className="w-4 h-4 mr-2" />
+            careers@streamkona.com
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
 };
 
+// ============ PRESS PAGE ============
+const PressPage = ({ navigate }) => {
+  const pressReleases = [
+    { date: "Feb 2026", title: "Kona Raises $10M Series A to Expand African Content Library", tag: "Funding" },
+    { date: "Jan 2026", title: "Kona Launches VIP Tier with Offline Viewing", tag: "Product" },
+    { date: "Dec 2025", title: "Creator Payouts Exceed $500K Milestone", tag: "Creators" },
+    { date: "Nov 2025", title: "Kona Reaches 1 Million Active Users", tag: "Milestone" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#030014]">
+      {/* Hero */}
+      <div className="relative bg-gradient-to-b from-blue-900/30 to-transparent py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Press & Media</h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            News, press releases, and media resources for Kona
+          </p>
+        </div>
+      </div>
+
+      {/* Quick Facts */}
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        <h2 className="text-2xl font-bold mb-6">Quick Facts</h2>
+        <div className="grid md:grid-cols-4 gap-4">
+          {[
+            { label: "Founded", value: "2024" },
+            { label: "Headquarters", value: "Nairobi, Kenya" },
+            { label: "Active Users", value: "1M+" },
+            { label: "Original Series", value: "50+" },
+          ].map((fact, i) => (
+            <div key={i} className="bg-white/5 rounded-xl p-4 border border-white/10">
+              <div className="text-sm text-gray-400">{fact.label}</div>
+              <div className="text-xl font-bold text-white">{fact.value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Press Releases */}
+      <section className="py-12 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8">Recent News</h2>
+          <div className="space-y-4">
+            {pressReleases.map((pr, i) => (
+              <div key={i} className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-blue-500/50 transition-all cursor-pointer group">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-sm text-gray-500">{pr.date}</span>
+                      <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded">{pr.tag}</span>
+                    </div>
+                    <h3 className="font-semibold group-hover:text-blue-400 transition-colors">{pr.title}</h3>
+                  </div>
+                  <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-400" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Media Kit */}
+      <section className="py-12 px-6 bg-white/5">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Media Kit</h2>
+            <Button className="bg-blue-600 hover:bg-blue-500">
+              <Download className="w-4 h-4 mr-2" />
+              Download Kit
+            </Button>
+          </div>
+          <p className="text-gray-400">
+            Includes high-resolution logos, executive headshots, product screenshots, and brand guidelines.
+          </p>
+        </div>
+      </section>
+
+      {/* Contact */}
+      <section className="py-20 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">Press Contact</h2>
+          <p className="text-gray-400 mb-6">For media inquiries, please contact:</p>
+          <Button variant="outline" className="border-white/30 hover:bg-white/10">
+            <Mail className="w-4 h-4 mr-2" />
+            press@streamkona.com
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============ SAFETY PAGE ============
+const SafetyPage = ({ navigate }) => {
+  const safetyFeatures = [
+    { icon: Shield, title: "Content Moderation", desc: "All content reviewed before publishing with 24/7 moderation team" },
+    { icon: Eye, title: "Age Ratings", desc: "G, PG, 13+, 16+, 18+ ratings to help you make informed choices" },
+    { icon: Lock, title: "Parental Controls", desc: "Set PIN for mature content, create kids profiles, set viewing limits" },
+    { icon: UserCheck, title: "Account Security", desc: "Email/phone verification, 2FA, secure passwords" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#030014]">
+      {/* Hero */}
+      <div className="relative bg-gradient-to-b from-green-900/30 to-transparent py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-8 h-8 text-green-400" />
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Safety Center</h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+            Your safety is our top priority. Learn about our safety features and how to stay safe on Kona.
+          </p>
+        </div>
+      </div>
+
+      {/* Safety Features */}
+      <section className="py-16 px-6">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-2xl font-bold mb-8 text-center">How We Keep You Safe</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {safetyFeatures.map((feature, i) => (
+              <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <feature.icon className="w-6 h-6 text-green-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-2">{feature.title}</h3>
+                    <p className="text-sm text-gray-400">{feature.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Report */}
+      <section className="py-16 px-6 bg-white/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <AlertTriangle className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-4">See Something? Report It.</h2>
+          <p className="text-gray-400 mb-6">
+            Help us keep Kona safe. Report inappropriate content or behavior.
+          </p>
+          <div className="flex items-center justify-center gap-4">
+            <Button className="bg-yellow-600 hover:bg-yellow-500">
+              <Flag className="w-4 h-4 mr-2" />
+              Report Content
+            </Button>
+            <Button variant="outline" className="border-white/30">
+              Report User
+            </Button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============ GUIDELINES PAGE ============
+const GuidelinesPage = ({ navigate }) => {
+  const rules = [
+    { title: "Be Respectful", desc: "Treat others with kindness. No harassment, bullying, or hate speech." },
+    { title: "Be Honest", desc: "Don't impersonate others or spread misinformation." },
+    { title: "Be Safe", desc: "Don't share personal information publicly. Report suspicious activity." },
+    { title: "No Spam", desc: "Don't post repetitive, misleading, or low-quality content." },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#030014]">
+      <div className="relative bg-gradient-to-b from-purple-900/30 to-transparent py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <Users className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Community Guidelines</h1>
+          <p className="text-xl text-gray-400">Rules for a positive community experience</p>
+        </div>
+      </div>
+
+      <section className="py-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <div className="space-y-6">
+            {rules.map((rule, i) => (
+              <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{rule.title}</h3>
+                    <p className="text-sm text-gray-400">{rule.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 bg-red-500/10 border border-red-500/20 rounded-xl p-6">
+            <h3 className="font-semibold text-red-400 mb-2">Violations Result In:</h3>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li>• First offense: Warning</li>
+              <li>• Second offense: Temporary suspension</li>
+              <li>• Third offense: Permanent ban</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============ ACCESSIBILITY PAGE ============
+const AccessibilityPage = ({ navigate }) => {
+  const features = [
+    { category: "Visual", items: ["High contrast mode", "Font size controls", "Screen reader support", "Color blind modes"] },
+    { category: "Audio", items: ["Subtitles on all content", "Closed captions", "Audio descriptions", "Volume controls"] },
+    { category: "Motor", items: ["Keyboard navigation", "Voice commands", "Large touch targets", "Reduced motion option"] },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#030014]">
+      <div className="relative bg-gradient-to-b from-cyan-900/30 to-transparent py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <Accessibility className="w-12 h-12 text-cyan-400 mx-auto mb-4" />
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">Accessibility</h1>
+          <p className="text-xl text-gray-400">Kona for everyone</p>
+        </div>
+      </div>
+
+      <section className="py-16 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-6">
+            {features.map((category, i) => (
+              <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10">
+                <h3 className="font-semibold text-cyan-400 mb-4">{category.category} Accessibility</h3>
+                <ul className="space-y-2">
+                  {category.items.map((item, j) => (
+                    <li key={j} className="flex items-center gap-2 text-sm text-gray-300">
+                      <Check className="w-4 h-4 text-cyan-400" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-16 px-6 bg-white/5">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl font-bold mb-4">Need Accommodations?</h2>
+          <p className="text-gray-400 mb-6">We're always improving. Tell us how we can do better.</p>
+          <Button variant="outline" className="border-white/30">
+            <Mail className="w-4 h-4 mr-2" />
+            accessibility@streamkona.com
+          </Button>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+// ============ LEGAL PAGES (Terms, Privacy, Cookies, DMCA) ============
+const LegalPage = ({ title, icon: Icon, sections }) => (
+  <div className="min-h-screen bg-[#030014]">
+    <div className="relative bg-gradient-to-b from-gray-800/50 to-transparent py-16 px-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-3 mb-4">
+          <Icon className="w-8 h-8 text-gray-400" />
+          <h1 className="text-3xl font-bold">{title}</h1>
+        </div>
+        <p className="text-gray-400">Last updated: February 1, 2026</p>
+      </div>
+    </div>
+
+    <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="space-y-8">
+        {sections.map((section, i) => (
+          <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10">
+            <h2 className="text-xl font-semibold mb-4 text-purple-400">{section.title}</h2>
+            <div className="text-sm text-gray-300 space-y-3 leading-relaxed">
+              {section.content.map((para, j) => (
+                <p key={j}>{para}</p>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ============ CREATOR PAGES ============
+const CreatorGuidelines = ({ navigate }) => (
+  <div className="min-h-screen bg-[#030014]">
+    <div className="relative bg-gradient-to-b from-orange-900/30 to-transparent py-20 px-6">
+      <div className="max-w-4xl mx-auto text-center">
+        <BookOpen className="w-12 h-12 text-orange-400 mx-auto mb-4" />
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4">Creator Guidelines</h1>
+        <p className="text-xl text-gray-400">Best practices for success on Kona</p>
+      </div>
+    </div>
+
+    <section className="py-16 px-6">
+      <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+        {[
+          { title: "Video Quality", items: ["1080p HD minimum", "24-30 fps", "Clear audio at 48kHz"] },
+          { title: "Storytelling", items: ["Hook viewers in 30 seconds", "Clear episode structure", "End with cliffhangers"] },
+          { title: "Optimization", items: ["Eye-catching thumbnails", "Descriptive titles", "Relevant tags (5-10)"] },
+          { title: "Engagement", items: ["Respond to comments", "Consistent upload schedule", "Cross-promote on social"] },
+        ].map((section, i) => (
+          <div key={i} className="bg-white/5 rounded-xl p-6 border border-white/10">
+            <h3 className="font-semibold text-orange-400 mb-4">{section.title}</h3>
+            <ul className="space-y-2">
+              {section.items.map((item, j) => (
+                <li key={j} className="flex items-center gap-2 text-sm text-gray-300">
+                  <Check className="w-4 h-4 text-orange-400" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+  </div>
+);
+
+const RevenuePage = ({ navigate }) => (
+  <div className="min-h-screen bg-[#030014]">
+    <div className="relative bg-gradient-to-b from-green-900/30 to-transparent py-20 px-6">
+      <div className="max-w-4xl mx-auto text-center">
+        <DollarSign className="w-12 h-12 text-green-400 mx-auto mb-4" />
+        <h1 className="text-4xl sm:text-5xl font-bold mb-4">Revenue Sharing</h1>
+        <p className="text-xl text-gray-400">Transparent, fair compensation for creators</p>
+      </div>
+    </div>
+
+    <section className="py-16 px-6">
+      <div className="max-w-4xl mx-auto">
+        {/* Revenue Split */}
+        <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-2xl p-8 border border-green-500/30 mb-12 text-center">
+          <h2 className="text-5xl font-bold text-green-400 mb-2">70%</h2>
+          <p className="text-xl text-gray-300">Creator Revenue Share</p>
+          <p className="text-sm text-gray-400 mt-2">Among the highest in the industry</p>
+        </div>
+
+        {/* How You Earn */}
+        <h3 className="text-2xl font-bold mb-6">How You Earn</h3>
+        <div className="grid md:grid-cols-2 gap-4 mb-12">
+          {[
+            { title: "Coin Purchases", desc: "70% when viewers spend coins on your content" },
+            { title: "Subscription Share", desc: "Distributed based on watch time" },
+            { title: "Tips", desc: "Keep 85% of viewer tips" },
+            { title: "Bonuses", desc: "Extra rewards for top performers" },
+          ].map((item, i) => (
+            <div key={i} className="bg-white/5 rounded-xl p-5 border border-white/10">
+              <h4 className="font-semibold mb-1">{item.title}</h4>
+              <p className="text-sm text-gray-400">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Payment Info */}
+        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+          <h3 className="font-semibold mb-4">Payment Details</h3>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li>• Payouts processed 1st of each month</li>
+            <li>• Minimum payout: $50 USD</li>
+            <li>• Methods: M-Pesa, Bank Transfer, PayPal, Wise</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+);
+
+// ============ PAGE ROUTER ============
 const ContentPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  
-  // Get page ID from path (e.g., /careers -> careers)
   const pageId = location.pathname.replace('/', '');
-  
-  const page = PAGE_CONTENT[pageId];
-  
-  if (!page) {
-    return (
-      <div className="min-h-screen bg-[#030014] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Page Not Found</h1>
-          <Button onClick={() => navigate("/")}>Go Home</Button>
-        </div>
-      </div>
-    );
-  }
 
-  const Icon = page.icon;
+  // Legal page content
+  const termsContent = [
+    { title: "1. Acceptance of Terms", content: ["By accessing or using Kona, you agree to be bound by these Terms. If you disagree, please do not use our service."] },
+    { title: "2. Eligibility", content: ["You must be at least 13 years old. If under 18, you need parental consent. You must not be prohibited from using our service by law."] },
+    { title: "3. Account Registration", content: ["Provide accurate information. Keep your password secure. You're responsible for all activity on your account. One account per person."] },
+    { title: "4. Subscriptions & Payments", content: ["Paid subscriptions are billed monthly and auto-renew unless cancelled. Cancel anytime. No refunds for partial months."] },
+    { title: "5. Content & Conduct", content: ["You may stream content for personal use. You may not download without permission, share your account, or harass other users."] },
+  ];
 
-  return (
-    <div className="min-h-screen bg-[#030014]" data-testid={`page-${pageId}`}>
-      <SEO title={`${page.title} - Kona`} description={page.description} />
+  const privacyContent = [
+    { title: "1. Information We Collect", content: ["Account info (email, phone, name), payment information, viewing history, device information, and cookies."] },
+    { title: "2. How We Use Your Information", content: ["To provide and improve our service, process payments, personalize recommendations, send notifications, and prevent fraud."] },
+    { title: "3. How We Share", content: ["With service providers, business partners (aggregated only), and legal authorities when required. We never sell your personal data."] },
+    { title: "4. Your Rights", content: ["You can access, correct, delete, or export your data. Opt out of marketing. Manage cookies in Settings > Privacy."] },
+  ];
 
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#030014]/95 backdrop-blur-sm border-b border-white/10">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate(-1)}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <Icon className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-white">{page.title}</h1>
-                <p className="text-xs text-gray-400">{page.description}</p>
-              </div>
+  const cookiesContent = [
+    { title: "What Are Cookies?", content: ["Cookies are small text files stored on your device. They help us remember your preferences and understand how you use our service."] },
+    { title: "Types We Use", content: ["Essential (authentication, security), Functional (preferences), Analytics (usage patterns), Marketing (personalization)."] },
+    { title: "Managing Cookies", content: ["Manage in Settings > Privacy > Cookie Preferences. You can also control cookies in your browser settings."] },
+  ];
+
+  const dmcaContent = [
+    { title: "Copyright Policy", content: ["Kona respects intellectual property rights. If you believe content infringes your copyright, submit a DMCA takedown notice."] },
+    { title: "Filing a Notice", content: ["Provide: your contact info, identification of copyrighted work, URL of infringing content, and statement of good faith belief."] },
+    { title: "Repeat Infringers", content: ["First offense: Warning. Second offense: Account suspension. Third offense: Permanent termination."] },
+    { title: "Contact", content: ["Email: dmca@streamkona.com"] },
+  ];
+
+  // Render based on page
+  const renderPage = () => {
+    switch (pageId) {
+      case 'careers':
+        return <CareersPage navigate={navigate} />;
+      case 'press':
+        return <PressPage navigate={navigate} />;
+      case 'safety':
+        return <SafetyPage navigate={navigate} />;
+      case 'guidelines':
+        return <GuidelinesPage navigate={navigate} />;
+      case 'accessibility':
+        return <AccessibilityPage navigate={navigate} />;
+      case 'terms':
+        return <LegalPage title="Terms of Service" icon={Scale} sections={termsContent} />;
+      case 'privacy':
+        return <LegalPage title="Privacy Policy" icon={Shield} sections={privacyContent} />;
+      case 'cookies':
+        return <LegalPage title="Cookie Policy" icon={Cookie} sections={cookiesContent} />;
+      case 'dmca':
+        return <LegalPage title="DMCA & Copyright" icon={FileWarning} sections={dmcaContent} />;
+      case 'creator-guidelines':
+        return <CreatorGuidelines navigate={navigate} />;
+      case 'revenue':
+        return <RevenuePage navigate={navigate} />;
+      default:
+        return (
+          <div className="min-h-screen bg-[#030014] flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold mb-4">Page Not Found</h1>
+              <Button onClick={() => navigate("/")}>Go Home</Button>
             </div>
           </div>
+        );
+    }
+  };
+
+  return (
+    <div data-testid={`page-${pageId}`}>
+      <SEO title={`${pageId.charAt(0).toUpperCase() + pageId.slice(1).replace('-', ' ')} - Kona`} />
+      
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-[#030014]/95 backdrop-blur-sm border-b border-white/10">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <button onClick={() => navigate(-1)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
           <button onClick={() => navigate("/")} className="hidden sm:block">
             <KonaLogo2Full height={24} />
           </button>
+          <div className="w-9" /> {/* Spacer */}
         </div>
       </header>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <article className="prose prose-invert prose-purple max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-p:text-gray-300 prose-li:text-gray-300 prose-strong:text-white prose-a:text-purple-400">
-          <ReactMarkdown>{page.content}</ReactMarkdown>
-        </article>
-      </div>
+      {renderPage()}
 
       {/* Footer */}
-      <footer className="border-t border-white/10 py-6 mt-12">
-        <div className="max-w-4xl mx-auto px-6 flex items-center justify-between">
+      <footer className="border-t border-white/10 py-6">
+        <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
           <button onClick={() => navigate("/")} className="text-gray-400 hover:text-white text-sm">
             ← Back to Kona
           </button>
