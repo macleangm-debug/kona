@@ -232,14 +232,14 @@ class ExchangeRateService:
         # Exact amount (for creator payouts - no rounding profit included)
         exact_amount = base_local_amount + margin_amount
         
-        # Apply nice rounding for display
+        # Apply nice rounding for display based on pricing style
         rounding_amount = 0
-        if apply_nice_rounding and usd_amount > 0:
-            display_amount = self._round_to_nice_number(exact_amount, currency_code)
+        if apply_nice_rounding and usd_amount > 0 and pricing_style != "exact":
+            display_amount = self._round_to_nice_number(exact_amount, currency_code, pricing_style)
             rounding_amount = display_amount - exact_amount
             if rounding_amount < 0:
                 rounding_amount = 0  # Never round down
-                display_amount = exact_amount
+                display_amount = round(exact_amount, 0)
         else:
             display_amount = round(exact_amount, 0)
         
@@ -247,7 +247,7 @@ class ExchangeRateService:
         kona_total_revenue_local = margin_amount + rounding_amount
         kona_total_revenue_usd = kona_total_revenue_local / base_rate if base_rate > 0 else 0
         
-        # Format for display: "KES 400 (~$2.99 USD)"
+        # Format for display: "KES 399 (~$2.99 USD)"
         currency_upper = currency_code.upper()
         formatted = f"{currency_upper} {display_amount:,.0f} (~${usd_amount:.2f} USD)"
         
