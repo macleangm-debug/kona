@@ -531,13 +531,17 @@ export const RewardsPage = ({ onAuthClick }) => {
 
         {/* Second Row: Challenges + Leaderboard */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <DailyChallenges token={token} onUpdate={refreshUser} />
+          <EmailVerificationGate featureName="Daily Challenges">
+            <DailyChallenges token={token} onUpdate={refreshUser} />
+          </EmailVerificationGate>
           <WeeklyLeaderboard token={token} userId={user?.id} />
         </div>
 
         {/* Third Row: Cards + Level */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <CharacterCards token={token} />
+          <EmailVerificationGate featureName="Character Cards">
+            <CharacterCards token={token} />
+          </EmailVerificationGate>
           <ViewerLevel token={token} />
         </div>
 
