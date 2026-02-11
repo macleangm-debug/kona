@@ -512,17 +512,21 @@ export const RewardsPage = ({ onAuthClick }) => {
 
         {/* NEW: Scratch Card + Prediction Streak Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-          <ScratchCard token={token} onUpdate={refreshUser} />
-          <Card className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
-            <h3 className="font-bold mb-3 flex items-center gap-2">
-              <Target className="w-4 h-4 text-orange-400" />
-              Prediction Stats
-            </h3>
-            <PredictionStreak token={token} />
-            <p className="text-xs text-gray-400 mt-3">
-              Make predictions before watching episodes to earn bonus coins!
-            </p>
-          </Card>
+          <EmailVerificationGate featureName="Scratch Card">
+            <ScratchCard token={token} onUpdate={refreshUser} />
+          </EmailVerificationGate>
+          <EmailVerificationGate featureName="Prediction Games">
+            <Card className="p-4 bg-gradient-to-br from-orange-500/10 to-red-500/10 border-orange-500/20">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <Target className="w-4 h-4 text-orange-400" />
+                Prediction Stats
+              </h3>
+              <PredictionStreak token={token} />
+              <p className="text-xs text-gray-400 mt-3">
+                Make predictions before watching episodes to earn bonus coins!
+              </p>
+            </Card>
+          </EmailVerificationGate>
         </div>
 
         {/* Second Row: Challenges + Leaderboard */}
