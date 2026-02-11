@@ -173,7 +173,8 @@ class ExchangeRateService:
         usd_amount: float, 
         country_code: str,
         include_margin: bool = True,
-        apply_nice_rounding: bool = True
+        apply_nice_rounding: bool = True,
+        pricing_style: str = "value"
     ) -> Dict[str, Any]:
         """
         Convert USD to local currency with optional margin and smart rounding
@@ -183,6 +184,7 @@ class ExchangeRateService:
             country_code: Country code (KE, TZ, etc.)
             include_margin: Whether to apply Kona's margin
             apply_nice_rounding: Whether to round to nice numbers (for display)
+            pricing_style: "value" (ends in 9), "premium" (ends in 0), or "exact"
         
         Returns:
             {
@@ -195,7 +197,8 @@ class ExchangeRateService:
                 "local_amount_exact": exact conversion (for creator payouts),
                 "local_amount_display": nicely rounded (for user display),
                 "currency": currency code,
-                "formatted": "KES 400 (~$2.99 USD)" format
+                "formatted": "KES 400 (~$2.99 USD)" format,
+                "pricing_style": applied pricing style
             }
         """
         
