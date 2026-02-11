@@ -95,13 +95,13 @@ async def seed_data():
     # Seed featured promos
     featured_promos = [
         {
-            "id": "promo-christmas",
+            "id": "promo-romance",
             "series_id": "series-1",
-            "title": "CHRISTMAS",
+            "title": "FEATURED",
             "subtitle": "Love in the City",
-            "description": "A heartwarming holiday romance that will melt your heart",
+            "description": "A heartwarming romance between two strangers who keep crossing paths in bustling New York City",
             "promo_image": "https://images.pexels.com/photos/1024960/pexels-photo-1024960.jpeg?auto=compress&cs=tinysrgb&w=800",
-            "tags": ["Romance", "Drama", "Holiday Special"],
+            "tags": ["Romance", "Drama", "Top Rated"],
             "badge_text": "SHORT DRAMA",
             "is_active": True,
             "priority": 10,
