@@ -303,20 +303,6 @@ class ExchangeRateService:
         
         # Fallback: round up to next nice number
         return base + (100 if amount < 1000 else 1000)
-        
-        return {
-            "usd_amount": usd_amount,
-            "base_rate": base_rate,
-            "base_local_amount": round(base_local_amount, 2),
-            "margin_percent": margin_percent,
-            "margin_amount": round(margin_amount, 2),
-            "kona_revenue_local": round(kona_revenue, 2),
-            "kona_revenue_usd": round(kona_revenue / base_rate, 4) if base_rate > 0 else 0,
-            "local_amount": final_amount,
-            "currency": currency_code.upper(),
-            "rate_source": "live" if currency_code in rates else "fallback",
-            "rate_timestamp": self._cache_time.isoformat() if self._cache_time else None
-        }
     
     async def get_creator_payout_amount(
         self, 
@@ -324,10 +310,25 @@ class ExchangeRateService:
         country_code: str
     ) -> Dict[str, Any]:
         """
-        Get creator payout amount WITHOUT margin (creator sees their full share)
-        This is what creators see - the actual amount they receive
+        Get creator payout amount WITHOUT margin and WITHOUT rounding profit
+        This is what creators see - the exact amount they receive based on their share
+        Uses exact conversion, not the rounded display amount
         """
-        return await self.convert_usd_to_local(usd_amount, country_code, include_margin=False)
+        result = await self.convert_usd_to_local(
+            usd_amount, 
+            country_code, 
+            include_margin=False,
+            apply_nice_rounding=False
+        )
+        
+        # Return simplified payout info for creators
+        return {
+            "usd_amount": result["usd_amount"],
+            "local_amount": result["local_amount_exact"],  # Exact, not rounded
+            "currency": result["currency"],
+            "exchange_rate": result["base_rate"],
+            "formatted": f"{result['currency']} {result['local_amount_exact']:,.0f}"
+        }
     
     async def record_margin_revenue(
         self,
