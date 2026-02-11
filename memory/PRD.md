@@ -305,6 +305,12 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Never rounds down - always rounds up to nice number
   - Admin dashboard shows breakdown: Margin Profit + Rounding Profit = Total Kona Profit
   - **Creator payouts use exact conversion** (no rounding markup applied to their share)
+- [x] Psychological Pricing Presets - COMPLETED (Feb 11, 2026)
+  - Three pricing styles: Value (ends in 9), Premium (ends in 0), Exact (no rounding)
+  - Pre-configured defaults: Basic/Premium → Value, VIP → Premium
+  - Admin UI to override per tier (Admin → Exchange Rates → Pricing Styles)
+  - APIs: GET/PUT/DELETE `/admin/exchange-rates/pricing-styles/{tier_id}`
+  - Rounding profit tracked and displayed in admin dashboard
 - [ ] Re-deploy application to production
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
