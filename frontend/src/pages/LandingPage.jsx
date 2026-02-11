@@ -181,50 +181,50 @@ const LandingPage = ({ onAuthClick }) => {
         </header>
 
         {/* Hero Content */}
-        <div className={`relative z-10 flex-1 flex items-center justify-center px-6 lg:px-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className={`relative z-10 flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
-              <Sparkles className="w-4 h-4 text-yellow-400" />
-              <span className="text-sm font-medium">Africa's #1 Mini-Series Platform</span>
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 backdrop-blur-sm rounded-full mb-4 sm:mb-6 border border-white/20">
+              <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
+              <span className="text-xs sm:text-sm font-medium">Africa's #1 Mini-Series Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
               Stories That Move
               <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
                 Africa Forward
               </span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto leading-relaxed px-2">
               Discover exclusive African mini-series. Romance, drama, thrillers & more. 
               Watch free episodes, earn rewards, and join millions of viewers.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 px-2">
               <Button 
                 size="lg"
                 onClick={handleStartWatching}
-                className="bg-white text-black hover:bg-white/90 rounded-full px-8 h-14 text-lg font-semibold shadow-2xl shadow-white/20 hover:scale-105 transition-all w-full sm:w-auto"
+                className="bg-white text-black hover:bg-white/90 rounded-full px-6 sm:px-8 h-12 sm:h-14 text-base sm:text-lg font-semibold shadow-2xl shadow-white/20 hover:scale-105 transition-all w-full sm:w-auto"
                 data-testid="start-watching-btn"
               >
-                <Play className="w-6 h-6 fill-black mr-2" />
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-black mr-2" />
                 Start Watching Free
               </Button>
               <Button 
                 size="lg"
                 variant="outline"
                 onClick={() => document.getElementById('how-it-works').scrollIntoView({ behavior: 'smooth' })}
-                className="border-white/30 hover:bg-white/10 rounded-full px-8 h-14 text-lg w-full sm:w-auto"
+                className="border-white/30 hover:bg-white/10 rounded-full px-6 sm:px-8 h-12 sm:h-14 text-base sm:text-lg w-full sm:w-auto"
               >
                 How It Works
-                <ChevronRight className="w-5 h-5 ml-1" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 ml-1" />
               </Button>
             </div>
 
-            <div className="flex items-center justify-center gap-8 sm:gap-16">
+            <div className="flex items-center justify-center gap-6 sm:gap-16">
               {stats.map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
+                  <div className="text-xl sm:text-3xl font-bold text-white">{stat.value}</div>
                   <div className="text-xs sm:text-sm text-gray-400">{stat.label}</div>
                 </div>
               ))}
