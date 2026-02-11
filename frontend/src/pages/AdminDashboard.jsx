@@ -3042,6 +3042,11 @@ export const AdminDashboard = () => {
           <ExchangeRateManager token={token} />
         )}
 
+        {/* A/B Testing Tab (Super Admin Only) */}
+        {activeTab === "ab-testing" && user?.is_super_admin && (
+          <ABTestingManager token={token} />
+        )}
+
         {/* Investment Calculator Tab (Super Admin Only) */}
         {activeTab === "investment" && user?.is_super_admin && (
           <InvestmentCalculatorTab token={token} />
