@@ -53,9 +53,11 @@ export const PromoPopup = ({ promo, open, onClose }) => {
             
             {/* Content */}
             <div className="absolute bottom-0 left-0 right-0 p-5">
-              {/* Title */}
-              <div className="mb-2">
-                <span className="text-sm font-medium text-primary tracking-widest">{promo.title}</span>
+              {/* Title Label - White pill for visibility */}
+              <div className="mb-3">
+                <span className="inline-block px-3 py-1.5 bg-white text-black text-xs font-bold uppercase tracking-wider rounded-full shadow-lg">
+                  {promo.title}
+                </span>
               </div>
               <h2 className="font-heading text-2xl font-bold mb-2 leading-tight">{promo.subtitle}</h2>
               
