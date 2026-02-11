@@ -192,6 +192,23 @@ const AppContent = () => {
         <Route path="/advertisers" element={<AdvertisersPage />} />
         <Route path="/creators" element={<CreatorsLandingPage />} />
         
+        {/* Help Center & Support */}
+        <Route path="/help" element={<HelpCenterPage />} />
+        <Route path="/help/article/:articleId" element={<HelpCenterPage />} />
+        <Route path="/help/tickets/new" element={<SupportTicketPage />} />
+        
+        {/* Footer Content Pages */}
+        <Route path="/careers" element={<ContentPage />} />
+        <Route path="/press" element={<ContentPage />} />
+        <Route path="/contact" element={<HelpCenterPage />} />
+        <Route path="/safety" element={<ContentPage />} />
+        <Route path="/guidelines" element={<ContentPage />} />
+        <Route path="/accessibility" element={<ContentPage />} />
+        <Route path="/cookies" element={<ContentPage />} />
+        <Route path="/dmca" element={<ContentPage />} />
+        <Route path="/creator-guidelines" element={<ContentPage />} />
+        <Route path="/revenue" element={<ContentPage />} />
+        
         {/* Auth Routes */}
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ForgotPasswordPage />} />
