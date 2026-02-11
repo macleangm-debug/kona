@@ -1288,7 +1288,10 @@ Payment questions? Email: payments@streamkona.com
 
 const ContentPage = () => {
   const navigate = useNavigate();
-  const { pageId } = useParams();
+  const location = useLocation();
+  
+  // Get page ID from path (e.g., /careers -> careers)
+  const pageId = location.pathname.replace('/', '');
   
   const page = PAGE_CONTENT[pageId];
   
