@@ -92,10 +92,10 @@ async def seed_data():
     
     await db.coming_soon.insert_many(coming_soon)
     
-    # Seed featured promos
+    # Seed featured promos - multiple promos for rotation
     featured_promos = [
         {
-            "id": "promo-romance",
+            "id": "promo-romance-1",
             "series_id": "series-1",
             "title": "FEATURED",
             "subtitle": "Love in the City",
@@ -113,17 +113,65 @@ async def seed_data():
         {
             "id": "promo-thriller",
             "series_id": "series-3",
-            "title": "REVENGE",
+            "title": "TRENDING",
             "subtitle": "Revenge of the Rejected",
-            "description": "She returns more powerful than ever",
-            "promo_image": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "description": "She returns more powerful than ever to destroy those who betrayed her",
+            "promo_image": "https://images.pexels.com/photos/3807277/pexels-photo-3807277.jpeg?auto=compress&cs=tinysrgb&w=800",
             "tags": ["Thriller", "Drama", "Exclusive"],
             "badge_text": "NEW SERIES",
             "is_active": True,
-            "priority": 5,
-            "trigger_type": "timed",
+            "priority": 9,
+            "trigger_type": "both",
             "delay_seconds": 15,
             "created_at": "2026-01-15T00:00:00Z",
+            "expires_at": None
+        },
+        {
+            "id": "promo-secret-heir",
+            "series_id": "series-2",
+            "title": "MUST WATCH",
+            "subtitle": "The Secret Heir",
+            "description": "A billionaire discovers he has a secret child, turning his world upside down",
+            "promo_image": "https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "tags": ["Drama", "Family", "Suspense"],
+            "badge_text": "TOP 10",
+            "is_active": True,
+            "priority": 8,
+            "trigger_type": "both",
+            "delay_seconds": 10,
+            "created_at": "2026-01-20T00:00:00Z",
+            "expires_at": None
+        },
+        {
+            "id": "promo-ceo",
+            "series_id": "series-4",
+            "title": "FAN FAVORITE",
+            "subtitle": "My CEO Husband",
+            "description": "An unexpected contract marriage leads to true love in this captivating romance",
+            "promo_image": "https://images.pexels.com/photos/3785079/pexels-photo-3785079.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "tags": ["Romance", "CEO", "Contract Marriage"],
+            "badge_text": "POPULAR",
+            "is_active": True,
+            "priority": 7,
+            "trigger_type": "both",
+            "delay_seconds": 10,
+            "created_at": "2026-02-01T00:00:00Z",
+            "expires_at": None
+        },
+        {
+            "id": "promo-fantasy",
+            "series_id": "series-22",
+            "title": "EPIC SERIES",
+            "subtitle": "The Dragon Prince",
+            "description": "A mythical love story that transcends realms and defies destiny",
+            "promo_image": "https://images.pexels.com/photos/3617500/pexels-photo-3617500.jpeg?auto=compress&cs=tinysrgb&w=800",
+            "tags": ["Fantasy", "Epic", "Adventure"],
+            "badge_text": "HIGHEST RATED",
+            "is_active": True,
+            "priority": 6,
+            "trigger_type": "both",
+            "delay_seconds": 10,
+            "created_at": "2026-02-05T00:00:00Z",
             "expires_at": None
         }
     ]
