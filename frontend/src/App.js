@@ -76,6 +76,16 @@ const AppContent = () => {
   const [forceSignUp, setForceSignUp] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   
+  // Check if running as installed PWA
+  const isPWA = typeof window !== 'undefined' && (
+    window.matchMedia("(display-mode: standalone)").matches 
+    || window.navigator.standalone 
+    || document.referrer.includes("android-app://")
+  );
+  
+  // Check if user has entered the app from landing page
+  const hasEnteredApp = sessionStorage.getItem('kona_entered_app') === 'true';
+  
   // Only show splash screen once per session using sessionStorage
   const [showSplash, setShowSplash] = useState(() => {
     const hasSeenSplash = sessionStorage.getItem('kona_splash_seen');
@@ -115,17 +125,27 @@ const AppContent = () => {
   };
 
   // Pages that should have their own layout (no header/nav)
-  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business"];
-  const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page));
+  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/"];
+  const isFullScreenPage = fullScreenPages.some(page => 
+    page === "/" ? location.pathname === "/" : location.pathname.startsWith(page)
+  );
+  
+  // Check if on landing page (only for non-PWA, non-entered users at root path)
+  const isLandingPage = location.pathname === "/" && !isPWA && !hasEnteredApp && !user;
   
   // Pages that skip splash screen
-  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password"];
-  const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page));
+  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/"];
+  const shouldSkipSplash = skipSplashPages.some(page => 
+    page === "/" ? location.pathname === "/" && isLandingPage : location.pathname.startsWith(page)
+  );
+  
+  // Determine if we're in the "app" area (not landing page)
+  const isInApp = isPWA || hasEnteredApp || user || location.pathname !== "/";
 
   return (
     <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
-      {/* Splash Screen - Netflix-style loading animation with Magic Chime sound */}
-      {showSplash && !shouldSkipSplash && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
+      {/* Splash Screen - Only show in app area, not on landing page */}
+      {showSplash && !shouldSkipSplash && isInApp && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
 
       {/* Desktop Header - Only on desktop and not on full-screen pages */}
       {isDesktop && !isFullScreenPage && (
