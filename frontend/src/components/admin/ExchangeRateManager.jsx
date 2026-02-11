@@ -87,6 +87,12 @@ export const ExchangeRateManager = ({ token }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRevenueStats(revenueRes.data);
+
+      // Fetch pricing styles
+      const stylesRes = await axios.get(`${API}/admin/exchange-rates/pricing-styles`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPricingStyles(stylesRes.data);
     } catch (e) {
       console.error("Failed to fetch exchange rate data:", e);
       toast.error("Failed to load exchange rate data");
