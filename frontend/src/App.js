@@ -262,6 +262,9 @@ const AppContent = () => {
       
       {/* PWA Install Prompt - Only show in app area (watching pages), not on landing page */}
       {isInApp && <InstallPrompt />}
+      
+      {/* AI Support Chat Widget - Available in app area */}
+      {isInApp && <SupportChatWidget />}
 
       {/* Toast Notifications */}
       <Toaster position="top-center" richColors />
