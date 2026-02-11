@@ -172,6 +172,37 @@ export const ExchangeRateManager = ({ token }) => {
     setSaving(false);
   };
 
+  const updatePricingStyle = async (tierId, style) => {
+    setSaving(true);
+    try {
+      await axios.put(
+        `${API}/admin/exchange-rates/pricing-styles/${tierId}?pricing_style=${style}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(`Pricing style updated for ${tierId}`);
+      await fetchData();
+    } catch (e) {
+      toast.error("Failed to update pricing style");
+    }
+    setSaving(false);
+  };
+
+  const resetPricingStyle = async (tierId) => {
+    setSaving(true);
+    try {
+      await axios.delete(
+        `${API}/admin/exchange-rates/pricing-styles/${tierId}`,
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(`Pricing style reset to default for ${tierId}`);
+      await fetchData();
+    } catch (e) {
+      toast.error("Failed to reset pricing style");
+    }
+    setSaving(false);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
