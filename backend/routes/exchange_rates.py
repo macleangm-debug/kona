@@ -299,3 +299,141 @@ async def get_rate_history(
             if currency_lower in item.get("rates", {})
         ]
     }
+
+
+# ============ PRICING STYLES ============
+
+class PricingStyleUpdate(BaseModel):
+    tier_id: str
+    pricing_style: str  # "value", "premium", or "exact"
+
+
+@router.get("/pricing-styles")
+async def get_pricing_styles(user: dict = Depends(get_current_user)):
+    """
+    Get pricing styles for all tiers
+    Shows default styles and any admin overrides
+    """
+    await verify_admin(user)
+    
+    from config.subscriptions import SUBSCRIPTION_TIERS, PRICING_STYLES
+    from services.database import db
+    
+    # Get admin overrides
+    admin_config = await db.system_config.find_one(
+        {"type": "tier_pricing_styles"},
+        {"_id": 0}
+    )
+    admin_styles = admin_config.get("styles", {}) if admin_config else {}
+    
+    # Build response
+    tiers = []
+    for tier_id, tier_info in SUBSCRIPTION_TIERS.items():
+        default_style = tier_info.get("pricing_style", "value")
+        current_style = admin_styles.get(tier_id, default_style)
+        
+        tiers.append({
+            "tier_id": tier_id,
+            "tier_name": tier_info["name"],
+            "price_usd": tier_info["price_usd"],
+            "default_style": default_style,
+            "current_style": current_style,
+            "is_overridden": tier_id in admin_styles
+        })
+    
+    return {
+        "status": "success",
+        "tiers": tiers,
+        "available_styles": [
+            {
+                "id": style_id,
+                "name": style_info["name"],
+                "description": style_info["description"]
+            }
+            for style_id, style_info in PRICING_STYLES.items()
+        ]
+    }
+
+
+@router.put("/pricing-styles/{tier_id}")
+async def update_pricing_style(
+    tier_id: str,
+    pricing_style: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Update pricing style for a specific tier
+    
+    Styles:
+    - "value": Ends in 9 (e.g., KES 399) - feels like a deal
+    - "premium": Ends in 0 (e.g., KES 400) - signals quality
+    - "exact": No rounding
+    """
+    await verify_admin(user)
+    
+    from config.subscriptions import SUBSCRIPTION_TIERS, PRICING_STYLES
+    from services.database import db
+    
+    # Validate tier
+    if tier_id not in SUBSCRIPTION_TIERS:
+        raise HTTPException(status_code=404, detail=f"Tier '{tier_id}' not found")
+    
+    # Validate style
+    if pricing_style not in PRICING_STYLES:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Invalid pricing style. Must be one of: {list(PRICING_STYLES.keys())}"
+        )
+    
+    # Update in database
+    result = await db.system_config.update_one(
+        {"type": "tier_pricing_styles"},
+        {
+            "$set": {
+                f"styles.{tier_id}": pricing_style,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        },
+        upsert=True
+    )
+    
+    return {
+        "status": "success",
+        "message": f"Pricing style for {SUBSCRIPTION_TIERS[tier_id]['name']} updated to '{pricing_style}'",
+        "tier_id": tier_id,
+        "pricing_style": pricing_style
+    }
+
+
+@router.delete("/pricing-styles/{tier_id}")
+async def reset_pricing_style(
+    tier_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """
+    Reset pricing style for a tier back to default
+    """
+    await verify_admin(user)
+    
+    from config.subscriptions import SUBSCRIPTION_TIERS
+    from services.database import db
+    
+    # Validate tier
+    if tier_id not in SUBSCRIPTION_TIERS:
+        raise HTTPException(status_code=404, detail=f"Tier '{tier_id}' not found")
+    
+    # Remove override
+    await db.system_config.update_one(
+        {"type": "tier_pricing_styles"},
+        {"$unset": {f"styles.{tier_id}": ""}}
+    )
+    
+    default_style = SUBSCRIPTION_TIERS[tier_id].get("pricing_style", "value")
+    
+    return {
+        "status": "success",
+        "message": f"Pricing style for {SUBSCRIPTION_TIERS[tier_id]['name']} reset to default",
+        "tier_id": tier_id,
+        "default_style": default_style
+    }
+
