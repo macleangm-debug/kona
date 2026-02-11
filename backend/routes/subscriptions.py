@@ -42,17 +42,24 @@ async def get_subscription_tiers(country_code: Optional[str] = None):
             **tier_info
         }
         
-        # Add local pricing if country code provided (with dynamic rates + margin)
+        # Add local pricing if country code provided (with dynamic rates + margin + nice rounding)
         if country_code:
             price_info = await kwikpay_subscription.convert_usd_to_local(
                 tier_info["price_usd"], 
                 country_code
             )
             tier_data["local_price"] = {
-                "amount": price_info["local_amount"],
+                "amount": price_info["local_amount"],  # Nicely rounded
+                "amount_exact": price_info["local_amount_exact"],  # For distribution
                 "currency": price_info["currency"],
-                "formatted": f"{price_info['currency']} {price_info['local_amount']:,.0f}",
-                "rate_source": price_info.get("rate_source", "live")
+                "formatted": price_info["formatted"],  # "KES 400 (~$2.99 USD)"
+                "display": f"{price_info['currency']} {price_info['local_amount']:,.0f}",
+                "usd_reference": f"~${tier_info['price_usd']:.2f} USD",
+                "rate_source": price_info.get("rate_source", "live"),
+                "kona_revenue": {
+                    "local": price_info.get("kona_total_revenue_local", 0),
+                    "usd": price_info.get("kona_total_revenue_usd", 0)
+                }
             }
         
         tiers_response[tier_id] = tier_data
