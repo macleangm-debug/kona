@@ -124,12 +124,12 @@ const AppContent = () => {
     setShowAuth(true);
   };
 
+  // Check if on landing page (only for non-PWA, non-entered users at root path)
+  const isLandingPage = location.pathname === "/" && !isPWA && !hasEnteredApp && !user;
+  
   // Pages that should have their own layout (no header/nav)
   const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business"];
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isLandingPage;
-  
-  // Check if on landing page (only for non-PWA, non-entered users at root path)
-  const isLandingPage = location.pathname === "/" && !isPWA && !hasEnteredApp && !user;
   
   // Pages that skip splash screen
   const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password"];
