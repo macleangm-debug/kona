@@ -2,9 +2,9 @@
 Support API Routes
 - AI Chatbot
 - Help Center Articles
-- Support Tickets
+- Support Tickets (User & Admin)
 """
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional, List
 import uuid
@@ -38,6 +38,16 @@ class TicketResponse(BaseModel):
     id: str
     status: str
     message: str
+
+class TicketResponseAdd(BaseModel):
+    response_text: str
+    responder: Optional[str] = "Support Team"
+
+class TicketCloseRequest(BaseModel):
+    resolution: str
+
+class TicketPriorityRequest(BaseModel):
+    priority: str  # low, normal, high, urgent
 
 
 # AI Chatbot Endpoints
@@ -112,7 +122,7 @@ async def get_help_categories():
     return sorted(categories)
 
 
-# Support Ticket Endpoints
+# Support Ticket Endpoints (User)
 @router.post("/tickets", response_model=TicketResponse)
 async def create_support_ticket(request: TicketCreateRequest):
     """Create a new support ticket"""
@@ -125,21 +135,94 @@ async def create_support_ticket(request: TicketCreateRequest):
     )
     
     return TicketResponse(
-        id=ticket["id"],
+        id=ticket["ticket_id"],
         status=ticket["status"],
-        message=f"Ticket #{ticket['id']} created successfully. We'll respond within 24 hours."
+        message=f"Ticket #{ticket['ticket_id']} created successfully. We'll respond within 24 hours."
     )
 
-@router.get("/tickets")
+@router.get("/tickets/user/{user_id}")
 async def get_user_tickets(user_id: str):
     """Get all tickets for a user"""
     tickets = await support_ticket_service.get_user_tickets(user_id)
+    # Convert datetime objects to strings
+    for ticket in tickets:
+        for key in ['created_at', 'updated_at', 'closed_at']:
+            if ticket.get(key) and hasattr(ticket[key], 'isoformat'):
+                ticket[key] = ticket[key].isoformat()
     return tickets
 
 @router.get("/tickets/{ticket_id}")
 async def get_ticket(ticket_id: str):
     """Get a specific ticket"""
     ticket = await support_ticket_service.get_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    # Convert datetime objects
+    for key in ['created_at', 'updated_at', 'closed_at']:
+        if ticket.get(key) and hasattr(ticket[key], 'isoformat'):
+            ticket[key] = ticket[key].isoformat()
+    return ticket
+
+
+# Admin Ticket Endpoints
+@router.get("/admin/tickets")
+async def admin_get_all_tickets(status: Optional[str] = None, limit: int = 50):
+    """Get all tickets (admin only)"""
+    tickets = await support_ticket_service.get_all_tickets(status=status, limit=limit)
+    # Convert datetime objects
+    for ticket in tickets:
+        for key in ['created_at', 'updated_at', 'closed_at']:
+            if ticket.get(key) and hasattr(ticket[key], 'isoformat'):
+                ticket[key] = ticket[key].isoformat()
+    return tickets
+
+@router.get("/admin/tickets/stats")
+async def admin_get_ticket_stats():
+    """Get ticket statistics (admin only)"""
+    stats = await support_ticket_service.get_ticket_stats()
+    return stats
+
+@router.post("/admin/tickets/{ticket_id}/respond")
+async def admin_respond_to_ticket(ticket_id: str, request: TicketResponseAdd):
+    """Add a response to a ticket (admin only)"""
+    ticket = await support_ticket_service.add_response(
+        ticket_id=ticket_id,
+        response_text=request.response_text,
+        responder=request.responder
+    )
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    # Convert datetime objects
+    for key in ['created_at', 'updated_at', 'closed_at']:
+        if ticket.get(key) and hasattr(ticket[key], 'isoformat'):
+            ticket[key] = ticket[key].isoformat()
+    return ticket
+
+@router.post("/admin/tickets/{ticket_id}/close")
+async def admin_close_ticket(ticket_id: str, request: TicketCloseRequest):
+    """Close a ticket and send resolution email (admin only)"""
+    ticket = await support_ticket_service.close_ticket(
+        ticket_id=ticket_id,
+        resolution=request.resolution
+    )
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+    # Convert datetime objects
+    for key in ['created_at', 'updated_at', 'closed_at']:
+        if ticket.get(key) and hasattr(ticket[key], 'isoformat'):
+            ticket[key] = ticket[key].isoformat()
+    return {"status": "success", "message": f"Ticket #{ticket_id} closed. Resolution email sent.", "ticket": ticket}
+
+@router.post("/admin/tickets/{ticket_id}/priority")
+async def admin_update_priority(ticket_id: str, request: TicketPriorityRequest):
+    """Update ticket priority (admin only)"""
+    if request.priority not in ["low", "normal", "high", "urgent"]:
+        raise HTTPException(status_code=400, detail="Invalid priority. Use: low, normal, high, urgent")
+    
+    ticket = await support_ticket_service.update_priority(
+        ticket_id=ticket_id,
+        priority=request.priority
+    )
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     return ticket
