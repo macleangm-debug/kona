@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import SEO from "@/components/SEO";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
