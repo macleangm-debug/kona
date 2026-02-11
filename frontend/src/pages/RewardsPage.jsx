@@ -26,6 +26,7 @@ import { StreakShield } from "@/components/StreakShield";
 import { PredictionStreak } from "@/components/PredictionGame";
 import { EconomyWarnings } from "@/components/EconomyWarnings";
 import { CoinAnimation } from "@/components/CoinAnimation";
+import { EmailVerificationGate } from "@/components/EmailVerificationGate";
 
 // Spin Wheel Component - Revenue optimized (max 5 coins)
 const SpinWheel = ({ onSpin, canSpin, isSpinning, setIsSpinning, spinsRemaining = 0, maxSpins = 3 }) => {
