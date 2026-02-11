@@ -477,8 +477,6 @@ export const SubscriptionPage = () => {
                 )}
               </div>
             </Card>
-
-            )}
           </>
         )}
 
