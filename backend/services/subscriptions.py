@@ -95,6 +95,7 @@ class KwikPaySubscriptionService:
     """
     KwikPay Subscription Service - MOCK IMPLEMENTATION
     Handles subscription payments via mobile money and other local methods
+    Uses dynamic exchange rates with configurable Kona margins
     """
     
     BASE_URL = "https://api.kwikpay.com/v1"
@@ -105,17 +106,45 @@ class KwikPaySubscriptionService:
         self.is_configured = bool(self.api_key and self.secret_key)
         self.mock_mode = True  # Always mock until KwikPay is ready
     
-    def convert_usd_to_local(self, usd_amount: float, country_code: str) -> Dict[str, Any]:
-        """Convert USD price to local currency"""
-        config = PAYMENT_PROVIDERS.get(country_code, {})
-        currency = config.get("currency", "USD")
-        rate = EXCHANGE_RATES.get(currency, 1)
-        local_amount = round(usd_amount * rate, 0)  # Round to whole number for local currency
+    async def convert_usd_to_local(self, usd_amount: float, country_code: str) -> Dict[str, Any]:
+        """
+        Convert USD price to local currency using dynamic rates with margin
+        The margin is Kona's revenue and is NOT shown to creators
+        """
+        # Use the dynamic exchange rate service
+        result = await exchange_rate_service.convert_usd_to_local(
+            usd_amount, 
+            country_code,
+            include_margin=True
+        )
+        
+        return {
+            "usd_amount": result["usd_amount"],
+            "local_amount": result["local_amount"],
+            "currency": result["currency"],
+            "exchange_rate": result["base_rate"],
+            "effective_rate": result["base_rate"] * (1 + result["margin_percent"] / 100),
+            "margin_percent": result["margin_percent"],
+            "kona_revenue_local": result["kona_revenue_local"],
+            "kona_revenue_usd": result["kona_revenue_usd"],
+            "rate_source": result["rate_source"]
+        }
+    
+    def convert_usd_to_local_sync(self, usd_amount: float, country_code: str) -> Dict[str, Any]:
+        """
+        Synchronous fallback for non-async contexts
+        Uses fallback rates without live update
+        """
+        from services.exchange_rates import FALLBACK_RATES
+        
+        currency_code = COUNTRY_CURRENCIES.get(country_code, "usd").lower()
+        rate = FALLBACK_RATES.get(currency_code, 1)
+        local_amount = round(usd_amount * rate * 1.03, 0)  # 3% default margin
         
         return {
             "usd_amount": usd_amount,
             "local_amount": local_amount,
-            "currency": currency,
+            "currency": currency_code.upper(),
             "exchange_rate": rate
         }
     
