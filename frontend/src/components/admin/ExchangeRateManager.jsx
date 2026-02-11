@@ -283,9 +283,10 @@ export const ExchangeRateManager = ({ token }) => {
               <TableHead>Currency</TableHead>
               <TableHead className="text-right">Market Rate</TableHead>
               <TableHead className="text-right">Margin</TableHead>
-              <TableHead className="text-right">Effective Rate</TableHead>
-              <TableHead className="text-right">$10 Example</TableHead>
-              <TableHead className="text-right">Kona Profit</TableHead>
+              <TableHead className="text-right">$10 Display Price</TableHead>
+              <TableHead className="text-right">Margin Profit</TableHead>
+              <TableHead className="text-right">Rounding Profit</TableHead>
+              <TableHead className="text-right text-green-400">Total Kona Profit</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -343,16 +344,21 @@ export const ExchangeRateManager = ({ token }) => {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className="text-right font-mono text-green-400">
-                  {rate.effective_rate.toFixed(2)}
+                <TableCell className="text-right">
+                  <div className="text-sm">
+                    <span className="text-white font-medium">
+                      {rate.example_10_usd.formatted || `${rate.currency} ${rate.example_10_usd.with_margin?.toLocaleString()}`}
+                    </span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-right text-sm">
-                  <span className="text-gray-400">{rate.example_10_usd.market.toLocaleString()}</span>
-                  <ArrowUpRight className="w-3 h-3 inline mx-1 text-green-400" />
-                  <span className="text-white">{rate.example_10_usd.with_margin.toLocaleString()}</span>
+                <TableCell className="text-right text-blue-400">
+                  ${rate.example_10_usd.margin_profit?.toFixed(2) || rate.example_10_usd.kona_profit?.toFixed(2)}
                 </TableCell>
-                <TableCell className="text-right font-semibold text-green-400">
-                  ${rate.example_10_usd.kona_profit.toFixed(2)}
+                <TableCell className="text-right text-purple-400">
+                  ${rate.example_10_usd.rounding_profit?.toFixed(2) || "0.00"}
+                </TableCell>
+                <TableCell className="text-right font-bold text-green-400">
+                  ${rate.example_10_usd.kona_profit?.toFixed(2)}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
