@@ -1,217 +1,169 @@
 <analysis>**original_problem_statement:**
-The user initially requested UI/UX improvements for the Kona streaming platform, including a typewriter animation for the splash screen logo and standardizing all loading spinners to a custom .
+The initial request was to restrict access to certain gamification features for users who have not verified their email account. Unverified users should only be able to access daily rewards, the spin game, and referrals. All other gamification features should prompt them to verify their email.
 
-Throughout the session, the user added several new feature requests and bug reports:
-- **Features:**
-  - Device/Session Management to limit simultaneous logins.
-  - Advanced SEO optimizations (Breadcrumbs, Video Schema).
-  - VIP subscription tiers with variable device limits.
-  - Advanced geo-targeting for ad campaigns.
-  - A subscription purchase flow using a mock KwikPay service.
-  - A Subscription Management UI.
-  - Global country support for registration (not limited to Africa).
-  - Content protection to deter screenshots and screen recording.
-  - A password visibility toggle (show/hide) on auth forms.
-
-- **Bugs/Issues:**
-  - Forgot Password flow should validate if an email exists before sending a link.
-  - The Forgot Password reset link expires immediately or points to the wrong environment (production vs. preview).
-  - Incorrect geo-location detection (showing Kenya for a user in Tanzania).
-  - A clunky country selection dropdown.
-  - Misalignment of the KONA text on the splash screen.
+This initial request evolved based on user feedback. The user then inquired about the VIP subscription upgrade process and currency conversion rates. This led to a series of new feature requests:
+1.  Implement a dynamic exchange rate system that pulls live rates from an API.
+2.  Add a configurable margin (initially 3%) on top of the exchange rate, which will be Kona's revenue.
+3.  The Kona admin should be able to configure this margin and see the profit generated.
+4.  The creator dashboard should only show the total revenue *without* Kona's margin.
+5.  Implement smart rounding for local currency prices to use psychological pricing (e.g., ending in 9 or 0). The profit from rounding should also be tracked as Kona's revenue.
+6.  The admin should be able to select the pricing style (e.g., Value ending in 9, Premium ending in 0) for each subscription tier.
+7.  Finally, implement an A/B testing capability for these pricing styles to determine which one converts better.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The project is a Flask (Python) backend and a React frontend for the Kona streaming service. It includes user/advertiser authentication, a MongoDB database, and various UI pages for administration, content viewing, and user profiles. A mock payment gateway (KwikPay) and a transactional email service (Resend) are integrated. The frontend uses TailwindCSS and Shadcn UI.
+The application now has a sophisticated, multi-layered pricing and subscription system built on top of the original features.
+-   An  component restricts access to advanced gamification features for unverified users.
+-   A dynamic currency exchange rate system fetches live rates from a free third-party API, calculates prices in local currencies, and applies a configurable profit margin for the platform.
+-   An admin dashboard section allows configuration of the profit margin, pricing psychology styles (e.g., rounding to end in .99 or .00) for each subscription tier, and tracks the revenue generated from both the margin and the rounding.
+-   A full A/B testing framework has been implemented, allowing admins to create, run, and monitor pricing experiments to optimize conversion rates. The backend automatically assigns users to test variants and the frontend displays the appropriate price.
 
 **Last working item**:
-- **Last item agent was working:** Implementing a password visibility toggle (show/hide password icon) in authentication forms.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** frontend testing agent
-- **User Testing Done:** N
+-   **Last item agent was working:** Implementing the A/B testing capability for pricing styles. This included creating the backend models, services, and API endpoints to manage tests, assign users to variants, and track results. On the frontend, an A/B Testing module was added to the admin dashboard to create and monitor experiments.
+-   **Status:** USER VERIFICATION PENDING
+-   **Agent Testing Done:** Y
+-   **Which testing method agent to use?** NA (The feature is implemented. The user has requested to let the test run to collect data, so the next phase is monitoring).
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1 (P0):** Forgot Password link is invalid or expired immediately.
-- **Issue 2 (P1):** Geo-location incorrectly detects user's country.
-- **Issue 3 (P1):** The user's test account () had issues being recognized by the Forgot Password system.
-- **Issue 4 (P2):** The KONA text on the splash screen is not correctly centered with the icon.
+-   Issue 1: (P0) Persistent splash screen on every navigation.
+-   Issue 2: (P1) The user's request for screenshots of the VIP upgrade flow was not fulfilled.
 
 **Issues Detail:**
-- **Issue 1: Forgot Password link is invalid or expired immediately.**
-    - **Attempted fixes:**
-        1.  Verified the token expiry logic; it was correct (1-hour expiry).
-        2.  Tested the backend API directly with a valid token; it worked.
-        3.  Discovered the reset email was sending a link to the production URL () instead of the preview URL.
-        4.  Attempted to fix this by using an  environment variable in . The backend was restarted to load the new variable.
-        5.  Despite the fix, the user reported the link still says it has expired ().
-    - **Next debug checklist:**
-        1.  Re-trigger the Forgot Password email for .
-        2.  Ask the user to provide the exact URL from the new email to verify it points to the preview environment.
-        3.  If the URL is correct, investigate the frontend code in  to see how the token is extracted from the URL and sent to the API. There might be a parsing error.
-        4.  Add extensive logging on both the frontend () and backend ( statements in 's  endpoint) to trace the token from the URL to the final database query.
-    - **Why fix this issue and what will be achieved with the fix?** This is a critical user journey. Users who forget their password cannot access their accounts.
-    - **Status:** USER VERIFICATION PENDING
-    - **Is recurring issue?** Y
-    - **Should Test frontend/backend/both after fix?** Both
-    - **Blocked on other issue:** None
+-   **Issue 1:** Persistent splash screen on every navigation.
+    -   **Attempted fixes:** The agent tried various workarounds like adding delays and using  to bypass the splash screen for testing, but these were only temporary fixes and did not solve the root cause. The splash screen consistently interfered with automated screenshot testing.
+    -   **Next debug checklist:**
+        -   Review  and its associated logic.
+        -   Identify why the component re-mounts or its visibility logic is re-triggered on every route change in .
+        -   Refactor the logic to ensure the splash screen only shows once per session (e.g., on the first visit) and not on subsequent page navigations.
+    -   **Why fix this issue and what will be achieved with the fix?** This is a critical UX flaw that frustrates users and severely hinders automated frontend testing. Fixing it will improve user experience and enable reliable testing.
+    -   **Status:** NOT STARTED
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on other issue:** None
 
-- **Issue 2: Geo-location incorrectly detects user's country.**
-    - **Attempted fixes:** The agent modified  to use an IP-based geo-detection service () to pre-select the user's country. The fallback was changed from Kenya to Tanzania.
-    - **Next debug checklist:** Ask the user to perform a hard refresh () and open the Sign-In modal to check if their country is now correctly detected as Tanzania.
-    - **Why fix this issue and what will be achieved with the fix?** Ensures correct user data is captured and improves the user registration experience.
-    - **Status:** USER VERIFICATION PENDING
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on other issue:** None
-
-- **Issue 3: Test account not found by Forgot Password system.**
-    - **Attempted fixes:** The agent discovered the preview environment uses a , but the test user was initially created in . The agent re-created the user  in the correct .
-    - **Next debug checklist:** This should be resolved, but it's linked to Issue 1. Testing the Forgot Password flow will confirm the fix.
-    - **Why fix this issue and what will be achieved with the fix?** This was a debugging step necessary to troubleshoot the primary Forgot Password issue.
-    - **Status:** RESOLVED
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Backend
-    - **Blocked on other issue:** None
-
-- **Issue 4: KONA text on splash screen not centered.**
-    - **Attempted fixes:** The agent made multiple CSS adjustments in . The last fix involved adding  to compensate for  that was pushing the text off-center.
-    - **Next debug checklist:** Ask the user to verify the alignment on the splash screen after a hard refresh. If still misaligned, a different CSS approach like using  on an absolute positioned element might be more robust.
-    - **Why fix this issue and what will be achieved with the fix?** A minor UI polish to improve brand presentation.
-    - **Status:** USER VERIFICATION PENDING
-    - **Is recurring issue?** Y
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on other issue:** None
+-   **Issue 2:** Screenshots of the VIP upgrade process were not provided.
+    -   **Attempted fixes:** The agent attempted to navigate the UI to capture the screenshots but was repeatedly blocked by the persistent splash screen issue.
+    -   **Next debug checklist:** Once Issue 1 is resolved, navigate through the VIP upgrade flow and capture screenshots.
+    -   **Why fix this issue and what will be achieved with the fix?** To fulfill the user's direct request and provide a visual confirmation of the subscription flow.
+    -   **Status:** BLOCKED
+    -   **Is recurring issue?** N
+    -   **Should Test frontend/backend/both after fix?** Frontend
+    -   **Blocked on other issue:** Issue 1: Persistent splash screen
 
 **In progress Task List**:
-- **Task 1: Implement password visibility toggle**
-    - **Where to resume:** The agent has added the state and toggle button to . The same implementation needs to be applied to the New Password and Confirm Password fields in .
-    - **What will be achieved with this?** Improves usability by allowing users to see their password as they type.
-    - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on something:** None
-
-- **Task 2: Implement basic content protection**
-    - **Where to resume:** The agent created a  hook and added it to . The implementation is complete but requires testing and user feedback.
-    - **What will be achieved with this?** Deters casual piracy by disabling right-click, adding a user-ID watermark, and blurring the video if screen capture is detected.
-    - **Status:** TESTING PENDING
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on something:** None
+None.
 
 **Upcoming and Future Tasks**
-- **Upcoming Tasks:**
-  - **(P0) User Verification:** Get confirmation from the user on all pending fixes: Forgot Password flow, geo-detection, country picker UI, and splash screen text alignment.
-  - **(P1) Test Content Protection:** Test the implemented anti-screenshot/recording features on different browsers and devices.
+-   **Upcoming Tasks:**
+    -   (P0) Monitor A/B Test Results: The user wants to let the current A/B test run and collect data. The next step is to build or enhance the  to show detailed conversion analytics (views, conversions, conversion rate per variant) and allow the admin to declare a winner when results are statistically significant.
+    -   (P1) Verify Creator Dashboard Revenue: The user specified that the creator dashboard should only show revenue *excluding* Kona's margin and rounding profit. This needs to be implemented and/or verified. Check the creator dashboard UI and its backing API.
 
-- **Future Tasks:**
-  - **(P2) DRM (Digital Rights Management) Integration:** Implement a professional DRM solution (e.g., Widevine, FairPlay) for robust content protection, as discussed with the user.
-  - **(P2) Forensic Watermarking:** Implement invisible watermarking to trace the source of leaked content.
+-   **Future Tasks:**
+    -   (P2) Expand A/B Testing: The A/B testing framework can be expanded to test other aspects of the app, such as different UI layouts, feature flags, or onboarding flows.
 
 **Completed work in this session**
-- **UI/UX & Branding:**
-  - Implemented typewriter animation on the splash screen (). (DONE)
-  - Replaced loading spinners with a consistent  across the app (e.g., , ). (DONE)
-  - Resized and attempted to center the KONA text on the splash screen. (DONE, pending verification)
-  - Replaced the clunky country dropdown with a smooth, searchable modal (). (DONE, pending verification)
-
-- **Backend & Features:**
-  - **Device & Session Management:** Built the backend API () and frontend UI () for users to view and log out of active sessions. (DONE)
-  - **Subscription Tiers:** Implemented variable device limits based on subscription tiers (Free, Basic, Premium) and created a  API. (DONE)
-  - **Subscription UI & Payments:** Created a  to display tiers and integrated a mock KwikPay flow for checkout. (DONE)
-  - **Advanced Ad Targeting:** Enhanced the campaign creation model and API to support advanced geo-targeting options. (DONE)
-  - **SEO:** Added Breadcrumb and Video schema generation to improve search engine visibility (, ). (DONE)
-  - **Global Registration:** Expanded the available country list from Africa-only to 195+ global countries. (DONE)
+-   **Email Verification Gate (DONE):** Created  and applied it to  to gate access to Mystery Box, Watch Streak, Streak Shield, Scratch Card, Prediction Games, Daily Challenges, and Character Cards.
+-   **Dynamic Exchange Rates (DONE):** Implemented  to fetch live rates, and created  for admin to set a profit margin.
+-   **Psychological Pricing (DONE):** Enhanced the exchange rate service to support smart rounding (to end in 9 or 0) and added a UI in  for admins to configure the pricing style for each subscription tier.
+-   **Pricing A/B Testing (DONE):** Implemented a full A/B testing framework (, ) to experiment with different pricing styles.
+-   **Bug Fix (DONE):** Resolved an issue in the backend registration route () where a session was not being created, which was causing login state persistence problems.
 
 **Earlier issues found/mentioned but not fixed**
-None. All issues raised by the user were either addressed or are currently in progress.
+-   **Issue 1:** Persistent Splash Screen.
+    -   **Debug checklist:** As detailed in the All Pending/In progress Issue list section.
+    -   **Why to solve this issue and what will be achieved with this?** Critical for both user experience and the ability to perform automated testing.
+    -   **Should Test frontend/backend/both after fix:** Frontend
+    -   **Is recurring issue?** Y
 
 **Known issue recurrence from previous fork**
-N/A
+-   No previous fork summary was provided in the initial message.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend:** React, Vite, TailwindCSS, Shadcn UI, React Router,  for SEO.
-- **Backend:** Python (Flask), Pydantic for data validation, JWT for authentication.
-- **Database:** MongoDB.
-- **3rd Party Services:** Resend (email), ip-api.com / ipapi.co (geo-location).
-- **Architecture:** RESTful API with a decoupled single-page application (SPA) frontend.
+-   **Frontend:** React, React Router, Context API for state management ().
+-   **Backend:** FastAPI (Python async framework).
+-   **Database:** MongoDB.
+-   **Architecture:** Decoupled frontend/backend with a REST API. The backend features a service-oriented architecture for concerns like subscriptions and exchange rates.
+-   **Asynchronous Operations:** Use of  in the backend for non-blocking calls to the external currency API.
 
 **key DB schema**
-- **users:** 
-- **advertisers:** 
-- **campaigns:** 
-- **subscriptions:** 
+-   **users:** 
+-   **sessions:** 
+-   **exchange_rates_config:** 
+-   **pricing_styles:**  (e.g., tier_id: vip, style: premium)
+-   **ab_tests:** 
+-   **ab_test_assignments:** 
+-   **ab_test_events:**  (e.g., 'view', 'conversion')
+-   **subscriptions:** 
 
 **changes in tech stack**
-- The  Python library was added to parse user-agent strings for session management.
+-   **:** Added to the backend dependencies to handle asynchronous HTTP requests to the currency exchange rate API.
 
 **All files of reference**
-- : Handles login, register, forgot/reset password, and session management APIs. **Critical for debugging the password reset flow.**
-- : Constructs and sends the password reset email. **The source of the incorrect URL issue.**
-- : Loads environment variables; needs to correctly load .
-- : Contains the login/registration form, country picker, and the new password visibility toggle.
-- : The UI for handling password reset. **Critical for debugging the expired link issue.**
-- : Contains the KONA logo and typewriter animation.
-- : New hook for preventing screen capture.
-- : The page where  is applied.
+-   : (New) Core logic for fetching live rates, applying margins, and performing smart rounding.
+-   : (New) Logic for managing A/B tests, assigning users, and tracking events.
+-   : (New) API endpoints for admin to manage exchange rate settings.
+-   : (New) API endpoints for admin to manage A/B tests.
+-   : (Updated) Registered the new admin routes.
+-   : (New) Reusable component to gate features for unverified users.
+-   : (New) Admin UI for managing margins and pricing styles.
+-   : (New) Admin UI for managing pricing A/B tests.
+-   : (Updated) Added tabs for the new Exchange Rate and A/B Testing modules.
+-   : (Updated) Modified to display prices in the new format: .
+-   : (Updated) Wrapped several components with the .
 
 **Areas that need refactoring**:
--  was identified by the agent as being overly complex and long, making it difficult to modify. It should be broken down into smaller, more manageable components.
-- The environment variable loading in  appears fragile and was the likely cause of the password reset URL issue. This could be made more robust.
+-   **:** The logic causing the splash screen to appear on every page load needs to be completely refactored. It should only appear once at the beginning of a user's session.
 
 **key api endpoints**
-- : Initiates the password reset process.
-- : Completes the password reset with a token.
-- : Lists a user's active device sessions.
-- : Logs out a specific device session.
-- : Retrieves available subscription plans.
-- : Provides the list of all supported countries for the registration form.
+-   : Fetches current rates, margins, and rounding profit examples.
+-   : Sets the global profit margin.
+-   : Sets the psychological pricing style for each subscription tier.
+-   : Retrieves all active and completed A/B tests and their results.
+-   : Creates a new pricing A/B test.
+-   : Ends an active A/B test.
+-   : Provides subscription tier details, with prices adjusted based on active A/B tests for the current user.
 
 **Critical Info for New Agent**
-- The Forgot Password flow is the highest priority. The user is blocked by an expired link error. The root cause is likely the reset URL in the email pointing to the wrong environment, despite a fix being attempted. You must verify the  is correctly loaded by the backend and used in the email template.
-- The preview environment uses a separate database () from production. The test account  (Password: ) exists only in this .
-- The user is testing from Tanzania. Any geo-location features should be tested with this in mind.
-- Changes to the frontend often require the user to perform a hard refresh () to see them. Remind the user of this when asking for verification.
-- The backend must be restarted () for changes to  files to take effect.
+-   The user is highly engaged and focused on business logic and revenue optimization. Be prepared to discuss and implement features related to pricing, analytics, and admin controls.
+-   The most immediate technical debt is the **persistent splash screen**. Resolving this should be a high priority as it impacts both user experience and your ability to test the frontend.
+-   A key business requirement, The creator dashboard should only see the total without margin, was stated but never verified. This is a critical loose end to address.
+-   The backend now has a robust, multi-layered pricing engine. When working on subscriptions, be mindful of the layers: Base Price (USD) -> Exchange Rate -> Margin -> Rounding -> A/B Test Variant.
 
 **documents and test reports created in this job**
-- : Updated with completed tasks and future roadmap items.
+-    (updated to reflect the new features)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1. : Request for a password visibility toggle. (IN PROGRESS)
-2. : Approval to implement basic content protection. (IN PROGRESS)
-3. : Inquiry about how to prevent screen recording/screenshots. (Addressed)
-4. : Report that the country dropdown fix is not visible. (Agent restarted frontend)
-5. : Report that the country dropdown is stucking and a request for all countries. (Addressed with a new UI)
-6. : Report incorrect geo-detection and request for global countries. (Addressed)
-7. : Inquiry about country capture on registration. (Addressed)
-8. : Critical report that the password reset link **still** says it has expired. (PENDING - HIGHEST PRIORITY)
-9. : First report that the password reset link is expired. (PENDING)
-10. : User asks to proceed with testing. (Addressed)
+1.  **User:** Asks what happens when clicking Upgrade to VIP and about currency conversion rates. (INQUIRY)
+2.  **User:** Requests screenshots of the upgrade process and asks to implement dynamic exchange rates with a 3% margin for Kona, with specific dashboard requirements for admins vs. creators. (ACTION)
+3.  **User:** Asks for the best option between showing local currency or USD. (INQUIRY)
+4.  **User:** Confirms the best option is Show Local Currency with USD Reference and adds the requirement for smart rounding, with rounding profit also tracked for Kona. (ACTION)
+5.  **User:** Asks for an explanation of psychological pricing presets. (INQUIRY)
+6.  **User:** Approves the psychological pricing idea and asks for it to be implemented with the suggested defaults, but with an admin override. (ACTION)
+7.  **User:** Asks to add A/B testing capability for the pricing styles. (ACTION)
+8.  **User:** (Implicitly approves A/B test implementation) Let test run and collect data. Monitor conversion rates in admin. Declare winner when statistically significant. (PENDING ACTION FOR NEXT AGENT)
 
 **Project Health Check:**
-- **Broken:** The Forgot Password flow is critically broken, preventing users from resetting their passwords.
-- **Mocked:** The KwikPay payment service is a mock and does not process real payments.
+-   **Broken:** The splash screen functionality is broken from a UX perspective, as it runs on every navigation.
+-   **Mocked:** The core payment processing flow for subscriptions still relies on a  endpoint and does not integrate with a real payment provider.
 
 **3rd Party Integrations**
-- **Resend** (Email): Used for transactional emails like password resets. Requires a User API Key.
-- **ip-api.com / ipapi.co** (Geo-location): Used for IP-based country detection.
-- **Shadcn UI** (Component Library): Used for frontend components.
+-   **fawazahmed0/currency-api:** Used for fetching live currency exchange rates. It's a free, open-source API that does not require an API key.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES
-- **Troubleshoot agent used after agent stuck in loop:** YES
-- **Test files created:** Backend test files were created and run via the testing agent.
-- **Known regressions:** The Forgot Password flow is a persistent bug that has regressed or was not fully fixed during the session.
+-   **Testing agent used after significant changes:** YES (It found a critical bug in the registration flow, which was then fixed).
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
-- **Email:** 
-- **Password:** 
+-   **User/Admin:**  / 
+-   **Note:** To access admin features, the user document in the  collection must have  and  set to .
 
 **What agent forgot to execute**
-- The agent did not complete the implementation of the password visibility toggle; it was only applied to one of the two required forms.
-- The agent did not get final user confirmation that the critical expired password link issue was resolved after the last fix attempt.
-- The agent did not ask the user to test the new content protection features after implementing them.</analysis>
+-   The agent did not provide the screenshots of the VIP upgrade process that the user requested, as it was blocked by the persistent splash screen issue.
+-   The agent did not verify that the creator dashboard correctly hides Kona's margin and rounding profit from the revenue numbers shown to creators.</analysis>
