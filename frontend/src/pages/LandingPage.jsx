@@ -349,24 +349,24 @@ const LandingPage = ({ onAuthClick }) => {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-6 lg:px-12 bg-[#0a0520]">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 bg-[#0a0520]">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12">What Viewers Say</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">What Viewers Say</h2>
           
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             {[
               { name: "Amara K.", location: "Kenya", text: "Finally a platform that tells OUR stories! The romance series are addictive." },
               { name: "Chidi O.", location: "Nigeria", text: "Love the coin system - I've earned so much just by watching and engaging!" },
               { name: "Thandiwe M.", location: "South Africa", text: "The app is so smooth. I watch on my commute every day. Best decision ever." },
             ].map((review, i) => (
-              <div key={i} className="bg-white/5 rounded-2xl p-6 border border-white/10">
-                <div className="flex items-center gap-1 mb-4">
+              <div key={i} className="bg-white/5 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/10">
+                <div className="flex items-center gap-1 mb-3 sm:mb-4">
                   {[...Array(5)].map((_, j) => (
-                    <Star key={j} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    <Star key={j} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4 leading-relaxed">"{review.text}"</p>
-                <div className="text-sm">
+                <p className="text-gray-300 text-sm sm:text-base mb-3 sm:mb-4 leading-relaxed">"{review.text}"</p>
+                <div className="text-xs sm:text-sm">
                   <span className="font-semibold">{review.name}</span>
                   <span className="text-gray-500"> · {review.location}</span>
                 </div>
@@ -377,31 +377,31 @@ const LandingPage = ({ onAuthClick }) => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-6 lg:px-12 bg-gradient-to-b from-[#0a0520] to-[#030014]">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 bg-gradient-to-b from-[#0a0520] to-[#030014]">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-gray-400">Everything you need to know about Kona</p>
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Frequently Asked Questions</h2>
+            <p className="text-gray-400 text-sm sm:text-base">Everything you need to know about Kona</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {faqs.map((faq, i) => (
               <div 
                 key={i}
-                className="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
+                className="bg-white/5 rounded-lg sm:rounded-xl border border-white/10 overflow-hidden"
               >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
-                  <span className="font-medium pr-4">{faq.question}</span>
+                  <span className="font-medium text-sm sm:text-base pr-3 sm:pr-4">{faq.question}</span>
                   <ChevronDown 
-                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                    className={`w-4 h-4 sm:w-5 sm:h-5 text-gray-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
                   />
                 </button>
                 {openFaq === i && (
-                  <div className="px-6 pb-4">
-                    <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                  <div className="px-4 sm:px-6 pb-3 sm:pb-4">
+                    <p className="text-gray-400 text-sm sm:text-base leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>
@@ -409,15 +409,15 @@ const LandingPage = ({ onAuthClick }) => {
           </div>
 
           {/* Still have questions? */}
-          <div className="text-center mt-12 p-8 bg-white/5 rounded-2xl border border-white/10">
-            <h3 className="text-xl font-semibold mb-2">Still have questions?</h3>
-            <p className="text-gray-400 mb-4">Our support team is here to help 24/7</p>
+          <div className="text-center mt-8 sm:mt-12 p-5 sm:p-8 bg-white/5 rounded-xl sm:rounded-2xl border border-white/10">
+            <h3 className="text-lg sm:text-xl font-semibold mb-2">Still have questions?</h3>
+            <p className="text-gray-400 text-sm sm:text-base mb-3 sm:mb-4">Our support team is here to help 24/7</p>
             <Button 
               variant="outline"
               onClick={() => navigate('/contact')}
-              className="border-white/30 hover:bg-white/10"
+              className="border-white/30 hover:bg-white/10 text-sm sm:text-base"
             >
-              <Mail className="w-4 h-4 mr-2" />
+              <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
               Contact Support
             </Button>
           </div>
@@ -425,18 +425,18 @@ const LandingPage = ({ onAuthClick }) => {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-6 lg:px-12 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start Watching?</h2>
-        <p className="text-gray-400 mb-8 max-w-lg mx-auto">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 text-center">
+        <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">Ready to Start Watching?</h2>
+        <p className="text-gray-400 text-sm sm:text-base mb-6 sm:mb-8 max-w-lg mx-auto px-2">
           Join millions of viewers. First episode of every series is free!
         </p>
         <Button 
           size="lg"
           onClick={handleStartWatching}
-          className="bg-white text-black hover:bg-white/90 rounded-full px-10 h-14 text-lg font-semibold"
+          className="bg-white text-black hover:bg-white/90 rounded-full px-6 sm:px-10 h-12 sm:h-14 text-base sm:text-lg font-semibold"
           data-testid="final-cta-btn"
         >
-          <Play className="w-6 h-6 fill-black mr-2" />
+          <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-black mr-2" />
           Start Watching Now
         </Button>
       </section>
