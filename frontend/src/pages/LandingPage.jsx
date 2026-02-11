@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Play, Smartphone, Download, Star, Users, Film, ChevronRight, Sparkles } from "lucide-react";
+import { 
+  Play, Smartphone, Download, Star, Users, Film, ChevronRight, Sparkles,
+  ChevronDown, UserPlus, Coins, Tv, Mail, MapPin, Phone, 
+  Twitter, Instagram, Facebook, Youtube, Heart, Shield, Zap
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import SEO from "@/components/SEO";
@@ -8,13 +12,13 @@ import SEO from "@/components/SEO";
 const LandingPage = ({ onAuthClick }) => {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const [openFaq, setOpenFaq] = useState(null);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
   const handleStartWatching = () => {
-    // Mark that user has seen landing page and wants to watch
     sessionStorage.setItem('kona_entered_app', 'true');
     navigate('/home');
   };
@@ -31,6 +35,95 @@ const LandingPage = ({ onAuthClick }) => {
     { value: "1M+", label: "Happy Viewers" },
   ];
 
+  const howItWorks = [
+    { 
+      step: "1", 
+      icon: UserPlus, 
+      title: "Sign Up Free", 
+      desc: "Create your account in seconds with email or phone. No credit card required.",
+      color: "from-blue-500 to-cyan-500"
+    },
+    { 
+      step: "2", 
+      icon: Tv, 
+      title: "Browse & Watch", 
+      desc: "Explore our library of exclusive African mini-series. First episode is always free!",
+      color: "from-purple-500 to-pink-500"
+    },
+    { 
+      step: "3", 
+      icon: Coins, 
+      title: "Earn Rewards", 
+      desc: "Watch daily, complete challenges, and earn coins to unlock more episodes.",
+      color: "from-yellow-500 to-orange-500"
+    },
+    { 
+      step: "4", 
+      icon: Heart, 
+      title: "Enjoy & Share", 
+      desc: "Binge your favorites, join watch parties, and share with friends to earn more!",
+      color: "from-pink-500 to-red-500"
+    },
+  ];
+
+  const faqs = [
+    {
+      question: "Is Kona free to use?",
+      answer: "Yes! You can sign up for free and watch the first episode of every series at no cost. You earn coins daily through rewards, challenges, and referrals which you can use to unlock more episodes. Premium subscriptions are available for unlimited access."
+    },
+    {
+      question: "What kind of content is on Kona?",
+      answer: "Kona features exclusive African mini-series across genres including Romance, Drama, Thriller, Action, Comedy, and Fantasy. Our content is produced by talented African creators and tells authentic African stories that resonate with audiences worldwide."
+    },
+    {
+      question: "How do I earn coins?",
+      answer: "There are many ways to earn coins: Daily check-ins, watching episodes, completing challenges, referring friends, spinning the daily wheel, participating in prediction games, and maintaining watch streaks. The more you engage, the more you earn!"
+    },
+    {
+      question: "Can I watch offline?",
+      answer: "Yes! Premium and VIP subscribers can download episodes to watch offline. Simply tap the download button on any episode and enjoy your favorite series without an internet connection."
+    },
+    {
+      question: "How do I become a VIP member?",
+      answer: "VIP membership gives you unlimited access to all content, ad-free viewing, early access to new releases, and exclusive perks. You can upgrade from your profile or when you try to access VIP content. We accept mobile money, cards, and crypto payments."
+    },
+    {
+      question: "Is Kona available in my country?",
+      answer: "Kona is available across Africa and globally! We support local payment methods in Kenya, Nigeria, South Africa, Ghana, Tanzania, Uganda, and many more countries. Content is available worldwide with localized pricing."
+    },
+    {
+      question: "How do I become a creator on Kona?",
+      answer: "We're always looking for talented creators! Visit our Creator Portal to apply. We offer competitive revenue sharing, production support, and access to millions of engaged viewers. Join the Kona creator community today."
+    },
+  ];
+
+  const footerLinks = {
+    company: [
+      { label: "About Us", path: "/about" },
+      { label: "Careers", path: "/careers" },
+      { label: "Press", path: "/press" },
+      { label: "Contact", path: "/contact" },
+    ],
+    support: [
+      { label: "Help Center", path: "/help" },
+      { label: "Safety", path: "/safety" },
+      { label: "Community Guidelines", path: "/guidelines" },
+      { label: "Accessibility", path: "/accessibility" },
+    ],
+    legal: [
+      { label: "Terms of Service", path: "/terms" },
+      { label: "Privacy Policy", path: "/privacy" },
+      { label: "Cookie Policy", path: "/cookies" },
+      { label: "DMCA", path: "/dmca" },
+    ],
+    creators: [
+      { label: "Creator Portal", path: "/creators" },
+      { label: "Creator Guidelines", path: "/creator-guidelines" },
+      { label: "Revenue Sharing", path: "/revenue" },
+      { label: "Apply Now", path: "/business/apply" },
+    ],
+  };
+
   return (
     <div className="min-h-screen bg-[#030014] text-white overflow-hidden" data-testid="landing-page">
       <SEO 
@@ -41,7 +134,6 @@ const LandingPage = ({ onAuthClick }) => {
 
       {/* Hero Section */}
       <div className="relative min-h-screen flex flex-col">
-        {/* Background Image with Gradient */}
         <div className="absolute inset-0">
           <img 
             src="https://images.pexels.com/photos/3807517/pexels-photo-3807517.jpeg?auto=compress&cs=tinysrgb&w=1920"
@@ -52,7 +144,7 @@ const LandingPage = ({ onAuthClick }) => {
           <div className="absolute inset-0 bg-gradient-to-r from-[#030014] via-transparent to-[#030014]/50" />
         </div>
 
-        {/* Floating Particles Effect */}
+        {/* Floating Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(20)].map((_, i) => (
             <div
@@ -88,16 +180,14 @@ const LandingPage = ({ onAuthClick }) => {
           </div>
         </header>
 
-        {/* Main Hero Content */}
+        {/* Hero Content */}
         <div className={`relative z-10 flex-1 flex items-center justify-center px-6 lg:px-12 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="max-w-4xl mx-auto text-center">
-            {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-6 border border-white/20">
               <Sparkles className="w-4 h-4 text-yellow-400" />
               <span className="text-sm font-medium">Africa's #1 Mini-Series Platform</span>
             </div>
 
-            {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold mb-6 leading-tight">
               Stories That Move
               <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
@@ -105,13 +195,11 @@ const LandingPage = ({ onAuthClick }) => {
               </span>
             </h1>
 
-            {/* Subheadline */}
             <p className="text-lg sm:text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
               Discover exclusive African mini-series. Romance, drama, thrillers & more. 
               Watch free episodes, earn rewards, and join millions of viewers.
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
               <Button 
                 size="lg"
@@ -125,15 +213,14 @@ const LandingPage = ({ onAuthClick }) => {
               <Button 
                 size="lg"
                 variant="outline"
-                onClick={() => navigate('/about')}
+                onClick={() => document.getElementById('how-it-works').scrollIntoView({ behavior: 'smooth' })}
                 className="border-white/30 hover:bg-white/10 rounded-full px-8 h-14 text-lg w-full sm:w-auto"
               >
-                Learn More
+                How It Works
                 <ChevronRight className="w-5 h-5 ml-1" />
               </Button>
             </div>
 
-            {/* Stats */}
             <div className="flex items-center justify-center gap-8 sm:gap-16">
               {stats.map((stat, i) => (
                 <div key={i} className="text-center">
@@ -147,16 +234,71 @@ const LandingPage = ({ onAuthClick }) => {
 
         {/* Scroll Indicator */}
         <div className="relative z-10 pb-8 flex justify-center">
-          <div className="animate-bounce">
+          <button 
+            onClick={() => document.getElementById('how-it-works').scrollIntoView({ behavior: 'smooth' })}
+            className="animate-bounce"
+          >
             <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
               <div className="w-1 h-2 bg-white/60 rounded-full animate-pulse" />
             </div>
-          </div>
+          </button>
         </div>
       </div>
 
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 px-6 lg:px-12 bg-gradient-to-b from-[#030014] to-[#0a0520]">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full mb-4 border border-green-500/20">
+              <Zap className="w-4 h-4 text-green-400" />
+              <span className="text-sm text-green-400 font-medium">Super Easy to Get Started</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Start Watching in Seconds</h2>
+            <p className="text-gray-400 max-w-xl mx-auto">No complicated setup. No credit card required. Just pure entertainment.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {howItWorks.map((item, i) => (
+              <div 
+                key={i}
+                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all group"
+              >
+                {/* Step number */}
+                <div className={`absolute -top-3 -left-3 w-8 h-8 bg-gradient-to-br ${item.color} rounded-full flex items-center justify-center text-sm font-bold shadow-lg`}>
+                  {item.step}
+                </div>
+                
+                {/* Connector line (not on last item) */}
+                {i < howItWorks.length - 1 && (
+                  <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-0.5 bg-gradient-to-r from-white/20 to-transparent" />
+                )}
+                
+                <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <item.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA after steps */}
+          <div className="text-center mt-12">
+            <Button 
+              size="lg"
+              onClick={onAuthClick}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full px-10 h-14 text-lg font-semibold"
+            >
+              <UserPlus className="w-5 h-5 mr-2" />
+              Create Free Account
+            </Button>
+            <p className="text-gray-500 text-sm mt-3">Takes less than 30 seconds</p>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="py-20 px-6 lg:px-12 bg-gradient-to-b from-[#030014] to-[#0a0520]">
+      <section className="py-20 px-6 lg:px-12 bg-[#0a0520]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Kona?</h2>
@@ -190,9 +332,7 @@ const LandingPage = ({ onAuthClick }) => {
             <span className="text-sm">Install as App for the Best Experience</span>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Take Kona Everywhere
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">Take Kona Everywhere</h2>
           <p className="text-gray-400 mb-8 max-w-xl mx-auto">
             Install Kona on your device for instant access, offline viewing, and push notifications for new episodes.
           </p>
@@ -236,6 +376,54 @@ const LandingPage = ({ onAuthClick }) => {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 px-6 lg:px-12 bg-gradient-to-b from-[#0a0520] to-[#030014]">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-gray-400">Everything you need to know about Kona</p>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, i) => (
+              <div 
+                key={i}
+                className="bg-white/5 rounded-xl border border-white/10 overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="font-medium pr-4">{faq.question}</span>
+                  <ChevronDown 
+                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${openFaq === i ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-4">
+                    <p className="text-gray-400 leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Still have questions? */}
+          <div className="text-center mt-12 p-8 bg-white/5 rounded-2xl border border-white/10">
+            <h3 className="text-xl font-semibold mb-2">Still have questions?</h3>
+            <p className="text-gray-400 mb-4">Our support team is here to help 24/7</p>
+            <Button 
+              variant="outline"
+              onClick={() => navigate('/contact')}
+              className="border-white/30 hover:bg-white/10"
+            >
+              <Mail className="w-4 h-4 mr-2" />
+              Contact Support
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-20 px-6 lg:px-12 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start Watching?</h2>
@@ -254,16 +442,137 @@ const LandingPage = ({ onAuthClick }) => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 border-t border-white/10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <KonaLogo2Full height={24} />
-          <div className="flex items-center gap-6 text-sm text-gray-500">
-            <button onClick={() => navigate('/about')} className="hover:text-white transition-colors">About</button>
-            <button onClick={() => navigate('/terms')} className="hover:text-white transition-colors">Terms</button>
-            <button onClick={() => navigate('/privacy')} className="hover:text-white transition-colors">Privacy</button>
-            <button onClick={() => navigate('/creators')} className="hover:text-white transition-colors">Creators</button>
+      <footer className="bg-black/50 border-t border-white/10">
+        {/* Main Footer */}
+        <div className="max-w-6xl mx-auto px-6 lg:px-12 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
+            {/* Brand Column */}
+            <div className="col-span-2 md:col-span-1">
+              <KonaLogo2Full height={28} />
+              <p className="text-gray-400 text-sm mt-4 leading-relaxed">
+                Africa's premier mini-series streaming platform. Stories that move Africa forward.
+              </p>
+              {/* Social Links */}
+              <div className="flex items-center gap-3 mt-6">
+                <a href="https://twitter.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Twitter className="w-4 h-4" />
+                </a>
+                <a href="https://instagram.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a href="https://facebook.com/streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a href="https://youtube.com/@streamkona" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Youtube className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Company */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Company</h4>
+              <ul className="space-y-3">
+                {footerLinks.company.map((link, i) => (
+                  <li key={i}>
+                    <button 
+                      onClick={() => navigate(link.path)}
+                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Support</h4>
+              <ul className="space-y-3">
+                {footerLinks.support.map((link, i) => (
+                  <li key={i}>
+                    <button 
+                      onClick={() => navigate(link.path)}
+                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Legal */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Legal</h4>
+              <ul className="space-y-3">
+                {footerLinks.legal.map((link, i) => (
+                  <li key={i}>
+                    <button 
+                      onClick={() => navigate(link.path)}
+                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Creators */}
+            <div>
+              <h4 className="font-semibold mb-4 text-sm uppercase tracking-wider text-gray-300">Creators</h4>
+              <ul className="space-y-3">
+                {footerLinks.creators.map((link, i) => (
+                  <li key={i}>
+                    <button 
+                      onClick={() => navigate(link.path)}
+                      className="text-gray-400 hover:text-white text-sm transition-colors"
+                    >
+                      {link.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
-          <p className="text-sm text-gray-600">© 2026 Kona. All rights reserved.</p>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-white/10">
+          <div className="max-w-6xl mx-auto px-6 lg:px-12 py-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <MapPin className="w-4 h-4" />
+                <span>Nairobi, Kenya</span>
+                <span className="mx-2">|</span>
+                <span>Lagos, Nigeria</span>
+                <span className="mx-2">|</span>
+                <span>Johannesburg, South Africa</span>
+              </div>
+              <div className="flex items-center gap-4 text-sm text-gray-500">
+                <span>© 2026 Kona Entertainment Ltd. All rights reserved.</span>
+              </div>
+            </div>
+            
+            {/* Payment Methods & Trust Badges */}
+            <div className="flex flex-wrap items-center justify-center gap-4 mt-6 pt-6 border-t border-white/5">
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Shield className="w-4 h-4 text-green-500" />
+                <span>Secure Payments</span>
+              </div>
+              <span className="text-gray-600">|</span>
+              <div className="flex items-center gap-3 text-xs text-gray-500">
+                <span>M-Pesa</span>
+                <span>Airtel Money</span>
+                <span>Visa</span>
+                <span>Mastercard</span>
+                <span>PayPal</span>
+                <span>Crypto</span>
+              </div>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
