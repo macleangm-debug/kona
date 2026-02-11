@@ -263,46 +263,71 @@ class ExchangeRateService:
             "local_amount_display": display_amount,  # For user display (nicely rounded)
             "currency": currency_upper,
             "formatted": formatted,
+            "pricing_style": pricing_style,
             "rate_source": "live" if currency_code in rates else "fallback",
             "rate_timestamp": self._cache_time.isoformat() if self._cache_time else None
         }
     
-    def _round_to_nice_number(self, amount: float, currency: str) -> float:
+    def _round_to_nice_number(self, amount: float, currency: str, pricing_style: str = "value") -> float:
         """
-        Round to psychologically appealing numbers
-        Examples:
-        - 389 -> 399 or 400
-        - 1,287 -> 1,299 or 1,300
-        - 25,830 -> 25,999 or 26,000
+        Round to psychologically appealing numbers based on pricing style
+        
+        Styles:
+        - "value": Ends in 9 (e.g., 399, 1,499) - feels like a deal
+        - "premium": Ends in 0 (e.g., 400, 1,500) - signals quality
+        - "exact": No rounding
         """
         if amount <= 0:
             return 0
         
-        # Determine the rounding increment based on amount size
+        if pricing_style == "exact":
+            return round(amount, 0)
+        
+        # Determine base and options based on amount size
         if amount < 100:
-            # Round to nearest 5 or 9 (e.g., 45, 49, 50)
             base = round(amount / 10) * 10
-            options = [base - 1, base, base + 4, base + 5, base + 9]
+            if pricing_style == "value":
+                # Target endings: 9, 19, 29, 39, 49, etc.
+                options = [base - 1, base + 9, base + 19]
+            else:  # premium
+                # Target endings: 0, 10, 20, 30, 50, etc.
+                options = [base, base + 10, base + 20, base + 50]
+                
         elif amount < 1000:
-            # Round to nearest 49, 50, 99, 100 (e.g., 399, 400, 449, 500)
             base = round(amount / 50) * 50
-            options = [base - 1, base, base + 49, base + 50, base + 99]
+            if pricing_style == "value":
+                # Target endings: 49, 99, 149, 199, 249, 299, etc.
+                options = [base - 1, base + 49, base + 99, base + 149, base + 199]
+            else:  # premium
+                # Target endings: 0, 50, 100, 150, 200, 250, 300, etc.
+                options = [base, base + 50, base + 100, base + 150, base + 200]
+                
         elif amount < 10000:
-            # Round to nearest 99 or 00 (e.g., 1,299, 1,300, 1,499, 1,500)
             base = round(amount / 100) * 100
-            options = [base - 1, base, base + 99, base + 100, base + 199]
+            if pricing_style == "value":
+                # Target endings: 99, 199, 299, 399, 499, etc.
+                options = [base - 1, base + 99, base + 199, base + 299, base + 399, base + 499]
+            else:  # premium
+                # Target endings: 0, 100, 200, 500, etc.
+                options = [base, base + 100, base + 200, base + 500]
+                
         else:
-            # Round to nearest 999 or 000 (e.g., 25,999, 26,000)
             base = round(amount / 1000) * 1000
-            options = [base - 1, base, base + 499, base + 500, base + 999]
+            if pricing_style == "value":
+                # Target endings: 999, 1999, 2999, etc.
+                options = [base - 1, base + 999, base + 1999, base + 2999]
+            else:  # premium
+                # Target endings: 0, 500, 1000, etc.
+                options = [base, base + 500, base + 1000]
         
         # Find the smallest option that's >= amount (never round down)
         valid_options = [opt for opt in options if opt >= amount]
         if valid_options:
             return min(valid_options)
         
-        # Fallback: round up to next nice number
-        return base + (100 if amount < 1000 else 1000)
+        # Fallback: round up to next increment
+        increment = 100 if amount < 1000 else 1000
+        return base + increment
     
     async def get_creator_payout_amount(
         self, 
