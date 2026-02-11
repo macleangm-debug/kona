@@ -199,7 +199,10 @@ async def register(data: UserCreate, request: Request):
     if "_id" in user:
         del user["_id"]
     
-    token = create_token(user_id)
+    # Create session for the new user (same pattern as login)
+    from services import create_session
+    session = await create_session(user_id, request, geo_data)
+    token = create_token(user_id, session["id"])
     
     return {
         "token": token,
