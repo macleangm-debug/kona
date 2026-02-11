@@ -308,8 +308,11 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
     - Categories: Getting Started, Coins & Rewards, Subscriptions, Billing, Features, Troubleshooting, Creators
     - 8+ detailed help articles with full markdown content
   - **Support Tickets**: Async ticket system at /help/tickets/new
-    - No phone/email exposed - users submit tickets through form
-    - Ticket confirmation and tracking
+    - Tickets stored in MongoDB (persistent)
+    - Admin dashboard section for ticket management
+    - View, respond, update priority, close tickets
+    - Automated resolution email sent when ticket is closed
+    - Stats dashboard: Total, Open, In Progress, Closed
   - **Footer Content Pages**: All footer links now have full content
     - /careers - Open positions and benefits
     - /press - Media kit and press releases
