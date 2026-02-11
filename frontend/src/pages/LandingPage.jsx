@@ -246,25 +246,25 @@ const LandingPage = ({ onAuthClick }) => {
       </div>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 px-6 lg:px-12 bg-gradient-to-b from-[#030014] to-[#0a0520]">
+      <section id="how-it-works" className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 bg-gradient-to-b from-[#030014] to-[#0a0520]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/10 rounded-full mb-4 border border-green-500/20">
-              <Zap className="w-4 h-4 text-green-400" />
-              <span className="text-sm text-green-400 font-medium">Super Easy to Get Started</span>
+          <div className="text-center mb-10 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-500/10 rounded-full mb-3 sm:mb-4 border border-green-500/20">
+              <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" />
+              <span className="text-xs sm:text-sm text-green-400 font-medium">Super Easy to Get Started</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Start Watching in Seconds</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">No complicated setup. No credit card required. Just pure entertainment.</p>
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Start Watching in Seconds</h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto px-2">No complicated setup. No credit card required. Just pure entertainment.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {howItWorks.map((item, i) => (
               <div 
                 key={i}
-                className="relative bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-white/20 transition-all group"
+                className="relative bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/10 hover:border-white/20 transition-all group"
               >
                 {/* Step number */}
-                <div className={`absolute -top-3 -left-3 w-8 h-8 bg-gradient-to-br ${item.color} rounded-full flex items-center justify-center text-sm font-bold shadow-lg`}>
+                <div className={`absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br ${item.color} rounded-full flex items-center justify-center text-xs sm:text-sm font-bold shadow-lg`}>
                   {item.step}
                 </div>
                 
@@ -273,49 +273,49 @@ const LandingPage = ({ onAuthClick }) => {
                   <div className="hidden lg:block absolute top-1/2 -right-3 w-6 h-0.5 bg-gradient-to-r from-white/20 to-transparent" />
                 )}
                 
-                <div className={`w-14 h-14 bg-gradient-to-br ${item.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <item.icon className="w-7 h-7 text-white" />
+                <div className={`w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br ${item.color} rounded-lg sm:rounded-xl flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform`}>
+                  <item.icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">{item.title}</h3>
+                <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
 
           {/* CTA after steps */}
-          <div className="text-center mt-12">
+          <div className="text-center mt-8 sm:mt-12">
             <Button 
               size="lg"
               onClick={onAuthClick}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full px-10 h-14 text-lg font-semibold"
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full px-6 sm:px-10 h-12 sm:h-14 text-base sm:text-lg font-semibold"
             >
-              <UserPlus className="w-5 h-5 mr-2" />
+              <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Create Free Account
             </Button>
-            <p className="text-gray-500 text-sm mt-3">Takes less than 30 seconds</p>
+            <p className="text-gray-500 text-xs sm:text-sm mt-2 sm:mt-3">Takes less than 30 seconds</p>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-6 lg:px-12 bg-[#0a0520]">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 bg-[#0a0520]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Kona?</h2>
-            <p className="text-gray-400 max-w-xl mx-auto">Experience African storytelling like never before</p>
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4">Why Choose Kona?</h2>
+            <p className="text-gray-400 text-sm sm:text-base max-w-xl mx-auto">Experience African storytelling like never before</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8">
             {features.map((feature, i) => (
               <div 
                 key={i}
-                className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10 hover:border-purple-500/50 transition-all hover:transform hover:scale-105 group"
+                className="bg-white/5 backdrop-blur-sm rounded-xl sm:rounded-2xl p-5 sm:p-8 border border-white/10 hover:border-purple-500/50 transition-all hover:transform hover:scale-105 group"
               >
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform">
+                  <feature.icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{feature.desc}</p>
+                <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{feature.title}</h3>
+                <p className="text-gray-400 text-sm sm:text-base leading-relaxed">{feature.desc}</p>
               </div>
             ))}
           </div>
@@ -323,26 +323,26 @@ const LandingPage = ({ onAuthClick }) => {
       </section>
 
       {/* App Download Section */}
-      <section className="py-20 px-6 lg:px-12 relative overflow-hidden">
+      <section className="py-12 sm:py-20 px-4 sm:px-6 lg:px-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-pink-900/20" />
         
         <div className="max-w-4xl mx-auto relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full mb-6">
-            <Download className="w-4 h-4 text-green-400" />
-            <span className="text-sm">Install as App for the Best Experience</span>
+          <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-white/10 rounded-full mb-4 sm:mb-6">
+            <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" />
+            <span className="text-xs sm:text-sm">Install as App for the Best Experience</span>
           </div>
           
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">Take Kona Everywhere</h2>
-          <p className="text-gray-400 mb-8 max-w-xl mx-auto">
+          <h2 className="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6">Take Kona Everywhere</h2>
+          <p className="text-gray-400 text-sm sm:text-base mb-6 sm:mb-8 max-w-xl mx-auto px-2">
             Install Kona on your device for instant access, offline viewing, and push notifications for new episodes.
           </p>
           
           <Button 
             size="lg"
             onClick={handleStartWatching}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full px-8 h-14 text-lg font-semibold"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 rounded-full px-6 sm:px-8 h-12 sm:h-14 text-base sm:text-lg font-semibold"
           >
-            <Smartphone className="w-5 h-5 mr-2" />
+            <Smartphone className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
             Enter Kona
           </Button>
         </div>
