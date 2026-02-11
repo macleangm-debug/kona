@@ -44,17 +44,30 @@ async def get_subscription_tiers(country_code: Optional[str] = None):
         
         # Add local pricing if country code provided (with dynamic rates + margin + nice rounding)
         if country_code:
+            # Get pricing style from tier config (admin can override via DB)
+            pricing_style = tier_info.get("pricing_style", "value")
+            
+            # Check for admin override in database
+            admin_config = await db.system_config.find_one(
+                {"type": "tier_pricing_styles"},
+                {"_id": 0}
+            )
+            if admin_config and tier_id in admin_config.get("styles", {}):
+                pricing_style = admin_config["styles"][tier_id]
+            
             price_info = await kwikpay_subscription.convert_usd_to_local(
                 tier_info["price_usd"], 
-                country_code
+                country_code,
+                pricing_style=pricing_style
             )
             tier_data["local_price"] = {
                 "amount": price_info["local_amount"],  # Nicely rounded
                 "amount_exact": price_info["local_amount_exact"],  # For distribution
                 "currency": price_info["currency"],
-                "formatted": price_info["formatted"],  # "KES 400 (~$2.99 USD)"
+                "formatted": price_info["formatted"],  # "KES 399 (~$2.99 USD)"
                 "display": f"{price_info['currency']} {price_info['local_amount']:,.0f}",
                 "usd_reference": f"~${tier_info['price_usd']:.2f} USD",
+                "pricing_style": pricing_style,
                 "rate_source": price_info.get("rate_source", "live"),
                 "kona_revenue": {
                     "local": price_info.get("kona_total_revenue_local", 0),
