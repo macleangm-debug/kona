@@ -280,17 +280,24 @@ export const SubscriptionPage = () => {
                     </div>
                     <div className="text-right">
                       {tier.price_usd > 0 ? (
-                        <>
+                        tier.local_price ? (
+                          // Show local currency prominently with USD reference
+                          <div>
+                            <p className="font-bold text-lg">
+                              {tier.local_price.display}
+                              <span className="text-xs text-muted-foreground font-normal">/mo</span>
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              ~${tier.price_usd} USD
+                            </p>
+                          </div>
+                        ) : (
+                          // Fallback to USD if no local price
                           <p className="font-bold">
                             ${tier.price_usd}
                             <span className="text-xs text-muted-foreground font-normal">/mo</span>
                           </p>
-                          {tier.local_price && (
-                            <p className="text-xs text-muted-foreground">
-                              {tier.local_price.formatted}
-                            </p>
-                          )}
-                        </>
+                        )
                       ) : (
                         <p className="font-bold text-green-400">Free</p>
                       )}
