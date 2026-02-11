@@ -3,12 +3,20 @@ import axios from "axios";
 import {
   RefreshCw, TrendingUp, Globe, DollarSign, 
   Settings, Percent, Save, AlertCircle,
-  ArrowUpRight, ArrowDownRight, Loader2
+  ArrowUpRight, ArrowDownRight, Loader2,
+  Tag, Sparkles, Crown, RotateCcw
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -40,6 +48,18 @@ const countryFlags = {
   ZA: "🇿🇦"
 };
 
+const pricingStyleIcons = {
+  value: Tag,
+  premium: Crown,
+  exact: Settings
+};
+
+const pricingStyleColors = {
+  value: "text-green-400 bg-green-500/20",
+  premium: "text-yellow-400 bg-yellow-500/20",
+  exact: "text-gray-400 bg-gray-500/20"
+};
+
 export const ExchangeRateManager = ({ token }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -48,6 +68,7 @@ export const ExchangeRateManager = ({ token }) => {
   const [revenueStats, setRevenueStats] = useState(null);
   const [defaultMargin, setDefaultMargin] = useState(3.0);
   const [countryMargins, setCountryMargins] = useState({});
+  const [pricingStyles, setPricingStyles] = useState(null);
   const [editingCountry, setEditingCountry] = useState(null);
   const [tempMargin, setTempMargin] = useState("");
 
