@@ -298,6 +298,13 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Shows market rate, effective rate, $10 example, Kona profit per transaction
   - **Creators see payout amounts WITHOUT margin info** (hidden from their view)
   - Revenue tracking and analytics for margin income
+- [x] Local Currency Display with Smart Rounding - COMPLETED (Feb 11, 2026)
+  - Display format: "KES 449 (~$2.99 USD)" - local currency prominent, USD reference
+  - **Smart rounding** to psychologically appealing numbers (ends in 9 or 0)
+  - Examples: 389 → 399, 1,287 → 1,399, 25,830 → 25,999
+  - Never rounds down - always rounds up to nice number
+  - Admin dashboard shows breakdown: Margin Profit + Rounding Profit = Total Kona Profit
+  - **Creator payouts use exact conversion** (no rounding markup applied to their share)
 - [ ] Re-deploy application to production
 - [ ] Integrate real KwikPay/Flutterwave API (currently MOCKED)
 - [ ] Integrate real OTP provider (Africa's Talking/Twilio) for SMS/WhatsApp/FlashCall
