@@ -386,7 +386,7 @@ async def update_pricing_style(
         )
     
     # Update in database
-    result = await db.system_config.update_one(
+    await db.system_config.update_one(
         {"type": "tier_pricing_styles"},
         {
             "$set": {
