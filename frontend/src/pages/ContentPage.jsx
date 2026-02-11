@@ -1342,10 +1342,7 @@ const ContentPage = () => {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <article className="prose prose-invert prose-purple max-w-none prose-headings:font-bold prose-h1:text-3xl prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-p:text-gray-300 prose-li:text-gray-300 prose-strong:text-white prose-a:text-purple-400">
-          <div dangerouslySetInnerHTML={{ __html: page.content.replace(/\n/g, '<br/>').replace(/#{1,6}\s/g, (match) => {
-            const level = match.trim().length;
-            return `</p><h${level}>`;
-          }) }} />
+          <ReactMarkdown>{page.content}</ReactMarkdown>
         </article>
       </div>
 
