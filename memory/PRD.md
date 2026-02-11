@@ -299,6 +299,27 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
     - Social media icons (Twitter, Instagram, Facebook, YouTube)
     - Location badges (Nairobi, Lagos, Johannesburg)
     - Payment method badges (M-Pesa, Airtel Money, Visa, Mastercard, PayPal, Crypto)
+- [x] **Netflix-Style Support System** - COMPLETED (Feb 11, 2026)
+  - **AI Chatbot (Kona Assistant)**: GPT-5.2 powered floating chat widget available 24/7
+    - Answers FAQs, guides users through issues
+    - Quick action buttons for common queries
+    - Maintains conversation context per session
+  - **Help Center**: Searchable knowledge base at /help
+    - Categories: Getting Started, Coins & Rewards, Subscriptions, Billing, Features, Troubleshooting, Creators
+    - 8+ detailed help articles with full markdown content
+  - **Support Tickets**: Async ticket system at /help/tickets/new
+    - No phone/email exposed - users submit tickets through form
+    - Ticket confirmation and tracking
+  - **Footer Content Pages**: All footer links now have full content
+    - /careers - Open positions and benefits
+    - /press - Media kit and press releases
+    - /safety - Safety center and reporting
+    - /guidelines - Community guidelines
+    - /accessibility - Accessibility features
+    - /cookies - Cookie policy
+    - /dmca - Copyright/DMCA info
+    - /creator-guidelines - Creator best practices
+    - /revenue - Revenue sharing details
 - [x] Geo-location tracking for users - COMPLETED (Feb 9, 2026)
 - [x] Typewriter animation for KONA splash screen - COMPLETED (Feb 10, 2026)
 - [x] Standardized loading indicators with Kona branding - COMPLETED (Feb 10, 2026)
