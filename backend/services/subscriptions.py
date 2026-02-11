@@ -169,17 +169,7 @@ class KwikPaySubscriptionService:
     ) -> Dict[str, Any]:
         """
         Initiate a subscription payment via KwikPay
-        
-        Args:
-            user_id: User's ID
-            tier: Subscription tier (basic, premium, vip)
-            country_code: User's country code
-            provider_id: Payment provider ID (mpesa, mtn_mobile_money, etc.)
-            phone_number: For mobile money payments
-            email: For card payments
-        
-        Returns:
-            Payment initiation response with checkout details
+        Records exchange rate margin for Kona revenue tracking
         """
         
         # Get tier details
@@ -187,11 +177,23 @@ class KwikPaySubscriptionService:
         if not tier_info:
             return {"status": "error", "message": f"Invalid subscription tier: {tier}"}
         
-        # Convert price to local currency
-        price_info = self.convert_usd_to_local(tier_info["price_usd"], country_code)
+        # Convert price to local currency WITH margin
+        price_info = await self.convert_usd_to_local(tier_info["price_usd"], country_code)
         
         # Generate payment reference
         payment_ref = f"sub_{uuid.uuid4().hex[:12]}"
+        
+        # Record margin revenue for Kona (will be finalized when payment completes)
+        margin_record = {
+            "payment_id": payment_ref,
+            "usd_amount": tier_info["price_usd"],
+            "local_amount": price_info["local_amount"],
+            "margin_percent": price_info.get("margin_percent", 0),
+            "kona_revenue_local": price_info.get("kona_revenue_local", 0),
+            "kona_revenue_usd": price_info.get("kona_revenue_usd", 0),
+            "country_code": country_code,
+            "currency": price_info["currency"]
+        }
         
         # MOCK RESPONSE
         if self.mock_mode:
@@ -213,6 +215,7 @@ class KwikPaySubscriptionService:
                             "local": price_info["local_amount"],
                             "currency": price_info["currency"]
                         },
+                        "margin_info": margin_record,  # Include for internal tracking
                         "provider": provider,
                         "phone_number": phone_number,
                         "status": "pending",
