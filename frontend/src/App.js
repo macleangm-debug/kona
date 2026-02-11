@@ -136,7 +136,7 @@ const AppContent = () => {
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isLandingPage;
   
   // Pages that skip splash screen
-  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password"];
+  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact"];
   const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isLandingPage;
   
   // Determine if we're in the "app" area (not landing page)
