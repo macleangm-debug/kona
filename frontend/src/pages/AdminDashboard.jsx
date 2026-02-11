@@ -23,6 +23,7 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { KonaLoader, PageLoader } from "@/components/SplashScreen";
 import { ExchangeRateManager } from "@/components/admin/ExchangeRateManager";
+import { ABTestingManager } from "@/components/admin/ABTestingManager";
 import { API } from "@/config";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
