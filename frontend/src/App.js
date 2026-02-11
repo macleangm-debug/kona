@@ -147,8 +147,8 @@ const AppContent = () => {
       {/* Splash Screen - Only show in app area, not on landing page */}
       {showSplash && !shouldSkipSplash && isInApp && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
 
-      {/* Desktop Header - Only on desktop and not on full-screen pages */}
-      {isDesktop && !isFullScreenPage && (
+      {/* Desktop Header - Only on desktop and not on full-screen pages and not on landing page */}
+      {isDesktop && !isFullScreenPage && !isLandingPage && (
         <DesktopHeader 
           onAuthClick={() => handleAuthClick()} 
           onSearchClick={() => setShowSearch(true)}
@@ -160,7 +160,14 @@ const AppContent = () => {
           Businesses and Creators have mandatory verification in their portals */}
 
       <Routes>
-        <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
+        {/* Landing page for first-time web visitors */}
+        <Route path="/" element={
+          isLandingPage 
+            ? <LandingPage onAuthClick={() => handleAuthClick()} />
+            : <HomePageResponsive onAuthClick={() => handleAuthClick()} />
+        } />
+        {/* Explicit /home route for post-landing navigation */}
+        <Route path="/home" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
         <Route path="/discover" element={<DiscoverPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/rewards" element={<RewardsPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/leaderboard" element={<LeaderboardPage onAuthClick={() => handleAuthClick()} />} />
