@@ -39,6 +39,7 @@ async def get_subscription_tiers(
     """Get all subscription tiers with pricing in local currency if country provided"""
     
     tiers_response = {}
+    ab_test_info = None
     
     for tier_id, tier_info in SUBSCRIPTION_TIERS.items():
         tier_data = {
@@ -58,6 +59,23 @@ async def get_subscription_tiers(
             )
             if admin_config and tier_id in admin_config.get("styles", {}):
                 pricing_style = admin_config["styles"][tier_id]
+            
+            # Check for A/B test override if user_id provided
+            if user_id and tier_info["price_usd"] > 0:
+                ab_variant = await ab_testing_service.get_user_variant(user_id, tier_id)
+                if ab_variant and ab_variant.get("is_in_test") and ab_variant.get("pricing_style"):
+                    pricing_style = ab_variant["pricing_style"]
+                    ab_test_info = {
+                        "test_id": ab_variant["test_id"],
+                        "variant": ab_variant["variant_name"],
+                        "tier": tier_id
+                    }
+                    # Record impression
+                    await ab_testing_service.record_impression(
+                        ab_variant["test_id"],
+                        ab_variant["variant_name"],
+                        user_id
+                    )
             
             price_info = await kwikpay_subscription.convert_usd_to_local(
                 tier_info["price_usd"], 
@@ -84,7 +102,8 @@ async def get_subscription_tiers(
     return {
         "tiers": tiers_response,
         "tier_order": ["free", "basic", "premium", "vip"],
-        "country_code": country_code
+        "country_code": country_code,
+        "ab_test": ab_test_info
     }
 
 @router.get("/payment-providers/{country_code}")
