@@ -59,6 +59,10 @@ import {
   CampaignCreatePage
 } from "@/pages";
 import ForgotPasswordPage from "@/pages/ForgotPasswordPage";
+import HelpCenterPage from "@/pages/HelpCenterPage";
+import SupportTicketPage from "@/pages/SupportTicketPage";
+import ContentPage from "@/pages/ContentPage";
+import SupportChatWidget from "@/components/SupportChatWidget";
 
 // Swiper CSS
 import 'swiper/css';
