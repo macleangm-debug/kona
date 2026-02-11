@@ -1,6 +1,7 @@
 """
 Subscription Payment Service with KwikPay Integration
 Handles subscription purchases, renewals, and management
+Uses dynamic exchange rates with configurable margins
 """
 import os
 import uuid
@@ -10,17 +11,8 @@ from enum import Enum
 
 from config.subscriptions import SUBSCRIPTION_TIERS, get_device_limit
 
-# Exchange rates (USD to local currency)
-EXCHANGE_RATES = {
-    "KES": 130,   # Kenya Shilling
-    "TZS": 2500,  # Tanzania Shilling
-    "UGX": 3700,  # Uganda Shilling
-    "RWF": 1300,  # Rwanda Franc
-    "GHS": 15,    # Ghana Cedi
-    "NGN": 1600,  # Nigeria Naira
-    "ZAR": 18,    # South Africa Rand
-    "USD": 1
-}
+# Import dynamic exchange rate service
+from services.exchange_rates import exchange_rate_service, COUNTRY_CURRENCIES
 
 # Mobile Money providers by country
 PAYMENT_PROVIDERS = {
