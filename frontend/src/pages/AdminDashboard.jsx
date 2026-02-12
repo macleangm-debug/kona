@@ -8,7 +8,7 @@ import {
   FileText, Server, Shield, Database, Calculator, Cpu, 
   HardDrive, Wifi, Globe, Zap, AlertTriangle, CheckCircle,
   Heart, Sparkles, Trash2, Play, Megaphone, Video, ExternalLink, Target,
-  FlaskConical, Ticket
+  FlaskConical, Ticket, Briefcase, Newspaper
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
