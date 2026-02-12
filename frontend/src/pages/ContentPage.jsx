@@ -432,14 +432,47 @@ const CareersPage = ({ navigate }) => {
 
 // ============ PRESS PAGE (Redesigned) ============
 const PressPage = ({ navigate }) => {
-  const pressReleases = [
-    { date: "Feb 2026", title: "Kona Raises $10M Series A to Expand African Content Library", tag: "Funding", featured: true },
-    { date: "Jan 2026", title: "Kona Launches VIP Tier with Offline Viewing", tag: "Product", featured: false },
-    { date: "Dec 2025", title: "Creator Payouts Exceed $500K Milestone", tag: "Creators", featured: false },
-    { date: "Nov 2025", title: "Kona Reaches 1 Million Active Users", tag: "Milestone", featured: true },
-    { date: "Oct 2025", title: "Partnership with Nollywood Studios Announced", tag: "Partnership", featured: false },
-    { date: "Sep 2025", title: "Mobile App Redesign Drives 40% Engagement Increase", tag: "Product", featured: false },
-  ];
+  const [pressReleases, setPressReleases] = useState([]);
+  const [featuredArticle, setFeaturedArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      try {
+        // Fetch all published articles
+        const res = await fetch(`${API_URL}/api/press/articles?limit=20`);
+        if (res.ok) {
+          const data = await res.json();
+          const articles = data.articles || [];
+          
+          // Separate featured and regular articles
+          const featured = articles.find(a => a.is_featured);
+          const others = articles.filter(a => !a.is_featured);
+          
+          setFeaturedArticle(featured || articles[0]);
+          setPressReleases(others);
+        }
+      } catch (err) {
+        console.error("Failed to fetch articles:", err);
+        // Use fallback data if API fails
+        setPressReleases([
+          { id: "1", published_at: "2026-02-01", title: "Kona Raises $10M Series A to Expand African Content Library", tag: "Funding", is_featured: true, summary: "Kona announced today a $10 million Series A funding round led by major African and global investors." },
+          { id: "2", published_at: "2026-01-15", title: "Kona Launches VIP Tier with Offline Viewing", tag: "Product", is_featured: false },
+          { id: "3", published_at: "2025-12-10", title: "Creator Payouts Exceed $500K Milestone", tag: "Creators", is_featured: false },
+          { id: "4", published_at: "2025-11-20", title: "Kona Reaches 1 Million Active Users", tag: "Milestone", is_featured: false },
+        ]);
+      }
+      setLoading(false);
+    };
+    
+    fetchArticles();
+  }, []);
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  };
 
   const mediaFeatures = [
     { outlet: "TechCrunch", title: "Kona is Netflix for African Stories", logo: "TC" },
