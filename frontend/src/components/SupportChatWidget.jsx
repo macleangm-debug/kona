@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Bot, User, Loader2, Trash2, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router-dom";
+import { MessageCircle, X, Send, Bot, User, Loader2, RotateCcw, Minimize2, Maximize2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 const SupportChatWidget = () => {
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
@@ -16,8 +18,17 @@ const SupportChatWidget = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Hide widget on video player pages
+  const isVideoPage = location.pathname.startsWith("/watch");
+  
+  // Don't render anything on video pages
+  if (isVideoPage) {
+    return null;
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -28,10 +39,27 @@ const SupportChatWidget = () => {
   }, [messages]);
 
   useEffect(() => {
-    if (isOpen && inputRef.current) {
+    if (isOpen && !isMinimized && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, isMinimized]);
+
+  // Track unread messages when minimized
+  useEffect(() => {
+    if (isMinimized && messages.length > 1) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === "assistant") {
+        setUnreadCount(prev => prev + 1);
+      }
+    }
+  }, [messages, isMinimized]);
+
+  // Clear unread when expanded
+  useEffect(() => {
+    if (!isMinimized && isOpen) {
+      setUnreadCount(0);
+    }
+  }, [isMinimized, isOpen]);
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
@@ -90,6 +118,20 @@ const SupportChatWidget = () => {
     }
   };
 
+  const handleMinimize = () => {
+    setIsMinimized(true);
+  };
+
+  const handleExpand = () => {
+    setIsMinimized(false);
+    setUnreadCount(0);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setIsMinimized(false);
+  };
+
   // Quick action buttons
   const quickActions = [
     "How do I earn coins?",
@@ -100,51 +142,86 @@ const SupportChatWidget = () => {
 
   return (
     <>
-      {/* Chat Widget Button - positioned in dedicated safe zone */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={cn(
-          "fixed z-[60] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
-          "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
-          isOpen 
-            ? "bg-gray-700 hover:bg-gray-600" 
-            : "bg-purple-600 hover:bg-purple-500 hover:scale-105"
-        )}
-        data-testid="support-chat-button"
-        aria-label="Open support chat"
-      >
-        {isOpen ? (
-          <X className="w-5 h-5 text-white" />
-        ) : (
+      {/* Main Chat Button - Show when chat is closed */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={cn(
+            "fixed z-[60] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
+            "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
+            "bg-purple-600 hover:bg-purple-500 hover:scale-105"
+          )}
+          data-testid="support-chat-button"
+          aria-label="Open support chat"
+        >
           <MessageCircle className="w-5 h-5 text-white" />
-        )}
-      </button>
+        </button>
+      )}
 
-      {/* Chat Window */}
-      {isOpen && (
+      {/* Minimized State - Small pill in corner */}
+      {isOpen && isMinimized && (
+        <button
+          onClick={handleExpand}
+          className={cn(
+            "fixed z-[60] flex items-center gap-2 px-3 py-2 rounded-full shadow-lg transition-all duration-300",
+            "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
+            "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
+          )}
+          data-testid="support-chat-minimized"
+          aria-label="Expand chat"
+        >
+          <Bot className="w-4 h-4 text-white" />
+          <span className="text-xs text-white font-medium">Kona Assistant</span>
+          {unreadCount > 0 && (
+            <span className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white font-bold">
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+          <Maximize2 className="w-3.5 h-3.5 text-white/70" />
+        </button>
+      )}
+
+      {/* Full Chat Window */}
+      {isOpen && !isMinimized && (
         <div 
           className="fixed z-[60] w-[340px] max-w-[calc(100vw-1.5rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden right-3 bottom-[130px] sm:bottom-20 sm:right-6"
           style={{ height: "400px", maxHeight: "calc(100vh - 180px)" }}
           data-testid="support-chat-window"
         >
           {/* Header */}
-          <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
+          <div className="bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-2.5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <Bot className="w-4 h-4 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">Kona Assistant</h3>
-                <p className="text-xs text-white/70">Always here to help</p>
+                <h3 className="font-semibold text-white text-sm">Kona Assistant</h3>
+                <p className="text-[10px] text-white/70">Always here to help</p>
               </div>
             </div>
-            <button 
-              onClick={clearChat}
-              className="p-2 hover:bg-white/10 rounded-full transition-colors"
-              title="Clear chat"
-            >
-              <RotateCcw className="w-4 h-4 text-white/70" />
-            </button>
+            <div className="flex items-center gap-1">
+              <button 
+                onClick={clearChat}
+                className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
+                title="Clear chat"
+              >
+                <RotateCcw className="w-3.5 h-3.5 text-white/70" />
+              </button>
+              <button 
+                onClick={handleMinimize}
+                className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
+                title="Minimize"
+              >
+                <Minimize2 className="w-3.5 h-3.5 text-white/70" />
+              </button>
+              <button 
+                onClick={handleClose}
+                className="p-1.5 hover:bg-white/10 rounded-full transition-colors"
+                title="Close"
+              >
+                <X className="w-3.5 h-3.5 text-white/70" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -158,23 +235,23 @@ const SupportChatWidget = () => {
                 )}
               >
                 {msg.role === "assistant" && (
-                  <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-4 h-4 text-purple-400" />
+                  <div className="w-7 h-7 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3.5 h-3.5 text-purple-400" />
                   </div>
                 )}
                 <div
                   className={cn(
-                    "max-w-[80%] rounded-2xl px-4 py-2.5 text-sm",
+                    "max-w-[80%] rounded-2xl px-3 py-2 text-sm",
                     msg.role === "user"
                       ? "bg-purple-600 text-white rounded-br-md"
                       : "bg-white/10 text-gray-200 rounded-bl-md"
                   )}
                 >
-                  <p className="whitespace-pre-wrap">{msg.content}</p>
+                  <p className="whitespace-pre-wrap text-[13px]">{msg.content}</p>
                 </div>
                 {msg.role === "user" && (
-                  <div className="w-8 h-8 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-4 h-4 text-gray-300" />
+                  <div className="w-7 h-7 bg-gray-600 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-3.5 h-3.5 text-gray-300" />
                   </div>
                 )}
               </div>
@@ -182,10 +259,10 @@ const SupportChatWidget = () => {
             
             {isLoading && (
               <div className="flex gap-2 justify-start">
-                <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-4 h-4 text-purple-400" />
+                <div className="w-7 h-7 bg-purple-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-3.5 h-3.5 text-purple-400" />
                 </div>
-                <div className="bg-white/10 rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="bg-white/10 rounded-2xl rounded-bl-md px-3 py-2.5">
                   <Loader2 className="w-4 h-4 text-purple-400 animate-spin" />
                 </div>
               </div>
@@ -196,8 +273,8 @@ const SupportChatWidget = () => {
 
           {/* Quick Actions - Only show at start */}
           {messages.length === 1 && (
-            <div className="px-4 pb-2">
-              <div className="flex flex-wrap gap-2">
+            <div className="px-3 pb-2">
+              <div className="flex flex-wrap gap-1.5">
                 {quickActions.map((action, i) => (
                   <button
                     key={i}
@@ -205,7 +282,7 @@ const SupportChatWidget = () => {
                       setInput(action);
                       setTimeout(() => sendMessage(), 100);
                     }}
-                    className="text-xs bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-3 py-1.5 text-gray-300 transition-colors"
+                    className="text-[11px] bg-white/5 hover:bg-white/10 border border-white/10 rounded-full px-2.5 py-1 text-gray-300 transition-colors"
                   >
                     {action}
                   </button>
@@ -215,7 +292,7 @@ const SupportChatWidget = () => {
           )}
 
           {/* Input */}
-          <div className="p-3 border-t border-white/10">
+          <div className="p-2.5 border-t border-white/10">
             <div className="flex items-center gap-2 bg-white/5 rounded-xl px-3 py-2">
               <input
                 ref={inputRef}
@@ -230,13 +307,13 @@ const SupportChatWidget = () => {
               <button
                 onClick={sendMessage}
                 disabled={!input.trim() || isLoading}
-                className="p-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors"
+                className="p-1.5 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-full transition-colors"
               >
                 <Send className="w-4 h-4 text-white" />
               </button>
             </div>
-            <p className="text-xs text-gray-500 text-center mt-2">
-              Powered by AI · <button onClick={() => window.location.href = '/help'} className="text-purple-400 hover:underline">Visit Help Center</button>
+            <p className="text-[10px] text-gray-500 text-center mt-1.5">
+              Powered by AI · <button onClick={() => window.location.href = '/help'} className="text-purple-400 hover:underline">Help Center</button>
             </p>
           </div>
         </div>
