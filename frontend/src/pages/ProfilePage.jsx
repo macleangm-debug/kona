@@ -597,6 +597,12 @@ Use my referral code: *${user?.referral_code}*
         onConfirm={() => claimMilestone(pendingClaimMilestone?.id)}
         loading={claimLoading}
       />
+
+      {/* Support Chat Sheet */}
+      <SupportChatSheet 
+        open={showSupportChat} 
+        onOpenChange={setShowSupportChat} 
+      />
     </div>
   );
 };
