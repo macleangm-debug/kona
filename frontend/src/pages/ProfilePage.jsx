@@ -31,6 +31,7 @@ export const ProfilePage = ({ onLogout }) => {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const [pendingClaimMilestone, setPendingClaimMilestone] = useState(null);
   const [claimLoading, setClaimLoading] = useState(false);
+  const [showSupportChat, setShowSupportChat] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
