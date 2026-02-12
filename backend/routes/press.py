@@ -147,7 +147,8 @@ async def create_article(
     await db.press_articles.insert_one(article_data)
     
     # Remove _id from response
-    del article_data["_id"] if "_id" in article_data else None
+    if "_id" in article_data:
+        del article_data["_id"]
     
     return article_data
 
