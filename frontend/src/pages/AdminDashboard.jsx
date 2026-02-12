@@ -26,6 +26,8 @@ import { KonaLoader, PageLoader } from "@/components/SplashScreen";
 import { ExchangeRateManager } from "@/components/admin/ExchangeRateManager";
 import { ABTestingManager } from "@/components/admin/ABTestingManager";
 import SupportTicketsModule from "@/components/admin/SupportTicketsModule";
+import JobApplicationsModule from "@/components/admin/JobApplicationsModule";
+import PressArticlesModule from "@/components/admin/PressArticlesModule";
 import { API } from "@/config";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
