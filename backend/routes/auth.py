@@ -265,6 +265,7 @@ async def login(data: UserLogin, request: Request):
     # Check device limit based on subscription tier
     subscription_tier = user.get("subscription_tier", "free")
     limit_status = await check_device_limit(user["id"], subscription_tier)
+    print(f"[DEBUG] Login check for {user['email']}: {limit_status}")
     
     if limit_status["exceeded"]:
         raise HTTPException(
