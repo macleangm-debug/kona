@@ -398,3 +398,279 @@ async def delete_application(app_id: str):
         raise HTTPException(status_code=404, detail="Application not found")
     
     return {"success": True, "message": "Application deleted"}
+
+# ============ KEYWORD FILTER MANAGEMENT ============
+@router.get("/admin/filters")
+async def get_keyword_filters(
+    user: dict = Depends(require_admin),
+    active_only: bool = False
+):
+    """Get all keyword filters for candidate matching"""
+    query = {"is_active": True} if active_only else {}
+    
+    filters = await db.keyword_filters.find(
+        query,
+        {"_id": 0}
+    ).sort("position_type", 1).to_list(length=100)
+    
+    # Get stats for each filter
+    for f in filters:
+        match_count = await db.job_applications.count_documents({
+            "filter_matches.filter_id": f["id"],
+            "filter_matches.qualification": {"$in": ["excellent", "good"]}
+        })
+        f["matched_candidates"] = match_count
+    
+    return {"filters": filters, "total": len(filters)}
+
+@router.post("/admin/filters")
+async def create_keyword_filter(
+    filter_data: KeywordFilter,
+    user: dict = Depends(require_admin)
+):
+    """Create a new keyword filter for candidate matching"""
+    filter_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    
+    doc = {
+        "id": filter_id,
+        **filter_data.model_dump(),
+        "created_by": user["id"],
+        "created_at": now,
+        "updated_at": now
+    }
+    
+    await db.keyword_filters.insert_one(doc)
+    
+    # Re-score existing applications with this filter
+    await rescore_applications_with_filter(doc)
+    
+    if "_id" in doc:
+        del doc["_id"]
+    
+    return doc
+
+@router.put("/admin/filters/{filter_id}")
+async def update_keyword_filter(
+    filter_id: str,
+    update: KeywordFilterUpdate,
+    user: dict = Depends(require_admin)
+):
+    """Update an existing keyword filter"""
+    existing = await db.keyword_filters.find_one({"id": filter_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Filter not found")
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.keyword_filters.update_one(
+        {"id": filter_id},
+        {"$set": update_data}
+    )
+    
+    # Re-score applications if filter criteria changed
+    if any(k in update_data for k in ["required_skills", "preferred_skills", "required_keywords", "min_experience"]):
+        updated_filter = await db.keyword_filters.find_one({"id": filter_id}, {"_id": 0})
+        await rescore_applications_with_filter(updated_filter)
+    
+    return {"success": True, "message": "Filter updated"}
+
+@router.delete("/admin/filters/{filter_id}")
+async def delete_keyword_filter(
+    filter_id: str,
+    user: dict = Depends(require_admin)
+):
+    """Delete a keyword filter"""
+    result = await db.keyword_filters.delete_one({"id": filter_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Filter not found")
+    
+    # Remove filter matches from applications
+    await db.job_applications.update_many(
+        {},
+        {"$pull": {"filter_matches": {"filter_id": filter_id}}}
+    )
+    
+    return {"success": True, "message": "Filter deleted"}
+
+async def rescore_applications_with_filter(keyword_filter: dict):
+    """Re-score all applications against a specific filter"""
+    position_type = keyword_filter.get("position_type", "").lower()
+    
+    # Find applications matching this position type
+    applications = await db.job_applications.find({
+        "position_interest": {"$regex": position_type, "$options": "i"}
+    }).to_list(length=1000)
+    
+    for app in applications:
+        match_result = calculate_skill_match(app, keyword_filter)
+        
+        # Update or add this filter's match result
+        await db.job_applications.update_one(
+            {"id": app["id"]},
+            {
+                "$pull": {"filter_matches": {"filter_id": keyword_filter["id"]}},
+            }
+        )
+        await db.job_applications.update_one(
+            {"id": app["id"]},
+            {
+                "$push": {"filter_matches": match_result}
+            }
+        )
+
+@router.post("/admin/applications/{app_id}/rescore")
+async def rescore_application(
+    app_id: str,
+    user: dict = Depends(require_admin)
+):
+    """Re-score an application against all active filters"""
+    application = await db.job_applications.find_one({"id": app_id})
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    # Get all active filters matching position
+    position = application.get("position_interest", "").lower()
+    filters = await db.keyword_filters.find({
+        "is_active": True,
+        "position_type": {"$regex": position, "$options": "i"}
+    }).to_list(length=100)
+    
+    # Calculate matches
+    filter_matches = []
+    best_match = 0
+    for f in filters:
+        match = calculate_skill_match(application, f)
+        filter_matches.append(match)
+        if match["match_percentage"] > best_match:
+            best_match = match["match_percentage"]
+    
+    # Update application with all filter matches
+    await db.job_applications.update_one(
+        {"id": app_id},
+        {"$set": {
+            "filter_matches": filter_matches,
+            "best_match_percentage": best_match,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {
+        "success": True,
+        "filter_matches": filter_matches,
+        "best_match_percentage": best_match
+    }
+
+# ============ FILTERED CANDIDATE SEARCH ============
+@router.get("/admin/applications/filtered")
+async def get_filtered_applications(
+    user: dict = Depends(require_admin),
+    filter_id: Optional[str] = None,
+    min_match: int = 0,
+    qualification: Optional[str] = None,  # excellent, good, partial, weak
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Get applications filtered by keyword match criteria"""
+    query = {}
+    
+    if filter_id:
+        query["filter_matches.filter_id"] = filter_id
+        if min_match > 0:
+            query["filter_matches.match_percentage"] = {"$gte": min_match}
+        if qualification:
+            query["filter_matches.qualification"] = qualification
+    elif min_match > 0:
+        query["best_match_percentage"] = {"$gte": min_match}
+    
+    if status:
+        query["status"] = status
+    
+    applications = await db.job_applications.find(
+        query,
+        {"_id": 0}
+    ).sort([
+        ("best_match_percentage", -1),
+        ("auto_score", -1),
+        ("created_at", -1)
+    ]).skip(skip).limit(limit).to_list(length=limit)
+    
+    total = await db.job_applications.count_documents(query)
+    
+    return {
+        "applications": applications,
+        "total": total,
+        "filters_applied": {
+            "filter_id": filter_id,
+            "min_match": min_match,
+            "qualification": qualification,
+            "status": status
+        }
+    }
+
+@router.get("/admin/applications/skill-search")
+async def search_by_skills(
+    user: dict = Depends(require_admin),
+    skills: str = Query(..., description="Comma-separated skills to search for"),
+    match_all: bool = False,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Search applications by specific skills"""
+    skill_list = [s.strip().lower() for s in skills.split(",") if s.strip()]
+    
+    if not skill_list:
+        raise HTTPException(status_code=400, detail="At least one skill required")
+    
+    if match_all:
+        # Must have ALL skills
+        query = {
+            "$and": [
+                {"$or": [
+                    {"skills": {"$regex": skill, "$options": "i"}},
+                    {"cover_letter": {"$regex": skill, "$options": "i"}}
+                ]} for skill in skill_list
+            ]
+        }
+    else:
+        # Must have ANY skill
+        query = {
+            "$or": [
+                {"skills": {"$regex": skill, "$options": "i"}} for skill in skill_list
+            ] + [
+                {"cover_letter": {"$regex": skill, "$options": "i"}} for skill in skill_list
+            ]
+        }
+    
+    applications = await db.job_applications.find(
+        query,
+        {"_id": 0}
+    ).sort([
+        ("auto_score", -1),
+        ("created_at", -1)
+    ]).skip(skip).limit(limit).to_list(length=limit)
+    
+    # Highlight matched skills for each application
+    for app in applications:
+        matched = []
+        app_skills = [s.lower() for s in app.get("skills", [])]
+        cover = app.get("cover_letter", "").lower()
+        
+        for skill in skill_list:
+            if any(skill in s for s in app_skills) or skill in cover:
+                matched.append(skill)
+        
+        app["matched_search_skills"] = matched
+        app["search_match_count"] = len(matched)
+    
+    total = await db.job_applications.count_documents(query)
+    
+    return {
+        "applications": applications,
+        "total": total,
+        "searched_skills": skill_list,
+        "match_mode": "all" if match_all else "any"
+    }
