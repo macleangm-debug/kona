@@ -893,6 +893,9 @@ const JobApplicationsModule = ({ token }) => {
         <div className="space-y-3">
           {filteredApps.map((app) => {
             const StatusIcon = STATUS_CONFIG[app.status]?.icon || Clock;
+            const bestMatch = app.best_match_percentage || (app.filter_matches?.length > 0 ? Math.max(...app.filter_matches.map(m => m.match_percentage)) : null);
+            const matchedSkills = app.matched_search_skills || [];
+            
             return (
               <Card
                 key={app.id}
@@ -913,18 +916,42 @@ const JobApplicationsModule = ({ token }) => {
                       <Badge className={PRIORITY_CONFIG[app.priority]?.color + " text-xs"}>
                         {app.priority}
                       </Badge>
+                      {bestMatch && (
+                        <Badge className={`text-xs ${bestMatch >= 70 ? 'bg-green-500/20 text-green-400' : bestMatch >= 50 ? 'bg-yellow-500/20 text-yellow-400' : 'bg-gray-500/20 text-gray-400'}`}>
+                          <Percent className="w-3 h-3 mr-1" />
+                          {bestMatch}% match
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-muted-foreground truncate">
                       {app.position_interest} • {app.experience_years}y experience • {app.country}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {app.skills?.slice(0, 3).map((skill, i) => (
-                        <span key={i} className="text-xs bg-white/10 px-2 py-0.5 rounded">
-                          {skill}
-                        </span>
-                      ))}
-                      {app.skills?.length > 3 && (
-                        <span className="text-xs text-muted-foreground">+{app.skills.length - 3}</span>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {/* Show matched search skills highlighted */}
+                      {matchedSkills.length > 0 ? (
+                        <>
+                          {matchedSkills.map((skill, i) => (
+                            <span key={i} className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded border border-green-500/30">
+                              {skill}
+                            </span>
+                          ))}
+                          {app.skills?.filter(s => !matchedSkills.includes(s.toLowerCase())).slice(0, 2).map((skill, i) => (
+                            <span key={`other-${i}`} className="text-xs bg-white/10 px-2 py-0.5 rounded">
+                              {skill}
+                            </span>
+                          ))}
+                        </>
+                      ) : (
+                        <>
+                          {app.skills?.slice(0, 3).map((skill, i) => (
+                            <span key={i} className="text-xs bg-white/10 px-2 py-0.5 rounded">
+                              {skill}
+                            </span>
+                          ))}
+                          {app.skills?.length > 3 && (
+                            <span className="text-xs text-muted-foreground">+{app.skills.length - 3}</span>
+                          )}
+                        </>
                       )}
                     </div>
                   </div>
