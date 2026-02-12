@@ -26,6 +26,7 @@ from .exchange_rates import router as exchange_rates_router
 from .ab_testing import router as ab_testing_router
 from .support import router as support_router
 from .careers import router as careers_router
+from .press import router as press_router
 
 # Create main API router
 api_router = APIRouter()
