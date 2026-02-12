@@ -243,7 +243,8 @@ async def submit_application(application: JobApplication):
     """Submit a new job application"""
     
     # Check for duplicate applications (same email in last 30 days)
-    thirty_days_ago = datetime.now(timezone.utc).replace(day=datetime.now().day - 30)
+    from datetime import timedelta
+    thirty_days_ago = datetime.now(timezone.utc) - timedelta(days=30)
     existing = await db.job_applications.find_one({
         "email": application.email.lower(),
         "created_at": {"$gte": thirty_days_ago.isoformat()}
