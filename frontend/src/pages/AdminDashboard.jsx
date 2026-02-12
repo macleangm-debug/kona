@@ -3033,6 +3033,16 @@ export const AdminDashboard = () => {
           <AdsApprovalTab token={token} />
         )}
 
+        {/* HR Job Applications Tab */}
+        {activeTab === "hr-applications" && (
+          <JobApplicationsModule token={token} />
+        )}
+
+        {/* Press & News Articles Tab */}
+        {activeTab === "press-articles" && (
+          <PressArticlesModule token={token} />
+        )}
+
         {/* Support Tickets Tab */}
         {activeTab === "support" && (
           <SupportTicketsModule />
