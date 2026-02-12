@@ -429,6 +429,41 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
     - Priority classification (high/medium/low)
     - Duplicate application prevention
     - Admin endpoints for reviewing/updating applications
+- [x] **Admin Dashboard - Job Applications Module** - COMPLETED (Feb 12, 2026)
+  - New "Job Applications" tab in Admin Dashboard for HR management
+  - Stats cards: Total, New, Shortlisted, Interviews, High Priority
+  - Full status workflow: New → Under Review → Shortlisted → Interview → Hired/Rejected
+  - Application detail view with:
+    - Contact info (email, phone, LinkedIn, portfolio)
+    - Professional background (experience, skills, current role)
+    - Cover letter display
+    - Auto-detected flags for incomplete applications
+    - Auto-score display (0-100)
+  - Update status with admin notes and interview scheduling
+  - Quick action buttons: Shortlist, Schedule Interview, Reject
+  - Search by name, email, or skills
+  - Filter by status and priority
+  - Backend: `/api/careers/admin/applications` CRUD endpoints
+- [x] **Admin Dashboard - Press & News Module** - COMPLETED (Feb 12, 2026)
+  - New "Press & News" tab for content management
+  - Stats cards: Total Articles, Published, Drafts, Featured
+  - Article list with thumbnails, tags, and publish status
+  - Create/Edit article form with:
+    - Title and Summary (for previews)
+    - Full content with character counter
+    - Tag selection: Funding, Product, Partnership, Milestone, Creators, Company, Awards, Events
+    - Category: News, Press Release, Blog, Announcement
+    - Image URL and Source Link
+    - Publish immediately toggle
+    - Set as featured toggle (only one featured at a time)
+  - Action buttons: Edit, Publish/Unpublish, Set Featured, Delete
+  - Backend: `/api/press/admin/articles` CRUD endpoints with `/api/press/articles` public endpoint
+- [x] **Dynamic Press Page** - COMPLETED (Feb 12, 2026)
+  - `/press` page now fetches articles from database
+  - Featured article displayed prominently
+  - Other articles listed with tags and dates
+  - Fallback to static content if API fails
+  - Auto-formatted dates (e.g., "Feb 2026")
 
 ### P1 (High Priority)
 - [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
