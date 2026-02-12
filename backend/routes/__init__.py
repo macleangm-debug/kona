@@ -25,6 +25,7 @@ from .subscriptions import router as subscriptions_router
 from .exchange_rates import router as exchange_rates_router
 from .ab_testing import router as ab_testing_router
 from .support import router as support_router
+from .careers import router as careers_router
 
 # Create main API router
 api_router = APIRouter()
@@ -54,3 +55,4 @@ api_router.include_router(subscriptions_router)
 api_router.include_router(exchange_rates_router)
 api_router.include_router(ab_testing_router)
 api_router.include_router(support_router)
+api_router.include_router(careers_router, prefix="/careers", tags=["careers"])
