@@ -311,6 +311,119 @@ async def check_application_status(email: str = Query(...)):
     }
 
 # ============ ADMIN ROUTES ============
+# NOTE: More specific routes must come before parameterized routes ({app_id})
+
+@router.get("/admin/applications/skill-search")
+async def search_by_skills(
+    user: dict = Depends(require_admin),
+    skills: str = Query(..., description="Comma-separated skills to search for"),
+    match_all: bool = False,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Search applications by specific skills"""
+    skill_list = [s.strip().lower() for s in skills.split(",") if s.strip()]
+    
+    if not skill_list:
+        raise HTTPException(status_code=400, detail="At least one skill required")
+    
+    if match_all:
+        # Must have ALL skills
+        query = {
+            "$and": [
+                {"$or": [
+                    {"skills": {"$regex": skill, "$options": "i"}},
+                    {"cover_letter": {"$regex": skill, "$options": "i"}}
+                ]} for skill in skill_list
+            ]
+        }
+    else:
+        # Must have ANY skill
+        query = {
+            "$or": [
+                {"skills": {"$regex": skill, "$options": "i"}} for skill in skill_list
+            ] + [
+                {"cover_letter": {"$regex": skill, "$options": "i"}} for skill in skill_list
+            ]
+        }
+    
+    applications = await db.job_applications.find(
+        query,
+        {"_id": 0}
+    ).sort([
+        ("auto_score", -1),
+        ("created_at", -1)
+    ]).skip(skip).limit(limit).to_list(length=limit)
+    
+    # Highlight matched skills for each application
+    for app in applications:
+        matched = []
+        app_skills = [s.lower() for s in app.get("skills", [])]
+        cover = app.get("cover_letter", "").lower()
+        
+        for skill in skill_list:
+            if any(skill in s for s in app_skills) or skill in cover:
+                matched.append(skill)
+        
+        app["matched_search_skills"] = matched
+        app["search_match_count"] = len(matched)
+    
+    total = await db.job_applications.count_documents(query)
+    
+    return {
+        "applications": applications,
+        "total": total,
+        "searched_skills": skill_list,
+        "match_mode": "all" if match_all else "any"
+    }
+
+@router.get("/admin/applications/filtered")
+async def get_filtered_applications(
+    user: dict = Depends(require_admin),
+    filter_id: Optional[str] = None,
+    min_match: int = 0,
+    qualification: Optional[str] = None,  # excellent, good, partial, weak
+    status: Optional[str] = None,
+    skip: int = 0,
+    limit: int = 50
+):
+    """Get applications filtered by keyword match criteria"""
+    query = {}
+    
+    if filter_id:
+        query["filter_matches.filter_id"] = filter_id
+        if min_match > 0:
+            query["filter_matches.match_percentage"] = {"$gte": min_match}
+        if qualification:
+            query["filter_matches.qualification"] = qualification
+    elif min_match > 0:
+        query["best_match_percentage"] = {"$gte": min_match}
+    
+    if status:
+        query["status"] = status
+    
+    applications = await db.job_applications.find(
+        query,
+        {"_id": 0}
+    ).sort([
+        ("best_match_percentage", -1),
+        ("auto_score", -1),
+        ("created_at", -1)
+    ]).skip(skip).limit(limit).to_list(length=limit)
+    
+    total = await db.job_applications.count_documents(query)
+    
+    return {
+        "applications": applications,
+        "total": total,
+        "filters_applied": {
+            "filter_id": filter_id,
+            "min_match": min_match,
+            "qualification": qualification,
+            "status": status
+        }
+    }
+
 @router.get("/admin/applications")
 async def get_all_applications(
     status: Optional[str] = None,
