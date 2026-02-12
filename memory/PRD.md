@@ -390,6 +390,17 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Testimonials: Single column on mobile
   - FAQ: Smaller padding and text on mobile
   - Footer: Better grid layout, locations wrap properly, reduced payment methods on mobile
+- [x] **Chat Widget Minimize Feature** - COMPLETED (Feb 12, 2026)
+  - Added minimize button to chat header (alongside clear and close)
+  - Minimized state shows compact pill: "Kona Assistant" with bot icon
+  - Unread message counter badge shows when minimized and new messages arrive
+  - Click minimized pill to expand back to full chat
+  - Smooth transitions between states
+- [x] **Hide Chat on Video Player** - COMPLETED (Feb 12, 2026)
+  - Chat widget completely hidden when on `/watch/*` routes
+  - Uses `useLocation` hook to detect video player pages
+  - Returns null (renders nothing) on video pages
+  - Ensures distraction-free viewing experience
 
 ### P1 (High Priority)
 - [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
