@@ -407,6 +407,28 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Profile page: "Help & Support" option in Settings section opens chat as bottom sheet
   - Created new `SupportChatSheet.jsx` component for profile-based chat access
   - Updated `SupportChatWidget.jsx` with MARKETING_PAGES whitelist
+- [x] **Press & Media Page Redesign** - COMPLETED (Feb 12, 2026)
+  - Professional media-focused design with hero stats (Founded, HQ, Users, Series)
+  - "As Featured In" section with media outlet logos
+  - Featured press release with full details
+  - List of press releases with tags (Funding, Product, Creators, Milestone, Partnership)
+  - Media Resources section (Brand Assets, Screenshots, Headshots)
+  - Speakers Available section with executives
+  - Press contact CTA
+- [x] **Careers Page Revamp** - COMPLETED (Feb 12, 2026)
+  - Removed specific job positions (no roles currently open)
+  - Added "Teams We're Building" section showing departments
+  - Comprehensive job application form with:
+    - Personal info (name, email, phone, country)
+    - Professional info (area of interest, experience, current role)
+    - Links (LinkedIn, Portfolio)
+    - Skills and cover letter
+    - Additional questions (how heard, availability)
+  - Backend API at `/api/careers/applications` with:
+    - Automated scoring system (0-100 based on experience, cover letter, profile completeness)
+    - Priority classification (high/medium/low)
+    - Duplicate application prevention
+    - Admin endpoints for reviewing/updating applications
 
 ### P1 (High Priority)
 - [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
