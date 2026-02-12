@@ -155,6 +155,105 @@ const JobApplicationsModule = ({ token }) => {
     }
   };
 
+  // Skill search handler
+  const handleSkillSearch = async () => {
+    if (!skillSearchQuery.trim()) {
+      toast.error("Enter skills to search");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${API}/careers/admin/applications/skill-search?skills=${encodeURIComponent(skillSearchQuery)}&match_all=${matchAllSkills}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setApplications(res.data.applications || []);
+      toast.success(`Found ${res.data.total} candidates matching "${skillSearchQuery}"`);
+    } catch (err) {
+      toast.error("Search failed");
+    }
+    setLoading(false);
+  };
+
+  // Create keyword filter
+  const handleCreateFilter = async () => {
+    if (!filterForm.name || !filterForm.position_type) {
+      toast.error("Name and position type are required");
+      return;
+    }
+    
+    setUpdating(true);
+    try {
+      const payload = {
+        name: filterForm.name,
+        position_type: filterForm.position_type,
+        required_skills: filterForm.required_skills.split(",").map(s => s.trim()).filter(Boolean),
+        preferred_skills: filterForm.preferred_skills.split(",").map(s => s.trim()).filter(Boolean),
+        required_keywords: filterForm.required_keywords.split(",").map(s => s.trim()).filter(Boolean),
+        min_experience: parseInt(filterForm.min_experience) || 0,
+        is_active: filterForm.is_active
+      };
+      
+      await axios.post(`${API}/careers/admin/filters`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Keyword filter created");
+      setFilterForm({
+        name: "", position_type: "", required_skills: "", preferred_skills: "",
+        required_keywords: "", min_experience: 0, is_active: true
+      });
+      fetchKeywordFilters();
+      setViewMode("list");
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to create filter");
+    }
+    setUpdating(false);
+  };
+
+  // Delete keyword filter
+  const handleDeleteFilter = async (filterId) => {
+    if (!window.confirm("Delete this filter?")) return;
+    
+    try {
+      await axios.delete(`${API}/careers/admin/filters/${filterId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Filter deleted");
+      fetchKeywordFilters();
+    } catch (err) {
+      toast.error("Failed to delete filter");
+    }
+  };
+
+  // Apply keyword filter to search
+  const handleApplyFilter = async (filterId) => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${API}/careers/admin/applications/filtered?filter_id=${filterId}&min_match=40`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setApplications(res.data.applications || []);
+      setSelectedFilter(keywordFilters.find(f => f.id === filterId));
+      toast.success(`Filter applied - ${res.data.total} matching candidates`);
+    } catch (err) {
+      toast.error("Failed to apply filter");
+    }
+    setLoading(false);
+  };
+
+  // Clear filters
+  const handleClearFilters = () => {
+    setSelectedFilter(null);
+    setSkillSearchQuery("");
+    setStatusFilter("");
+    setPriorityFilter("");
+    setSearchQuery("");
+    fetchApplications();
+  };
+
   // Filter applications by search query
   const filteredApps = applications.filter(app => {
     if (!searchQuery) return true;
