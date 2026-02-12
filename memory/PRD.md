@@ -401,6 +401,12 @@ Build and enhance Kona, a streaming platform for mini-series content targeting A
   - Uses `useLocation` hook to detect video player pages
   - Returns null (renders nothing) on video pages
   - Ensures distraction-free viewing experience
+- [x] **Contextual Chat Widget Placement** - COMPLETED (Feb 12, 2026)
+  - Marketing/static pages (landing, careers, about, etc.): Floating chat button in corner
+  - App browsing pages (home, discover, rewards, etc.): NO floating button - cleaner UI
+  - Profile page: "Help & Support" option in Settings section opens chat as bottom sheet
+  - Created new `SupportChatSheet.jsx` component for profile-based chat access
+  - Updated `SupportChatWidget.jsx` with MARKETING_PAGES whitelist
 
 ### P1 (High Priority)
 - [x] Admin UI for Ad Approval - COMPLETED (Feb 9, 2026)
