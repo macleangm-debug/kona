@@ -562,44 +562,55 @@ const PressPage = ({ navigate }) => {
             </Button>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-6">
-            {/* Featured Release */}
-            {pressReleases.filter(p => p.featured).slice(0, 1).map((pr, i) => (
-              <div key={i} className="lg:row-span-2 bg-gradient-to-br from-blue-900/40 to-purple-900/40 rounded-2xl p-6 sm:p-8 border border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer group">
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="text-xs bg-blue-500/30 text-blue-300 px-2 py-1 rounded">{pr.tag}</span>
-                  <span className="text-sm text-gray-500">{pr.date}</span>
-                </div>
-                <h3 className="text-xl sm:text-2xl font-bold mb-4 group-hover:text-blue-400 transition-colors">{pr.title}</h3>
-                <p className="text-gray-400 mb-6">
-                  Kona announced today a $10 million Series A funding round led by major African and global investors, 
-                  marking a significant milestone in the company's mission to bring African stories to the world.
-                </p>
-                <div className="flex items-center gap-2 text-blue-400">
-                  <span className="text-sm">Read full release</span>
-                  <ExternalLink className="w-4 h-4" />
-                </div>
-              </div>
-            ))}
-            
-            {/* Other Releases */}
-            <div className="space-y-4">
-              {pressReleases.filter(p => !p.featured).slice(0, 4).map((pr, i) => (
-                <div key={i} className="bg-white/5 rounded-xl p-4 sm:p-5 border border-white/10 hover:border-blue-500/30 transition-all cursor-pointer group">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-3 mb-2">
-                        <span className="text-xs text-gray-500">{pr.date}</span>
-                        <span className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded">{pr.tag}</span>
-                      </div>
-                      <h3 className="font-semibold group-hover:text-blue-400 transition-colors text-sm sm:text-base">{pr.title}</h3>
-                    </div>
-                    <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-400 flex-shrink-0 ml-4" />
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-400" />
+            </div>
+          ) : (
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Featured Release */}
+              {featuredArticle && (
+                <div className="lg:row-span-2 bg-gradient-to-br from-blue-900/40 to-purple-900/40 rounded-2xl p-6 sm:p-8 border border-blue-500/30 hover:border-blue-500/50 transition-all cursor-pointer group">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-xs bg-blue-500/30 text-blue-300 px-2 py-1 rounded">{featuredArticle.tag}</span>
+                    <span className="text-sm text-gray-500">{formatDate(featuredArticle.published_at)}</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-4 group-hover:text-blue-400 transition-colors">{featuredArticle.title}</h3>
+                  <p className="text-gray-400 mb-6">
+                    {featuredArticle.summary || featuredArticle.content?.slice(0, 200) + "..."}
+                  </p>
+                  <div className="flex items-center gap-2 text-blue-400">
+                    <span className="text-sm">Read full release</span>
+                    <ExternalLink className="w-4 h-4" />
                   </div>
                 </div>
-              ))}
+              )}
+              
+              {/* Other Releases */}
+              <div className="space-y-4">
+                {pressReleases.slice(0, 4).map((pr, i) => (
+                  <div key={pr.id || i} className="bg-white/5 rounded-xl p-4 sm:p-5 border border-white/10 hover:border-blue-500/30 transition-all cursor-pointer group">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-xs text-gray-500">{formatDate(pr.published_at)}</span>
+                          <span className="text-xs bg-white/10 text-gray-300 px-2 py-0.5 rounded">{pr.tag}</span>
+                        </div>
+                        <h3 className="font-semibold group-hover:text-blue-400 transition-colors text-sm sm:text-base">{pr.title}</h3>
+                      </div>
+                      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-400 flex-shrink-0 ml-4" />
+                    </div>
+                  </div>
+                ))}
+                {pressReleases.length === 0 && !featuredArticle && (
+                  <div className="text-center py-8 text-gray-400">
+                    <Newspaper className="w-10 h-10 mx-auto mb-3 opacity-50" />
+                    <p>No news articles yet. Check back soon!</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
 
