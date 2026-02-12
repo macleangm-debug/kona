@@ -2522,23 +2522,27 @@ export const AdminDashboard = () => {
   }
 
   const tabs = [
-    { id: "overview", label: "Overview", icon: BarChart3 },
-    { id: "users", label: "Users", icon: Users },
-    { id: "content", label: "Content", icon: Film },
-    { id: "submissions", label: "Submissions", icon: FileText },
-    { id: "revenue", label: "Revenue", icon: DollarSign },
-    { id: "creators", label: "Creators", icon: Crown },
-    { id: "ads", label: "Ads Approval", icon: Megaphone },
-    { id: "support", label: "Support Tickets", icon: Ticket },
+    // Core Operations
+    { id: "overview", label: "Overview", icon: BarChart3, section: "core" },
+    { id: "users", label: "Users", icon: Users, section: "core" },
+    { id: "content", label: "Content", icon: Film, section: "core" },
+    { id: "submissions", label: "Submissions", icon: FileText, section: "core" },
+    { id: "revenue", label: "Revenue", icon: DollarSign, section: "core" },
+    { id: "creators", label: "Creators", icon: Crown, section: "core" },
+    { id: "ads", label: "Ads Approval", icon: Megaphone, section: "core" },
+    // HR & Content Management
+    { id: "hr-applications", label: "Job Applications", icon: Briefcase, section: "hr" },
+    { id: "press-articles", label: "Press & News", icon: Newspaper, section: "content-mgmt" },
+    { id: "support", label: "Support Tickets", icon: Ticket, section: "support" },
     ...(user?.is_super_admin ? [
-      { id: "checklist", label: "Launch Checklist", icon: Check },
-      { id: "seeding", label: "Engagement Seeding", icon: Sparkles },
-      { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard },
-      { id: "exchange-rates", label: "Exchange Rates", icon: Globe },
-      { id: "ab-testing", label: "A/B Testing", icon: FlaskConical },
-      { id: "investment", label: "Investment Calculator", icon: Calculator },
-      { id: "infrastructure", label: "Infrastructure Calculator", icon: Server },
-      { id: "docs", label: "Docs & System", icon: FileText }
+      { id: "checklist", label: "Launch Checklist", icon: Check, section: "super" },
+      { id: "seeding", label: "Engagement Seeding", icon: Sparkles, section: "super" },
+      { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard, section: "super" },
+      { id: "exchange-rates", label: "Exchange Rates", icon: Globe, section: "super" },
+      { id: "ab-testing", label: "A/B Testing", icon: FlaskConical, section: "super" },
+      { id: "investment", label: "Investment Calculator", icon: Calculator, section: "super" },
+      { id: "infrastructure", label: "Infrastructure Calculator", icon: Server, section: "super" },
+      { id: "docs", label: "Docs & System", icon: FileText, section: "super" }
     ] : [])
   ];
 
