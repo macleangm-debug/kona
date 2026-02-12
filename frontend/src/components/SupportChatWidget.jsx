@@ -5,6 +5,26 @@ import { cn } from "@/lib/utils";
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
+// Pages where the floating chat widget should appear
+const MARKETING_PAGES = [
+  "/",           // Landing page
+  "/careers",
+  "/about", 
+  "/press",
+  "/contact",
+  "/terms",
+  "/privacy",
+  "/cookies",
+  "/dmca",
+  "/safety",
+  "/guidelines",
+  "/accessibility",
+  "/creator-guidelines",
+  "/revenue",
+  "/help",
+  "/support-ticket"
+];
+
 const SupportChatWidget = () => {
   const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
@@ -22,11 +42,11 @@ const SupportChatWidget = () => {
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Hide widget on video player pages
-  const isVideoPage = location.pathname.startsWith("/watch");
+  // Only show on marketing/static pages
+  const isMarketingPage = MARKETING_PAGES.includes(location.pathname);
   
-  // Don't render anything on video pages
-  if (isVideoPage) {
+  // Don't render on app pages (home, discover, watch, profile, etc.)
+  if (!isMarketingPage) {
     return null;
   }
 
@@ -148,7 +168,7 @@ const SupportChatWidget = () => {
           onClick={() => setIsOpen(true)}
           className={cn(
             "fixed z-[60] w-11 h-11 rounded-full shadow-lg flex items-center justify-center transition-all duration-300",
-            "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
+            "right-4 bottom-6",
             "bg-purple-600 hover:bg-purple-500 hover:scale-105"
           )}
           data-testid="support-chat-button"
@@ -164,7 +184,7 @@ const SupportChatWidget = () => {
           onClick={handleExpand}
           className={cn(
             "fixed z-[60] flex items-center gap-2 px-3 py-2 rounded-full shadow-lg transition-all duration-300",
-            "right-3 bottom-[72px] sm:bottom-6 sm:right-6",
+            "right-4 bottom-6",
             "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500"
           )}
           data-testid="support-chat-minimized"
@@ -184,8 +204,8 @@ const SupportChatWidget = () => {
       {/* Full Chat Window */}
       {isOpen && !isMinimized && (
         <div 
-          className="fixed z-[60] w-[340px] max-w-[calc(100vw-1.5rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden right-3 bottom-[130px] sm:bottom-20 sm:right-6"
-          style={{ height: "400px", maxHeight: "calc(100vh - 180px)" }}
+          className="fixed z-[60] w-[340px] max-w-[calc(100vw-2rem)] bg-[#1a1a2e] rounded-2xl shadow-2xl border border-white/10 flex flex-col overflow-hidden right-4 bottom-20"
+          style={{ height: "420px", maxHeight: "calc(100vh - 120px)" }}
           data-testid="support-chat-window"
         >
           {/* Header */}
