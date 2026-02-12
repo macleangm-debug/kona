@@ -541,9 +541,25 @@ Use my referral code: *${user?.referral_code}*
         </div>
 
         {/* Device Management */}
-        <div className="py-3">
+        <div className="py-3 border-b border-white/10">
           <DeviceManagement />
         </div>
+
+        {/* Help & Support */}
+        <button 
+          onClick={() => setShowSupportChat(true)}
+          className="w-full flex items-center justify-between py-3"
+          data-testid="help-support-btn"
+        >
+          <div className="flex items-center gap-3">
+            <HelpCircle className="w-5 h-5 text-emerald-400" />
+            <div className="text-left">
+              <p className="font-medium text-sm">Help & Support</p>
+              <p className="text-xs text-muted-foreground">Chat with Kona Assistant</p>
+            </div>
+          </div>
+          <ChevronLeft className="w-5 h-5 rotate-180" />
+        </button>
       </Card>
 
       {/* Achievement Badges Section */}
