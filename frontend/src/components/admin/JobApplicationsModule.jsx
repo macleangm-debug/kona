@@ -563,8 +563,230 @@ const JobApplicationsModule = ({ token }) => {
   // List View
   return (
     <div className="space-y-6" data-testid="job-applications-module">
+      {/* View Mode Tabs */}
+      <div className="flex items-center gap-2 border-b border-white/10 pb-4">
+        <Button
+          variant={viewMode === "list" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => { setViewMode("list"); handleClearFilters(); }}
+        >
+          <Users className="w-4 h-4 mr-2" />
+          All Applications
+        </Button>
+        <Button
+          variant={viewMode === "skill-search" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setViewMode("skill-search")}
+        >
+          <Search className="w-4 h-4 mr-2" />
+          Skill Search
+        </Button>
+        <Button
+          variant={viewMode === "filters" ? "default" : "ghost"}
+          size="sm"
+          onClick={() => setViewMode("filters")}
+        >
+          <Settings className="w-4 h-4 mr-2" />
+          Manage Filters
+        </Button>
+      </div>
+
+      {/* Keyword Filter Management View */}
+      {viewMode === "filters" && (
+        <div className="space-y-6">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Plus className="w-5 h-5 text-primary" />
+              Create Keyword Filter
+            </h3>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm mb-2">Filter Name *</label>
+                <Input
+                  value={filterForm.name}
+                  onChange={(e) => setFilterForm({ ...filterForm, name: e.target.value })}
+                  placeholder="e.g., Senior Backend Engineer"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Position Type *</label>
+                <Input
+                  value={filterForm.position_type}
+                  onChange={(e) => setFilterForm({ ...filterForm, position_type: e.target.value })}
+                  placeholder="e.g., Engineering, Marketing, Content"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Required Skills (comma-separated)</label>
+                <Input
+                  value={filterForm.required_skills}
+                  onChange={(e) => setFilterForm({ ...filterForm, required_skills: e.target.value })}
+                  placeholder="python, react, mongodb"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Preferred Skills (comma-separated)</label>
+                <Input
+                  value={filterForm.preferred_skills}
+                  onChange={(e) => setFilterForm({ ...filterForm, preferred_skills: e.target.value })}
+                  placeholder="aws, docker, kubernetes"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Required Keywords (in cover letter)</label>
+                <Input
+                  value={filterForm.required_keywords}
+                  onChange={(e) => setFilterForm({ ...filterForm, required_keywords: e.target.value })}
+                  placeholder="streaming, growth, africa"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+              <div>
+                <label className="block text-sm mb-2">Minimum Experience (years)</label>
+                <Input
+                  type="number"
+                  min="0"
+                  value={filterForm.min_experience}
+                  onChange={(e) => setFilterForm({ ...filterForm, min_experience: e.target.value })}
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+            </div>
+            <Button
+              onClick={handleCreateFilter}
+              disabled={updating}
+              className="mt-4 bg-primary"
+              data-testid="create-filter-btn"
+            >
+              {updating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+              Create Filter
+            </Button>
+          </Card>
+
+          {/* Existing Filters */}
+          <div className="space-y-3">
+            <h3 className="font-semibold">Active Filters ({keywordFilters.length})</h3>
+            {keywordFilters.length === 0 ? (
+              <Card className="p-8 text-center">
+                <Target className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="text-muted-foreground">No keyword filters created yet</p>
+              </Card>
+            ) : (
+              keywordFilters.map((filter) => (
+                <Card key={filter.id} className="p-4 hover:bg-white/5 transition-colors">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="font-semibold">{filter.name}</h4>
+                        <Badge className="bg-blue-500/20 text-blue-400 text-xs">{filter.position_type}</Badge>
+                        {filter.matched_candidates > 0 && (
+                          <Badge className="bg-green-500/20 text-green-400 text-xs">
+                            {filter.matched_candidates} matches
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground space-y-1">
+                        {filter.required_skills?.length > 0 && (
+                          <p><span className="text-red-400">Required:</span> {filter.required_skills.join(", ")}</p>
+                        )}
+                        {filter.preferred_skills?.length > 0 && (
+                          <p><span className="text-yellow-400">Preferred:</span> {filter.preferred_skills.join(", ")}</p>
+                        )}
+                        {filter.min_experience > 0 && (
+                          <p><span className="text-purple-400">Min Exp:</span> {filter.min_experience} years</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleApplyFilter(filter.id)}
+                        className="border-primary text-primary hover:bg-primary/10"
+                      >
+                        <Filter className="w-3 h-3 mr-1" />
+                        Apply
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteFilter(filter.id)}
+                        className="text-red-400 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Skill Search View */}
+      {viewMode === "skill-search" && (
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+            <Search className="w-5 h-5 text-primary" />
+            Search by Skills
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <Input
+                value={skillSearchQuery}
+                onChange={(e) => setSkillSearchQuery(e.target.value)}
+                placeholder="Enter skills (comma-separated): python, react, aws"
+                className="bg-white/5 border-white/10"
+                onKeyPress={(e) => e.key === "Enter" && handleSkillSearch()}
+                data-testid="skill-search-input"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={matchAllSkills}
+                  onChange={(e) => setMatchAllSkills(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                />
+                Match ALL skills
+              </label>
+              <Button onClick={handleSkillSearch} className="bg-primary" data-testid="skill-search-btn">
+                <Search className="w-4 h-4 mr-2" />
+                Search
+              </Button>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Searches both listed skills and cover letter content
+          </p>
+        </Card>
+      )}
+
+      {/* Applied Filter Banner */}
+      {selectedFilter && (
+        <Card className="p-3 bg-primary/10 border-primary/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-primary" />
+              <span className="text-sm">
+                Filtered by: <span className="font-semibold">{selectedFilter.name}</span>
+              </span>
+            </div>
+            <Button variant="ghost" size="sm" onClick={handleClearFilters}>
+              Clear Filter
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Stats Cards */}
-      {stats && (
+      {stats && viewMode === "list" && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <Card className="p-4 bg-gradient-to-br from-gray-500/10 to-gray-600/5 border-gray-500/20">
             <div className="flex items-center gap-3">
