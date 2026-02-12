@@ -4,7 +4,8 @@ import {
   Users, Briefcase, Clock, Star, CheckCircle, XCircle, Eye,
   Filter, Search, ChevronLeft, Loader2, Calendar, MapPin,
   Mail, Phone, ExternalLink, Linkedin, Link as LinkIcon,
-  FileText, Award, AlertCircle, UserCheck, ArrowUpRight
+  FileText, Award, AlertCircle, UserCheck, ArrowUpRight,
+  Settings, Plus, Trash2, Target, Percent, Sparkles
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,13 @@ const PRIORITY_CONFIG = {
   low: { label: "Low", color: "bg-gray-500/20 text-gray-400" }
 };
 
+const QUALIFICATION_CONFIG = {
+  excellent: { label: "Excellent Match", color: "bg-green-500/20 text-green-400", icon: Sparkles },
+  good: { label: "Good Match", color: "bg-blue-500/20 text-blue-400", icon: CheckCircle },
+  partial: { label: "Partial Match", color: "bg-yellow-500/20 text-yellow-400", icon: AlertCircle },
+  weak: { label: "Weak Match", color: "bg-gray-500/20 text-gray-400", icon: XCircle }
+};
+
 const JobApplicationsModule = ({ token }) => {
   const [applications, setApplications] = useState([]);
   const [selectedApp, setSelectedApp] = useState(null);
@@ -36,10 +44,28 @@ const JobApplicationsModule = ({ token }) => {
   const [updating, setUpdating] = useState(false);
   const [stats, setStats] = useState(null);
   
+  // View modes: "list", "detail", "filters", "skill-search"
+  const [viewMode, setViewMode] = useState("list");
+  
   // Filters
   const [statusFilter, setStatusFilter] = useState("");
   const [priorityFilter, setPriorityFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [skillSearchQuery, setSkillSearchQuery] = useState("");
+  const [matchAllSkills, setMatchAllSkills] = useState(false);
+  
+  // Keyword Filters
+  const [keywordFilters, setKeywordFilters] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [filterForm, setFilterForm] = useState({
+    name: "",
+    position_type: "",
+    required_skills: "",
+    preferred_skills: "",
+    required_keywords: "",
+    min_experience: 0,
+    is_active: true
+  });
   
   // Update form
   const [updateForm, setUpdateForm] = useState({
@@ -68,8 +94,20 @@ const JobApplicationsModule = ({ token }) => {
     setLoading(false);
   };
 
+  const fetchKeywordFilters = async () => {
+    try {
+      const res = await axios.get(`${API}/careers/admin/filters`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setKeywordFilters(res.data.filters || []);
+    } catch (err) {
+      console.error("Failed to fetch filters:", err);
+    }
+  };
+
   useEffect(() => {
     fetchApplications();
+    fetchKeywordFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, priorityFilter]);
 
