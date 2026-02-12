@@ -2,11 +2,12 @@
 Careers/Job Application Routes
 Handles job applications with automated filtering
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from datetime import datetime, timezone
 from services.database import db
+from services import get_current_user
 import uuid
 import re
 
@@ -39,6 +40,128 @@ class AdminApplicationUpdate(BaseModel):
     status: str  # "pending", "reviewed", "shortlisted", "interview", "rejected", "hired"
     admin_notes: Optional[str] = None
     interview_date: Optional[str] = None
+
+# ============ KEYWORD FILTER MODELS ============
+class KeywordFilter(BaseModel):
+    name: str = Field(..., min_length=2, max_length=100)  # e.g., "Backend Engineer"
+    position_type: str = Field(..., min_length=2, max_length=100)  # e.g., "Engineering"
+    required_skills: List[str] = Field(default_factory=list)  # Must have these
+    preferred_skills: List[str] = Field(default_factory=list)  # Nice to have
+    required_keywords: List[str] = Field(default_factory=list)  # Must appear in cover letter
+    min_experience: int = Field(0, ge=0, le=50)
+    is_active: bool = True
+
+class KeywordFilterUpdate(BaseModel):
+    name: Optional[str] = None
+    position_type: Optional[str] = None
+    required_skills: Optional[List[str]] = None
+    preferred_skills: Optional[List[str]] = None
+    required_keywords: Optional[List[str]] = None
+    min_experience: Optional[int] = None
+    is_active: Optional[bool] = None
+
+# ============ ADMIN DEPENDENCY ============
+async def require_admin(user: dict = Depends(get_current_user)):
+    """Dependency to require admin privileges"""
+    if not user.get("is_admin"):
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+# ============ SKILL MATCHING ALGORITHM ============
+def calculate_skill_match(application: dict, keyword_filter: dict) -> dict:
+    """
+    Calculate how well an application matches a keyword filter.
+    Returns match percentage and details.
+    """
+    app_skills = [s.lower().strip() for s in application.get("skills", [])]
+    cover_letter = application.get("cover_letter", "").lower()
+    experience = application.get("experience_years", 0)
+    
+    required_skills = [s.lower().strip() for s in keyword_filter.get("required_skills", [])]
+    preferred_skills = [s.lower().strip() for s in keyword_filter.get("preferred_skills", [])]
+    required_keywords = [k.lower().strip() for k in keyword_filter.get("required_keywords", [])]
+    min_exp = keyword_filter.get("min_experience", 0)
+    
+    # Calculate required skills match
+    required_matched = []
+    required_missing = []
+    for skill in required_skills:
+        # Check exact match or partial match in skills list
+        matched = any(skill in app_skill or app_skill in skill for app_skill in app_skills)
+        # Also check if mentioned in cover letter
+        if not matched:
+            matched = skill in cover_letter
+        if matched:
+            required_matched.append(skill)
+        else:
+            required_missing.append(skill)
+    
+    # Calculate preferred skills match
+    preferred_matched = []
+    for skill in preferred_skills:
+        matched = any(skill in app_skill or app_skill in skill for app_skill in app_skills)
+        if not matched:
+            matched = skill in cover_letter
+        if matched:
+            preferred_matched.append(skill)
+    
+    # Calculate keyword match
+    keywords_matched = []
+    keywords_missing = []
+    for keyword in required_keywords:
+        if keyword in cover_letter:
+            keywords_matched.append(keyword)
+        else:
+            keywords_missing.append(keyword)
+    
+    # Experience check
+    meets_experience = experience >= min_exp
+    
+    # Calculate overall match percentage
+    total_required = len(required_skills) + len(required_keywords)
+    total_matched_required = len(required_matched) + len(keywords_matched)
+    
+    # Required items are 70% of score, preferred are 30%
+    if total_required > 0:
+        required_score = (total_matched_required / total_required) * 70
+    else:
+        required_score = 70  # No requirements = full score
+    
+    if len(preferred_skills) > 0:
+        preferred_score = (len(preferred_matched) / len(preferred_skills)) * 30
+    else:
+        preferred_score = 30  # No preferences = full score
+    
+    # Experience penalty
+    if not meets_experience:
+        required_score *= 0.8  # 20% penalty for not meeting experience
+    
+    match_percentage = round(required_score + preferred_score)
+    
+    # Determine qualification level
+    if match_percentage >= 80 and len(required_missing) == 0:
+        qualification = "excellent"
+    elif match_percentage >= 60 and len(required_missing) <= 1:
+        qualification = "good"
+    elif match_percentage >= 40:
+        qualification = "partial"
+    else:
+        qualification = "weak"
+    
+    return {
+        "filter_id": keyword_filter.get("id"),
+        "filter_name": keyword_filter.get("name"),
+        "match_percentage": match_percentage,
+        "qualification": qualification,
+        "required_skills_matched": required_matched,
+        "required_skills_missing": required_missing,
+        "preferred_skills_matched": preferred_matched,
+        "keywords_matched": keywords_matched,
+        "keywords_missing": keywords_missing,
+        "meets_experience": meets_experience,
+        "experience_required": min_exp,
+        "experience_has": experience
+    }
 
 # ============ AUTOMATED SCORING ============
 def calculate_application_score(application: dict) -> dict:
