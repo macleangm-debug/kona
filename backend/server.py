@@ -304,8 +304,14 @@ async def health_check():
         "version": "2.0.0",
         "database": db_status,
         "cache": cache_status,
-        "scaling": {
+        "security": {
             "rate_limiting": "enabled",
+            "bot_protection": "enabled",
+            "brute_force_protection": "enabled",
+            "xss_protection": "enabled",
+            "security_headers": "enabled"
+        },
+        "scaling": {
             "connection_pooling": "enabled",
             "indexes": "optimized"
         }
