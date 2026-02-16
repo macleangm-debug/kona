@@ -144,9 +144,9 @@ const AppContent = () => {
   const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome"];
   const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
-  // Determine if we're in the "app" area (not landing page)
-  // Since series carousel is now at "/", we always want to show splash there
-  const isInApp = isPWA || hasEnteredApp || user || location.pathname !== "/" || !isWelcomePage;
+  // Determine if we're in the "app" area
+  // Since series carousel is now the default at "/", we're always "in app" except at /welcome
+  const isInApp = !isWelcomePage;
 
   return (
     <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
