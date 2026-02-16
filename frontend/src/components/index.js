@@ -5,6 +5,7 @@ export { CoinBalance } from './CoinBalance';
 export { DailyRewardModal } from './DailyRewardModal';
 export { UnlockSheet } from './UnlockSheet';
 export { SeriesCard } from './SeriesCard';
+export { LazySeriesCard, LazyCarouselRow } from './LazySeriesCard';
 export { ContinueWatchingCard } from './ContinueWatchingCard';
 export { ComingSoonCard } from './ComingSoonCard';
 export { ReminderSuccessModal } from './ReminderSuccessModal';
