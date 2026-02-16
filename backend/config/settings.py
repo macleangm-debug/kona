@@ -5,10 +5,22 @@ import os
 from datetime import timezone
 
 # Environment
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "test_database")
-JWT_SECRET = os.environ.get("JWT_SECRET", "kona-mini-series-jwt-secret-key-2024-secure")
+MONGO_URL = os.environ.get("MONGO_URL")
+if not MONGO_URL:
+    raise ValueError("MONGO_URL environment variable is required")
+
+DB_NAME = os.environ.get("DB_NAME")
+if not DB_NAME:
+    raise ValueError("DB_NAME environment variable is required")
+
+JWT_SECRET = os.environ.get("JWT_SECRET")
+if not JWT_SECRET:
+    raise ValueError("JWT_SECRET environment variable is required")
+
 STRIPE_API_KEY = os.environ.get("STRIPE_API_KEY", "")
+
+# CORS Configuration - restrict in production
+CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*").split(",")
 
 # Daily Rewards - PROFIT FOCUSED (very low to encourage purchases)
 DAILY_REWARD_COINS = 3
