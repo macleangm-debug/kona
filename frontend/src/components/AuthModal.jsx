@@ -468,8 +468,31 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   };
 
   const switchAuthMethod = (method) => {
+    // Prevent rapid switching during transition
+    if (isTransitioning || authMethod === method) return;
+    
+    setIsTransitioning(true);
+    
+    // Use callback form to ensure state updates are atomic
     setAuthMethod(method);
-    resetForm();
+    
+    // Reset form fields atomically
+    setEmail("");
+    setPhone("");
+    setPassword("");
+    setName("");
+    setReferralCode("");
+    setOtp(["", "", "", "", "", ""]);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setShowOTPInput(false);
+    setReferralValid(null);
+    setReferralBonus(0);
+    
+    // Allow transitions again after state settles
+    requestAnimationFrame(() => {
+      setIsTransitioning(false);
+    });
   };
 
   return (
