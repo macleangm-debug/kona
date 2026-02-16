@@ -145,7 +145,8 @@ const AppContent = () => {
   const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Determine if we're in the "app" area (not landing page)
-  const isInApp = isPWA || hasEnteredApp || user || location.pathname !== "/";
+  // Since series carousel is now at "/", we always want to show splash there
+  const isInApp = isPWA || hasEnteredApp || user || location.pathname !== "/" || !isWelcomePage;
 
   return (
     <div className={`min-h-screen bg-background text-white ${isDesktop ? "w-full" : "max-w-md mx-auto"} relative`}>
