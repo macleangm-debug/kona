@@ -459,7 +459,7 @@ export const HomePage = ({ onAuthClick }) => {
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {series.filter(s => myList.includes(s.id)).map((s) => (
               <div key={s.id} className="flex-shrink-0 w-28">
-                <SeriesCard 
+                <LazySeriesCard 
                   series={s}
                   onClick={() => navigate(`/series/${s.id}`)}
                   showViews={false}
