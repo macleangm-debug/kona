@@ -1,0 +1,56 @@
+# robots.txt for Stream Kona
+# https://www.streamkona.com
+
+User-agent: *
+Allow: /
+Allow: /discover
+Allow: /stories
+Allow: /series/
+Allow: /search
+
+# Disallow private/authenticated pages
+Disallow: /admin
+Disallow: /creator
+Disallow: /profile
+Disallow: /settings
+Disallow: /checkout
+Disallow: /api/
+
+# Disallow authentication pages
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+
+# Allow all crawlers
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.streamkona.com/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Host directive
+Host: https://www.streamkona.com

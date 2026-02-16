@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kona App - Content Creator Showcase</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #8b5cf6, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle {
+            text-align: center;
+            color: #a1a1aa;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+        }
+        .video-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        .video-section h2 {
+            margin-bottom: 20px;
+            color: #d946ef;
+        }
+        video {
+            width: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: linear-gradient(90deg, #8b5cf6, #d946ef);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+        .feature-card h3 {
+            color: #8b5cf6;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        .feature-card ul {
+            list-style: none;
+            color: #d1d5db;
+        }
+        .feature-card li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        .feature-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin: 40px 0;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(90deg, #8b5cf6, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label { color: #a1a1aa; margin-top: 5px; }
+        .cta {
+            text-align: center;
+            margin-top: 50px;
+            padding: 40px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 20px;
+        }
+        .cta h2 { margin-bottom: 15px; }
+        .cta p { color: #a1a1aa; margin-bottom: 25px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 KONA</h1>
+        <p class="subtitle">The Next-Generation Mini-Series Streaming Platform</p>
+
+        <!-- Promo Video Section -->
+        <div class="video-section">
+            <h2>📽️ Promotional Video</h2>
+            <video controls autoplay muted loop>
+                <source src="/kona_promo.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <br>
+            <a href="/kona_promo.mp4" download="Kona_Promo_Video.mp4" class="download-btn">
+                ⬇️ Download Promo Video
+            </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value">50+</div>
+                <div class="stat-label">Mini-Series</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">500+</div>
+                <div class="stat-label">Episodes</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">70%</div>
+                <div class="stat-label">Revenue Share</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value">24hr</div>
+                <div class="stat-label">Payout Cycle</div>
+            </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="features">
+            <div class="feature-card">
+                <h3>🎯 For Content Creators</h3>
+                <ul>
+                    <li>Upload your mini-series easily</li>
+                    <li>Set your own coin pricing</li>
+                    <li>70% revenue share on all views</li>
+                    <li>Real-time analytics dashboard</li>
+                    <li>Local payout options (M-Pesa, Bank)</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h3>💰 Monetization</h3>
+                <ul>
+                    <li>Coin-based economy</li>
+                    <li>Episode 1 always free (hooks viewers)</li>
+                    <li>Multiple payment gateways</li>
+                    <li>Subscription plans available</li>
+                    <li>Referral rewards system</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h3>🎮 Gamification Features</h3>
+                <ul>
+                    <li>Daily login rewards</li>
+                    <li>Watch streaks with bonuses</li>
+                    <li>Scratch card mini-game</li>
+                    <li>Episode trivia challenges</li>
+                    <li>Prediction games</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <h3>📱 Platform Features</h3>
+                <ul>
+                    <li>Netflix-style 3D UI</li>
+                    <li>Mobile-first design</li>
+                    <li>Offline downloads</li>
+                    <li>Watch party feature</li>
+                    <li>PWA - installable app</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta">
+            <h2>Ready to Share Your Stories?</h2>
+            <p>Join Kona and reach millions of viewers across Africa and beyond.</p>
+            <a href="/creator" class="download-btn">🚀 Become a Creator</a>
+        </div>
+    </div>
+</body>
+</html>

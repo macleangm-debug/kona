@@ -1,0 +1,134 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Anti-AI Designer",
+    "principles": [
+      "Fusion over Imitation",
+      "Emotion First",
+      "Content is King",
+      "Zoom In",
+      "Negative Space",
+      "Contrast"
+    ]
+  },
+  "project": {
+    "name": "MiniSeries App",
+    "type": "Entertainment Streaming",
+    "platform": "Mobile Web (PWA style)",
+    "theme_strategy": "Neon Noir (Dark Mode Only)",
+    "emotional_tone": "Cinematic, Addictive, Premium, Guilty Pleasure"
+  },
+  "typography": {
+    "font_family": {
+      "headings": "Syne, sans-serif",
+      "body": "Manrope, sans-serif"
+    },
+    "google_fonts_import": "https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Syne:wght@400;600;700;800&display=swap",
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-bold tracking-tight",
+      "h2": "text-2xl md:text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-semibold",
+      "body": "text-base leading-relaxed",
+      "caption": "text-xs text-muted-foreground uppercase tracking-wider"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#09090b",
+      "foreground": "#fafafa",
+      "card": "#18181b",
+      "card_foreground": "#fafafa",
+      "primary": "#7c3aed",
+      "primary_foreground": "#ffffff",
+      "secondary": "#27272a",
+      "secondary_foreground": "#fafafa",
+      "accent": "#f472b6",
+      "accent_foreground": "#09090b",
+      "muted": "#27272a",
+      "muted_foreground": "#a1a1aa",
+      "border": "#27272a",
+      "input": "#27272a",
+      "ring": "#7c3aed"
+    },
+    "special_colors": {
+      "coin_gradient_start": "#fbbf24",
+      "coin_gradient_end": "#d97706",
+      "unlock_button_bg": "bg-gradient-to-r from-violet-600 to-indigo-600",
+      "overlay_gradient": "bg-gradient-to-t from-black/90 via-black/50 to-transparent"
+    }
+  },
+  "layout": {
+    "container": "max-w-md mx-auto min-h-screen bg-background overflow-hidden shadow-2xl border-x border-border/10 relative",
+    "spacing": {
+      "page_padding": "px-4 py-6",
+      "section_gap": "gap-8",
+      "item_gap": "gap-4"
+    },
+    "grids": {
+      "series_grid": "grid grid-cols-2 gap-4",
+      "coin_grid": "grid grid-cols-2 gap-3"
+    },
+    "z_index": {
+      "nav": "z-50",
+      "modal": "z-50",
+      "overlay": "z-40",
+      "floating_action": "z-30"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full font-semibold shadow-[0_0_15px_rgba(124,58,237,0.5)] hover:shadow-[0_0_25px_rgba(124,58,237,0.7)] transition-all duration-300",
+      "secondary": "rounded-full bg-secondary/50 backdrop-blur-md border border-white/10 hover:bg-secondary/80 transition-all",
+      "ghost": "hover:bg-white/5 rounded-full"
+    },
+    "cards": {
+      "series_poster": "aspect-[2/3] rounded-xl overflow-hidden relative group cursor-pointer border border-white/5",
+      "episode_row": "flex items-center gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors border-b border-white/5 last:border-0",
+      "coin_package": "relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 p-4 flex flex-col items-center justify-center gap-2 hover:border-violet-500/50 transition-all group"
+    },
+    "navigation": {
+      "bottom_bar": "fixed bottom-0 left-0 right-0 h-16 bg-black/80 backdrop-blur-xl border-t border-white/10 flex items-center justify-around z-50 max-w-md mx-auto"
+    },
+    "visual_enhancers": {
+      "glass_panel": "bg-black/40 backdrop-blur-xl border border-white/10",
+      "neon_glow": "shadow-[0_0_20px_rgba(124,58,237,0.3)]",
+      "shimmer": "animate-pulse bg-white/5"
+    }
+  },
+  "assets": {
+    "images": {
+      "hero_poster": "https://images.pexels.com/photos/6800202/pexels-photo-6800202.jpeg",
+      "coin_pile": "https://images.pexels.com/photos/12198531/pexels-photo-12198531.jpeg",
+      "gift_box": "https://images.pexels.com/photos/5469698/pexels-photo-5469698.jpeg",
+      "user_avatar": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"
+    },
+    "icons": {
+      "library": "lucide-react",
+      "preferred_set": "lucide-react"
+    }
+  },
+  "motion": {
+    "transitions": "transition-all duration-300 ease-out",
+    "hover_effects": "hover:scale-[1.02] active:scale-[0.98]",
+    "page_transition": "animate-in fade-in slide-in-from-bottom-4 duration-500"
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Install 'lucide-react' and 'framer-motion' immediately.",
+    "2. FONTS: Add the Google Fonts import to index.css immediately.",
+    "3. LAYOUT: Treat the app as a Mobile PWA. Wrap the entire app in a 'max-w-md mx-auto' container to simulate a mobile screen on desktop view, with a dark background outside.",
+    "4. NAVIGATION: Implement a sticky bottom navigation bar with glassmorphism.",
+    "5. PLAYER: The video player should be vertical (9:16 aspect ratio) and take up the full screen height minus nav.",
+    "6. COINS: The coin balance should be visible in the top right of the Home and Profile screens.",
+    "7. UNLOCKING: Episodes 2+ are locked. Clicking them opens a 'Unlock Drawer' (Sheet component) asking for coins.",
+    "8. DATA: Mock a list of 5-6 series, each with 10 episodes. Use the 'hero_poster' image for all of them but with different titles to save time.",
+    "9. THEME: Force Dark Mode. Do not implement a light mode toggle. This is a cinema app."
+  ],
+  "universal_guidelines": [
+    "Do not use generic centered layouts.",
+    "Use 2-3x more spacing than feels comfortable.",
+    "Every interaction needs micro-animations.",
+    "Use glass-morphism effects with backdrop filters.",
+    "Never use 'transition: all'.",
+    "All interactive elements must have data-testid."
+  ]
+}

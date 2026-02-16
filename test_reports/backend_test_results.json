@@ -1,0 +1,312 @@
+{
+  "total_tests": 61,
+  "passed_tests": 59,
+  "success_rate": 96.72131147540983,
+  "test_results": [
+    {
+      "test": "User Registration",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Welcome Bonus (50 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "User Login",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get User Profile",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Stats",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward Amount (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referee Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Validate Referral Code (1CFCCF55)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Name in Validation",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Validate Referral Code (INVALID123)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Invalid Referral Code Rejection",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Leaderboard",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Leaderboard Accessible (Empty)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Registration with Referral Code",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Registration Bonus (80 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Check Referrer Reward",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Referral Stats",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referrer Reward Amount (20 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referee Bonus Amount (30 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Stats Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Count Update",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Referral Earnings Update",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Series List",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Series Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Series Detail",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Episodes List",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "First Episode Free",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Episode Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Episode Detail",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Update Watch Progress",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Unlock Episode",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Featured Series",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Daily Reward Status",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Claim Daily Reward",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Daily Reward Amount (10 coins)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Coin Packages",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Package Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Unlocked Episodes",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Geo Location Detection",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Geo Detection Payment Methods Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Get Supported Countries",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Required Countries Present",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Country Data Structure",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for KE",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Kenya Payment Methods (M-Pesa + Card)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Kenya Currency (KES)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for UG",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Uganda Payment Methods (MTN + Airtel + Card)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Uganda Currency (UGX)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Payment Methods for INTL",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "International Payment Methods (Card Only)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "International Currency (USD)",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Checkout with KE mpesa",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (flutterwave)",
+      "success": false,
+      "details": "Expected flutterwave, got stripe"
+    },
+    {
+      "test": "Checkout with UG mtn",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (flutterwave)",
+      "success": false,
+      "details": "Expected flutterwave, got stripe"
+    },
+    {
+      "test": "Checkout with INTL card",
+      "success": true,
+      "details": ""
+    },
+    {
+      "test": "Correct Provider Selection (stripe)",
+      "success": true,
+      "details": ""
+    }
+  ]
+}
