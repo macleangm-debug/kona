@@ -137,12 +137,12 @@ const AppContent = () => {
   const isWelcomePage = location.pathname === "/welcome";
   
   // Pages that should have their own layout (no header/nav)
-  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact"];
-  const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isLandingPage;
+  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome"];
+  const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Pages that skip splash screen
-  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact"];
-  const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isLandingPage;
+  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome"];
+  const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Determine if we're in the "app" area (not landing page)
   const isInApp = isPWA || hasEnteredApp || user || location.pathname !== "/";
