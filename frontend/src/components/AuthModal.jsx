@@ -226,6 +226,9 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
   
+  // Track if modal is transitioning to prevent race conditions
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  
   // Form fields
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
