@@ -230,6 +230,10 @@ async def register(data: UserCreate, request: Request):
 async def login(data: UserLogin, request: Request):
     """Login with email or phone"""
     from services import create_session, check_device_limit, DEFAULT_DEVICE_LIMIT
+    from middleware.security import get_login_identifier, record_login_attempt
+    
+    # Get login identifier for tracking attempts
+    login_id = await get_login_identifier(request)
     
     # Detect user's geo-location from IP
     client_ip = request.client.host
@@ -255,11 +259,15 @@ async def login(data: UserLogin, request: Request):
         })
     
     if not user:
+        # Record failed attempt
+        await record_login_attempt(login_id, success=False)
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Check password - the field is named 'password' in DB
     password_hash = user.get("password")
     if not password_hash or not verify_password(data.password, password_hash):
+        # Record failed attempt
+        await record_login_attempt(login_id, success=False)
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
     # Check device limit based on subscription tier
@@ -271,6 +279,9 @@ async def login(data: UserLogin, request: Request):
             status_code=403, 
             detail=f"Device limit reached ({limit_status['max_devices']} devices for {subscription_tier} tier). Upgrade your subscription or log out from another device."
         )
+    
+    # Record successful login
+    await record_login_attempt(login_id, success=True)
     
     # Create session for this login
     session = await create_session(user["id"], request, geo_data)
