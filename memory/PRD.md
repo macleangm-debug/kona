@@ -140,6 +140,10 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 - [x] Netflix-style lazy loading for carousels
 - [x] Login modal state management fix
 - [x] Production scaling documentation
+- [x] Push notifications (Admin + Automated triggers)
+- [x] Social sharing features
+- [x] Analytics export (CSV/PDF)
+- [x] Creator payout automation (tiered system)
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
@@ -147,7 +151,6 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 - [ ] Video encoding/CDN integration
 
 ### P2 (Medium)
-- [ ] Push notifications
 - [ ] Social sharing features
 - [ ] Creator payout automation
 
