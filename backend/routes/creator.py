@@ -388,6 +388,315 @@ async def compare_analytics_periods(
     }
 
 
+
+@router.get("/analytics/audience")
+async def get_audience_analytics(
+    user: dict = Depends(get_current_user),
+    period: str = Query("30d", description="Time period: 7d, 30d, 90d, all")
+):
+    """Get audience demographics and geographic distribution"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    now = datetime.now(timezone.utc)
+    
+    if period == "7d":
+        start = now - timedelta(days=7)
+    elif period == "30d":
+        start = now - timedelta(days=30)
+    elif period == "90d":
+        start = now - timedelta(days=90)
+    else:
+        start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    
+    creator_id = creator["id"]
+    
+    # Get view records with geo data
+    view_records = await db.view_records.find({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": start.isoformat()}
+    }).to_list(50000)
+    
+    # Aggregate by country
+    country_views = {}
+    device_views = {"mobile": 0, "desktop": 0, "tablet": 0, "unknown": 0}
+    hourly_views = {str(h).zfill(2): 0 for h in range(24)}
+    returning_viewers = set()
+    new_viewers = set()
+    
+    viewer_watch_counts = {}
+    
+    for record in view_records:
+        # Country aggregation
+        country = record.get("country_code") or record.get("geo", {}).get("country_code") or "Unknown"
+        country_name = record.get("country_name") or record.get("geo", {}).get("country_name") or country
+        if country not in country_views:
+            country_views[country] = {"code": country, "name": country_name, "views": 0, "earnings": 0}
+        country_views[country]["views"] += 1
+        country_views[country]["earnings"] += record.get("creator_share", 0)
+        
+        # Device aggregation
+        device = record.get("device_type", "unknown").lower()
+        if device in device_views:
+            device_views[device] += 1
+        else:
+            device_views["unknown"] += 1
+        
+        # Hourly distribution
+        try:
+            record_time = datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00"))
+            hour = str(record_time.hour).zfill(2)
+            hourly_views[hour] += 1
+        except (ValueError, KeyError):
+            pass
+        
+        # Track viewer engagement
+        user_id = record.get("user_id")
+        if user_id:
+            if user_id not in viewer_watch_counts:
+                viewer_watch_counts[user_id] = 0
+            viewer_watch_counts[user_id] += 1
+    
+    # Calculate returning vs new
+    for user_id, count in viewer_watch_counts.items():
+        if count > 1:
+            returning_viewers.add(user_id)
+        else:
+            new_viewers.add(user_id)
+    
+    # Sort countries by views
+    top_countries = sorted(country_views.values(), key=lambda x: x["views"], reverse=True)[:10]
+    
+    # Calculate percentages
+    total_views = sum(device_views.values())
+    device_distribution = {
+        device: {"count": count, "percentage": round(count / max(total_views, 1) * 100, 1)}
+        for device, count in device_views.items()
+    }
+    
+    # Peak hours analysis
+    peak_hours = sorted(hourly_views.items(), key=lambda x: x[1], reverse=True)[:3]
+    
+    # Audience segments
+    highly_engaged = len([u for u, c in viewer_watch_counts.items() if c >= 5])
+    moderately_engaged = len([u for u, c in viewer_watch_counts.items() if 2 <= c < 5])
+    casual_viewers = len([u for u, c in viewer_watch_counts.items() if c == 1])
+    
+    return {
+        "period": period,
+        "geographic": {
+            "top_countries": top_countries,
+            "total_countries": len(country_views)
+        },
+        "devices": device_distribution,
+        "watch_time": {
+            "hourly_distribution": [{"hour": h, "views": v} for h, v in sorted(hourly_views.items())],
+            "peak_hours": [{"hour": h, "views": v} for h, v in peak_hours],
+            "best_time_to_post": peak_hours[0][0] + ":00 UTC" if peak_hours and peak_hours[0][1] > 0 else "No data"
+        },
+        "audience_segments": {
+            "highly_engaged": {"count": highly_engaged, "description": "5+ episodes watched"},
+            "moderately_engaged": {"count": moderately_engaged, "description": "2-4 episodes watched"},
+            "casual_viewers": {"count": casual_viewers, "description": "1 episode watched"},
+            "total_unique_viewers": len(viewer_watch_counts)
+        },
+        "retention": {
+            "returning_viewers": len(returning_viewers),
+            "new_viewers": len(new_viewers),
+            "return_rate": round(len(returning_viewers) / max(len(viewer_watch_counts), 1) * 100, 1)
+        }
+    }
+
+
+@router.get("/analytics/realtime")
+async def get_realtime_analytics(user: dict = Depends(get_current_user)):
+    """Get real-time analytics (last 24 hours with hourly breakdown)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    now = datetime.now(timezone.utc)
+    last_24h = now - timedelta(hours=24)
+    last_1h = now - timedelta(hours=1)
+    
+    creator_id = creator["id"]
+    
+    # Views in last hour
+    views_1h = await db.view_records.count_documents({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": last_1h.isoformat()}
+    })
+    
+    # Views in last 24h
+    views_24h = await db.view_records.count_documents({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": last_24h.isoformat()}
+    })
+    
+    # Hourly breakdown for last 24 hours
+    view_records = await db.view_records.find({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": last_24h.isoformat()}
+    }).to_list(10000)
+    
+    hourly_data = {}
+    for i in range(24):
+        hour_start = now - timedelta(hours=24-i)
+        hour_key = hour_start.strftime("%H:00")
+        hourly_data[hour_key] = {"views": 0, "earnings": 0}
+    
+    for record in view_records:
+        try:
+            record_time = datetime.fromisoformat(record["timestamp"].replace("Z", "+00:00"))
+            hour_key = record_time.strftime("%H:00")
+            if hour_key in hourly_data:
+                hourly_data[hour_key]["views"] += 1
+                hourly_data[hour_key]["earnings"] += record.get("creator_share", 0)
+        except (ValueError, KeyError):
+            pass
+    
+    # Active viewers (unique users in last hour)
+    recent_records = await db.view_records.find({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": last_1h.isoformat()}
+    }).to_list(1000)
+    
+    active_viewers = len(set(r.get("user_id") for r in recent_records if r.get("user_id")))
+    
+    # Currently trending episode
+    episode_views = {}
+    for r in recent_records:
+        ep_id = r.get("episode_id")
+        if ep_id:
+            episode_views[ep_id] = episode_views.get(ep_id, 0) + 1
+    
+    trending_episode = None
+    if episode_views:
+        top_ep_id = max(episode_views, key=episode_views.get)
+        ep = await db.creator_episodes.find_one({"id": top_ep_id}, {"_id": 0})
+        if ep:
+            trending_episode = {
+                "episode_id": top_ep_id,
+                "title": ep.get("title", "Unknown"),
+                "episode_code": ep.get("episode_code", ""),
+                "views_last_hour": episode_views[top_ep_id]
+            }
+    
+    return {
+        "timestamp": now.isoformat(),
+        "live_stats": {
+            "views_last_hour": views_1h,
+            "views_last_24h": views_24h,
+            "active_viewers": active_viewers
+        },
+        "hourly_breakdown": [{"hour": h, **v} for h, v in sorted(hourly_data.items())],
+        "trending_now": trending_episode,
+        "velocity": {
+            "views_per_hour": round(views_24h / 24, 1),
+            "trend": "high" if views_1h > (views_24h / 24) else "normal"
+        }
+    }
+
+
+@router.get("/analytics/content")
+async def get_content_analytics(
+    user: dict = Depends(get_current_user),
+    period: str = Query("30d", description="Time period: 7d, 30d, 90d, all")
+):
+    """Get content performance analytics - what content performs best"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    now = datetime.now(timezone.utc)
+    
+    if period == "7d":
+        start = now - timedelta(days=7)
+    elif period == "30d":
+        start = now - timedelta(days=30)
+    elif period == "90d":
+        start = now - timedelta(days=90)
+    else:
+        start = datetime(2020, 1, 1, tzinfo=timezone.utc)
+    
+    creator_id = creator["id"]
+    
+    # Get all series
+    series_list = await db.creator_series.find({"creator_id": creator_id}, {"_id": 0}).to_list(100)
+    
+    # Get view records
+    view_records = await db.view_records.find({
+        "creator_id": creator_id,
+        "timestamp": {"$gte": start.isoformat()}
+    }).to_list(50000)
+    
+    # Genre performance
+    genre_stats = {}
+    series_id_to_genre = {s["id"]: s.get("genre", "Other") for s in series_list}
+    
+    for record in view_records:
+        series_id = record.get("series_id")
+        genre = series_id_to_genre.get(series_id, "Other")
+        if genre not in genre_stats:
+            genre_stats[genre] = {"views": 0, "earnings": 0, "series_count": 0}
+        genre_stats[genre]["views"] += 1
+        genre_stats[genre]["earnings"] += record.get("creator_share", 0)
+    
+    # Count series per genre
+    for s in series_list:
+        genre = s.get("genre", "Other")
+        if genre in genre_stats:
+            genre_stats[genre]["series_count"] += 1
+    
+    # Episode performance by position
+    episode_position_stats = {}
+    for record in view_records:
+        ep_num = record.get("episode_number", 1)
+        if ep_num not in episode_position_stats:
+            episode_position_stats[ep_num] = {"views": 0, "earnings": 0}
+        episode_position_stats[ep_num]["views"] += 1
+        episode_position_stats[ep_num]["earnings"] += record.get("creator_share", 0)
+    
+    # Calculate drop-off rate
+    ep_positions = sorted(episode_position_stats.keys())
+    drop_off_analysis = []
+    for i, ep_num in enumerate(ep_positions):
+        prev_views = episode_position_stats[ep_positions[i-1]]["views"] if i > 0 else episode_position_stats[ep_num]["views"]
+        curr_views = episode_position_stats[ep_num]["views"]
+        retention = round(curr_views / max(prev_views, 1) * 100, 1)
+        drop_off_analysis.append({
+            "episode_number": ep_num,
+            "views": curr_views,
+            "retention_from_previous": retention
+        })
+    
+    # Content length analysis (if duration is tracked)
+    # Best performing content attributes
+    
+    return {
+        "period": period,
+        "genre_performance": [
+            {"genre": g, **stats, "avg_views_per_series": round(stats["views"] / max(stats["series_count"], 1))}
+            for g, stats in sorted(genre_stats.items(), key=lambda x: x[1]["views"], reverse=True)
+        ],
+        "episode_position_analysis": drop_off_analysis[:15],
+        "insights": {
+            "best_performing_genre": max(genre_stats.items(), key=lambda x: x[1]["views"])[0] if genre_stats else "N/A",
+            "highest_drop_off": min(drop_off_analysis, key=lambda x: x["retention_from_previous"])["episode_number"] if drop_off_analysis else "N/A",
+            "recommendations": [
+                "Episode 1 is your hook - make it compelling",
+                f"Your {max(genre_stats.items(), key=lambda x: x[1]['views'])[0] if genre_stats else 'content'} content performs best",
+                "Consider shorter seasons if drop-off is high after episode 3"
+            ]
+        }
+    }
+
+
+
 # ============ SERIES SUBMISSION & APPROVAL WORKFLOW ============
 
 @router.post("/series/submit", response_model=SeriesSubmissionResponse)
