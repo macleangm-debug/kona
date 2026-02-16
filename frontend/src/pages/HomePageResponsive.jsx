@@ -84,7 +84,7 @@ const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveF
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {series.map((s, index) => (
-            <SeriesCardDesktop
+            <LazySeriesCardDesktop
               key={s.id}
               series={s}
               badge={badge ? (typeof badge === 'function' ? badge(s, index) : badge) : null}
