@@ -84,10 +84,18 @@ class KonaAnalyticsAPITester:
                 "password": "SuperAdmin2025!"
             }
         )
-        if success and 'access_token' in response:
-            self.token = response['access_token']
-            print(f"   Token obtained: {self.token[:20]}...")
-            return True
+        if success:
+            print(f"   Response keys: {list(response.keys())}")
+            if 'access_token' in response:
+                self.token = response['access_token']
+                print(f"   Token obtained: {self.token[:20]}...")
+                return True
+            elif 'token' in response:
+                self.token = response['token']
+                print(f"   Token obtained: {self.token[:20]}...")
+                return True
+            else:
+                print(f"   No token found in response")
         return False
 
     def test_security_config(self):
