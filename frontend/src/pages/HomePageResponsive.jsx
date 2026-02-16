@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance, DailyRewardModal, ReminderSuccessModal, SearchModal, KonaLoader } from "@/components";
 import SeriesCardDesktop from "@/components/SeriesCardDesktop";
+import { LazySeriesCardDesktop } from "@/components/LazySeriesCardDesktop";
 import SpinInviteModal from "@/components/SpinInviteModal";
 import SEO from "@/components/SEO";
 import Footer from "@/components/Footer";
