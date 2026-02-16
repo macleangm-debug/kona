@@ -334,6 +334,10 @@ code {
   min-height: 180px;
 }
 
+.lazy-card-wrapper-desktop {
+  min-height: 280px;
+}
+
 /* Smooth card reveal animation */
 .animate-card-reveal {
   animation: fadeInScale 0.3s ease-out forwards;
