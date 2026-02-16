@@ -272,6 +272,10 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, custom_rate_limit_handler)
 app.add_middleware(SlowAPIMiddleware)
 
+# Security middleware (bot detection, brute force protection)
+from middleware.security import SecurityMiddleware
+app.add_middleware(SecurityMiddleware)
+
 # CORS - configurable via environment
 from config.settings import CORS_ORIGINS
 app.add_middleware(
