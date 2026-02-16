@@ -8,6 +8,7 @@ export { SeriesCard } from './SeriesCard';
 export { LazySeriesCard, LazyCarouselRow } from './LazySeriesCard';
 export { SeriesCardDesktop } from './SeriesCardDesktop';
 export { LazySeriesCardDesktop } from './LazySeriesCardDesktop';
+export { ShareButton, QuickShare } from './ShareButton';
 export { ContinueWatchingCard } from './ContinueWatchingCard';
 export { ComingSoonCard } from './ComingSoonCard';
 export { ReminderSuccessModal } from './ReminderSuccessModal';
