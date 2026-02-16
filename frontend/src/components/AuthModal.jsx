@@ -929,11 +929,32 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
               {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
               <button
                 onClick={() => {
+                  // Prevent rapid toggling during transition
+                  if (isTransitioning) return;
+                  
+                  setIsTransitioning(true);
                   setIsLogin(!isLogin);
-                  resetForm();
+                  
+                  // Reset form fields atomically
+                  setEmail("");
+                  setPhone("");
+                  setPassword("");
+                  setName("");
+                  setReferralCode("");
+                  setOtp(["", "", "", "", "", ""]);
+                  setOtpSent(false);
+                  setOtpVerified(false);
+                  setShowOTPInput(false);
+                  setReferralValid(null);
+                  setReferralBonus(0);
+                  
+                  requestAnimationFrame(() => {
+                    setIsTransitioning(false);
+                  });
                 }}
                 className="text-primary hover:underline"
                 data-testid="auth-toggle-btn"
+                disabled={isTransitioning}
               >
                 {isLogin ? "Sign up" : "Sign in"}
               </button>
