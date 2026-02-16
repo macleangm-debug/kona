@@ -165,13 +165,11 @@ const AppContent = () => {
           Businesses and Creators have mandatory verification in their portals */}
 
       <Routes>
-        {/* Landing page for first-time web visitors */}
-        <Route path="/" element={
-          isLandingPage 
-            ? <LandingPage onAuthClick={() => handleAuthClick()} />
-            : <HomePageResponsive onAuthClick={() => handleAuthClick()} />
-        } />
-        {/* Explicit /home route for post-landing navigation */}
+        {/* Series carousel is now the default landing page */}
+        <Route path="/" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
+        {/* Marketing landing page moved to /welcome */}
+        <Route path="/welcome" element={<LandingPage onAuthClick={() => handleAuthClick()} />} />
+        {/* Explicit /home route for backwards compatibility */}
         <Route path="/home" element={<HomePageResponsive onAuthClick={() => handleAuthClick()} />} />
         <Route path="/discover" element={<DiscoverPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/rewards" element={<RewardsPage onAuthClick={() => handleAuthClick()} />} />
