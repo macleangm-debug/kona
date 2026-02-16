@@ -17,7 +17,6 @@ export { MilestoneAlert } from './MilestoneAlert';
 export { SearchModal } from './SearchModal';
 export { KonaLogo2Full } from './KonaLogo';
 export { DesktopHeader } from './DesktopHeader';
-export { SeriesCardDesktop } from './SeriesCardDesktop';
 export { SplashScreen, KonaLoader, PageLoader, ContentLoader } from './SplashScreen';
 
 // Gamification components
