@@ -152,8 +152,8 @@ const AppContent = () => {
       {/* Splash Screen - Only show in app area, not on landing page */}
       {showSplash && !shouldSkipSplash && isInApp && <SplashWithSound onComplete={handleSplashComplete} minDuration={5000} />}
 
-      {/* Desktop Header - Only on desktop and not on full-screen pages and not on landing page */}
-      {isDesktop && !isFullScreenPage && !isLandingPage && (
+      {/* Desktop Header - Only on desktop and not on full-screen pages */}
+      {isDesktop && !isFullScreenPage && (
         <DesktopHeader 
           onAuthClick={() => handleAuthClick()} 
           onSearchClick={() => setShowSearch(true)}
