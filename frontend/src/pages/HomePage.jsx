@@ -14,7 +14,7 @@ import { PageLoader } from "@/components/SplashScreen";
 import { API } from "@/config";
 import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
-import { CoinBalance, SeriesCard, ContinueWatchingCard, ComingSoonCard, DailyRewardModal, ReminderSuccessModal, SearchModal } from "@/components";
+import { CoinBalance, SeriesCard, LazySeriesCard, ContinueWatchingCard, ComingSoonCard, DailyRewardModal, ReminderSuccessModal, SearchModal } from "@/components";
 
 // Tab Button
 const TabButton = ({ active, children, onClick }) => (
