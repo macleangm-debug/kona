@@ -44,42 +44,45 @@ const SupportChatWidget = () => {
 
   // Only show on marketing/static pages
   const isMarketingPage = MARKETING_PAGES.includes(location.pathname);
-  
-  // Don't render on app pages (home, discover, watch, profile, etc.)
-  if (!isMarketingPage) {
-    return null;
-  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // All hooks must be called before any conditional returns
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (isMarketingPage) {
+      scrollToBottom();
+    }
+  }, [messages, isMarketingPage]);
 
   useEffect(() => {
-    if (isOpen && !isMinimized && inputRef.current) {
+    if (isMarketingPage && isOpen && !isMinimized && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen, isMinimized]);
+  }, [isOpen, isMinimized, isMarketingPage]);
 
   // Track unread messages when minimized
   useEffect(() => {
-    if (isMinimized && messages.length > 1) {
+    if (isMarketingPage && isMinimized && messages.length > 1) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.role === "assistant") {
         setUnreadCount(prev => prev + 1);
       }
     }
-  }, [messages, isMinimized]);
+  }, [messages, isMinimized, isMarketingPage]);
 
   // Clear unread when expanded
   useEffect(() => {
-    if (!isMinimized && isOpen) {
+    if (isMarketingPage && !isMinimized && isOpen) {
       setUnreadCount(0);
     }
-  }, [isMinimized, isOpen]);
+  }, [isMinimized, isOpen, isMarketingPage]);
+  
+  // Don't render on app pages (home, discover, watch, profile, etc.)
+  if (!isMarketingPage) {
+    return null;
+  }
 
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
