@@ -425,3 +425,433 @@ async def get_email_queue(
         "note": "Email service integration pending - emails are queued but not yet sent"
     }
 
+
+# ============ ADMIN NOTIFICATION MANAGEMENT ============
+from routes.admin import require_admin, require_super_admin
+from pydantic import BaseModel
+from typing import List
+from enum import Enum
+from datetime import timedelta
+
+
+class NotificationTarget(str, Enum):
+    ALL_USERS = "all_users"
+    SUBSCRIBERS = "subscribers"
+    INACTIVE_USERS = "inactive_users"
+    CREATORS = "creators"
+    VIP_USERS = "vip_users"
+    LOW_BALANCE = "low_balance"
+    SPECIFIC_USERS = "specific_users"
+
+
+class NotificationPriority(str, Enum):
+    LOW = "low"
+    NORMAL = "normal"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
+class AdminNotificationRequest(BaseModel):
+    title: str
+    message: str
+    notification_type: str = "system"
+    target: NotificationTarget = NotificationTarget.ALL_USERS
+    priority: NotificationPriority = NotificationPriority.NORMAL
+    target_user_ids: Optional[List[str]] = None
+    target_series_id: Optional[str] = None
+    action_url: Optional[str] = None
+    image_url: Optional[str] = None
+    scheduled_at: Optional[str] = None
+
+
+class TriggerConfigUpdate(BaseModel):
+    enabled: bool
+    config: dict = {}
+
+
+# Default automated trigger configurations
+DEFAULT_TRIGGERS = {
+    "new_episode": {
+        "enabled": True,
+        "title_template": "New Episode Available!",
+        "message_template": "{series_title} - Episode {episode_number} is now live!",
+        "priority": "high"
+    },
+    "series_follow_update": {
+        "enabled": True,
+        "title_template": "Update from {series_title}",
+        "message_template": "A series you follow has new content!",
+        "priority": "normal"
+    },
+    "coin_balance_low": {
+        "enabled": True,
+        "threshold": 10,
+        "title_template": "Running Low on Coins",
+        "message_template": "You have only {coins} coins left. Top up to keep watching!",
+        "priority": "normal"
+    },
+    "weekly_digest": {
+        "enabled": True,
+        "day_of_week": 0,
+        "hour": 10,
+        "title_template": "Your Weekly Kona Digest",
+        "message_template": "Check out {new_episodes} new episodes and {trending_count} trending series this week!",
+        "priority": "low"
+    },
+    "inactive_user": {
+        "enabled": True,
+        "days_inactive": 7,
+        "title_template": "We Miss You!",
+        "message_template": "You haven't watched anything in {days} days. {new_content} new episodes are waiting!",
+        "priority": "normal"
+    },
+    "creator_milestone": {
+        "enabled": True,
+        "milestones": [100, 1000, 10000, 100000, 1000000],
+        "title_template": "Milestone Achieved!",
+        "message_template": "Your series {series_title} reached {milestone} views!",
+        "priority": "high"
+    }
+}
+
+
+async def get_target_users(target: NotificationTarget, target_user_ids: List[str] = None,
+                           target_series_id: str = None, days_inactive: int = 7,
+                           coin_threshold: int = 10) -> List[dict]:
+    """Get users based on target criteria"""
+    users = []
+    
+    if target == NotificationTarget.ALL_USERS:
+        users = await db.users.find({}, {"_id": 0, "id": 1, "name": 1, "email": 1}).to_list(100000)
+    
+    elif target == NotificationTarget.SPECIFIC_USERS and target_user_ids:
+        users = await db.users.find(
+            {"id": {"$in": target_user_ids}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1}
+        ).to_list(len(target_user_ids))
+    
+    elif target == NotificationTarget.SUBSCRIBERS and target_series_id:
+        watch_history = await db.watch_history.find(
+            {"series_id": target_series_id},
+            {"user_id": 1}
+        ).to_list(100000)
+        user_ids = list(set([w["user_id"] for w in watch_history]))
+        
+        my_list_users = await db.users.find(
+            {"my_list": target_series_id},
+            {"_id": 0, "id": 1}
+        ).to_list(100000)
+        user_ids.extend([u["id"] for u in my_list_users])
+        user_ids = list(set(user_ids))
+        
+        users = await db.users.find(
+            {"id": {"$in": user_ids}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1}
+        ).to_list(len(user_ids))
+    
+    elif target == NotificationTarget.INACTIVE_USERS:
+        cutoff_date = (datetime.now(timezone.utc) - timedelta(days=days_inactive)).isoformat()
+        users = await db.users.find(
+            {"last_active": {"$lt": cutoff_date}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1}
+        ).to_list(100000)
+    
+    elif target == NotificationTarget.CREATORS:
+        creators = await db.creators.find(
+            {"status": "approved"},
+            {"_id": 0, "user_id": 1}
+        ).to_list(10000)
+        creator_user_ids = [c["user_id"] for c in creators if c.get("user_id")]
+        users = await db.users.find(
+            {"id": {"$in": creator_user_ids}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1}
+        ).to_list(len(creator_user_ids))
+    
+    elif target == NotificationTarget.VIP_USERS:
+        users = await db.users.find(
+            {"subscription_tier": {"$in": ["premium", "vip", "ultra"]}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1}
+        ).to_list(100000)
+    
+    elif target == NotificationTarget.LOW_BALANCE:
+        users = await db.users.find(
+            {"coins": {"$lt": coin_threshold}},
+            {"_id": 0, "id": 1, "name": 1, "email": 1, "coins": 1}
+        ).to_list(100000)
+    
+    return users
+
+
+async def send_bulk_notifications(users: List[dict], title: str, message: str,
+                                  notification_type: str, priority: str = "normal",
+                                  action_url: str = None, image_url: str = None,
+                                  batch_id: str = None):
+    """Send notifications to multiple users"""
+    if not batch_id:
+        batch_id = f"batch-{uuid.uuid4().hex[:8]}"
+    
+    notifications = []
+    now = datetime.now(timezone.utc).isoformat()
+    type_info = NOTIFICATION_TYPES.get(notification_type, NOTIFICATION_TYPES["system"])
+    
+    for user in users:
+        notifications.append({
+            "id": f"notif-{uuid.uuid4().hex[:12]}",
+            "user_id": user["id"],
+            "type": notification_type,
+            "icon": type_info["icon"],
+            "color": type_info["color"],
+            "title": title,
+            "message": message,
+            "priority": priority,
+            "action_url": action_url,
+            "image_url": image_url,
+            "batch_id": batch_id,
+            "read": False,
+            "created_at": now
+        })
+    
+    if notifications:
+        await db.notifications.insert_many(notifications)
+    
+    return len(notifications)
+
+
+@router.post("/admin/send")
+async def admin_send_notification(
+    data: AdminNotificationRequest,
+    user: dict = Depends(require_admin)
+):
+    """Send notification to targeted users (Admin only)"""
+    
+    target_users = await get_target_users(
+        target=data.target,
+        target_user_ids=data.target_user_ids,
+        target_series_id=data.target_series_id
+    )
+    
+    if not target_users:
+        raise HTTPException(status_code=400, detail="No users match the target criteria")
+    
+    batch_id = f"batch-{uuid.uuid4().hex[:8]}"
+    
+    # Log the campaign
+    campaign = {
+        "id": batch_id,
+        "title": data.title,
+        "message": data.message,
+        "notification_type": data.notification_type,
+        "target": data.target,
+        "target_count": len(target_users),
+        "priority": data.priority,
+        "action_url": data.action_url,
+        "image_url": data.image_url,
+        "scheduled_at": data.scheduled_at,
+        "sent_by": user["id"],
+        "sent_by_name": user.get("name", "Admin"),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "sending" if not data.scheduled_at else "scheduled"
+    }
+    await db.notification_campaigns.insert_one(campaign)
+    
+    if not data.scheduled_at:
+        sent_count = await send_bulk_notifications(
+            users=target_users,
+            title=data.title,
+            message=data.message,
+            notification_type=data.notification_type,
+            priority=data.priority,
+            action_url=data.action_url,
+            image_url=data.image_url,
+            batch_id=batch_id
+        )
+        
+        await db.notification_campaigns.update_one(
+            {"id": batch_id},
+            {"$set": {"status": "sent", "sent_count": sent_count, "sent_at": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        return {
+            "message": f"Notification sent to {sent_count} users",
+            "batch_id": batch_id,
+            "target_count": len(target_users)
+        }
+    else:
+        return {
+            "message": f"Notification scheduled for {data.scheduled_at}",
+            "batch_id": batch_id,
+            "target_count": len(target_users)
+        }
+
+
+@router.get("/admin/campaigns")
+async def get_notification_campaigns(
+    user: dict = Depends(require_admin),
+    status: str = None,
+    limit: int = 50
+):
+    """Get notification campaign history"""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    campaigns = await db.notification_campaigns.find(
+        query,
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return {"campaigns": campaigns}
+
+
+@router.delete("/admin/campaigns/{campaign_id}")
+async def delete_campaign(campaign_id: str, user: dict = Depends(require_admin)):
+    """Delete a notification campaign"""
+    result = await db.notification_campaigns.delete_one({"id": campaign_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+    return {"message": "Campaign deleted"}
+
+
+@router.get("/admin/triggers")
+async def get_trigger_configs(user: dict = Depends(require_admin)):
+    """Get automated trigger configurations"""
+    configs = await db.notification_triggers.find({}, {"_id": 0}).to_list(100)
+    
+    result = {}
+    for trigger_type, default_config in DEFAULT_TRIGGERS.items():
+        saved_config = next((c for c in configs if c.get("trigger_type") == trigger_type), None)
+        if saved_config:
+            result[trigger_type] = {**default_config, **saved_config}
+        else:
+            result[trigger_type] = {**default_config, "trigger_type": trigger_type}
+    
+    return {"triggers": result}
+
+
+@router.put("/admin/triggers/{trigger_type}")
+async def update_trigger_config(
+    trigger_type: str,
+    config: TriggerConfigUpdate,
+    user: dict = Depends(require_admin)
+):
+    """Update an automated trigger configuration"""
+    if trigger_type not in DEFAULT_TRIGGERS:
+        raise HTTPException(status_code=400, detail="Invalid trigger type")
+    
+    await db.notification_triggers.update_one(
+        {"trigger_type": trigger_type},
+        {"$set": {
+            "trigger_type": trigger_type,
+            "enabled": config.enabled,
+            **config.config,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": user["id"]
+        }},
+        upsert=True
+    )
+    
+    return {"message": f"Trigger '{trigger_type}' updated", "enabled": config.enabled}
+
+
+@router.get("/admin/stats")
+async def get_admin_notification_stats(user: dict = Depends(require_admin)):
+    """Get notification statistics for admin dashboard"""
+    total_sent = await db.notifications.count_documents({})
+    total_read = await db.notifications.count_documents({"read": True})
+    total_unread = await db.notifications.count_documents({"read": False})
+    
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()
+    sent_today = await db.notifications.count_documents({
+        "created_at": {"$gte": today_start}
+    })
+    
+    pipeline = [
+        {"$group": {"_id": "$type", "count": {"$sum": 1}}}
+    ]
+    by_type = await db.notifications.aggregate(pipeline).to_list(20)
+    
+    recent_campaigns = await db.notification_campaigns.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(5).to_list(5)
+    
+    # Get trigger statuses
+    triggers = await db.notification_triggers.find({}, {"_id": 0, "trigger_type": 1, "enabled": 1}).to_list(10)
+    trigger_status = {t["trigger_type"]: t.get("enabled", True) for t in triggers}
+    
+    return {
+        "total_sent": total_sent,
+        "total_read": total_read,
+        "total_unread": total_unread,
+        "read_rate": round((total_read / total_sent * 100) if total_sent > 0 else 0, 1),
+        "sent_today": sent_today,
+        "by_type": {item["_id"]: item["count"] for item in by_type},
+        "recent_campaigns": recent_campaigns,
+        "triggers": trigger_status
+    }
+
+
+# ============ AUTOMATED TRIGGER FUNCTIONS ============
+
+async def trigger_new_episode_notification(series_id: str, episode_number: int):
+    """Triggered when a new episode is published"""
+    config = await db.notification_triggers.find_one({"trigger_type": "new_episode"})
+    if config and not config.get("enabled", True):
+        return 0
+    
+    cfg = config or DEFAULT_TRIGGERS["new_episode"]
+    series = await db.series.find_one({"id": series_id}, {"_id": 0, "title": 1, "thumbnail": 1})
+    if not series:
+        return 0
+    
+    title = cfg.get("title_template", DEFAULT_TRIGGERS["new_episode"]["title_template"])
+    message = cfg.get("message_template", DEFAULT_TRIGGERS["new_episode"]["message_template"])
+    message = message.format(series_title=series["title"], episode_number=episode_number)
+    
+    users = await get_target_users(NotificationTarget.SUBSCRIBERS, target_series_id=series_id)
+    
+    if users:
+        return await send_bulk_notifications(
+            users=users,
+            title=title,
+            message=message,
+            notification_type="new_episode",
+            priority=cfg.get("priority", "high"),
+            action_url=f"/series/{series_id}",
+            image_url=series.get("thumbnail")
+        )
+    return 0
+
+
+async def trigger_low_coin_notification(user_id: str, current_coins: int):
+    """Triggered when user's coin balance drops below threshold"""
+    config = await db.notification_triggers.find_one({"trigger_type": "coin_balance_low"})
+    if config and not config.get("enabled", True):
+        return
+    
+    cfg = config or DEFAULT_TRIGGERS["coin_balance_low"]
+    threshold = cfg.get("threshold", 10)
+    if current_coins >= threshold:
+        return
+    
+    recent = await db.notifications.find_one({
+        "user_id": user_id,
+        "type": "coins",
+        "created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()}
+    })
+    if recent:
+        return
+    
+    title = cfg.get("title_template", DEFAULT_TRIGGERS["coin_balance_low"]["title_template"])
+    message = cfg.get("message_template", DEFAULT_TRIGGERS["coin_balance_low"]["message_template"])
+    message = message.format(coins=current_coins)
+    
+    await create_notification(
+        user_id=user_id,
+        notification_type="coins",
+        title=title,
+        message=message,
+        action_url="/shop"
+    )
+
+
