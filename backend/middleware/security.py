@@ -82,13 +82,21 @@ SUSPICIOUS_REGEX = re.compile('|'.join(SUSPICIOUS_PATTERNS), re.IGNORECASE)
 def is_bot(user_agent: str) -> bool:
     """Check if user agent is a bot"""
     if not user_agent:
-        return True  # No user agent = suspicious
+        return False  # Allow requests without user agent (some mobile apps)
     
-    # Check if it's an allowed bot
+    user_agent_lower = user_agent.lower()
+    
+    # Allow all standard browsers
+    browser_indicators = ['mozilla', 'chrome', 'safari', 'firefox', 'edge', 'opera', 'webkit']
+    if any(indicator in user_agent_lower for indicator in browser_indicators):
+        # It's a browser - allow it unless it's specifically a blocked bot
+        return False
+    
+    # Check if it's an allowed bot (social media, search engines)
     if ALLOWED_BOT_REGEX.search(user_agent):
         return False
     
-    # Check if it's a blocked bot
+    # Check if it's a blocked bot pattern
     return bool(BOT_REGEX.search(user_agent))
 
 
