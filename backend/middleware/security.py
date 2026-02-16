@@ -51,15 +51,12 @@ def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) -> JSO
 
 # Known bot user-agent patterns
 BOT_PATTERNS = [
-    r'bot', r'crawler', r'spider', r'scraper', r'curl', r'wget', r'python-requests',
-    r'axios', r'node-fetch', r'go-http-client', r'java/', r'okhttp',
-    r'postman', r'insomnia', r'httpie', r'apache-httpclient',
-    r'googlebot', r'bingbot', r'yandexbot', r'baiduspider', r'facebookexternalhit',
-    r'twitterbot', r'rogerbot', r'linkedinbot', r'embedly', r'quora link preview',
-    r'showyoubot', r'outbrain', r'pinterest', r'slackbot', r'vkshare',
-    r'w3c_validator', r'validator', r'feedfetcher', r'mediapartners-google',
-    r'adsbot', r'semrush', r'ahrefsbot', r'mj12bot', r'dotbot', r'petalbot',
-    r'headlesschrome', r'phantomjs', r'selenium', r'puppeteer', r'playwright'
+    r'bot(?![\w-])', r'crawler', r'spider', r'scraper',  # Common bots (bot with word boundary)
+    r'python-requests', r'python-urllib', r'python-httpx',  # Python libraries
+    r'go-http-client', r'java/', r'okhttp',  # Other languages
+    r'postman', r'insomnia', r'httpie',  # API testing tools
+    r'semrush', r'ahrefsbot', r'mj12bot', r'dotbot', r'petalbot',  # SEO bots
+    r'phantomjs', r'selenium(?![\w-])',  # Headless browsers (but not in normal UA)
 ]
 
 # Compiled regex for faster matching
