@@ -99,6 +99,9 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 ### P0 (Critical)
 - [x] Security fixes (env vars)
 - [x] Creator analytics enhancements
+- [x] Netflix-style lazy loading for carousels
+- [x] Login modal state management fix
+- [x] Production scaling documentation
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
