@@ -222,8 +222,8 @@ const AppContent = () => {
         <Route path="/business/campaigns/new" element={<CampaignCreatePage />} />
       </Routes>
 
-      {/* Bottom Navigation - Only on mobile and not on full-screen pages and not on landing page */}
-      {!isDesktop && !isFullScreenPage && !isLandingPage && (
+      {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
+      {!isDesktop && !isFullScreenPage && (
         <BottomNav onAuthClick={() => handleAuthClick()} />
       )}
 
