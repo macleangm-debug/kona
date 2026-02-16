@@ -3,7 +3,7 @@ Kona Mini-Series Backend - Refactored Main Server
 """
 # Load environment variables FIRST
 from dotenv import load_dotenv
-load_dotenv('/app/backend/.env')
+load_dotenv()  # Auto-discovers .env files, respects K8s env vars in production
 
 import logging
 from contextlib import asynccontextmanager
