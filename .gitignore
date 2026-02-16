@@ -90,3 +90,7 @@ frontend/node_modules/.cache/default-development/8.pack
 
 # Note: .env files are NOT ignored - they are required for Emergent deployment
 # Emergent auto-updates .env files with production values during deployment
+-e 
+# Environment files
+*.env
+*.env.*
