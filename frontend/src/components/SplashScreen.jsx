@@ -549,8 +549,8 @@ export const PreSplash = ({ onEnter }) => {
 };
 
 // Combined component
-export const SplashWithSound = ({ onComplete, minDuration = 5000 }) => {
-  const [stage, setStage] = useState('pre'); // 'pre' | 'splash' | 'done'
+export const SplashWithSound = ({ onComplete, minDuration = 5000, autoPlay = true }) => {
+  const [stage, setStage] = useState(autoPlay ? 'splash' : 'pre'); // 'pre' | 'splash' | 'done'
 
   const handleEnter = () => {
     setStage('splash');
@@ -562,6 +562,16 @@ export const SplashWithSound = ({ onComplete, minDuration = 5000 }) => {
       onComplete();
     }
   };
+
+  // Auto-enter after brief delay if autoPlay is false but we want auto-progression
+  useEffect(() => {
+    if (stage === 'pre' && autoPlay) {
+      const timer = setTimeout(() => {
+        setStage('splash');
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [stage, autoPlay]);
 
   if (stage === 'pre') {
     return <PreSplash onEnter={handleEnter} />;
