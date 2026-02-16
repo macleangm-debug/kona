@@ -129,7 +129,12 @@ const AppContent = () => {
   };
 
   // Check if on landing page (only for non-PWA, non-entered users at root path)
-  const isLandingPage = location.pathname === "/" && !isPWA && !hasEnteredApp && !user;
+  // DISABLED: Now showing series carousel directly instead of landing page
+  // const isLandingPage = location.pathname === "/" && !isPWA && !hasEnteredApp && !user;
+  const isLandingPage = false;  // Always show series carousel first
+  
+  // Legacy landing page can still be accessed at /welcome
+  const isWelcomePage = location.pathname === "/welcome";
   
   // Pages that should have their own layout (no header/nav)
   const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact"];
