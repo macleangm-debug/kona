@@ -29,10 +29,16 @@ export const CreatorAnalytics = ({ token }) => {
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState(null);
   const [comparison, setComparison] = useState(null);
+  const [audience, setAudience] = useState(null);
+  const [realtime, setRealtime] = useState(null);
+  const [contentAnalytics, setContentAnalytics] = useState(null);
   const [period, setPeriod] = useState("30d");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [showCustomDates, setShowCustomDates] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  const COLORS = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899'];
 
   const fetchAnalytics = async () => {
     if (!token) return;
@@ -44,15 +50,21 @@ export const CreatorAnalytics = ({ token }) => {
         url += `&start_date=${customStart}&end_date=${customEnd}`;
       }
       
-      const [analyticsRes, comparisonRes] = await Promise.all([
+      const [analyticsRes, comparisonRes, audienceRes, realtimeRes, contentRes] = await Promise.all([
         axios.get(url, { headers: { Authorization: `Bearer ${token}` } }),
         period !== "custom" && period !== "all" 
           ? axios.get(`${API}/creator/analytics/compare?period=${period}`, { headers: { Authorization: `Bearer ${token}` } })
-          : Promise.resolve({ data: null })
+          : Promise.resolve({ data: null }),
+        axios.get(`${API}/creator/analytics/audience?period=${period}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null })),
+        axios.get(`${API}/creator/analytics/realtime`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null })),
+        axios.get(`${API}/creator/analytics/content?period=${period}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null }))
       ]);
       
       setAnalytics(analyticsRes.data);
       setComparison(comparisonRes.data);
+      setAudience(audienceRes.data);
+      setRealtime(realtimeRes.data);
+      setContentAnalytics(contentRes.data);
     } catch (e) {
       console.error("Failed to fetch analytics:", e);
     }
