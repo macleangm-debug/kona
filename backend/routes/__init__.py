@@ -27,6 +27,7 @@ from .ab_testing import router as ab_testing_router
 from .support import router as support_router
 from .careers import router as careers_router
 from .press import router as press_router
+from .analytics_export import router as analytics_export_router
 
 # Create main API router
 api_router = APIRouter()
@@ -58,3 +59,4 @@ api_router.include_router(ab_testing_router)
 api_router.include_router(support_router)
 api_router.include_router(careers_router, prefix="/careers", tags=["careers"])
 api_router.include_router(press_router, prefix="/press", tags=["press"])
+api_router.include_router(analytics_export_router)
