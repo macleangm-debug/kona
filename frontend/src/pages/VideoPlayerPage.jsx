@@ -1448,8 +1448,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           ref={videoRef}
           src={episode.video_url}
           autoPlay
+          muted
           playsInline
-          preload="metadata"
+          preload="auto"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleVideoEnded}
           onWaiting={handleWaiting}
