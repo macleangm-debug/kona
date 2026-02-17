@@ -1138,6 +1138,15 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   };
 
+  // Toggle mute/unmute
+  const toggleMute = () => {
+    const video = document.getElementById('main-video');
+    if (video) {
+      video.muted = !video.muted;
+      setIsMuted(video.muted);
+    }
+  };
+
   // ============ GESTURE CONTROLS ============
   // Double-tap to like (center) or seek (left/right)
   const handleVideoTap = (e) => {
