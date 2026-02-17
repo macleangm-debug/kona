@@ -2008,6 +2008,15 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
           {/* Playback controls */}
           <div className="flex items-center gap-2">
+            {/* Volume toggle */}
+            <button 
+              onClick={toggleMute}
+              className="text-white bg-white/20 p-1.5 rounded"
+              data-testid="volume-toggle"
+            >
+              {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            </button>
+            
             <button 
               onClick={changeSpeed}
               className="text-white text-xs font-medium bg-white/20 px-2.5 py-1 rounded"
