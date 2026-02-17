@@ -1447,7 +1447,6 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           autoPlay
           playsInline
           preload="metadata"
-          crossOrigin="anonymous"
           onTimeUpdate={handleTimeUpdate}
           onEnded={handleVideoEnded}
           onWaiting={handleWaiting}
