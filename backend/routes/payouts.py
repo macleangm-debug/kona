@@ -288,3 +288,169 @@ async def kwikpay_webhook(request: Request):
     except Exception as e:
         print(f"KwikPay webhook error: {e}")
         return {"status": "error"}
+
+
+
+# ============ AUTO-PAYOUT ROUTES ============
+
+class AutoPayoutSettingsRequest(BaseModel):
+    status: Optional[str] = None  # enabled, disabled, paused
+    threshold_coins: Optional[int] = None
+    payout_method: Optional[str] = None
+    payout_details: Optional[dict] = None
+    country_code: Optional[str] = None
+
+
+@router.get("/auto/settings")
+async def get_auto_payout_settings(user: dict = Depends(get_current_user)):
+    """Get creator's auto-payout settings"""
+    from services.payout_automation import payout_automation
+    
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0, "id": 1})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="You must be a creator to access payout settings")
+    
+    settings = await payout_automation.get_creator_auto_payout_settings(creator["id"])
+    
+    # Add current balance info
+    creator_full = await db.creators.find_one({"id": creator["id"]}, {"_id": 0, "pending_payout": 1})
+    settings["current_balance"] = creator_full.get("pending_payout", 0)
+    settings["balance_meets_threshold"] = settings["current_balance"] >= settings.get("threshold_coins", 5000)
+    
+    return settings
+
+
+@router.put("/auto/settings")
+async def update_auto_payout_settings(
+    data: AutoPayoutSettingsRequest, 
+    user: dict = Depends(get_current_user)
+):
+    """Update creator's auto-payout settings"""
+    from services.payout_automation import payout_automation
+    
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0, "id": 1, "status": 1})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="You must be a creator to access payout settings")
+    
+    if creator.get("status") != "approved":
+        raise HTTPException(status_code=403, detail="Your creator account must be approved")
+    
+    try:
+        settings = await payout_automation.update_auto_payout_settings(
+            creator_id=creator["id"],
+            status=data.status,
+            threshold_coins=data.threshold_coins,
+            payout_method=data.payout_method,
+            payout_details=data.payout_details,
+            country_code=data.country_code
+        )
+        return settings
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/auto/trigger-check")
+async def trigger_auto_payout_check(user: dict = Depends(get_current_user)):
+    """
+    Manually trigger auto-payout check for your account.
+    Useful for testing or immediate payout when threshold is reached.
+    """
+    from services.payout_automation import payout_automation
+    
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0, "id": 1, "status": 1, "pending_payout": 1})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="You must be a creator")
+    
+    if creator.get("status") != "approved":
+        raise HTTPException(status_code=403, detail="Your creator account must be approved")
+    
+    # Get settings
+    settings = await payout_automation.get_creator_auto_payout_settings(creator["id"])
+    
+    if settings["status"] != "enabled":
+        raise HTTPException(status_code=400, detail="Auto-payout is not enabled for your account")
+    
+    balance = creator.get("pending_payout", 0)
+    threshold = settings.get("threshold_coins", 5000)
+    
+    if balance < threshold:
+        return {
+            "triggered": False,
+            "message": f"Balance ({balance} coins) is below threshold ({threshold} coins)",
+            "balance": balance,
+            "threshold": threshold
+        }
+    
+    # Trigger payout
+    result = await payout_automation._trigger_auto_payout(
+        creator_id=creator["id"],
+        user_id=user["id"],
+        coins=balance,
+        country_code=settings.get("country_code"),
+        method=PayoutMethod(settings.get("payout_method")),
+        recipient_details=settings.get("payout_details")
+    )
+    
+    if result["success"]:
+        return {
+            "triggered": True,
+            "message": "Auto-payout triggered successfully",
+            "payout_id": result["payout_id"],
+            "coins": result["coins"],
+            "local_amount": result["local_amount"],
+            "currency": result["currency"]
+        }
+    else:
+        raise HTTPException(status_code=500, detail=result.get("error", "Failed to trigger payout"))
+
+
+# ============ ADMIN AUTO-PAYOUT ROUTES ============
+
+@router.get("/auto/admin/stats")
+async def get_auto_payout_stats(user: dict = Depends(get_current_user)):
+    """Get auto-payout statistics (admin only)"""
+    from services.payout_automation import payout_automation
+    
+    if user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    return await payout_automation.get_auto_payout_stats()
+
+
+@router.post("/auto/admin/run-check")
+async def admin_run_auto_payout_check(user: dict = Depends(get_current_user)):
+    """Run auto-payout check for all creators (admin only)"""
+    from services.payout_automation import payout_automation
+    
+    if user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    results = await payout_automation.check_and_trigger_auto_payouts()
+    return results
+
+
+@router.post("/auto/admin/start-background")
+async def admin_start_background_checker(user: dict = Depends(get_current_user)):
+    """Start the background auto-payout checker (admin only)"""
+    from services.payout_automation import payout_automation
+    
+    if user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await payout_automation.start_background_checker()
+    return {"status": "started", "message": "Background auto-payout checker started"}
+
+
+@router.post("/auto/admin/stop-background")
+async def admin_stop_background_checker(user: dict = Depends(get_current_user)):
+    """Stop the background auto-payout checker (admin only)"""
+    from services.payout_automation import payout_automation
+    
+    if user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    await payout_automation.stop_background_checker()
+    return {"status": "stopped", "message": "Background auto-payout checker stopped"}
