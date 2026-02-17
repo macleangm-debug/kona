@@ -1506,6 +1506,30 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         </video>
       </div>
 
+      {/* Video Error Overlay */}
+      {videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/90 z-40">
+          <div className="text-center p-6">
+            <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Play className="w-8 h-8 text-red-400" />
+            </div>
+            <h3 className="text-white text-lg font-semibold mb-2">Video Unavailable</h3>
+            <p className="text-gray-400 text-sm mb-4">{videoError}</p>
+            <button 
+              onClick={() => {
+                setVideoError(null);
+                if (videoRef.current) {
+                  videoRef.current.load();
+                }
+              }}
+              className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Video format indicator - shows when controls are visible */}
       {showControls && videoAspectRatio && (
         <div className="absolute top-16 left-1/2 -translate-x-1/2 z-30">
