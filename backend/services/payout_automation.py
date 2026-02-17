@@ -74,9 +74,6 @@ class PayoutAutomationService:
             if threshold_coins > self.MAX_THRESHOLD_COINS:
                 raise ValueError(f"Maximum threshold is {self.MAX_THRESHOLD_COINS} coins")
         
-        # Get current settings
-        current = await self.get_creator_auto_payout_settings(creator_id)
-        
         # Build update
         update = {
             "creator_id": creator_id,
