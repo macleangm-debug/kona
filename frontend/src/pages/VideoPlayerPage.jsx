@@ -340,6 +340,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [likesCount, setLikesCount] = useState(0);
   const [showShareModal, setShowShareModal] = useState(false);
   
+  // Video error state
+  const [videoError, setVideoError] = useState(null);
+  
   // Subtitle states
   const [subtitles, setSubtitles] = useState({}); // { en: "url", sw: "url", fr: "url" }
   const [activeSubtitle, setActiveSubtitle] = useState("off");
