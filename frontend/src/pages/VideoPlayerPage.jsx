@@ -1461,6 +1461,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
               videoRef.current.play().catch(() => {});
               setIsPlaying(true);
             }
+            setVideoError(null);
+          }}
+          onError={(e) => {
+            console.error('Video load error:', e);
+            setVideoError('Video unavailable - please try again later');
           }}
           className={`w-full h-full transition-all duration-300 ${getVideoDisplayStyle()}`}
           style={{
