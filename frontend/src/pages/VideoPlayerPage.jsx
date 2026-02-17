@@ -354,6 +354,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [screenOrientation, setScreenOrientation] = useState('portrait');
 
+  // Volume state (starts muted to allow autoplay)
+  const [isMuted, setIsMuted] = useState(true);
+
   // Gesture Control states
   const [lastTapTime, setLastTapTime] = useState(0);
   const [doubleTapSide, setDoubleTapSide] = useState(null); // 'left' | 'right' | 'center'
