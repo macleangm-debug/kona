@@ -1825,7 +1825,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       </div>
 
       {/* Right side action buttons - ALWAYS visible (like TikTok style) */}
-      <div className="absolute right-3 bottom-36 flex flex-col items-center gap-5 z-20">
+      <div className="absolute right-3 bottom-36 flex flex-col items-center gap-5 z-50">
         {/* Fullscreen toggle - for horizontal videos */}
         {!isVerticalVideo && (
           <button 
