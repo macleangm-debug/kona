@@ -168,7 +168,7 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 
 ## Prioritized Backlog
 
-### P0 (Critical)
+### P0 (Critical) - COMPLETED
 - [x] Security fixes (env vars)
 - [x] Creator analytics enhancements
 - [x] Netflix-style lazy loading for carousels
@@ -178,15 +178,14 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 - [x] Social sharing features
 - [x] Analytics export (CSV/PDF)
 - [x] Creator payout automation (tiered system)
+- [x] Video playback bug fix (error UI added)
+- [x] Like button bug fix (z-index issue)
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
 - [ ] Real SMS provider for OTP (Africa's Talking)
-- [ ] Video encoding/CDN integration
-
-### P2 (Medium)
-- [ ] Social sharing features
-- [ ] Creator payout automation
+- [ ] Video encoding/CDN integration (Bunny.net already configured)
+- [ ] Creator payout automation UI in frontend
 
 ### P3 (Low)
 - [ ] Analytics export (CSV/PDF)
