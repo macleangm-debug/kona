@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Test</title>
+  <style>
+    body { margin: 0; padding: 20px; background: #000; color: #fff; }
+    video { max-width: 100%; height: auto; }
+    #status { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Video Test Page</h1>
+  <video id="test-video" controls autoplay muted playsinline preload="auto">
+    <source src="/kona_promo.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <div id="status">Loading...</div>
+  
+  <script>
+    const video = document.getElementById('test-video');
+    const status = document.getElementById('status');
+    
+    video.addEventListener('loadstart', () => { status.textContent = 'Load started...'; });
+    video.addEventListener('loadedmetadata', () => { status.textContent = 'Metadata loaded: ' + video.duration + 's'; });
+    video.addEventListener('loadeddata', () => { status.textContent = 'Video loaded successfully!'; });
+    video.addEventListener('canplay', () => { status.textContent = 'Can play!'; });
+    video.addEventListener('playing', () => { status.textContent = 'Playing!'; });
+    video.addEventListener('error', (e) => { 
+      status.textContent = 'Error: ' + (video.error ? video.error.message : 'Unknown error');
+      console.error('Video error:', video.error);
+    });
+  </script>
+</body>
+</html>
