@@ -37,7 +37,8 @@ const SCHEDULES = [
   { value: "biweekly", label: "Bi-weekly" }
 ];
 
-export const SeriesSubmissionForm = ({ open, onClose, token, onSuccess }) => {
+export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuccess }) => {
+  const closeHandler = onClose || onOpenChange;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
