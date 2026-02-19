@@ -5,7 +5,7 @@ import {
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
   Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X,
-  ChevronDown, ChevronRight, FolderPlus, Layers, GripVertical, Move
+  ChevronDown, ChevronRight, FolderPlus, Layers, GripVertical, Move, Send, Globe
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
