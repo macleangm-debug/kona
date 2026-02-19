@@ -393,15 +393,47 @@ const SeasonAccordion = ({
   onEditEpisode,
   onAddSeason,
   onAddEpisode,
-  onReorderEpisodes
+  onReorderEpisodes,
+  onBulkEdit
 }) => {
   const [activeId, setActiveId] = useState(null);
   const [localEpisodes, setLocalEpisodes] = useState(episodes);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedEpisodes, setSelectedEpisodes] = useState([]);
   
   // Sync local episodes with props
   useEffect(() => {
     setLocalEpisodes(episodes);
   }, [episodes]);
+  
+  // Toggle episode selection
+  const toggleSelect = (episodeId) => {
+    setSelectedEpisodes(prev => 
+      prev.includes(episodeId) 
+        ? prev.filter(id => id !== episodeId)
+        : [...prev, episodeId]
+    );
+  };
+  
+  // Select all episodes
+  const selectAll = () => {
+    setSelectedEpisodes(localEpisodes.map(ep => ep.id));
+  };
+  
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedEpisodes([]);
+    setSelectionMode(false);
+  };
+  
+  // Toggle selection mode
+  const toggleSelectionMode = () => {
+    if (selectionMode) {
+      clearSelection();
+    } else {
+      setSelectionMode(true);
+    }
+  };
   
   const sensors = useSensors(
     useSensor(PointerSensor, {
