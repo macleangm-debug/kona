@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Star, AlertCircle } from "lucide-react";
@@ -12,6 +12,7 @@ import { API } from "@/config";
 import { toast } from "sonner";
 import { SeriesSubmissionForm } from "@/components/SeriesSubmissionForm";
 import { CreatorAnalytics } from "@/components/CreatorAnalytics";
+import { CreateSeriesDialog } from "@/components/creator/CreateSeriesDialog";
 import {
   CreatorHeader,
   CreatorStats,
