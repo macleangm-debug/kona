@@ -145,20 +145,25 @@ export const CreateSeriesDialog = memo(({ open, onOpenChange, onSubmit, loading 
               </span>
             </div>
 
-            {/* Thumbnail Preview */}
+            {/* Thumbnail Preview - Centered */}
             {thumbnailPreview && (
-              <div className="mb-2 relative w-24 h-36 rounded-lg overflow-hidden border border-white/20">
-                <img 
-                  src={thumbnailPreview} 
-                  alt="Thumbnail preview" 
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => { setThumbnailUrl(""); setThumbnailPreview(""); }}
-                  className="absolute top-1 right-1 w-5 h-5 bg-black/70 rounded-full flex items-center justify-center text-white text-xs"
-                >
-                  ×
-                </button>
+              <div className="flex justify-center mb-3">
+                <div className="relative w-32 h-48 rounded-lg overflow-hidden border-2 border-primary/30 shadow-lg">
+                  <img 
+                    src={thumbnailPreview} 
+                    alt="Thumbnail preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={() => { setThumbnailUrl(""); setThumbnailPreview(""); }}
+                    className="absolute top-1 right-1 w-6 h-6 bg-black/80 hover:bg-red-500 rounded-full flex items-center justify-center text-white text-sm transition-colors"
+                  >
+                    ×
+                  </button>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                    <p className="text-[10px] text-white/80 text-center">Preview</p>
+                  </div>
+                </div>
               </div>
             )}
 
