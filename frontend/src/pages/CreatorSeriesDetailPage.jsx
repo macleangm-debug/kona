@@ -657,6 +657,23 @@ export const CreatorSeriesDetailPage = () => {
     ));
   };
 
+  // Reorder episodes (drag & drop)
+  const handleReorderEpisodes = async (reorderData) => {
+    try {
+      await axios.post(
+        `${API}/creator/series/${seriesId}/reorder-episodes`,
+        { episodes: reorderData },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success("Episodes reordered successfully!");
+      fetchSeriesDetail(); // Refresh to get updated episode codes
+    } catch (e) {
+      console.error("Failed to reorder episodes:", e);
+      toast.error("Failed to save episode order");
+      fetchSeriesDetail(); // Refresh to reset to server state
+    }
+  };
+
   // Generate video thumbnail from file
   const generateThumbnail = (file) => {
     return new Promise((resolve) => {
