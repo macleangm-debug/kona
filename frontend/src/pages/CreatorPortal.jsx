@@ -275,24 +275,13 @@ export const CreatorPortal = () => {
         {/* Tab Content */}
         <div className="p-4 lg:p-8">
           {activeTab === "dashboard" && (
-            <div className="space-y-6 lg:space-y-8">
-              {/* Desktop: Two column layout */}
-              <div className="lg:grid lg:grid-cols-3 lg:gap-8">
-                {/* Left Column - Stats and Tier */}
-                <div className="lg:col-span-2 space-y-6">
-                  <CreatorPendingSubmissions submissions={submissions} />
-                  <CreatorStats dashboard={dashboard} />
-                </div>
-                
-                {/* Right Column - Series */}
-                <div className="mt-6 lg:mt-0">
-                  <CreatorSeriesList 
-                    series={series} 
-                    onCreateSeries={() => setShowCreateSeries(true)}
-                  />
-                </div>
-              </div>
-            </div>
+            <CreatorDashboardOverview
+              dashboard={dashboard}
+              series={series}
+              submissions={submissions}
+              onCreateSeries={() => setShowCreateSeries(true)}
+              loading={loading}
+            />
           )}
 
           {activeTab === "analytics" && (
