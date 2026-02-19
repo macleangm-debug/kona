@@ -273,7 +273,6 @@ async def login(data: UserLogin, request: Request):
     # Skip device limit for admin users
     if user.get("is_admin"):
         # Clear old sessions for admin to avoid accumulation
-        from services import db
         await db.sessions.delete_many({"user_id": user["id"]})
     else:
         # Check device limit based on subscription tier for non-admin users
