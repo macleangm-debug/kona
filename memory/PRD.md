@@ -180,6 +180,11 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 - [x] Creator payout automation (tiered system)
 - [x] Video playback bug fix (error UI added)
 - [x] Like button bug fix (z-index issue)
+- [x] **Creator Episode Upload Fix (2026-02-19)**
+  - Root cause: Frontend batch upload called `/api/creator/series/{id}/episodes` but backend only had `/api/creator/episodes`
+  - Added new endpoint `POST /api/creator/series/{series_id}/episodes` to match frontend expectations
+  - Updated video upload endpoint to auto-initialize Bunny.net video if not already set
+  - Full flow verified: series creation → episode creation → video upload to Bunny.net CDN
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
