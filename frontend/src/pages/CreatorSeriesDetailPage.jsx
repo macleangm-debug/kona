@@ -5,7 +5,7 @@ import {
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
   Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X,
-  ChevronDown, ChevronRight, FolderPlus, Layers
+  ChevronDown, ChevronRight, FolderPlus, Layers, GripVertical, Move
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,25 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
+
+// DnD Kit imports
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 // Supported subtitle languages
 const SUBTITLE_LANGUAGES = [
