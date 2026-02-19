@@ -36,6 +36,7 @@ export const CreatorPortal = () => {
   const [showCreateSeries, setShowCreateSeries] = useState(false);
   const [showSubmitSeries, setShowSubmitSeries] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const [creatingSeriesLoading, setCreatingSeriesLoading] = useState(false);
 
   // Application form state
   const [applyForm, setApplyForm] = useState({
@@ -44,13 +45,6 @@ export const CreatorPortal = () => {
     bio: "",
     content_type: "romance",
     expected_uploads_per_month: 4
-  });
-
-  // Series creation form
-  const [seriesForm, setSeriesForm] = useState({
-    title: "",
-    description: "",
-    genre: "Romance"
   });
 
   const fetchCreatorData = async () => {
