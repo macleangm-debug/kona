@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo, useCallback, memo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Search, Bell, ChevronDown, User, LogOut, Crown, Settings, Film, Trophy, Home, Compass, Gift, Clock, Info } from "lucide-react";
@@ -14,6 +14,53 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+
+// Memoized User Menu to prevent re-renders
+const UserMenu = memo(({ user, onNavigate, onLogout, t }) => (
+  <DropdownMenu modal={false}>
+    <DropdownMenuTrigger className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-sm font-bold">
+        {user.name?.charAt(0).toUpperCase() || "U"}
+      </div>
+      <ChevronDown className="w-4 h-4 text-gray-400" />
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-white/10" sideOffset={8}>
+      <div className="px-3 py-2 border-b border-white/10">
+        <p className="font-medium text-sm">{user.name}</p>
+        <p className="text-xs text-gray-400">{user.email}</p>
+      </div>
+      <DropdownMenuItem onClick={() => onNavigate("/profile")} className="cursor-pointer">
+        <User className="w-4 h-4 mr-2" />
+        {t("profile.title")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => onNavigate("/leaderboard")} className="cursor-pointer">
+        <Trophy className="w-4 h-4 mr-2 text-yellow-400" />
+        {t("leaderboard.title")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => onNavigate("/subscriptions")} className="cursor-pointer">
+        <Crown className="w-4 h-4 mr-2 text-yellow-400" />
+        {t("profile.upgradeToVip")}
+      </DropdownMenuItem>
+      <DropdownMenuItem onClick={() => onNavigate("/creator")} className="cursor-pointer">
+        <Film className="w-4 h-4 mr-2 text-green-400" />
+        {t("profile.creatorStudio")}
+      </DropdownMenuItem>
+      {user.is_admin && (
+        <DropdownMenuItem onClick={() => onNavigate("/admin")} className="cursor-pointer">
+          <Settings className="w-4 h-4 mr-2" />
+          {t("profile.adminPanel")}
+        </DropdownMenuItem>
+      )}
+      <DropdownMenuSeparator className="bg-white/10" />
+      <DropdownMenuItem onClick={onLogout} className="cursor-pointer text-red-400">
+        <LogOut className="w-4 h-4 mr-2" />
+        {t("auth.signOut")}
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+));
+
+UserMenu.displayName = 'UserMenu';
 
 export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
   const { t } = useTranslation();
