@@ -1160,6 +1160,48 @@ async def submit_series_for_review(series_id: str, user: dict = Depends(get_curr
     }
 
 
+@router.post("/series/{series_id}/publish")
+async def publish_series(series_id: str, user: dict = Depends(get_current_user)):
+    """Publish a series (admin or owner with approved status)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Get the series
+    series = await db.creator_series.find_one({"id": series_id, "creator_id": creator["id"]})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Check if has at least 1 episode
+    episode_count = await db.creator_episodes.count_documents({"series_id": series_id})
+    if episode_count == 0:
+        raise HTTPException(status_code=400, detail="Add at least 1 episode before publishing")
+    
+    # For admins, allow direct publish; for others, require approved status
+    if user.get("is_admin") or series["status"] == "approved":
+        await db.creator_series.update_one(
+            {"id": series_id},
+            {"$set": {
+                "status": "published",
+                "published_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Add to main series collection for public viewing
+        await publish_series_to_main(series_id, creator["id"])
+        
+        return {
+            "message": "Series published successfully! It's now visible to all viewers.",
+            "status": "published"
+        }
+    else:
+        raise HTTPException(
+            status_code=403, 
+            detail="Series must be approved before publishing. Submit it for review first."
+        )
+
+
 async def publish_series_to_main(series_id: str, creator_id: str):
     """Copy series to main series collection for public viewing"""
     series = await db.creator_series.find_one({"id": series_id}, {"_id": 0})
