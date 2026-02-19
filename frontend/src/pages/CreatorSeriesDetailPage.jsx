@@ -238,7 +238,7 @@ const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging, isSele
         </div>
         
         {/* Details */}
-        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onEditEpisode(ep)}>
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => selectionMode ? onToggleSelect(ep.id) : onEditEpisode(ep)}>
           <div className="flex flex-wrap items-center gap-1.5 mb-1">
             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
               {ep.episode_code || `S${String(seasonNum).padStart(2, '0')}E${String(ep.episode_number).padStart(2, '0')}`}
@@ -267,16 +267,18 @@ const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging, isSele
           </div>
         </div>
         
-        {/* Edit Button */}
-        <button 
-          className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
-          onClick={(e) => {
-            e.stopPropagation();
-            onEditEpisode(ep);
-          }}
-        >
-          <Edit className="w-4 h-4 text-muted-foreground" />
-        </button>
+        {/* Edit Button (hidden in selection mode) */}
+        {!selectionMode && (
+          <button 
+            className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditEpisode(ep);
+            }}
+          >
+            <Edit className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
       </div>
     </Card>
   );
