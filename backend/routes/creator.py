@@ -1451,7 +1451,8 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
 @router.post("/episodes/{episode_id}/upload")
 async def upload_episode_video(
     episode_id: str,
-    file: UploadFile = File(...),
+    video: UploadFile = File(None, alias="video"),
+    file: UploadFile = File(None),
     user: dict = Depends(get_current_user)
 ):
     """Upload video file for an episode"""
@@ -1465,14 +1466,36 @@ async def upload_episode_video(
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
     
-    if not episode.get("bunny_video_id"):
-        raise HTTPException(status_code=400, detail="Video not initialized")
+    # Use whichever file field was provided (video or file)
+    upload_file = video if video and video.filename else file
+    if not upload_file or not upload_file.filename:
+        raise HTTPException(status_code=400, detail="No video file provided")
+    
+    # If bunny_video_id not set, initialize it now
+    bunny_video_id = episode.get("bunny_video_id")
+    if not bunny_video_id:
+        # Get series for naming
+        series = await db.creator_series.find_one({"id": episode.get("series_id")}, {"_id": 0})
+        series_title = series.get("title", "Series") if series else "Series"
+        video_title = f"{series_title} - {episode.get('episode_code', 'EP')}: {episode.get('title', 'Episode')}"
+        
+        bunny_result = await bunny_service.create_video(video_title)
+        if not bunny_result["success"]:
+            raise HTTPException(status_code=500, detail="Failed to initialize video upload: " + bunny_result.get("error", "Unknown error"))
+        
+        bunny_video_id = bunny_result["video_id"]
+        
+        # Update episode with bunny_video_id
+        await db.creator_episodes.update_one(
+            {"id": episode_id},
+            {"$set": {"bunny_video_id": bunny_video_id, "encoding_status": "pending"}}
+        )
     
     # Read file content
-    content = await file.read()
+    content = await upload_file.read()
     
     # Upload to Bunny.net
-    result = await bunny_service.upload_video(episode["bunny_video_id"], content)
+    result = await bunny_service.upload_video(bunny_video_id, content)
     
     if not result["success"]:
         raise HTTPException(status_code=500, detail="Upload failed: " + result.get("error", "Unknown error"))
