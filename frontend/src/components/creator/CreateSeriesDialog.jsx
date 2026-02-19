@@ -192,13 +192,21 @@ export const CreateSeriesDialog = memo(({ open, onOpenChange, onSubmit, loading 
             </div>
           </div>
 
-          <Button 
-            onClick={handleSubmit} 
-            className="w-full"
-            disabled={loading || !title || description.length < 20}
-          >
-            {loading ? "Creating..." : "Create Series"}
-          </Button>
+          {/* Submit Button */}
+          <div className="pt-2">
+            {(!title || description.length < 20) && (
+              <p className="text-xs text-amber-400 text-center mb-2">
+                {!title ? "Please enter a series title" : `Description needs ${20 - description.length} more characters`}
+              </p>
+            )}
+            <Button 
+              onClick={handleSubmit} 
+              className="w-full"
+              disabled={loading || !title || description.length < 20}
+            >
+              {loading ? "Creating..." : "Create Series"}
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
