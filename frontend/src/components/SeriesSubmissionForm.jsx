@@ -105,7 +105,7 @@ export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuc
 
   if (submitted) {
     return (
-      <Dialog open={open} onOpenChange={onClose}>
+      <Dialog open={open} onOpenChange={closeHandler}>
         <DialogContent className="max-w-md">
           <div className="text-center py-6">
             <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
@@ -118,7 +118,7 @@ export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuc
             <p className="text-sm text-muted-foreground mb-6">
               Submission ID: <span className="font-mono">{submissionId}</span>
             </p>
-            <Button onClick={onClose} className="w-full">
+            <Button onClick={() => closeHandler(false)} className="w-full">
               Done
             </Button>
           </div>
@@ -128,7 +128,7 @@ export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuc
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={closeHandler}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
