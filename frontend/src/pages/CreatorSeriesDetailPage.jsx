@@ -563,15 +563,114 @@ const SeasonAccordion = ({
   
   const activeEpisode = activeId ? localEpisodes.find(ep => ep.id === activeId) : null;
   
+  // Handle bulk edit action
+  const handleBulkAction = (action, value) => {
+    if (selectedEpisodes.length === 0) return;
+    onBulkEdit(selectedEpisodes, action, value);
+    clearSelection();
+  };
+  
   return (
     <div className="space-y-3" data-testid="season-accordion">
-      {/* Drag hint banner */}
+      {/* Action Bar */}
       <div className="flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
-        <Move className="w-4 h-4 text-primary" />
-        <p className="text-xs text-muted-foreground">
-          <span className="text-foreground font-medium">Drag & drop</span> episodes to reorder within or between seasons
-        </p>
+        {selectionMode ? (
+          <>
+            {/* Selection Mode Active */}
+            <CheckCircle className="w-4 h-4 text-green-400" />
+            <span className="text-xs font-medium text-green-400">
+              {selectedEpisodes.length} selected
+            </span>
+            <div className="flex-1" />
+            <Button size="sm" variant="ghost" onClick={selectAll} className="h-7 text-xs">
+              Select All
+            </Button>
+            <Button size="sm" variant="ghost" onClick={clearSelection} className="h-7 text-xs text-red-400 hover:text-red-300">
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <>
+            {/* Normal Mode */}
+            <Move className="w-4 h-4 text-primary" />
+            <p className="text-xs text-muted-foreground flex-1">
+              <span className="text-foreground font-medium">Drag & drop</span> to reorder, or
+            </p>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={toggleSelectionMode}
+              className="h-7 text-xs"
+              data-testid="bulk-edit-btn"
+            >
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Bulk Edit
+            </Button>
+          </>
+        )}
       </div>
+      
+      {/* Bulk Edit Actions Bar (when items selected) */}
+      {selectionMode && selectedEpisodes.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-green-500/10 border border-green-500/30" data-testid="bulk-actions-bar">
+          <span className="text-xs text-green-400 font-medium mr-2">Bulk Actions:</span>
+          
+          {/* Move to Season */}
+          <select
+            className="h-7 px-2 text-xs rounded bg-secondary/50 border border-white/10"
+            onChange={(e) => {
+              if (e.target.value) {
+                handleBulkAction('move_season', parseInt(e.target.value));
+              }
+            }}
+            defaultValue=""
+          >
+            <option value="" disabled>Move to Season...</option>
+            {allSeasonNumbers.map(num => (
+              <option key={num} value={num}>Season {num}</option>
+            ))}
+            <option value={allSeasonNumbers.length + 1}>New Season {allSeasonNumbers.length + 1}</option>
+          </select>
+          
+          {/* Set Free Status */}
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs bg-green-500/20 border-green-500/30 text-green-400 hover:bg-green-500/30"
+            onClick={() => handleBulkAction('set_free', true)}
+          >
+            Make Free
+          </Button>
+          
+          {/* Set Paid Status */}
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 text-xs"
+            onClick={() => handleBulkAction('set_free', false)}
+          >
+            Make Paid
+          </Button>
+          
+          {/* Set Coins */}
+          <div className="flex items-center gap-1">
+            <Coins className="w-3 h-3 text-yellow-400" />
+            <input
+              type="number"
+              min={1}
+              max={50}
+              placeholder="5"
+              className="w-12 h-7 px-2 text-xs rounded bg-secondary/50 border border-white/10"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleBulkAction('set_coins', parseInt(e.target.value) || 5);
+                }
+              }}
+            />
+            <span className="text-xs text-muted-foreground">coins (Enter)</span>
+          </div>
+        </div>
+      )}
       
       <DndContext
         sensors={sensors}
@@ -599,6 +698,9 @@ const SeasonAccordion = ({
               onAddEpisode={onAddEpisode}
               onEditEpisode={onEditEpisode}
               activeId={activeId}
+              selectionMode={selectionMode}
+              selectedEpisodes={selectedEpisodes}
+              onToggleSelect={toggleSelect}
             />
           );
         })}
