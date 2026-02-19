@@ -491,7 +491,7 @@ export const CreatorSeriesDetailPage = () => {
         formData.append('video', ep.file);
         
         await axios.post(
-          `${API}/creator/episodes/${createRes.data.episode.id}/upload-video`,
+          `${API}/creator/episodes/${createRes.data.episode.id}/upload`,
           formData,
           { 
             headers: { 
