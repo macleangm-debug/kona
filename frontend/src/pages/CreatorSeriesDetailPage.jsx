@@ -1221,6 +1221,183 @@ export const CreatorSeriesDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Batch Upload Modal */}
+      <Dialog open={showBatchUpload} onOpenChange={setShowBatchUpload}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="w-5 h-5 text-primary" />
+              Add Episodes
+            </DialogTitle>
+            <DialogDescription>
+              Upload multiple video files at once. Each file will become a separate episode.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 mt-4">
+            {/* Upload Area */}
+            <label className="block cursor-pointer">
+              <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
+                <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
+                <p className="font-medium">Drop video files here or click to browse</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Supported formats: MP4, WebM, MOV (max 500MB each)
+                </p>
+              </div>
+              <input
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleBatchFileSelect}
+                className="hidden"
+              />
+            </label>
+
+            {/* Episode List */}
+            {batchEpisodes.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-medium text-sm">{batchEpisodes.length} episode(s) ready</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setBatchEpisodes([])}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    Clear All
+                  </Button>
+                </div>
+                
+                {batchEpisodes.map((ep, index) => (
+                  <Card key={ep.id} className={`p-3 ${ep.uploaded ? 'bg-green-500/10 border-green-500/30' : ep.error ? 'bg-red-500/10 border-red-500/30' : ''}`}>
+                    <div className="flex items-start gap-3">
+                      {/* Preview/Status */}
+                      <div className="w-16 h-16 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
+                        {ep.uploaded ? (
+                          <CheckCircle className="w-6 h-6 text-green-400" />
+                        ) : ep.uploading ? (
+                          <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                        ) : ep.error ? (
+                          <AlertCircle className="w-6 h-6 text-red-400" />
+                        ) : (
+                          <Video className="w-6 h-6 text-muted-foreground" />
+                        )}
+                      </div>
+                      
+                      {/* Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs bg-white/10 px-2 py-0.5 rounded">
+                            Ep {episodes.length + index + 1}
+                          </span>
+                          {!ep.uploaded && !ep.uploading && (
+                            <button
+                              onClick={() => removeBatchEpisode(ep.id)}
+                              className="ml-auto text-red-400 hover:text-red-300"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                        
+                        <Input
+                          value={ep.title}
+                          onChange={(e) => updateBatchEpisode(ep.id, 'title', e.target.value)}
+                          placeholder="Episode title"
+                          className="mb-2 text-sm"
+                          disabled={ep.uploading || ep.uploaded}
+                        />
+                        
+                        <div className="flex items-center gap-4 text-xs">
+                          <label className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              checked={ep.is_free}
+                              onChange={(e) => updateBatchEpisode(ep.id, 'is_free', e.target.checked)}
+                              disabled={ep.uploading || ep.uploaded}
+                              className="rounded border-white/20"
+                            />
+                            Free
+                          </label>
+                          
+                          {!ep.is_free && (
+                            <div className="flex items-center gap-1">
+                              <Coins className="w-3 h-3 text-yellow-400" />
+                              <input
+                                type="number"
+                                value={ep.coins_required}
+                                onChange={(e) => updateBatchEpisode(ep.id, 'coins_required', parseInt(e.target.value) || 5)}
+                                className="w-14 px-2 py-1 text-xs bg-secondary/50 border border-white/10 rounded"
+                                disabled={ep.uploading || ep.uploaded}
+                              />
+                            </div>
+                          )}
+                          
+                          <span className="text-muted-foreground ml-auto">
+                            {(ep.file.size / (1024 * 1024)).toFixed(1)} MB
+                          </span>
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        {(ep.uploading || ep.uploaded) && (
+                          <div className="mt-2">
+                            <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-300 ${ep.uploaded ? 'bg-green-500' : 'bg-primary'}`}
+                                style={{ width: `${ep.progress}%` }}
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {ep.uploaded ? 'Uploaded!' : `${ep.progress}% complete`}
+                            </p>
+                          </div>
+                        )}
+                        
+                        {ep.error && (
+                          <p className="text-xs text-red-400 mt-1">{ep.error}</p>
+                        )}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4 border-t border-white/10">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setBatchEpisodes([]);
+                  setShowBatchUpload(false);
+                }}
+                className="flex-1"
+                disabled={batchUploading}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={uploadBatchEpisodes}
+                disabled={batchEpisodes.length === 0 || batchUploading || batchEpisodes.every(ep => ep.uploaded)}
+                className="flex-1"
+              >
+                {batchUploading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="w-4 h-4 mr-2" />
+                    Upload {batchEpisodes.filter(ep => !ep.uploaded).length} Episode(s)
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
