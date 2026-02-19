@@ -1432,6 +1432,32 @@ export const CreatorSeriesDetailPage = () => {
           >
             <Plus className="w-4 h-4 mr-2" /> Add Episodes
           </Button>
+          
+          {/* Publish Button */}
+          {series.status !== "published" && (
+            <Button 
+              className="w-full bg-green-600 hover:bg-green-700"
+              onClick={handlePublishSeries}
+              disabled={publishing || episodes.length === 0}
+              data-testid="publish-series-btn"
+            >
+              {publishing ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Globe className="w-4 h-4 mr-2" />
+              )}
+              {publishing ? "Publishing..." : "Publish Series"}
+            </Button>
+          )}
+          
+          {series.status === "published" && (
+            <div className="p-2 rounded-lg bg-green-500/20 border border-green-500/30 text-center">
+              <p className="text-xs text-green-400 flex items-center justify-center gap-1">
+                <Globe className="w-3 h-3" /> Live & visible to viewers
+              </p>
+            </div>
+          )}
+          
           {series.status === "pending_review" && (
             <p className="text-xs text-center text-muted-foreground">
               You can add episodes while under review
