@@ -3,6 +3,15 @@
 ## [Feb 19, 2026]
 
 ### Added
+- **Drag & Drop Episode Reordering** - Reorganize episodes within and between seasons
+  - Drag handle (grip icon) on each episode card
+  - Visual feedback: lifted card effect during drag with floating DragOverlay
+  - Reorder within same season or move to different season
+  - Episode codes auto-update (S01E01, S01E02, etc.)
+  - Backend endpoint: `POST /api/creator/series/{id}/reorder-episodes`
+  - S01E01 automatically made free when episode moved to first position
+  - Success toast notification after reorder
+
 - **Upload Progress Panel** - Persistent indicator showing real-time upload status with thumbnail previews
   - Visible in bottom-right corner during uploads (outside modal)
   - Shows uploading/encoding/ready/failed status for each video
@@ -30,9 +39,16 @@
   - Response structure includes `episode.id` for frontend compatibility
   - Full flow verified: series creation → episode creation → video upload to Bunny.net CDN
 
+- **HTML Nesting Warning** - Fixed nested button elements in season accordion header
+
 ### Modified
-- `/app/frontend/src/pages/CreatorSeriesDetailPage.jsx` - Complete rewrite with SeasonAccordion and UploadProgressPanel components
-- `/app/backend/routes/creator.py` - Added series-specific episode creation endpoint
+- `/app/frontend/src/pages/CreatorSeriesDetailPage.jsx` - Complete rewrite with DndContext, SeasonAccordion, and UploadProgressPanel
+- `/app/backend/routes/creator.py` - Added episode reorder endpoint and series-specific episode creation
+
+### Dependencies Added
+- `@dnd-kit/core@6.3.1` - Core drag and drop primitives
+- `@dnd-kit/sortable@10.0.0` - Sortable preset for list reordering
+- `@dnd-kit/utilities@3.2.2` - Utility functions for transforms
 
 ---
 
