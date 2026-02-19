@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, memo } from "react";
 import axios from "axios";
 import { 
   X, Upload, Film, Clock, Users, Globe, Star, FileVideo,
@@ -10,6 +10,29 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { API } from "@/config";
 import { toast } from "sonner";
+
+// Memoized form input to prevent re-renders
+const FormInput = memo(({ value, onChange, placeholder, type = "text", className = "" }) => (
+  <Input
+    type={type}
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+    className={className}
+  />
+));
+FormInput.displayName = "FormInput";
+
+const FormTextarea = memo(({ value, onChange, placeholder, rows = 3, className = "" }) => (
+  <textarea
+    className={`w-full p-3 rounded-lg bg-secondary/50 border border-white/10 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 ${className}`}
+    rows={rows}
+    value={value}
+    onChange={onChange}
+    placeholder={placeholder}
+  />
+));
+FormTextarea.displayName = "FormTextarea";
 
 const GENRES = [
   "Romance", "Drama", "Thriller", "Action", "Comedy", 
