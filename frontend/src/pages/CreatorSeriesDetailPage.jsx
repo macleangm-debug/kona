@@ -852,6 +852,32 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // Publish series to make it visible to viewers
+  const [publishing, setPublishing] = useState(false);
+  
+  const handlePublishSeries = async () => {
+    if (episodes.length === 0) {
+      toast.error("Add at least 1 episode before publishing");
+      return;
+    }
+    
+    setPublishing(true);
+    try {
+      const res = await axios.post(
+        `${API}/creator/series/${seriesId}/publish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchSeriesDetail(); // Refresh to get updated status
+    } catch (e) {
+      console.error("Failed to publish series:", e);
+      toast.error(e.response?.data?.detail || "Failed to publish series");
+    } finally {
+      setPublishing(false);
+    }
+  };
+
   // Generate video thumbnail from file
   const generateThumbnail = (file) => {
     return new Promise((resolve) => {
