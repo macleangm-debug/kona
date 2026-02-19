@@ -96,24 +96,30 @@ export const CreatorPortal = () => {
     }
   };
 
-  const handleCreateSeries = async () => {
-    if (!seriesForm.title || seriesForm.title.length < 3) {
+  const handleCreateSeries = useCallback(async (formData) => {
+    if (!formData.title || formData.title.length < 3) {
       toast.error("Please enter a series title (min 3 characters)");
       return;
     }
+    if (!formData.description || formData.description.length < 20) {
+      toast.error("Please enter a description (min 20 characters)");
+      return;
+    }
     
+    setCreatingSeriesLoading(true);
     try {
-      const res = await axios.post(`${API}/creator/series`, seriesForm, {
+      const res = await axios.post(`${API}/creator/series`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success("Series created! Now add episodes.");
       setShowCreateSeries(false);
-      setSeriesForm({ title: "", description: "", genre: "Romance" });
       navigate(`/creator/series/${res.data.series_id}`);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Failed to create series");
+    } finally {
+      setCreatingSeriesLoading(false);
     }
-  };
+  }, [token, navigate]);
 
   // Loading state
   if (loading) {
