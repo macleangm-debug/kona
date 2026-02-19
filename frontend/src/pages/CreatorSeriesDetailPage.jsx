@@ -4,7 +4,7 @@ import axios from "axios";
 import { 
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
-  Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle
+  Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
