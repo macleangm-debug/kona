@@ -197,6 +197,11 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
     - Visual feedback with floating DragOverlay
     - Auto-update episode codes (S01E01, S01E02, etc.)
     - Backend API: `POST /api/creator/series/{id}/reorder-episodes`
+  - **Bulk Episode Editing**: Select multiple episodes to edit at once
+    - Selection mode with checkboxes on each episode
+    - "Select All" and "Cancel" buttons
+    - Bulk actions: Move to Season, Make Free, Make Paid, Set Coin Price
+    - Backend API: `POST /api/creator/series/{id}/bulk-edit-episodes`
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
