@@ -185,6 +185,13 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Added new endpoint `POST /api/creator/series/{series_id}/episodes` to match frontend expectations
   - Updated video upload endpoint to auto-initialize Bunny.net video if not already set
   - Full flow verified: series creation → episode creation → video upload to Bunny.net CDN
+- [x] **Creator Portal Enhancements (2026-02-19)**
+  - Upload Progress Panel: Persistent indicator showing upload status with thumbnail previews (visible outside modal)
+  - Season Management UI: Accordion-style collapsible sections for organizing episodes by season
+  - Season selector dropdown in batch upload modal
+  - Create new seasons with custom titles
+  - Episodes automatically grouped by season number
+  - Bunny.net CDN messaging for performance awareness
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
