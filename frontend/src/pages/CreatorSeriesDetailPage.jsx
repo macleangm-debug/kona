@@ -169,7 +169,194 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
   );
 };
 
-// ============ SEASON ACCORDION COMPONENT ============
+// ============ DRAGGABLE EPISODE CARD ============
+const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: ep.id });
+  
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+  
+  return (
+    <Card 
+      ref={setNodeRef}
+      style={style}
+      className={`p-3 hover:bg-white/5 transition-colors cursor-pointer group border-white/5 ${isDragging ? 'ring-2 ring-primary' : ''}`}
+      data-testid={`episode-${ep.id}`}
+    >
+      <div className="flex gap-3">
+        {/* Drag Handle */}
+        <button
+          {...attributes}
+          {...listeners}
+          className="flex items-center justify-center w-6 self-stretch cursor-grab active:cursor-grabbing hover:bg-white/10 rounded transition-colors"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <GripVertical className="w-4 h-4 text-muted-foreground" />
+        </button>
+        
+        {/* Thumbnail */}
+        <div 
+          className="w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden relative cursor-pointer"
+          onClick={() => onEditEpisode(ep)}
+        >
+          {ep.thumbnail ? (
+            <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
+          ) : (
+            <Play className="w-6 h-6 text-muted-foreground" />
+          )}
+          {ep.encoding_status === 'encoding' && (
+            <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-yellow-400" />
+            </div>
+          )}
+        </div>
+        
+        {/* Details */}
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => onEditEpisode(ep)}>
+          <div className="flex flex-wrap items-center gap-1.5 mb-1">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+              {ep.episode_code || `S${String(seasonNum).padStart(2, '0')}E${String(ep.episode_number).padStart(2, '0')}`}
+            </Badge>
+            {ep.is_free && (
+              <Badge className="text-[10px] px-1.5 py-0 bg-green-500/20 text-green-400 border-0">FREE</Badge>
+            )}
+            {ep.season_number === 1 && ep.episode_number === 1 && (
+              <Badge className="text-[10px] px-1.5 py-0 bg-purple-500/20 text-purple-400 border-0">STORIES</Badge>
+            )}
+            {ep.encoding_status === 'encoding' && (
+              <Badge className="text-[10px] px-1.5 py-0 bg-yellow-500/20 text-yellow-400 border-0">PROCESSING</Badge>
+            )}
+          </div>
+          <h4 className="font-medium text-sm line-clamp-1">{ep.title}</h4>
+          <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+            <span className="flex items-center gap-1">
+              <Eye className="w-3 h-3" /> {ep.views || 0}
+            </span>
+            <span className="flex items-center gap-1">
+              <Coins className="w-3 h-3" /> {ep.earnings || 0}
+            </span>
+            {!ep.is_free && (
+              <span>{ep.coins_required} coins</span>
+            )}
+          </div>
+        </div>
+        
+        {/* Edit Button */}
+        <button 
+          className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            onEditEpisode(ep);
+          }}
+        >
+          <Edit className="w-4 h-4 text-muted-foreground" />
+        </button>
+      </div>
+    </Card>
+  );
+};
+
+// ============ DROPPABLE SEASON COMPONENT ============
+const DroppableSeason = ({ 
+  seasonNum, 
+  season, 
+  episodes, 
+  isExpanded, 
+  onToggleSeason, 
+  onAddEpisode, 
+  onEditEpisode,
+  activeId 
+}) => {
+  const episodeIds = episodes.map(ep => ep.id);
+  
+  return (
+    <div 
+      className="rounded-xl border border-white/10 overflow-hidden bg-card/50"
+      data-testid={`season-${seasonNum}`}
+    >
+      {/* Season Header */}
+      <button
+        onClick={() => onToggleSeason(seasonNum)}
+        className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${isExpanded ? 'bg-primary/20' : 'bg-white/5'}`}>
+            <Layers className={`w-4 h-4 ${isExpanded ? 'text-primary' : 'text-muted-foreground'}`} />
+          </div>
+          <div className="text-left">
+            <h3 className="font-heading font-semibold">{season.title || `Season ${seasonNum}`}</h3>
+            <p className="text-xs text-muted-foreground">
+              {episodes.length} episode{episodes.length !== 1 ? 's' : ''}
+              {episodes.length > 0 && (
+                <span className="ml-2">
+                  • {episodes.reduce((sum, ep) => sum + (ep.views || 0), 0)} views
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8 px-2"
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddEpisode(seasonNum);
+            }}
+          >
+            <Plus className="w-4 h-4" />
+          </Button>
+          {isExpanded ? (
+            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+          )}
+        </div>
+      </button>
+      
+      {/* Season Episodes */}
+      {isExpanded && (
+        <div className="border-t border-white/10">
+          {episodes.length === 0 ? (
+            <div className="p-8 text-center">
+              <Film className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
+              <p className="text-sm text-muted-foreground mb-3">No episodes in this season yet</p>
+              <Button size="sm" variant="outline" onClick={() => onAddEpisode(seasonNum)}>
+                <Plus className="w-4 h-4 mr-1" /> Add Episode
+              </Button>
+            </div>
+          ) : (
+            <div className="p-3 space-y-2">
+              <SortableContext items={episodeIds} strategy={verticalListSortingStrategy}>
+                {episodes.map((ep) => (
+                  <DraggableEpisodeCard
+                    key={ep.id}
+                    ep={ep}
+                    seasonNum={seasonNum}
+                    onEditEpisode={onEditEpisode}
+                    isDragging={activeId === ep.id}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ SEASON ACCORDION WITH DND ============
 const SeasonAccordion = ({ 
   seasons, 
   episodes, 
@@ -177,11 +364,31 @@ const SeasonAccordion = ({
   onToggleSeason, 
   onEditEpisode,
   onAddSeason,
-  onAddEpisode
+  onAddEpisode,
+  onReorderEpisodes
 }) => {
+  const [activeId, setActiveId] = useState(null);
+  const [localEpisodes, setLocalEpisodes] = useState(episodes);
+  
+  // Sync local episodes with props
+  useEffect(() => {
+    setLocalEpisodes(episodes);
+  }, [episodes]);
+  
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px of movement required before drag starts
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+  
   // Group episodes by season
   const episodesBySeason = {};
-  episodes.forEach(ep => {
+  localEpisodes.forEach(ep => {
     const seasonNum = ep.season_number || 1;
     if (!episodesBySeason[seasonNum]) {
       episodesBySeason[seasonNum] = [];
@@ -194,7 +401,7 @@ const SeasonAccordion = ({
     episodesBySeason[seasonNum].sort((a, b) => a.episode_number - b.episode_number);
   });
   
-  // Ensure all seasons are represented (even if empty)
+  // Get all season numbers
   const allSeasonNumbers = [...new Set([
     ...seasons.map(s => s.season_number),
     ...Object.keys(episodesBySeason).map(Number)
@@ -204,149 +411,162 @@ const SeasonAccordion = ({
     allSeasonNumbers.push(1);
   }
   
+  // Find which season an episode is in
+  const findEpisodeSeason = (episodeId) => {
+    for (const [seasonNum, eps] of Object.entries(episodesBySeason)) {
+      if (eps.find(ep => ep.id === episodeId)) {
+        return Number(seasonNum);
+      }
+    }
+    return null;
+  };
+  
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+  };
+  
+  const handleDragOver = (event) => {
+    const { active, over } = event;
+    if (!over) return;
+    
+    const activeId = active.id;
+    const overId = over.id;
+    
+    if (activeId === overId) return;
+    
+    const activeSeason = findEpisodeSeason(activeId);
+    const overSeason = findEpisodeSeason(overId);
+    
+    if (!activeSeason || !overSeason) return;
+    
+    // Moving between seasons
+    if (activeSeason !== overSeason) {
+      setLocalEpisodes(prev => {
+        const activeEp = prev.find(ep => ep.id === activeId);
+        const overEp = prev.find(ep => ep.id === overId);
+        
+        if (!activeEp || !overEp) return prev;
+        
+        return prev.map(ep => {
+          if (ep.id === activeId) {
+            return { ...ep, season_number: overSeason };
+          }
+          return ep;
+        });
+      });
+    }
+  };
+  
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+    setActiveId(null);
+    
+    if (!over || active.id === over.id) return;
+    
+    const activeSeason = findEpisodeSeason(active.id);
+    if (!activeSeason) return;
+    
+    // Reorder within the same season
+    const seasonEpisodes = episodesBySeason[activeSeason] || [];
+    const oldIndex = seasonEpisodes.findIndex(ep => ep.id === active.id);
+    const newIndex = seasonEpisodes.findIndex(ep => ep.id === over.id);
+    
+    if (oldIndex === -1 || newIndex === -1) return;
+    
+    const reorderedSeason = arrayMove(seasonEpisodes, oldIndex, newIndex);
+    
+    // Update local state immediately
+    const updatedEpisodes = localEpisodes.map(ep => {
+      const reorderedIdx = reorderedSeason.findIndex(r => r.id === ep.id);
+      if (reorderedIdx !== -1) {
+        return { 
+          ...ep, 
+          episode_number: reorderedIdx + 1,
+          season_number: activeSeason
+        };
+      }
+      return ep;
+    });
+    
+    setLocalEpisodes(updatedEpisodes);
+    
+    // Call parent to save to backend
+    if (onReorderEpisodes) {
+      const reorderData = updatedEpisodes.map(ep => ({
+        episode_id: ep.id,
+        season_number: ep.season_number || 1,
+        episode_number: ep.episode_number
+      }));
+      onReorderEpisodes(reorderData);
+    }
+  };
+  
+  const activeEpisode = activeId ? localEpisodes.find(ep => ep.id === activeId) : null;
+  
   return (
     <div className="space-y-3" data-testid="season-accordion">
-      {allSeasonNumbers.map((seasonNum) => {
-        const season = seasons.find(s => s.season_number === seasonNum) || {
-          season_number: seasonNum,
-          title: `Season ${seasonNum}`
-        };
-        const seasonEpisodes = episodesBySeason[seasonNum] || [];
-        const isExpanded = expandedSeasons.includes(seasonNum);
+      {/* Drag hint banner */}
+      <div className="flex items-center gap-2 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+        <Move className="w-4 h-4 text-primary" />
+        <p className="text-xs text-muted-foreground">
+          <span className="text-foreground font-medium">Drag & drop</span> episodes to reorder within or between seasons
+        </p>
+      </div>
+      
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        {allSeasonNumbers.map((seasonNum) => {
+          const season = seasons.find(s => s.season_number === seasonNum) || {
+            season_number: seasonNum,
+            title: `Season ${seasonNum}`
+          };
+          const seasonEpisodes = episodesBySeason[seasonNum] || [];
+          const isExpanded = expandedSeasons.includes(seasonNum);
+          
+          return (
+            <DroppableSeason
+              key={seasonNum}
+              seasonNum={seasonNum}
+              season={season}
+              episodes={seasonEpisodes}
+              isExpanded={isExpanded}
+              onToggleSeason={onToggleSeason}
+              onAddEpisode={onAddEpisode}
+              onEditEpisode={onEditEpisode}
+              activeId={activeId}
+            />
+          );
+        })}
         
-        return (
-          <div 
-            key={seasonNum} 
-            className="rounded-xl border border-white/10 overflow-hidden bg-card/50"
-            data-testid={`season-${seasonNum}`}
-          >
-            {/* Season Header */}
-            <button
-              onClick={() => onToggleSeason(seasonNum)}
-              className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${isExpanded ? 'bg-primary/20' : 'bg-white/5'}`}>
-                  <Layers className={`w-4 h-4 ${isExpanded ? 'text-primary' : 'text-muted-foreground'}`} />
+        {/* Drag Overlay */}
+        <DragOverlay>
+          {activeEpisode ? (
+            <Card className="p-3 bg-card border-primary shadow-lg shadow-primary/20">
+              <div className="flex gap-3 items-center">
+                <GripVertical className="w-4 h-4 text-primary" />
+                <div className="w-12 h-12 rounded bg-secondary/50 flex items-center justify-center">
+                  {activeEpisode.thumbnail ? (
+                    <img src={activeEpisode.thumbnail} alt="" className="w-full h-full object-cover rounded" />
+                  ) : (
+                    <Play className="w-5 h-5 text-muted-foreground" />
+                  )}
                 </div>
-                <div className="text-left">
-                  <h3 className="font-heading font-semibold">{season.title || `Season ${seasonNum}`}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {seasonEpisodes.length} episode{seasonEpisodes.length !== 1 ? 's' : ''}
-                    {seasonEpisodes.length > 0 && (
-                      <span className="ml-2">
-                        • {seasonEpisodes.reduce((sum, ep) => sum + (ep.views || 0), 0)} views
-                      </span>
-                    )}
-                  </p>
+                <div>
+                  <Badge variant="outline" className="text-[10px] mb-1">
+                    {activeEpisode.episode_code}
+                  </Badge>
+                  <p className="text-sm font-medium">{activeEpisode.title}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="h-8 px-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddEpisode(seasonNum);
-                  }}
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
-                {isExpanded ? (
-                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                )}
-              </div>
-            </button>
-            
-            {/* Season Episodes */}
-            {isExpanded && (
-              <div className="border-t border-white/10">
-                {seasonEpisodes.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Film className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
-                    <p className="text-sm text-muted-foreground mb-3">No episodes in this season yet</p>
-                    <Button size="sm" variant="outline" onClick={() => onAddEpisode(seasonNum)}>
-                      <Plus className="w-4 h-4 mr-1" /> Add Episode
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="p-3 space-y-2">
-                    {seasonEpisodes.map((ep) => (
-                      <Card 
-                        key={ep.id} 
-                        className="p-3 hover:bg-white/5 transition-colors cursor-pointer group border-white/5"
-                        onClick={() => onEditEpisode(ep)}
-                        data-testid={`episode-${ep.id}`}
-                      >
-                        <div className="flex gap-3">
-                          {/* Thumbnail */}
-                          <div className="w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
-                            {ep.thumbnail ? (
-                              <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
-                            ) : (
-                              <Play className="w-6 h-6 text-muted-foreground" />
-                            )}
-                            {/* Encoding status overlay */}
-                            {ep.encoding_status === 'encoding' && (
-                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                                <Loader2 className="w-5 h-5 animate-spin text-yellow-400" />
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Details */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                                {ep.episode_code || `S${String(seasonNum).padStart(2, '0')}E${String(ep.episode_number).padStart(2, '0')}`}
-                              </Badge>
-                              {ep.is_free && (
-                                <Badge className="text-[10px] px-1.5 py-0 bg-green-500/20 text-green-400 border-0">FREE</Badge>
-                              )}
-                              {ep.season_number === 1 && ep.episode_number === 1 && (
-                                <Badge className="text-[10px] px-1.5 py-0 bg-purple-500/20 text-purple-400 border-0">STORIES</Badge>
-                              )}
-                              {ep.encoding_status === 'encoding' && (
-                                <Badge className="text-[10px] px-1.5 py-0 bg-yellow-500/20 text-yellow-400 border-0">PROCESSING</Badge>
-                              )}
-                            </div>
-                            <h4 className="font-medium text-sm line-clamp-1">{ep.title}</h4>
-                            <div className="flex gap-3 text-xs text-muted-foreground mt-1">
-                              <span className="flex items-center gap-1">
-                                <Eye className="w-3 h-3" /> {ep.views || 0}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Coins className="w-3 h-3" /> {ep.earnings || 0}
-                              </span>
-                              {!ep.is_free && (
-                                <span>{ep.coins_required} coins</span>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Edit Button */}
-                          <button 
-                            className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEditEpisode(ep);
-                            }}
-                          >
-                            <Edit className="w-4 h-4 text-muted-foreground" />
-                          </button>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        );
-      })}
+            </Card>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
       
       {/* Add New Season Button */}
       <button
