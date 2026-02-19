@@ -270,15 +270,21 @@ async def login(data: UserLogin, request: Request):
         await record_login_attempt(login_id, success=False)
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # Check device limit based on subscription tier
-    subscription_tier = user.get("subscription_tier", "free")
-    limit_status = await check_device_limit(user["id"], subscription_tier)
-    
-    if limit_status["exceeded"]:
-        raise HTTPException(
-            status_code=403, 
-            detail=f"Device limit reached ({limit_status['max_devices']} devices for {subscription_tier} tier). Upgrade your subscription or log out from another device."
-        )
+    # Skip device limit for admin users
+    if user.get("is_admin"):
+        # Clear old sessions for admin to avoid accumulation
+        from services import db
+        await db.sessions.delete_many({"user_id": user["id"]})
+    else:
+        # Check device limit based on subscription tier for non-admin users
+        subscription_tier = user.get("subscription_tier", "free")
+        limit_status = await check_device_limit(user["id"], subscription_tier)
+        
+        if limit_status["exceeded"]:
+            raise HTTPException(
+                status_code=403, 
+                detail=f"Device limit reached ({limit_status['max_devices']} devices for {subscription_tier} tier). Upgrade your subscription or log out from another device."
+            )
     
     # Record successful login
     await record_login_attempt(login_id, success=True)
