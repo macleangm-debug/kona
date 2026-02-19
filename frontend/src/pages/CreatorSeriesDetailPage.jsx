@@ -52,6 +52,11 @@ export const CreatorSeriesDetailPage = () => {
     thumbnail_url: "",
     video_url: ""
   });
+
+  // Batch upload state
+  const [showBatchUpload, setShowBatchUpload] = useState(false);
+  const [batchEpisodes, setBatchEpisodes] = useState([]);
+  const [batchUploading, setBatchUploading] = useState(false);
   
   // Subtitle upload state
   const [subtitleUploading, setSubtitleUploading] = useState(false);
