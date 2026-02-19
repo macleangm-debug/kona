@@ -734,13 +734,16 @@ export const CreatorSeriesDetailPage = () => {
               <h3 className="font-heading text-lg font-semibold mb-2">No Episodes Yet</h3>
               <p className="text-muted-foreground mb-4">
                 {series.status === "pending_review" 
-                  ? "Your series is under review. Once approved, you can add more episodes."
+                  ? "Start adding episodes while your series is under review!"
                   : "Start adding episodes to your series."}
               </p>
-              {(series.status === "approved" || series.status === "published") && (
-                <Button>
-                  <Plus className="w-4 h-4 mr-2" /> Add First Episode
-                </Button>
+              <Button onClick={() => setShowBatchUpload(true)} data-testid="add-first-episode-btn">
+                <Plus className="w-4 h-4 mr-2" /> Add Episodes
+              </Button>
+              {series.status === "pending_review" && (
+                <p className="text-xs text-muted-foreground mt-3">
+                  Episodes will be published once your series is approved
+                </p>
               )}
             </Card>
           ) : (
