@@ -89,6 +89,31 @@ async def get_creator_status(user: dict = Depends(get_current_user)):
     """Get creator application/profile status"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
+    # Auto-approve admins as creators if they don't have a creator record
+    if not creator and user.get("is_admin"):
+        # Create approved creator record for admin
+        creator_id = f"creator-{uuid.uuid4().hex[:8]}"
+        creator = {
+            "id": creator_id,
+            "user_id": user["id"],
+            "name": user.get("name", "Admin Creator"),
+            "email": user.get("email"),
+            "status": "approved",
+            "tier": "gold",  # Admins get gold tier
+            "revenue_share": 0.5,
+            "total_views": 0,
+            "total_earnings": 0,
+            "payout_method": None,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.creators.insert_one(creator)
+        return {
+            "is_creator": True,
+            "status": "approved",
+            "tier": "gold",
+            "creator_id": creator_id
+        }
+    
     if not creator:
         return {"is_creator": False, "status": None}
     
