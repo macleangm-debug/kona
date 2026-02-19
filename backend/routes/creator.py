@@ -1744,6 +1744,141 @@ async def reorder_episodes(
     }
 
 
+# ============ BULK EPISODE EDITING ============
+
+class BulkEditRequest(PydanticBaseModel):
+    """Request to bulk edit episodes"""
+    episode_ids: list[str]
+    action: str  # 'move_season', 'set_free', 'set_coins'
+    value: int | bool  # season_number, is_free (bool), or coins_required (int)
+
+@router.post("/series/{series_id}/bulk-edit-episodes")
+async def bulk_edit_episodes(
+    series_id: str,
+    data: BulkEditRequest,
+    user: dict = Depends(get_current_user)
+):
+    """Bulk edit multiple episodes at once (change season, free status, or pricing)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Verify series ownership
+    series = await db.creator_series.find_one({"id": series_id, "creator_id": creator["id"]})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    if not data.episode_ids:
+        raise HTTPException(status_code=400, detail="No episodes selected")
+    
+    updated_count = 0
+    
+    for episode_id in data.episode_ids:
+        # Verify episode belongs to this series and creator
+        episode = await db.creator_episodes.find_one({
+            "id": episode_id,
+            "series_id": series_id,
+            "creator_id": creator["id"]
+        })
+        
+        if not episode:
+            continue
+        
+        update_data = {}
+        
+        if data.action == "move_season":
+            new_season = int(data.value)
+            
+            # Get or create season
+            season = await db.seasons.find_one({
+                "series_id": series_id,
+                "season_number": new_season
+            })
+            
+            if not season:
+                # Create new season
+                season_id = f"season-{uuid.uuid4().hex[:8]}"
+                new_season_doc = {
+                    "id": season_id,
+                    "series_id": series_id,
+                    "creator_id": creator["id"],
+                    "season_number": new_season,
+                    "title": f"Season {new_season}",
+                    "description": None,
+                    "total_episodes": 0,
+                    "status": "active",
+                    "created_at": datetime.now(timezone.utc).isoformat()
+                }
+                await db.seasons.insert_one(new_season_doc)
+                await db.creator_series.update_one(
+                    {"id": series_id},
+                    {"$inc": {"total_seasons": 1}}
+                )
+                update_data["season_id"] = season_id
+            else:
+                update_data["season_id"] = season["id"]
+            
+            # Get next episode number in target season
+            existing_count = await db.creator_episodes.count_documents({
+                "series_id": series_id,
+                "season_number": new_season
+            })
+            
+            update_data["season_number"] = new_season
+            update_data["episode_number"] = existing_count + 1
+            update_data["episode_code"] = f"S{str(new_season).zfill(2)}E{str(existing_count + 1).zfill(2)}"
+            
+        elif data.action == "set_free":
+            is_free = bool(data.value)
+            update_data["is_free"] = is_free
+            if is_free:
+                update_data["coins_required"] = 0
+                
+        elif data.action == "set_coins":
+            coins = max(1, min(50, int(data.value)))
+            update_data["coins_required"] = coins
+            update_data["is_free"] = False
+        
+        if update_data:
+            await db.creator_episodes.update_one(
+                {"id": episode_id},
+                {"$set": update_data}
+            )
+            
+            # Also update main episodes collection if published
+            await db.episodes.update_one(
+                {"id": episode_id},
+                {"$set": update_data}
+            )
+            
+            updated_count += 1
+    
+    # Recalculate season episode counts
+    all_seasons = await db.seasons.find({"series_id": series_id}).to_list(100)
+    for season in all_seasons:
+        count = await db.creator_episodes.count_documents({
+            "series_id": series_id,
+            "season_number": season["season_number"]
+        })
+        await db.seasons.update_one(
+            {"id": season["id"]},
+            {"$set": {"total_episodes": count}}
+        )
+    
+    action_desc = {
+        "move_season": f"moved to Season {data.value}",
+        "set_free": "set to free" if data.value else "set to paid",
+        "set_coins": f"priced at {data.value} coins"
+    }.get(data.action, "updated")
+    
+    return {
+        "message": f"Successfully {action_desc} {updated_count} episode(s)",
+        "updated_count": updated_count,
+        "action": data.action
+    }
+
+
 @router.post("/episodes/{episode_id}/init-video")
 async def initialize_video_upload(episode_id: str, user: dict = Depends(get_current_user)):
     """Initialize Bunny.net video for an episode (call this before uploading)"""
