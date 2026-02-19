@@ -1186,6 +1186,141 @@ async def publish_series_to_main(series_id: str, creator_id: str):
 
 
 # ============ EPISODE MANAGEMENT ============
+
+# Model for series-specific episode creation (simpler, used by batch upload)
+from pydantic import BaseModel as PydanticBaseModel
+from typing import Optional as Opt
+
+class SimpleEpisodeCreate(PydanticBaseModel):
+    """Simple episode creation for batch upload"""
+    title: str
+    episode_number: Opt[int] = None
+    season_number: int = 1
+    is_free: bool = False
+    coins_required: int = 5
+    intro_duration: int = 30
+
+
+@router.post("/series/{series_id}/episodes")
+async def create_episode_for_series(
+    series_id: str,
+    data: SimpleEpisodeCreate,
+    user: dict = Depends(get_current_user)
+):
+    """Create a new episode for a specific series (used by batch upload UI)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator.get("status") != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    # Verify series ownership - allow adding episodes even while under review
+    series = await db.creator_series.find_one({"id": series_id, "creator_id": creator["id"]})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Allow episodes to be added while series is pending_review, approved, or published
+    if series.get("status") not in ["pending_review", "approved", "published"]:
+        raise HTTPException(status_code=400, detail="Cannot add episodes to rejected or draft series")
+    
+    # Get existing episode count to auto-generate episode number
+    existing_count = await db.creator_episodes.count_documents({"series_id": series_id})
+    episode_number = data.episode_number if data.episode_number else existing_count + 1
+    
+    # Get or create season
+    season = await db.seasons.find_one({
+        "series_id": series_id,
+        "season_number": data.season_number
+    })
+    
+    if not season:
+        # Create new season
+        season_id = f"season-{uuid.uuid4().hex[:8]}"
+        season = {
+            "id": season_id,
+            "series_id": series_id,
+            "creator_id": creator["id"],
+            "season_number": data.season_number,
+            "title": f"Season {data.season_number}",
+            "description": None,
+            "total_episodes": 0,
+            "status": "active",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.seasons.insert_one(season)
+        await db.creator_series.update_one(
+            {"id": series_id},
+            {"$inc": {"total_seasons": 1}}
+        )
+    
+    season_id = season["id"]
+    
+    # Generate episode code (S01E03 format)
+    episode_code = f"S{str(data.season_number).zfill(2)}E{str(episode_number).zfill(2)}"
+    episode_id = f"{series_id}-{episode_code.lower()}"
+    
+    # Check if episode already exists
+    existing = await db.creator_episodes.find_one({"id": episode_id})
+    if existing:
+        # Use timestamp to make unique
+        episode_id = f"{series_id}-{episode_code.lower()}-{uuid.uuid4().hex[:6]}"
+    
+    # Create video placeholder in Bunny.net
+    bunny_video_id = None
+    video_title = f"{series['title']} - {episode_code}: {data.title}"
+    bunny_result = await bunny_service.create_video(video_title)
+    
+    if bunny_result["success"]:
+        bunny_video_id = bunny_result["video_id"]
+    
+    episode = {
+        "id": episode_id,
+        "series_id": series_id,
+        "season_id": season_id,
+        "creator_id": creator["id"],
+        "season_number": data.season_number,
+        "episode_number": episode_number,
+        "episode_code": episode_code,
+        "title": data.title,
+        "description": None,
+        "video_url": None,
+        "bunny_video_id": bunny_video_id,
+        "encoding_status": "pending",
+        "duration": None,
+        "thumbnail": None,
+        "is_free": data.is_free or (data.season_number == 1 and episode_number == 1),
+        "is_pilot": data.season_number == 1 and episode_number == 1,
+        "coins_required": 0 if (data.is_free or (data.season_number == 1 and episode_number == 1)) else data.coins_required,
+        "intro_duration": data.intro_duration,
+        "is_story_content": data.season_number == 1 and episode_number == 1,
+        "requires_vertical": data.season_number == 1 and episode_number == 1,
+        "aspect_ratio": None,
+        "views": 0,
+        "earnings": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "published_at": None
+    }
+    
+    await db.creator_episodes.insert_one(episode)
+    
+    # Update season and series episode counts
+    await db.seasons.update_one({"id": season_id}, {"$inc": {"total_episodes": 1}})
+    await db.creator_series.update_one({"id": series_id}, {"$inc": {"total_episodes": 1}})
+    
+    # Return response with 'episode' key for frontend compatibility
+    return {
+        "message": f"Episode {episode_code} created successfully",
+        "episode": {
+            "id": episode_id,
+            "episode_code": episode_code,
+            "bunny_video_id": bunny_video_id
+        },
+        "episode_id": episode_id,
+        "episode_code": episode_code,
+        "season_number": data.season_number,
+        "episode_number": episode_number
+    }
+
+
 @router.post("/episodes")
 async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_current_user)):
     """Create a new episode with season support (S01E03 format)"""
