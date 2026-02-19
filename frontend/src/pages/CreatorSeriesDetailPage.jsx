@@ -170,7 +170,7 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
 };
 
 // ============ DRAGGABLE EPISODE CARD ============
-const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging }) => {
+const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging, isSelected, onToggleSelect, selectionMode }) => {
   const {
     attributes,
     listeners,
@@ -189,24 +189,41 @@ const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging }) => {
     <Card 
       ref={setNodeRef}
       style={style}
-      className={`p-3 hover:bg-white/5 transition-colors cursor-pointer group border-white/5 ${isDragging ? 'ring-2 ring-primary' : ''}`}
+      className={`p-3 hover:bg-white/5 transition-colors cursor-pointer group border-white/5 ${isDragging ? 'ring-2 ring-primary' : ''} ${isSelected ? 'ring-2 ring-green-500 bg-green-500/10' : ''}`}
       data-testid={`episode-${ep.id}`}
     >
       <div className="flex gap-3">
-        {/* Drag Handle */}
-        <button
-          {...attributes}
-          {...listeners}
-          className="flex items-center justify-center w-6 self-stretch cursor-grab active:cursor-grabbing hover:bg-white/10 rounded transition-colors"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <GripVertical className="w-4 h-4 text-muted-foreground" />
-        </button>
+        {/* Selection Checkbox (when in selection mode) */}
+        {selectionMode ? (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSelect(ep.id);
+            }}
+            className={`flex items-center justify-center w-6 self-stretch rounded transition-colors ${isSelected ? 'bg-green-500' : 'bg-white/10 hover:bg-white/20'}`}
+          >
+            {isSelected ? (
+              <CheckCircle className="w-4 h-4 text-white" />
+            ) : (
+              <div className="w-4 h-4 border-2 border-white/40 rounded" />
+            )}
+          </button>
+        ) : (
+          /* Drag Handle */
+          <button
+            {...attributes}
+            {...listeners}
+            className="flex items-center justify-center w-6 self-stretch cursor-grab active:cursor-grabbing hover:bg-white/10 rounded transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <GripVertical className="w-4 h-4 text-muted-foreground" />
+          </button>
+        )}
         
         {/* Thumbnail */}
         <div 
           className="w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden relative cursor-pointer"
-          onClick={() => onEditEpisode(ep)}
+          onClick={() => selectionMode ? onToggleSelect(ep.id) : onEditEpisode(ep)}
         >
           {ep.thumbnail ? (
             <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
