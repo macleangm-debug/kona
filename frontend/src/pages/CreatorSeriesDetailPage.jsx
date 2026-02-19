@@ -494,10 +494,17 @@ export const CreatorSeriesDetailPage = () => {
           <Button className="w-full" variant="outline" onClick={openSeriesEditor}>
             <Edit className="w-4 h-4 mr-2" /> Edit Series Info
           </Button>
-          {(series.status === "approved" || series.status === "published") && (
-            <Button className="w-full" data-testid="add-episode-btn">
-              <Plus className="w-4 h-4 mr-2" /> Add Episode
-            </Button>
+          <Button 
+            className="w-full" 
+            onClick={() => setShowBatchUpload(true)}
+            data-testid="add-episode-btn"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Add Episodes
+          </Button>
+          {series.status === "pending_review" && (
+            <p className="text-xs text-center text-muted-foreground">
+              You can add episodes while under review
+            </p>
           )}
         </div>
       </aside>
