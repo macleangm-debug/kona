@@ -2,6 +2,27 @@
 
 ## [Feb 19, 2026]
 
+### Added
+- **Upload Progress Panel** - Persistent indicator showing real-time upload status with thumbnail previews
+  - Visible in bottom-right corner during uploads (outside modal)
+  - Shows uploading/encoding/ready/failed status for each video
+  - Thumbnail preview extracted from video file
+  - Dismiss individual uploads or clear all when done
+
+- **Season Management UI** - Modern accordion-style interface for organizing episodes
+  - Collapsible season sections with expand/collapse functionality
+  - Episodes automatically grouped by season number
+  - Episode count and total views displayed per season
+  - Quick "Add Episode" button per season
+  - "Add New Season" button to create new seasons
+  - Season Creator dialog with custom title input
+
+- **Batch Upload Enhancements**
+  - Season selector dropdown to choose which season to upload to
+  - Option to create new season directly from upload modal
+  - Video thumbnails auto-generated from first frame
+  - Bunny.net CDN messaging for performance awareness
+
 ### Fixed
 - **Creator Episode Upload Bug** - Episodes now upload correctly via batch upload feature
   - Added new endpoint `POST /api/creator/series/{series_id}/episodes` to match frontend expectations
@@ -10,8 +31,8 @@
   - Full flow verified: series creation → episode creation → video upload to Bunny.net CDN
 
 ### Modified
-- `/app/backend/routes/creator.py` - Added `create_episode_for_series` endpoint (lines 1188-1313)
-- `/app/backend/routes/creator.py` - Updated `upload_episode_video` to handle missing bunny_video_id
+- `/app/frontend/src/pages/CreatorSeriesDetailPage.jsx` - Complete rewrite with SeasonAccordion and UploadProgressPanel components
+- `/app/backend/routes/creator.py` - Added series-specific episode creation endpoint
 
 ---
 
