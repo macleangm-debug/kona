@@ -836,6 +836,22 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // Bulk edit episodes
+  const handleBulkEdit = async (episodeIds, action, value) => {
+    try {
+      const res = await axios.post(
+        `${API}/creator/series/${seriesId}/bulk-edit-episodes`,
+        { episode_ids: episodeIds, action, value },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchSeriesDetail(); // Refresh to get updated episodes
+    } catch (e) {
+      console.error("Failed to bulk edit episodes:", e);
+      toast.error(e.response?.data?.detail || "Failed to update episodes");
+    }
+  };
+
   // Generate video thumbnail from file
   const generateThumbnail = (file) => {
     return new Promise((resolve) => {
