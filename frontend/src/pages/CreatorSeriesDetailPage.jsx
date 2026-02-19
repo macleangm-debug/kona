@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { 
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
-  Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X
+  Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X,
+  ChevronDown, ChevronRight, FolderPlus, Layers
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,326 @@ const SUBTITLE_LANGUAGES = [
   { code: "fr", name: "French" }
 ];
 
+// ============ UPLOAD PROGRESS PANEL COMPONENT ============
+const UploadProgressPanel = ({ uploads, onDismiss }) => {
+  if (!uploads || uploads.length === 0) return null;
+  
+  const activeUploads = uploads.filter(u => !u.dismissed);
+  if (activeUploads.length === 0) return null;
+  
+  const completedCount = activeUploads.filter(u => u.status === 'ready' || u.status === 'encoding').length;
+  const failedCount = activeUploads.filter(u => u.status === 'failed').length;
+  const uploadingCount = activeUploads.filter(u => u.status === 'uploading').length;
+  
+  return (
+    <div className="fixed bottom-4 right-4 z-50 w-80 max-h-96 overflow-hidden rounded-xl bg-card/95 backdrop-blur-sm border border-white/10 shadow-2xl" data-testid="upload-progress-panel">
+      {/* Header */}
+      <div className="p-3 border-b border-white/10 bg-gradient-to-r from-primary/20 to-purple-500/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Upload className="w-4 h-4 text-primary" />
+            <span className="font-medium text-sm">Upload Progress</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs">
+            {uploadingCount > 0 && (
+              <span className="text-yellow-400">{uploadingCount} uploading</span>
+            )}
+            {completedCount > 0 && (
+              <span className="text-green-400">{completedCount} done</span>
+            )}
+            {failedCount > 0 && (
+              <span className="text-red-400">{failedCount} failed</span>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Upload Items */}
+      <div className="max-h-72 overflow-y-auto p-2 space-y-2">
+        {activeUploads.map((upload) => (
+          <div 
+            key={upload.id} 
+            className={`p-2 rounded-lg border transition-all ${
+              upload.status === 'ready' || upload.status === 'encoding' 
+                ? 'bg-green-500/10 border-green-500/30' 
+                : upload.status === 'failed' 
+                  ? 'bg-red-500/10 border-red-500/30'
+                  : 'bg-white/5 border-white/10'
+            }`}
+          >
+            <div className="flex items-start gap-2">
+              {/* Thumbnail Preview */}
+              <div className="w-12 h-12 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                {upload.thumbnail ? (
+                  <img src={upload.thumbnail} alt="" className="w-full h-full object-cover" />
+                ) : upload.status === 'ready' || upload.status === 'encoding' ? (
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : upload.status === 'uploading' ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                ) : upload.status === 'failed' ? (
+                  <XCircle className="w-5 h-5 text-red-400" />
+                ) : (
+                  <Video className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+              
+              {/* Details */}
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium truncate">{upload.title}</p>
+                <p className="text-[10px] text-muted-foreground">{upload.episodeCode}</p>
+                
+                {/* Progress Bar */}
+                {upload.status === 'uploading' && (
+                  <div className="mt-1">
+                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${upload.progress}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{upload.progress}%</p>
+                  </div>
+                )}
+                
+                {upload.status === 'encoding' && (
+                  <p className="text-[10px] text-yellow-400 mt-1 flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Processing on CDN...
+                  </p>
+                )}
+                
+                {upload.status === 'ready' && (
+                  <p className="text-[10px] text-green-400 mt-1">Ready to stream</p>
+                )}
+                
+                {upload.status === 'failed' && (
+                  <p className="text-[10px] text-red-400 mt-1">{upload.error || 'Upload failed'}</p>
+                )}
+              </div>
+              
+              {/* Dismiss button */}
+              {(upload.status === 'ready' || upload.status === 'failed') && (
+                <button 
+                  onClick={() => onDismiss(upload.id)}
+                  className="p-1 hover:bg-white/10 rounded"
+                >
+                  <X className="w-3 h-3 text-muted-foreground" />
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Clear All Button */}
+      {completedCount + failedCount === activeUploads.length && activeUploads.length > 0 && (
+        <div className="p-2 border-t border-white/10">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="w-full text-xs"
+            onClick={() => activeUploads.forEach(u => onDismiss(u.id))}
+          >
+            Clear All
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ SEASON ACCORDION COMPONENT ============
+const SeasonAccordion = ({ 
+  seasons, 
+  episodes, 
+  expandedSeasons, 
+  onToggleSeason, 
+  onEditEpisode,
+  onAddSeason,
+  onAddEpisode
+}) => {
+  // Group episodes by season
+  const episodesBySeason = {};
+  episodes.forEach(ep => {
+    const seasonNum = ep.season_number || 1;
+    if (!episodesBySeason[seasonNum]) {
+      episodesBySeason[seasonNum] = [];
+    }
+    episodesBySeason[seasonNum].push(ep);
+  });
+  
+  // Sort episodes within each season
+  Object.keys(episodesBySeason).forEach(seasonNum => {
+    episodesBySeason[seasonNum].sort((a, b) => a.episode_number - b.episode_number);
+  });
+  
+  // Ensure all seasons are represented (even if empty)
+  const allSeasonNumbers = [...new Set([
+    ...seasons.map(s => s.season_number),
+    ...Object.keys(episodesBySeason).map(Number)
+  ])].sort((a, b) => a - b);
+  
+  if (allSeasonNumbers.length === 0) {
+    allSeasonNumbers.push(1);
+  }
+  
+  return (
+    <div className="space-y-3" data-testid="season-accordion">
+      {allSeasonNumbers.map((seasonNum) => {
+        const season = seasons.find(s => s.season_number === seasonNum) || {
+          season_number: seasonNum,
+          title: `Season ${seasonNum}`
+        };
+        const seasonEpisodes = episodesBySeason[seasonNum] || [];
+        const isExpanded = expandedSeasons.includes(seasonNum);
+        
+        return (
+          <div 
+            key={seasonNum} 
+            className="rounded-xl border border-white/10 overflow-hidden bg-card/50"
+            data-testid={`season-${seasonNum}`}
+          >
+            {/* Season Header */}
+            <button
+              onClick={() => onToggleSeason(seasonNum)}
+              className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg ${isExpanded ? 'bg-primary/20' : 'bg-white/5'}`}>
+                  <Layers className={`w-4 h-4 ${isExpanded ? 'text-primary' : 'text-muted-foreground'}`} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-heading font-semibold">{season.title || `Season ${seasonNum}`}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {seasonEpisodes.length} episode{seasonEpisodes.length !== 1 ? 's' : ''}
+                    {seasonEpisodes.length > 0 && (
+                      <span className="ml-2">
+                        • {seasonEpisodes.reduce((sum, ep) => sum + (ep.views || 0), 0)} views
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-8 px-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddEpisode(seasonNum);
+                  }}
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+                {isExpanded ? (
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
+            </button>
+            
+            {/* Season Episodes */}
+            {isExpanded && (
+              <div className="border-t border-white/10">
+                {seasonEpisodes.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <Film className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
+                    <p className="text-sm text-muted-foreground mb-3">No episodes in this season yet</p>
+                    <Button size="sm" variant="outline" onClick={() => onAddEpisode(seasonNum)}>
+                      <Plus className="w-4 h-4 mr-1" /> Add Episode
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="p-3 space-y-2">
+                    {seasonEpisodes.map((ep) => (
+                      <Card 
+                        key={ep.id} 
+                        className="p-3 hover:bg-white/5 transition-colors cursor-pointer group border-white/5"
+                        onClick={() => onEditEpisode(ep)}
+                        data-testid={`episode-${ep.id}`}
+                      >
+                        <div className="flex gap-3">
+                          {/* Thumbnail */}
+                          <div className="w-16 h-16 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                            {ep.thumbnail ? (
+                              <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
+                            ) : (
+                              <Play className="w-6 h-6 text-muted-foreground" />
+                            )}
+                            {/* Encoding status overlay */}
+                            {ep.encoding_status === 'encoding' && (
+                              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                                <Loader2 className="w-5 h-5 animate-spin text-yellow-400" />
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Details */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                                {ep.episode_code || `S${String(seasonNum).padStart(2, '0')}E${String(ep.episode_number).padStart(2, '0')}`}
+                              </Badge>
+                              {ep.is_free && (
+                                <Badge className="text-[10px] px-1.5 py-0 bg-green-500/20 text-green-400 border-0">FREE</Badge>
+                              )}
+                              {ep.season_number === 1 && ep.episode_number === 1 && (
+                                <Badge className="text-[10px] px-1.5 py-0 bg-purple-500/20 text-purple-400 border-0">STORIES</Badge>
+                              )}
+                              {ep.encoding_status === 'encoding' && (
+                                <Badge className="text-[10px] px-1.5 py-0 bg-yellow-500/20 text-yellow-400 border-0">PROCESSING</Badge>
+                              )}
+                            </div>
+                            <h4 className="font-medium text-sm line-clamp-1">{ep.title}</h4>
+                            <div className="flex gap-3 text-xs text-muted-foreground mt-1">
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3 h-3" /> {ep.views || 0}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Coins className="w-3 h-3" /> {ep.earnings || 0}
+                              </span>
+                              {!ep.is_free && (
+                                <span>{ep.coins_required} coins</span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Edit Button */}
+                          <button 
+                            className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onEditEpisode(ep);
+                            }}
+                          >
+                            <Edit className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+      
+      {/* Add New Season Button */}
+      <button
+        onClick={onAddSeason}
+        className="w-full p-4 rounded-xl border-2 border-dashed border-white/10 hover:border-primary/50 transition-colors flex items-center justify-center gap-2 text-muted-foreground hover:text-foreground"
+        data-testid="add-season-btn"
+      >
+        <FolderPlus className="w-5 h-5" />
+        <span>Add New Season</span>
+      </button>
+    </div>
+  );
+};
+
+// ============ MAIN COMPONENT ============
 export const CreatorSeriesDetailPage = () => {
   const navigate = useNavigate();
   const { id: seriesId } = useParams();
@@ -31,6 +352,10 @@ export const CreatorSeriesDetailPage = () => {
   const [series, setSeries] = useState(null);
   const [episodes, setEpisodes] = useState([]);
   const [seasons, setSeasons] = useState([]);
+  const [expandedSeasons, setExpandedSeasons] = useState([1]); // Season 1 expanded by default
+  
+  // Upload progress tracking (persistent outside modal)
+  const [uploadQueue, setUploadQueue] = useState([]);
   
   // Series editor state
   const [showSeriesEditor, setShowSeriesEditor] = useState(false);
@@ -57,6 +382,11 @@ export const CreatorSeriesDetailPage = () => {
   const [showBatchUpload, setShowBatchUpload] = useState(false);
   const [batchEpisodes, setBatchEpisodes] = useState([]);
   const [batchUploading, setBatchUploading] = useState(false);
+  const [selectedSeason, setSelectedSeason] = useState(1);
+  
+  // Season creator state
+  const [showSeasonCreator, setShowSeasonCreator] = useState(false);
+  const [newSeasonTitle, setNewSeasonTitle] = useState("");
   
   // Subtitle upload state
   const [subtitleUploading, setSubtitleUploading] = useState(false);
@@ -71,72 +401,51 @@ export const CreatorSeriesDetailPage = () => {
     dimensions: null,
     error: null
   });
-  const videoValidationRef = useRef(null);
 
-  // Validate video dimensions before upload
-  const validateVideoDimensions = (file, isEpisode1 = false) => {
+  // Toggle season expansion
+  const toggleSeason = (seasonNum) => {
+    setExpandedSeasons(prev => 
+      prev.includes(seasonNum) 
+        ? prev.filter(s => s !== seasonNum)
+        : [...prev, seasonNum]
+    );
+  };
+
+  // Dismiss upload from progress panel
+  const dismissUpload = (uploadId) => {
+    setUploadQueue(prev => prev.map(u => 
+      u.id === uploadId ? { ...u, dismissed: true } : u
+    ));
+  };
+
+  // Generate video thumbnail from file
+  const generateThumbnail = (file) => {
     return new Promise((resolve) => {
-      setVideoValidation({ isValidating: true, isVertical: null, dimensions: null, error: null });
-      
       const video = document.createElement('video');
       video.preload = 'metadata';
+      video.muted = true;
       
-      video.onloadedmetadata = () => {
+      video.onloadeddata = () => {
+        video.currentTime = 1; // Seek to 1 second
+      };
+      
+      video.onseeked = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 160;
+        canvas.height = 90;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const thumbnail = canvas.toDataURL('image/jpeg', 0.5);
         window.URL.revokeObjectURL(video.src);
-        const width = video.videoWidth;
-        const height = video.videoHeight;
-        const aspectRatio = width / height;
-        const isVertical = aspectRatio < 1; // Height > Width = vertical
-        
-        const validation = {
-          isValidating: false,
-          isVertical,
-          dimensions: { width, height, aspectRatio: aspectRatio.toFixed(2) },
-          error: null
-        };
-        
-        // If Episode 1 and not vertical, show warning
-        if (isEpisode1 && !isVertical) {
-          validation.error = `This video is horizontal (${width}x${height}). Episode 1 should be vertical (9:16) for the Stories feed. Vertical videos get 3x more engagement!`;
-        }
-        
-        setVideoValidation(validation);
-        resolve(validation);
+        resolve(thumbnail);
       };
       
       video.onerror = () => {
-        setVideoValidation({
-          isValidating: false,
-          isVertical: null,
-          dimensions: null,
-          error: 'Could not read video dimensions'
-        });
-        resolve({ isVertical: null, error: 'Could not read video' });
+        resolve(null);
       };
       
       video.src = URL.createObjectURL(file);
     });
-  };
-
-  // Handle video file selection with validation
-  const handleVideoFileSelect = async (e, isEpisode1 = false) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Validate dimensions
-    const validation = await validateVideoDimensions(file, isEpisode1);
-    
-    // If Episode 1 and horizontal, show warning but allow continue
-    if (isEpisode1 && validation.isVertical === false) {
-      toast.warning(
-        'Horizontal video detected! Episode 1 appears in the Stories feed and works best with vertical (9:16) format.',
-        { duration: 6000 }
-      );
-    } else if (validation.isVertical === true) {
-      toast.success('Perfect! Vertical video detected - ideal for Stories feed!');
-    }
-    
-    return file;
   };
 
   const fetchSeriesDetail = async () => {
@@ -146,7 +455,6 @@ export const CreatorSeriesDetailPage = () => {
     }
     
     if (!token) {
-      // Not authenticated - redirect to login
       toast.error("Please login to access creator dashboard");
       navigate("/");
       return;
@@ -177,8 +485,34 @@ export const CreatorSeriesDetailPage = () => {
 
   useEffect(() => {
     fetchSeriesDetail();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, seriesId]);
+
+  // Poll for encoding status updates
+  useEffect(() => {
+    const encodingUploads = uploadQueue.filter(u => u.status === 'encoding' && !u.dismissed);
+    if (encodingUploads.length === 0) return;
+    
+    const interval = setInterval(async () => {
+      for (const upload of encodingUploads) {
+        try {
+          const res = await axios.get(`${API}/creator/episodes/${upload.episodeId}/status`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (res.data.status === 'ready') {
+            setUploadQueue(prev => prev.map(u => 
+              u.id === upload.id ? { ...u, status: 'ready', thumbnail: res.data.thumbnail } : u
+            ));
+            fetchSeriesDetail(); // Refresh episode list
+          }
+        } catch (e) {
+          console.error("Failed to check status:", e);
+        }
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [uploadQueue, token]);
 
   const openSeriesEditor = () => {
     if (series) {
@@ -228,7 +562,6 @@ export const CreatorSeriesDetailPage = () => {
     setSelectedSubtitleLanguage("en");
     setShowEpisodeEditor(true);
     
-    // Fetch latest subtitles from backend
     try {
       const res = await axios.get(
         `${API}/creator/episodes/${episode.id}/subtitles`,
@@ -242,12 +575,6 @@ export const CreatorSeriesDetailPage = () => {
 
   const handleUpdateEpisode = async () => {
     if (!selectedEpisode) return;
-    
-    // Block save if Episode 1 and video is horizontal
-    if (selectedEpisode.episode_number === 1 && videoValidation.isVertical === false) {
-      toast.error("Episode 1 must be a vertical video (9:16) for the Stories feed. Please upload a vertical video.");
-      return;
-    }
     
     try {
       const params = new URLSearchParams();
@@ -272,77 +599,10 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
-  // Validate video dimensions from URL
-  const validateVideoFromUrl = async (url) => {
-    if (!url) {
-      toast.error("Please enter a video URL first");
-      return;
-    }
-    
-    setVideoValidation({ isValidating: true, isVertical: null, dimensions: null, error: null });
-    
-    try {
-      const video = document.createElement('video');
-      video.crossOrigin = 'anonymous';
-      video.preload = 'metadata';
-      
-      await new Promise((resolve, reject) => {
-        video.onloadedmetadata = () => {
-          const width = video.videoWidth;
-          const height = video.videoHeight;
-          const aspectRatio = width / height;
-          const isVertical = aspectRatio < 1;
-          
-          const validation = {
-            isValidating: false,
-            isVertical,
-            dimensions: { width, height, aspectRatio: aspectRatio.toFixed(2) },
-            error: null
-          };
-          
-          if (selectedEpisode?.episode_number === 1 && !isVertical) {
-            validation.error = `Horizontal video detected (${width}x${height}). Episode 1 requires vertical format for Stories feed.`;
-            toast.error("This video is horizontal. Episode 1 must be vertical (9:16) for the Stories feed.");
-          } else if (isVertical) {
-            toast.success(`Perfect! Vertical video detected (${width}x${height}) - ideal for Stories!`);
-          } else {
-            toast.info(`Video dimensions: ${width}x${height} (horizontal)`);
-          }
-          
-          setVideoValidation(validation);
-          resolve();
-        };
-        
-        video.onerror = () => {
-          setVideoValidation({
-            isValidating: false,
-            isVertical: null,
-            dimensions: null,
-            error: 'Could not load video. Try a direct MP4 link.'
-          });
-          toast.error("Could not load video to check dimensions. Ensure it's a direct video URL.");
-          reject();
-        };
-        
-        // Add timeout
-        setTimeout(() => {
-          if (video.readyState === 0) {
-            video.onerror();
-          }
-        }, 10000);
-        
-        video.src = url;
-      });
-    } catch (e) {
-      console.error("Video validation error:", e);
-    }
-  };
-
   // Handle subtitle file upload
   const handleSubtitleUpload = async (file) => {
     if (!selectedEpisode || !file) return;
     
-    // Validate file type
     if (!file.name.endsWith('.vtt')) {
       toast.error("Please upload a .vtt file");
       return;
@@ -354,8 +614,6 @@ export const CreatorSeriesDetailPage = () => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const content = e.target.result;
-        
-        // Convert the content to base64 data URL for storage
         const base64Content = btoa(unescape(encodeURIComponent(content)));
         const subtitleDataUrl = `data:text/vtt;base64,${base64Content}`;
         
@@ -387,13 +645,11 @@ export const CreatorSeriesDetailPage = () => {
       setSubtitleUploading(false);
     }
     
-    // Reset file input
     if (subtitleFileInputRef.current) {
       subtitleFileInputRef.current.value = "";
     }
   };
 
-  // Handle subtitle removal
   const handleRemoveSubtitle = async (language) => {
     if (!selectedEpisode) return;
     
@@ -416,7 +672,7 @@ export const CreatorSeriesDetailPage = () => {
 
   // ============ BATCH UPLOAD HANDLERS ============
   
-  const handleBatchFileSelect = (e) => {
+  const handleBatchFileSelect = async (e) => {
     const files = Array.from(e.target.files || []);
     const videoFiles = files.filter(f => f.type.startsWith('video/'));
     
@@ -425,17 +681,26 @@ export const CreatorSeriesDetailPage = () => {
       return;
     }
     
-    const newEpisodes = videoFiles.map((file, index) => ({
-      id: `batch-${Date.now()}-${index}`,
-      file,
-      title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
-      is_free: index === 0, // First episode is free by default
-      coins_required: 5,
-      intro_duration: 30,
-      uploading: false,
-      progress: 0,
-      uploaded: false,
-      error: null
+    // Get current episode count for this season
+    const seasonEpisodes = episodes.filter(ep => ep.season_number === selectedSeason);
+    
+    const newEpisodes = await Promise.all(videoFiles.map(async (file, index) => {
+      const thumbnail = await generateThumbnail(file);
+      return {
+        id: `batch-${Date.now()}-${index}`,
+        file,
+        thumbnail,
+        title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+        season_number: selectedSeason,
+        episode_number: seasonEpisodes.length + index + 1,
+        is_free: seasonEpisodes.length + index === 0 && selectedSeason === 1, // S01E01 is free
+        coins_required: 5,
+        intro_duration: 30,
+        uploading: false,
+        progress: 0,
+        uploaded: false,
+        error: null
+      };
     }));
     
     setBatchEpisodes(prev => [...prev, ...newEpisodes]);
@@ -461,19 +726,33 @@ export const CreatorSeriesDetailPage = () => {
       const ep = batchEpisodes[i];
       if (ep.uploaded) continue;
       
+      const uploadId = `upload-${Date.now()}-${i}`;
+      
       try {
-        // Update progress
+        // Update progress in batch list
         setBatchEpisodes(prev => prev.map(e => 
           e.id === ep.id ? { ...e, uploading: true, progress: 10 } : e
         ));
         
-        // Create episode first
+        // Add to upload queue for progress panel
+        setUploadQueue(prev => [...prev, {
+          id: uploadId,
+          title: ep.title,
+          episodeCode: `S${String(ep.season_number).padStart(2, '0')}E${String(ep.episode_number).padStart(2, '0')}`,
+          thumbnail: ep.thumbnail,
+          status: 'uploading',
+          progress: 10,
+          dismissed: false
+        }]);
+        
+        // Create episode
         const episodeData = {
           title: ep.title,
+          season_number: ep.season_number,
+          episode_number: ep.episode_number,
           is_free: ep.is_free,
           coins_required: ep.coins_required,
-          intro_duration: ep.intro_duration,
-          episode_number: episodes.length + i + 1
+          intro_duration: ep.intro_duration
         };
         
         const createRes = await axios.post(
@@ -482,16 +761,21 @@ export const CreatorSeriesDetailPage = () => {
           { headers: { Authorization: `Bearer ${token}` }}
         );
         
+        const episodeId = createRes.data.episode?.id || createRes.data.episode_id;
+        
         setBatchEpisodes(prev => prev.map(e => 
           e.id === ep.id ? { ...e, progress: 30 } : e
         ));
+        setUploadQueue(prev => prev.map(u => 
+          u.id === uploadId ? { ...u, progress: 30, episodeId } : u
+        ));
         
-        // Upload video file
+        // Upload video file to Bunny.net
         const formData = new FormData();
         formData.append('video', ep.file);
         
         await axios.post(
-          `${API}/creator/episodes/${createRes.data.episode.id}/upload`,
+          `${API}/creator/episodes/${episodeId}/upload`,
           formData,
           { 
             headers: { 
@@ -503,20 +787,32 @@ export const CreatorSeriesDetailPage = () => {
               setBatchEpisodes(prev => prev.map(e => 
                 e.id === ep.id ? { ...e, progress } : e
               ));
+              setUploadQueue(prev => prev.map(u => 
+                u.id === uploadId ? { ...u, progress } : u
+              ));
             }
           }
         );
         
-        // Mark as complete
+        // Mark as encoding (video is processing on Bunny CDN)
         setBatchEpisodes(prev => prev.map(e => 
           e.id === ep.id ? { ...e, uploading: false, progress: 100, uploaded: true } : e
         ));
+        setUploadQueue(prev => prev.map(u => 
+          u.id === uploadId ? { ...u, status: 'encoding', progress: 100 } : u
+        ));
+        
         successCount++;
         
       } catch (err) {
         console.error(`Failed to upload episode: ${ep.title}`, err);
+        const errorMsg = err.response?.data?.detail || "Upload failed";
+        
         setBatchEpisodes(prev => prev.map(e => 
-          e.id === ep.id ? { ...e, uploading: false, error: err.response?.data?.detail || "Upload failed" } : e
+          e.id === ep.id ? { ...e, uploading: false, error: errorMsg } : e
+        ));
+        setUploadQueue(prev => prev.map(u => 
+          u.id === uploadId ? { ...u, status: 'failed', error: errorMsg } : u
         ));
       }
     }
@@ -524,17 +820,55 @@ export const CreatorSeriesDetailPage = () => {
     setBatchUploading(false);
     
     if (successCount > 0) {
-      toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded successfully!`);
-      fetchSeriesDetail(); // Refresh the episode list
+      toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded to Bunny.net CDN!`);
+      fetchSeriesDetail();
     }
     
-    // Remove successfully uploaded episodes from batch list after a delay
+    // Close modal after delay if all done
     setTimeout(() => {
-      setBatchEpisodes(prev => prev.filter(ep => !ep.uploaded));
-      if (batchEpisodes.every(ep => ep.uploaded)) {
+      const allDone = batchEpisodes.every(ep => ep.uploaded || ep.error);
+      if (allDone) {
+        setBatchEpisodes([]);
         setShowBatchUpload(false);
       }
     }, 2000);
+  };
+
+  // ============ SEASON MANAGEMENT ============
+  
+  const handleCreateSeason = async () => {
+    if (!newSeasonTitle.trim()) {
+      toast.error("Please enter a season title");
+      return;
+    }
+    
+    try {
+      const nextSeasonNum = seasons.length > 0 
+        ? Math.max(...seasons.map(s => s.season_number)) + 1 
+        : 1;
+      
+      await axios.post(
+        `${API}/creator/series/${seriesId}/seasons`,
+        { 
+          season_number: nextSeasonNum,
+          title: newSeasonTitle.trim()
+        },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      
+      toast.success(`Season ${nextSeasonNum} created!`);
+      setShowSeasonCreator(false);
+      setNewSeasonTitle("");
+      setExpandedSeasons(prev => [...prev, nextSeasonNum]);
+      fetchSeriesDetail();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to create season");
+    }
+  };
+
+  const openBatchUploadForSeason = (seasonNum) => {
+    setSelectedSeason(seasonNum);
+    setShowBatchUpload(true);
   };
 
   if (loading) {
@@ -560,7 +894,10 @@ export const CreatorSeriesDetailPage = () => {
 
   return (
     <div className="min-h-screen pt-16 lg:pt-16" data-testid="creator-series-detail">
-      {/* Desktop Sidebar - positioned below main header */}
+      {/* Upload Progress Panel (Persistent) */}
+      <UploadProgressPanel uploads={uploadQueue} onDismiss={dismissUpload} />
+      
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-72 bg-card border-r border-white/10 z-40">
         {/* Back Navigation */}
         <div className="p-4 border-b border-white/10">
@@ -611,7 +948,13 @@ export const CreatorSeriesDetailPage = () => {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground flex items-center gap-2">
-              <Film className="w-4 h-4 text-purple-400" /> Episodes
+              <Layers className="w-4 h-4 text-purple-400" /> Seasons
+            </span>
+            <span className="font-bold">{seasons.length || 1}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground flex items-center gap-2">
+              <Film className="w-4 h-4 text-green-400" /> Episodes
             </span>
             <span className="font-bold">{episodes.length}</span>
           </div>
@@ -645,7 +988,7 @@ export const CreatorSeriesDetailPage = () => {
           </button>
           <div className="flex-1">
             <h1 className="font-heading text-lg font-bold line-clamp-1">{series.title}</h1>
-            <p className="text-xs text-muted-foreground">{series.genre} • {series.total_episodes} episodes</p>
+            <p className="text-xs text-muted-foreground">{series.genre} • {episodes.length} episodes</p>
           </div>
           <button 
             onClick={openSeriesEditor}
@@ -666,14 +1009,17 @@ export const CreatorSeriesDetailPage = () => {
         <div className="hidden lg:block border-b border-white/10 px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-heading text-2xl font-bold">Episodes</h2>
-              <p className="text-sm text-muted-foreground">Manage episodes for {series.title}</p>
+              <h2 className="font-heading text-2xl font-bold">Seasons & Episodes</h2>
+              <p className="text-sm text-muted-foreground">Organize your content by seasons</p>
             </div>
-            {(series.status === "approved" || series.status === "published") && (
-              <Button data-testid="add-episode-btn-desktop">
-                <Plus className="w-4 h-4 mr-2" /> Add New Episode
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setShowSeasonCreator(true)}>
+                <FolderPlus className="w-4 h-4 mr-2" /> New Season
               </Button>
-            )}
+              <Button onClick={() => setShowBatchUpload(true)} data-testid="add-episode-btn-desktop">
+                <Plus className="w-4 h-4 mr-2" /> Add Episodes
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -691,129 +1037,64 @@ export const CreatorSeriesDetailPage = () => {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-muted-foreground line-clamp-3">{series.description || "No description"}</p>
-              <Button size="sm" variant="outline" className="mt-2" onClick={openSeriesEditor}>
-                <Edit className="w-3 h-3 mr-1" /> Edit
-              </Button>
+              <div className="flex gap-2 mt-2">
+                <Button size="sm" variant="outline" onClick={openSeriesEditor}>
+                  <Edit className="w-3 h-3 mr-1" /> Edit
+                </Button>
+                <Button size="sm" onClick={() => setShowBatchUpload(true)}>
+                  <Plus className="w-3 h-3 mr-1" /> Add
+                </Button>
+              </div>
             </div>
           </Card>
 
           {/* Mobile Stats */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-4">
             <Card className="p-3 bg-gradient-to-br from-blue-500/20 to-cyan-600/20 border-blue-500/30">
-              <p className="text-xs text-muted-foreground mb-1">Total Views</p>
-              <p className="font-heading text-xl font-bold flex items-center gap-1">
-                <Eye className="w-4 h-4 text-blue-400" />
-                {series.total_views || 0}
-              </p>
+              <p className="text-[10px] text-muted-foreground">Views</p>
+              <p className="font-heading text-lg font-bold">{series.total_views || 0}</p>
+            </Card>
+            <Card className="p-3 bg-gradient-to-br from-purple-500/20 to-pink-600/20 border-purple-500/30">
+              <p className="text-[10px] text-muted-foreground">Seasons</p>
+              <p className="font-heading text-lg font-bold">{seasons.length || 1}</p>
             </Card>
             <Card className="p-3 bg-gradient-to-br from-green-500/20 to-emerald-600/20 border-green-500/30">
-              <p className="text-xs text-muted-foreground mb-1">Earnings</p>
-              <p className="font-heading text-xl font-bold flex items-center gap-1">
-                <Coins className="w-4 h-4 text-yellow-400" />
-                {series.total_earnings || 0}
-              </p>
+              <p className="text-[10px] text-muted-foreground">Episodes</p>
+              <p className="font-heading text-lg font-bold">{episodes.length}</p>
             </Card>
           </div>
         </div>
 
-        {/* Episodes Section */}
+        {/* Seasons Accordion Section */}
         <div className="p-4 lg:p-8">
-          {/* Mobile Episodes Header */}
-          <div className="lg:hidden flex items-center justify-between mb-4">
-            <h3 className="font-heading font-semibold">Episodes ({episodes.length})</h3>
-            {(series.status === "approved" || series.status === "published") && (
-              <Button size="sm" variant="outline" data-testid="add-episode-btn-mobile">
-                <Plus className="w-4 h-4 mr-1" /> Add
-              </Button>
-            )}
-          </div>
-
-          {episodes.length === 0 ? (
+          {episodes.length === 0 && seasons.length === 0 ? (
             <Card className="p-12 text-center">
-              <Film className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="font-heading text-lg font-semibold mb-2">No Episodes Yet</h3>
-              <p className="text-muted-foreground mb-4">
+              <Layers className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="font-heading text-lg font-semibold mb-2">Start Your Series</h3>
+              <p className="text-muted-foreground mb-4 max-w-md mx-auto">
                 {series.status === "pending_review" 
-                  ? "Start adding episodes while your series is under review!"
-                  : "Start adding episodes to your series."}
+                  ? "Your series is under review. Start adding seasons and episodes while you wait!"
+                  : "Organize your content into seasons and add episodes to each season."}
               </p>
-              <Button onClick={() => setShowBatchUpload(true)} data-testid="add-first-episode-btn">
-                <Plus className="w-4 h-4 mr-2" /> Add Episodes
-              </Button>
-              {series.status === "pending_review" && (
-                <p className="text-xs text-muted-foreground mt-3">
-                  Episodes will be published once your series is approved
-                </p>
-              )}
+              <div className="flex gap-3 justify-center">
+                <Button variant="outline" onClick={() => setShowSeasonCreator(true)}>
+                  <FolderPlus className="w-4 h-4 mr-2" /> Create Season
+                </Button>
+                <Button onClick={() => setShowBatchUpload(true)} data-testid="add-first-episode-btn">
+                  <Plus className="w-4 h-4 mr-2" /> Add Episodes
+                </Button>
+              </div>
             </Card>
           ) : (
-            <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
-              {episodes.map((ep) => (
-                <Card 
-                  key={ep.id} 
-                  className="p-4 hover:bg-white/5 transition-colors cursor-pointer group"
-                  onClick={() => openEpisodeEditor(ep)}
-                  data-testid={`episode-${ep.id}`}
-                >
-                  <div className="flex gap-4">
-                    <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-lg bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
-                      {ep.thumbnail ? (
-                        <img src={ep.thumbnail} alt={ep.title} className="w-full h-full object-cover" />
-                      ) : (
-                        <Play className="w-8 h-8 text-muted-foreground" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-[10px] px-1.5">
-                          {ep.episode_code || `E${ep.episode_number}`}
-                        </Badge>
-                        {ep.is_free && (
-                          <Badge className="text-[10px] bg-green-500/20 text-green-400">FREE</Badge>
-                        )}
-                        {ep.episode_number === 1 && (
-                          <Badge className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/30">
-                            📱 STORIES
-                          </Badge>
-                        )}
-                        {ep.subtitles && Object.keys(ep.subtitles).length > 0 && (
-                          <Badge variant="outline" className="text-[10px] border-blue-500/30 text-blue-400">
-                            CC ({Object.keys(ep.subtitles).length})
-                          </Badge>
-                        )}
-                      </div>
-                      <h4 className="font-medium text-sm lg:text-base line-clamp-1 mb-1">{ep.title}</h4>
-                      {ep.episode_number === 1 && (
-                        <p className="text-[10px] text-purple-400 mb-1">
-                          Vertical format (9:16) recommended for Stories feed
-                        </p>
-                      )}
-                      <div className="flex gap-4 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <Eye className="w-3 h-3" /> {ep.views || 0}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Coins className="w-3 h-3" /> {ep.earnings || 0}
-                        </span>
-                        {!ep.is_free && (
-                          <span>{ep.coins_required} coins</span>
-                        )}
-                      </div>
-                    </div>
-                    <button 
-                      className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-start"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openEpisodeEditor(ep);
-                      }}
-                      data-testid={`edit-episode-${ep.id}`}
-                    >
-                      <Edit className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <SeasonAccordion 
+              seasons={seasons}
+              episodes={episodes}
+              expandedSeasons={expandedSeasons}
+              onToggleSeason={toggleSeason}
+              onEditEpisode={openEpisodeEditor}
+              onAddSeason={() => setShowSeasonCreator(true)}
+              onAddEpisode={openBatchUploadForSeason}
+            />
           )}
         </div>
       </main>
@@ -908,7 +1189,7 @@ export const CreatorSeriesDetailPage = () => {
             )}
             
             {/* Thumbnail URL Section */}
-            <div className="border-t border-white/10 pt-4 mt-4">
+            <div className="border-t border-white/10 pt-4">
               <label className="text-sm font-medium flex items-center gap-2 mb-2">
                 <Image className="w-4 h-4 text-purple-400" />
                 Episode Thumbnail
@@ -919,9 +1200,6 @@ export const CreatorSeriesDetailPage = () => {
                 placeholder="https://example.com/thumbnail.jpg"
                 data-testid="episode-thumbnail-input"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Paste image URL from Imgur, Cloudinary, or any image hosting service
-              </p>
               {episodeForm.thumbnail_url && (
                 <div className="mt-2 relative w-24 h-24 rounded-lg overflow-hidden bg-secondary/50">
                   <img 
@@ -934,139 +1212,17 @@ export const CreatorSeriesDetailPage = () => {
               )}
             </div>
             
-            {/* Video URL Section */}
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2 mb-2">
-                <Video className="w-4 h-4 text-green-400" />
-                Video URL
-                {selectedEpisode?.episode_number === 1 && (
-                  <Badge className="text-[10px] bg-purple-500/20 text-purple-400 ml-2">
-                    📱 Vertical (9:16) Required
-                  </Badge>
-                )}
-              </label>
-              <div className="flex gap-2">
-                <Input 
-                  value={episodeForm.video_url}
-                  onChange={(e) => {
-                    setEpisodeForm({...episodeForm, video_url: e.target.value});
-                    // Reset validation when URL changes
-                    setVideoValidation({ isValidating: false, isVertical: null, dimensions: null, error: null });
-                  }}
-                  placeholder="https://example.com/video.mp4 or Bunny.net URL"
-                  data-testid="episode-video-input"
-                  className="flex-1"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => validateVideoFromUrl(episodeForm.video_url)}
-                  disabled={videoValidation.isValidating || !episodeForm.video_url}
-                  data-testid="validate-video-btn"
-                  className="flex-shrink-0"
-                >
-                  {videoValidation.isValidating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Checking...
-                    </>
-                  ) : (
-                    <>
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Validate
-                    </>
-                  )}
-                </Button>
-              </div>
-              
-              {/* Episode 1 vertical format guidance */}
-              {selectedEpisode?.episode_number === 1 && (
-                <div className="mt-2 p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm text-purple-300 font-medium">Stories Feed Requirement</p>
-                      <p className="text-xs text-purple-400/80 mt-1">
-                        Episode 1 appears in the <strong>Stories feed</strong> (like TikTok/Reels). 
-                        For best results, upload a <strong>vertical video (9:16 aspect ratio)</strong>.
-                      </p>
-                      <div className="flex gap-4 mt-2 text-xs">
-                        <span className="text-green-400">✓ 1080x1920 (9:16)</span>
-                        <span className="text-green-400">✓ 720x1280 (9:16)</span>
-                        <span className="text-red-400/70">✗ 1920x1080 (16:9)</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              
-              {/* Video dimension validation feedback */}
-              {videoValidation.dimensions && (
-                <div className={`mt-2 p-2 rounded-lg border ${
-                  videoValidation.isVertical 
-                    ? 'bg-green-500/10 border-green-500/30' 
-                    : selectedEpisode?.episode_number === 1 
-                      ? 'bg-red-500/10 border-red-500/30'
-                      : 'bg-blue-500/10 border-blue-500/30'
-                }`}>
-                  <div className="flex items-center gap-2">
-                    {videoValidation.isVertical ? (
-                      <CheckCircle className="w-4 h-4 text-green-400" />
-                    ) : selectedEpisode?.episode_number === 1 ? (
-                      <XCircle className="w-4 h-4 text-red-400" />
-                    ) : (
-                      <AlertCircle className="w-4 h-4 text-blue-400" />
-                    )}
-                    <span className={`text-xs ${
-                      videoValidation.isVertical ? 'text-green-400' : selectedEpisode?.episode_number === 1 ? 'text-red-400' : 'text-blue-400'
-                    }`}>
-                      {videoValidation.isVertical 
-                        ? `✓ Vertical video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height}) - Perfect for Stories!`
-                        : selectedEpisode?.episode_number === 1
-                          ? `✗ Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height}) - Episode 1 MUST be vertical for Stories feed`
-                          : `Horizontal video (${videoValidation.dimensions.width}x${videoValidation.dimensions.height})`
-                      }
-                    </span>
-                  </div>
-                  {selectedEpisode?.episode_number === 1 && !videoValidation.isVertical && (
-                    <p className="text-xs text-red-400/80 mt-2 ml-6">
-                      Please upload a vertical video (9:16 aspect ratio) to proceed. You cannot save until the video is vertical.
-                    </p>
-                  )}
-                </div>
-              )}
-              
-              {videoValidation.error && !videoValidation.dimensions && (
-                <div className="mt-2 p-2 rounded-lg border bg-red-500/10 border-red-500/30">
-                  <p className="text-xs text-red-400">{videoValidation.error}</p>
-                </div>
-              )}
-              
-              <p className="text-xs text-muted-foreground mt-1">
-                Direct video URL (MP4, HLS) or Bunny.net streaming URL
-              </p>
-              {selectedEpisode?.bunny_video_id && (
-                <div className="mt-2 p-2 bg-green-500/10 rounded border border-green-500/20">
-                  <p className="text-xs text-green-400 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3" />
-                    Bunny.net Video ID: {selectedEpisode.bunny_video_id}
-                  </p>
-                </div>
-              )}
-            </div>
-            
             {/* Subtitle Upload Section */}
-            <div className="border-t border-white/10 pt-4 mt-4">
+            <div className="border-t border-white/10 pt-4">
               <label className="text-sm font-medium flex items-center gap-2 mb-3">
                 <Languages className="w-4 h-4 text-blue-400" />
                 Subtitles (Optional)
               </label>
               
-              {/* Current Subtitles */}
               {Object.keys(episodeSubtitles).length > 0 && (
                 <div className="mb-3 space-y-2">
                   <p className="text-xs text-muted-foreground">Uploaded subtitles:</p>
-                  {Object.entries(episodeSubtitles).map(([lang, url]) => (
+                  {Object.entries(episodeSubtitles).map(([lang]) => (
                     <div key={lang} className="flex items-center justify-between p-2 bg-green-500/10 rounded-md border border-green-500/20">
                       <div className="flex items-center gap-2">
                         <CheckCircle className="w-4 h-4 text-green-400" />
@@ -1078,7 +1234,6 @@ export const CreatorSeriesDetailPage = () => {
                         type="button"
                         onClick={() => handleRemoveSubtitle(lang)}
                         className="p-1 hover:bg-red-500/20 rounded text-red-400"
-                        data-testid={`remove-subtitle-${lang}`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -1087,14 +1242,12 @@ export const CreatorSeriesDetailPage = () => {
                 </div>
               )}
               
-              {/* Upload New Subtitle */}
               <div className="space-y-2">
                 <div className="flex gap-2">
                   <select
                     value={selectedSubtitleLanguage}
                     onChange={(e) => setSelectedSubtitleLanguage(e.target.value)}
                     className="flex-1 p-2 rounded-lg bg-secondary/50 border border-white/10 text-sm"
-                    data-testid="subtitle-language-select"
                   >
                     {SUBTITLE_LANGUAGES.map(lang => (
                       <option key={lang.code} value={lang.code}>
@@ -1120,7 +1273,6 @@ export const CreatorSeriesDetailPage = () => {
                         }
                       }}
                       disabled={subtitleUploading}
-                      data-testid="subtitle-file-input"
                     />
                   </label>
                 </div>
@@ -1157,7 +1309,6 @@ export const CreatorSeriesDetailPage = () => {
                 value={seriesForm.title}
                 onChange={(e) => setSeriesForm({...seriesForm, title: e.target.value})}
                 placeholder="Series title"
-                data-testid="series-title-input"
               />
             </div>
             
@@ -1197,11 +1348,7 @@ export const CreatorSeriesDetailPage = () => {
                 value={seriesForm.thumbnail_url}
                 onChange={(e) => setSeriesForm({...seriesForm, thumbnail_url: e.target.value})}
                 placeholder="https://example.com/thumbnail.jpg"
-                data-testid="series-thumbnail-input"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Paste image URL from Imgur, Cloudinary, or any image hosting service
-              </p>
               {seriesForm.thumbnail_url && (
                 <div className="mt-2 relative w-24 h-32 rounded-lg overflow-hidden bg-secondary/50">
                   <img 
@@ -1214,13 +1361,47 @@ export const CreatorSeriesDetailPage = () => {
               )}
             </div>
             
-            <Button 
-              onClick={handleUpdateSeries} 
-              className="w-full"
-              data-testid="save-series-btn"
-            >
+            <Button onClick={handleUpdateSeries} className="w-full">
               Save Changes
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Season Creator Dialog */}
+      <Dialog open={showSeasonCreator} onOpenChange={setShowSeasonCreator}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FolderPlus className="w-5 h-5 text-primary" />
+              Create New Season
+            </DialogTitle>
+            <DialogDescription>
+              Add a new season to organize your episodes
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <label className="text-sm text-muted-foreground mb-2 block">Season Title</label>
+              <Input 
+                value={newSeasonTitle}
+                onChange={(e) => setNewSeasonTitle(e.target.value)}
+                placeholder={`Season ${seasons.length + 1}`}
+                data-testid="new-season-title-input"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                This will be Season {seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) + 1 : 1}
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => setShowSeasonCreator(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button onClick={handleCreateSeason} className="flex-1" data-testid="create-season-btn">
+                Create Season
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -1234,11 +1415,34 @@ export const CreatorSeriesDetailPage = () => {
               Add Episodes
             </DialogTitle>
             <DialogDescription>
-              Upload multiple video files at once. Each file will become a separate episode.
+              Upload videos to Bunny.net CDN for smooth streaming performance
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 mt-4">
+            {/* Season Selector */}
+            <div className="p-3 rounded-lg bg-gradient-to-r from-primary/10 to-purple-500/10 border border-primary/20">
+              <label className="text-sm font-medium mb-2 block flex items-center gap-2">
+                <Layers className="w-4 h-4 text-primary" />
+                Select Season
+              </label>
+              <select
+                value={selectedSeason}
+                onChange={(e) => setSelectedSeason(parseInt(e.target.value))}
+                className="w-full p-2 rounded-lg bg-secondary/50 border border-white/10 text-sm"
+                data-testid="season-selector"
+              >
+                {[...new Set([...seasons.map(s => s.season_number), 1])].sort().map(num => (
+                  <option key={num} value={num}>
+                    Season {num} {seasons.find(s => s.season_number === num)?.title ? `- ${seasons.find(s => s.season_number === num)?.title}` : ''}
+                  </option>
+                ))}
+                <option value={seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) + 1 : 2}>
+                  + New Season {seasons.length > 0 ? Math.max(...seasons.map(s => s.season_number)) + 1 : 2}
+                </option>
+              </select>
+            </div>
+
             {/* Upload Area */}
             <label className="block cursor-pointer">
               <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
@@ -1246,6 +1450,9 @@ export const CreatorSeriesDetailPage = () => {
                 <p className="font-medium">Drop video files here or click to browse</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Supported formats: MP4, WebM, MOV (max 500MB each)
+                </p>
+                <p className="text-xs text-primary mt-2">
+                  Videos are uploaded to Bunny.net CDN for fast, reliable streaming
                 </p>
               </div>
               <input
@@ -1261,7 +1468,7 @@ export const CreatorSeriesDetailPage = () => {
             {batchEpisodes.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-medium text-sm">{batchEpisodes.length} episode(s) ready</h4>
+                  <h4 className="font-medium text-sm">{batchEpisodes.length} episode(s) ready for Season {selectedSeason}</h4>
                   <Button 
                     variant="ghost" 
                     size="sm" 
@@ -1272,12 +1479,14 @@ export const CreatorSeriesDetailPage = () => {
                   </Button>
                 </div>
                 
-                {batchEpisodes.map((ep, index) => (
+                {batchEpisodes.map((ep) => (
                   <Card key={ep.id} className={`p-3 ${ep.uploaded ? 'bg-green-500/10 border-green-500/30' : ep.error ? 'bg-red-500/10 border-red-500/30' : ''}`}>
                     <div className="flex items-start gap-3">
-                      {/* Preview/Status */}
-                      <div className="w-16 h-16 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0">
-                        {ep.uploaded ? (
+                      {/* Thumbnail Preview */}
+                      <div className="w-20 h-14 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        {ep.thumbnail ? (
+                          <img src={ep.thumbnail} alt="" className="w-full h-full object-cover" />
+                        ) : ep.uploaded ? (
                           <CheckCircle className="w-6 h-6 text-green-400" />
                         ) : ep.uploading ? (
                           <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -1291,9 +1500,9 @@ export const CreatorSeriesDetailPage = () => {
                       {/* Details */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs bg-white/10 px-2 py-0.5 rounded">
-                            Ep {episodes.length + index + 1}
-                          </span>
+                          <Badge variant="outline" className="text-[10px] px-1.5">
+                            S{String(ep.season_number).padStart(2, '0')}E{String(ep.episode_number).padStart(2, '0')}
+                          </Badge>
                           {!ep.uploaded && !ep.uploading && (
                             <button
                               onClick={() => removeBatchEpisode(ep.id)}
@@ -1308,7 +1517,7 @@ export const CreatorSeriesDetailPage = () => {
                           value={ep.title}
                           onChange={(e) => updateBatchEpisode(ep.id, 'title', e.target.value)}
                           placeholder="Episode title"
-                          className="mb-2 text-sm"
+                          className="mb-2 text-sm h-8"
                           disabled={ep.uploading || ep.uploaded}
                         />
                         
@@ -1352,7 +1561,7 @@ export const CreatorSeriesDetailPage = () => {
                               />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {ep.uploaded ? 'Uploaded!' : `${ep.progress}% complete`}
+                              {ep.uploaded ? 'Uploaded to Bunny CDN!' : `${ep.progress}% uploading...`}
                             </p>
                           </div>
                         )}
@@ -1388,7 +1597,7 @@ export const CreatorSeriesDetailPage = () => {
                 {batchUploading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Uploading...
+                    Uploading to CDN...
                   </>
                 ) : (
                   <>
