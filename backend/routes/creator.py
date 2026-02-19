@@ -1191,16 +1191,17 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
     """Create a new episode with season support (S01E03 format)"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
-    if not creator or creator["status"] != "approved":
+    if not creator or creator.get("status") != "approved":
         raise HTTPException(status_code=403, detail="Not an approved creator")
     
-    # Verify series ownership and approval status
+    # Verify series ownership - allow adding episodes even while under review
     series = await db.creator_series.find_one({"id": data.series_id, "creator_id": creator["id"]})
     if not series:
         raise HTTPException(status_code=404, detail="Series not found")
     
-    if series["status"] not in ["approved", "published"]:
-        raise HTTPException(status_code=400, detail="Series must be approved before adding episodes")
+    # Allow episodes to be added while series is pending_review, approved, or published
+    if series.get("status") not in ["pending_review", "approved", "published"]:
+        raise HTTPException(status_code=400, detail="Cannot add episodes to rejected or draft series")
     
     # Get or create season
     season = await db.seasons.find_one({
