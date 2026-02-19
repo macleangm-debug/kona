@@ -1622,13 +1622,15 @@ async def update_episode(
 
 # ============ EPISODE REORDERING (DRAG & DROP) ============
 
-class EpisodeReorderItem(BaseModel):
+from pydantic import BaseModel as PydanticBaseModel
+
+class EpisodeReorderItem(PydanticBaseModel):
     """Single episode reorder item"""
     episode_id: str
     season_number: int
     episode_number: int
 
-class EpisodeReorderRequest(BaseModel):
+class EpisodeReorderRequest(PydanticBaseModel):
     """Request to reorder episodes"""
     episodes: list[EpisodeReorderItem]
 
