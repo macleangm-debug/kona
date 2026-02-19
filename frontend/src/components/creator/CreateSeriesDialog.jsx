@@ -102,9 +102,11 @@ export const CreateSeriesDialog = memo(({ open, onOpenChange, onSubmit, loading 
               rows={3}
               value={description}
               onChange={handleDescriptionChange}
-              placeholder="What is your series about?"
+              placeholder="What is your series about? Tell viewers what to expect..."
             />
-            <p className="text-xs text-muted-foreground mt-1">{description.length}/20 characters</p>
+            <p className={`text-xs mt-1 ${description.length >= 20 ? 'text-green-400' : 'text-red-400'}`}>
+              {description.length}/20 characters {description.length < 20 && `(need ${20 - description.length} more)`}
+            </p>
           </div>
 
           {/* Genre Dropdown - Native select for better performance */}
