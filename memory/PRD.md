@@ -192,6 +192,11 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Create new seasons with custom titles
   - Episodes automatically grouped by season number
   - Bunny.net CDN messaging for performance awareness
+  - **Drag & Drop Episode Reordering**: Move episodes within and between seasons
+    - Drag handle on each episode card
+    - Visual feedback with floating DragOverlay
+    - Auto-update episode codes (S01E01, S01E02, etc.)
+    - Backend API: `POST /api/creator/series/{id}/reorder-episodes`
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
