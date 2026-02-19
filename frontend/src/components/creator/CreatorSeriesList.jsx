@@ -53,7 +53,7 @@ export const CreatorSeriesList = ({ series, onCreateSeries }) => {
           key={s.id}
           className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
           onClick={() => navigate(`/creator/series/${s.id}`)}
-          data-testid={`series-${s.id}`}
+          data-testid={`series-card-${s.id}`}
         >
           <div className="flex gap-3">
             <div className="w-16 h-20 rounded-lg bg-secondary/50 overflow-hidden flex-shrink-0">
