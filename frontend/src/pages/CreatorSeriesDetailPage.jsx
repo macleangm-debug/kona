@@ -293,7 +293,10 @@ const DroppableSeason = ({
   onToggleSeason, 
   onAddEpisode, 
   onEditEpisode,
-  activeId 
+  activeId,
+  selectionMode,
+  selectedEpisodes,
+  onToggleSelect
 }) => {
   const episodeIds = episodes.map(ep => ep.id);
   
@@ -367,6 +370,9 @@ const DroppableSeason = ({
                     seasonNum={seasonNum}
                     onEditEpisode={onEditEpisode}
                     isDragging={activeId === ep.id}
+                    selectionMode={selectionMode}
+                    isSelected={selectedEpisodes?.includes(ep.id)}
+                    onToggleSelect={onToggleSelect}
                   />
                 ))}
               </SortableContext>
