@@ -5,3 +5,4 @@ export { CreatorSeriesList } from "./CreatorSeriesList";
 export { CreatorPendingSubmissions } from "./CreatorPendingSubmissions";
 export { PayoutHistory } from "./PayoutHistory";
 export { CreatorNotifications } from "./CreatorNotifications";
+export { CreatorDashboardOverview } from "./CreatorDashboardOverview";
