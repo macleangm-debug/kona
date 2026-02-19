@@ -1608,7 +1608,7 @@ async def get_payout_history(
             "total_requested": total_requested,
             "total_completed": total_completed,
             "total_pending": total_pending,
-            "available_balance": creator["pending_payout"]
+            "available_balance": creator.get("pending_payout", 0)
         }
     }
 
