@@ -3,6 +3,17 @@
 ## [Feb 19, 2026]
 
 ### Added
+- **Bulk Episode Editing** - Select multiple episodes and edit at once
+  - "Bulk Edit" button toggles selection mode
+  - Checkboxes replace drag handles when in selection mode
+  - Green checkmarks for selected episodes
+  - Bulk action bar with options:
+    - Move to Season (dropdown with existing + new season option)
+    - Make Free / Make Paid buttons
+    - Set coin price input (1-50 coins)
+  - "Select All" and "Cancel" buttons
+  - Backend endpoint: `POST /api/creator/series/{id}/bulk-edit-episodes`
+
 - **Drag & Drop Episode Reordering** - Reorganize episodes within and between seasons
   - Drag handle (grip icon) on each episode card
   - Visual feedback: lifted card effect during drag with floating DragOverlay
