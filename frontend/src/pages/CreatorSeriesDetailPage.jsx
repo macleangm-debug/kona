@@ -414,6 +414,129 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // ============ BATCH UPLOAD HANDLERS ============
+  
+  const handleBatchFileSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    const videoFiles = files.filter(f => f.type.startsWith('video/'));
+    
+    if (videoFiles.length === 0) {
+      toast.error("Please select video files");
+      return;
+    }
+    
+    const newEpisodes = videoFiles.map((file, index) => ({
+      id: `batch-${Date.now()}-${index}`,
+      file,
+      title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
+      is_free: index === 0, // First episode is free by default
+      coins_required: 5,
+      intro_duration: 30,
+      uploading: false,
+      progress: 0,
+      uploaded: false,
+      error: null
+    }));
+    
+    setBatchEpisodes(prev => [...prev, ...newEpisodes]);
+  };
+
+  const removeBatchEpisode = (id) => {
+    setBatchEpisodes(prev => prev.filter(ep => ep.id !== id));
+  };
+
+  const updateBatchEpisode = (id, field, value) => {
+    setBatchEpisodes(prev => prev.map(ep => 
+      ep.id === id ? { ...ep, [field]: value } : ep
+    ));
+  };
+
+  const uploadBatchEpisodes = async () => {
+    if (batchEpisodes.length === 0) return;
+    
+    setBatchUploading(true);
+    let successCount = 0;
+    
+    for (let i = 0; i < batchEpisodes.length; i++) {
+      const ep = batchEpisodes[i];
+      if (ep.uploaded) continue;
+      
+      try {
+        // Update progress
+        setBatchEpisodes(prev => prev.map(e => 
+          e.id === ep.id ? { ...e, uploading: true, progress: 10 } : e
+        ));
+        
+        // Create episode first
+        const episodeData = {
+          title: ep.title,
+          is_free: ep.is_free,
+          coins_required: ep.coins_required,
+          intro_duration: ep.intro_duration,
+          episode_number: episodes.length + i + 1
+        };
+        
+        const createRes = await axios.post(
+          `${API}/creator/series/${seriesId}/episodes`,
+          episodeData,
+          { headers: { Authorization: `Bearer ${token}` }}
+        );
+        
+        setBatchEpisodes(prev => prev.map(e => 
+          e.id === ep.id ? { ...e, progress: 30 } : e
+        ));
+        
+        // Upload video file
+        const formData = new FormData();
+        formData.append('video', ep.file);
+        
+        await axios.post(
+          `${API}/creator/episodes/${createRes.data.episode.id}/upload-video`,
+          formData,
+          { 
+            headers: { 
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data'
+            },
+            onUploadProgress: (progressEvent) => {
+              const progress = 30 + Math.round((progressEvent.loaded / progressEvent.total) * 60);
+              setBatchEpisodes(prev => prev.map(e => 
+                e.id === ep.id ? { ...e, progress } : e
+              ));
+            }
+          }
+        );
+        
+        // Mark as complete
+        setBatchEpisodes(prev => prev.map(e => 
+          e.id === ep.id ? { ...e, uploading: false, progress: 100, uploaded: true } : e
+        ));
+        successCount++;
+        
+      } catch (err) {
+        console.error(`Failed to upload episode: ${ep.title}`, err);
+        setBatchEpisodes(prev => prev.map(e => 
+          e.id === ep.id ? { ...e, uploading: false, error: err.response?.data?.detail || "Upload failed" } : e
+        ));
+      }
+    }
+    
+    setBatchUploading(false);
+    
+    if (successCount > 0) {
+      toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded successfully!`);
+      fetchSeriesDetail(); // Refresh the episode list
+    }
+    
+    // Remove successfully uploaded episodes from batch list after a delay
+    setTimeout(() => {
+      setBatchEpisodes(prev => prev.filter(ep => !ep.uploaded));
+      if (batchEpisodes.every(ep => ep.uploaded)) {
+        setShowBatchUpload(false);
+      }
+    }, 2000);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
