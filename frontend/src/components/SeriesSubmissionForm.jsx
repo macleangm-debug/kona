@@ -90,9 +90,9 @@ export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuc
     unique_selling_point: ""
   });
 
-  const handleChange = (field, value) => {
+  const handleChange = useCallback((field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
-  };
+  }, []);
 
   const handleSubmit = async () => {
     setLoading(true);
