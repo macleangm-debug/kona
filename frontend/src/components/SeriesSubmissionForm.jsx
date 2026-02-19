@@ -370,7 +370,7 @@ export const SeriesSubmissionForm = ({ open, onClose, onOpenChange, token, onSuc
               Back
             </Button>
           ) : (
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={() => closeHandler(false)}>
               Cancel
             </Button>
           )}
