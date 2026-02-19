@@ -308,51 +308,13 @@ export const CreatorPortal = () => {
         </div>
       </main>
 
-      {/* Create Series Dialog */}
-      <Dialog open={showCreateSeries} onOpenChange={setShowCreateSeries}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Create New Series</DialogTitle>
-            <DialogDescription>Start a new series for your content</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <label className="text-sm text-muted-foreground">Series Title</label>
-              <Input
-                value={seriesForm.title}
-                onChange={(e) => setSeriesForm({...seriesForm, title: e.target.value})}
-                placeholder="My Amazing Series"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground">Description</label>
-              <textarea
-                className="w-full p-3 rounded-lg bg-secondary/50 border border-white/10 text-sm resize-none"
-                rows={3}
-                value={seriesForm.description}
-                onChange={(e) => setSeriesForm({...seriesForm, description: e.target.value})}
-                placeholder="What is your series about?"
-              />
-            </div>
-            <div>
-              <label className="text-sm text-muted-foreground">Genre</label>
-              <select
-                className="w-full p-3 rounded-lg bg-secondary/50 border border-white/10 text-sm"
-                value={seriesForm.genre}
-                onChange={(e) => setSeriesForm({...seriesForm, genre: e.target.value})}
-              >
-                <option value="Romance">Romance</option>
-                <option value="Drama">Drama</option>
-                <option value="Thriller">Thriller</option>
-                <option value="Fantasy">Fantasy</option>
-                <option value="Action">Action</option>
-                <option value="Comedy">Comedy</option>
-              </select>
-            </div>
-            <Button onClick={handleCreateSeries} className="w-full">Create Series</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Create Series Dialog - Optimized for performance */}
+      <CreateSeriesDialog
+        open={showCreateSeries}
+        onOpenChange={setShowCreateSeries}
+        onSubmit={handleCreateSeries}
+        loading={creatingSeriesLoading}
+      />
 
       {/* Series Submission Form */}
       <SeriesSubmissionForm
