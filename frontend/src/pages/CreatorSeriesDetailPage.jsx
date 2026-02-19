@@ -1529,6 +1529,7 @@ export const CreatorSeriesDetailPage = () => {
               onAddSeason={() => setShowSeasonCreator(true)}
               onAddEpisode={openBatchUploadForSeason}
               onReorderEpisodes={handleReorderEpisodes}
+              onBulkEdit={handleBulkEdit}
             />
           )}
         </div>
