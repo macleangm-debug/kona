@@ -1,5 +1,20 @@
 # Kona Streaming Platform - Changelog
 
+## [Feb 19, 2026]
+
+### Fixed
+- **Creator Episode Upload Bug** - Episodes now upload correctly via batch upload feature
+  - Added new endpoint `POST /api/creator/series/{series_id}/episodes` to match frontend expectations
+  - Updated video upload endpoint to auto-initialize Bunny.net video placeholder if missing
+  - Response structure includes `episode.id` for frontend compatibility
+  - Full flow verified: series creation → episode creation → video upload to Bunny.net CDN
+
+### Modified
+- `/app/backend/routes/creator.py` - Added `create_episode_for_series` endpoint (lines 1188-1313)
+- `/app/backend/routes/creator.py` - Updated `upload_episode_video` to handle missing bunny_video_id
+
+---
+
 ## [Feb 11, 2026]
 
 ### Added
