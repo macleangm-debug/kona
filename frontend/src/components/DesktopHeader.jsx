@@ -79,16 +79,22 @@ export const DesktopHeader = ({ onAuthClick, onSearchClick }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navItems = [
+  // Memoize nav items to prevent recreation
+  const navItems = useMemo(() => [
     { label: t("nav.home"), path: "/home", icon: Home },
     { label: t("nav.discover"), path: "/discover", icon: Compass },
     { label: t("nav.rewards"), path: "/rewards", icon: Gift, highlight: true },
-  ];
+  ], [t]);
 
-  const handleLogout = () => {
+  // Memoize handlers
+  const handleLogout = useCallback(() => {
     logout();
     navigate("/home");
-  };
+  }, [logout, navigate]);
+
+  const handleNavigate = useCallback((path) => {
+    navigate(path);
+  }, [navigate]);
 
   return (
     <header 
