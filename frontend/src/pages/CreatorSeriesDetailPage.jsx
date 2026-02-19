@@ -135,7 +135,17 @@ export const CreatorSeriesDetailPage = () => {
   };
 
   const fetchSeriesDetail = async () => {
-    if (!token || !seriesId) return;
+    if (!seriesId) {
+      setLoading(false);
+      return;
+    }
+    
+    if (!token) {
+      // Not authenticated - redirect to login
+      toast.error("Please login to access creator dashboard");
+      navigate("/");
+      return;
+    }
     
     try {
       const res = await axios.get(`${API}/creator/series/${seriesId}`, {
