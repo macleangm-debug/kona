@@ -436,21 +436,28 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     const mp4Url = episode?.mp4_url;
     const embedUrl = episode?.embed_url;
     
-    // If using embed fallback, skip HLS initialization
+    // If using embed fallback, skip video initialization
     if (useEmbedFallback) return;
+    
+    // Wait for video element to be mounted
+    if (!video || !videoMounted) return;
     
     // If using MP4 fallback, set the video source directly
     if (useMp4Fallback && mp4Url) {
-      console.log("Using MP4 fallback:", mp4Url);
-      if (video) {
-        video.src = mp4Url;
-        video.load();
-      }
+      console.log("Setting MP4 source:", mp4Url);
+      // Clear any previous errors
+      setVideoError(null);
+      video.src = mp4Url;
+      video.load();
+      // Try to play
+      video.play().catch(err => {
+        console.log("MP4 autoplay blocked:", err.message);
+      });
       return;
     }
     
-    // Wait for video element to be mounted before initializing HLS
-    if (!video || !videoUrl || !videoMounted) return;
+    // Need video_url for HLS
+    if (!videoUrl) return;
     
     // Reset error state on new video
     setVideoError(null);
