@@ -87,7 +87,7 @@ class TestAdminPlatformSettings:
         """Verify admin can get full platform settings"""
         response = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 200, f"Failed: {response.text}"
         
@@ -103,7 +103,7 @@ class TestAdminPlatformSettings:
         # Get current settings
         current = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         original_price = current.get("pricing", {}).get("default_episode_price", 5)
@@ -112,7 +112,7 @@ class TestAdminPlatformSettings:
         new_price = 10
         response = requests.put(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={
                 "id": "global",
                 "pricing": {
@@ -128,14 +128,14 @@ class TestAdminPlatformSettings:
         # Verify update
         updated = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         assert updated["pricing"]["default_episode_price"] == new_price
         
         # Restore original
         requests.put(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={
                 "id": "global",
                 "pricing": {
@@ -152,7 +152,7 @@ class TestAdminPlatformSettings:
         # Get current settings
         current = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         original_formats = current.get("video", {}).get("allowed_formats", ["vertical"])
@@ -160,7 +160,7 @@ class TestAdminPlatformSettings:
         # Update to allow both formats
         response = requests.put(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={
                 "id": "global",
                 "pricing": current.get("pricing", {}),
@@ -176,7 +176,7 @@ class TestAdminPlatformSettings:
         # Verify creator upload-settings reflects update
         creator_settings = requests.get(
             f"{BASE_URL}/api/creator/upload-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         assert "vertical" in creator_settings["video"]["allowed_formats"]
@@ -186,7 +186,7 @@ class TestAdminPlatformSettings:
         # Restore original
         requests.put(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={
                 "id": "global",
                 "pricing": current.get("pricing", {}),
@@ -205,7 +205,7 @@ class TestAdminPlatformSettings:
         # Since we have a super admin token, this should work
         response = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 200
 
