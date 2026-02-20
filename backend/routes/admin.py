@@ -1379,7 +1379,8 @@ async def get_platform_settings(user: dict = Depends(require_super_admin)):
             "updated_at": datetime.now(timezone.utc).isoformat()
         }
         await db.platform_settings.insert_one(settings)
-        del settings["_id"] if "_id" in settings else None
+        if "_id" in settings:
+            del settings["_id"]
     
     return settings
 
