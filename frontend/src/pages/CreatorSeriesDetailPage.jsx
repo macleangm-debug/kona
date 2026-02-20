@@ -171,6 +171,7 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
   const completedCount = activeUploads.filter(u => u.status === 'ready' || u.status === 'encoding').length;
   const failedCount = activeUploads.filter(u => u.status === 'failed').length;
   const uploadingCount = activeUploads.filter(u => u.status === 'uploading').length;
+  const processingCount = activeUploads.filter(u => u.status === 'encoding').length;
   
   return (
     <div className="fixed bottom-4 right-4 z-50 w-80 max-h-96 overflow-hidden rounded-xl bg-card/95 backdrop-blur-sm border border-white/10 shadow-2xl" data-testid="upload-progress-panel">
@@ -179,14 +180,17 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Upload className="w-4 h-4 text-primary" />
-            <span className="font-medium text-sm">Upload Progress</span>
+            <span className="font-medium text-sm">Video Upload</span>
           </div>
           <div className="flex items-center gap-2 text-xs">
             {uploadingCount > 0 && (
               <span className="text-yellow-400">{uploadingCount} uploading</span>
             )}
+            {processingCount > 0 && (
+              <span className="text-blue-400">{processingCount} processing</span>
+            )}
             {completedCount > 0 && (
-              <span className="text-green-400">{completedCount} done</span>
+              <span className="text-green-400">{completedCount - processingCount > 0 ? `${completedCount - processingCount} done` : ''}</span>
             )}
             {failedCount > 0 && (
               <span className="text-red-400">{failedCount} failed</span>
@@ -201,8 +205,10 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
           <div 
             key={upload.id} 
             className={`p-2 rounded-lg border transition-all ${
-              upload.status === 'ready' || upload.status === 'encoding' 
+              upload.status === 'ready' 
                 ? 'bg-green-500/10 border-green-500/30' 
+                : upload.status === 'encoding'
+                  ? 'bg-blue-500/10 border-blue-500/30'
                 : upload.status === 'failed' 
                   ? 'bg-red-500/10 border-red-500/30'
                   : 'bg-white/5 border-white/10'
@@ -213,8 +219,10 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
               <div className="w-12 h-12 rounded bg-secondary/50 flex items-center justify-center flex-shrink-0 overflow-hidden">
                 {upload.thumbnail ? (
                   <img src={upload.thumbnail} alt="" className="w-full h-full object-cover" />
-                ) : upload.status === 'ready' || upload.status === 'encoding' ? (
+                ) : upload.status === 'ready' ? (
                   <CheckCircle className="w-5 h-5 text-green-400" />
+                ) : upload.status === 'encoding' ? (
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-400" />
                 ) : upload.status === 'uploading' ? (
                   <Loader2 className="w-5 h-5 animate-spin text-primary" />
                 ) : upload.status === 'failed' ? (
@@ -243,13 +251,13 @@ const UploadProgressPanel = ({ uploads, onDismiss }) => {
                 )}
                 
                 {upload.status === 'encoding' && (
-                  <p className="text-[10px] text-yellow-400 mt-1 flex items-center gap-1">
-                    <Loader2 className="w-3 h-3 animate-spin" /> Processing on CDN...
+                  <p className="text-[10px] text-blue-400 mt-1 flex items-center gap-1">
+                    <Loader2 className="w-3 h-3 animate-spin" /> Processing video...
                   </p>
                 )}
                 
                 {upload.status === 'ready' && (
-                  <p className="text-[10px] text-green-400 mt-1">Ready to stream</p>
+                  <p className="text-[10px] text-green-400 mt-1">Ready to watch</p>
                 )}
                 
                 {upload.status === 'failed' && (
