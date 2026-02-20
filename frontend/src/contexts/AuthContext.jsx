@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext, useCallback } from "react";
+import React, { useState, useEffect, createContext, useContext, useCallback, useRef } from "react";
 import axios from "axios";
 import { API } from "@/config";
 
@@ -6,18 +6,45 @@ const AuthContext = createContext(null);
 
 export const useAuth = () => useContext(AuthContext);
 
+// Token expiration check (JWT exp claim)
+const isTokenExpired = (token) => {
+  if (!token) return true;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const exp = payload.exp * 1000; // Convert to milliseconds
+    // Add 30 second buffer before actual expiration
+    return Date.now() >= (exp - 30000);
+  } catch {
+    return false; // If can't decode, let server validate
+  }
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(null);
+  const logoutInProgress = useRef(false);
+  const lastFetchTime = useRef(0);
 
   // Stable reference for logout to avoid re-renders
-  const handleLogout = useCallback(() => {
+  const handleLogout = useCallback((message = null) => {
+    if (logoutInProgress.current) return;
+    logoutInProgress.current = true;
+    
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
-    setAuthError(null);
+    if (message) {
+      setAuthError(message);
+    } else {
+      setAuthError(null);
+    }
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      logoutInProgress.current = false;
+    }, 100);
   }, []);
 
   // Fetch user on initial load or token change
@@ -30,6 +57,24 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       
+      // Check if token appears expired before making request
+      if (isTokenExpired(token)) {
+        console.warn("Token appears expired, clearing session");
+        if (isMounted) {
+          handleLogout("Session expired. Please log in again.");
+          setLoading(false);
+        }
+        return;
+      }
+      
+      // Debounce - don't fetch if we just fetched
+      const now = Date.now();
+      if (now - lastFetchTime.current < 2000) {
+        setLoading(false);
+        return;
+      }
+      lastFetchTime.current = now;
+      
       try {
         const res = await axios.get(`${API}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -39,20 +84,25 @@ export const AuthProvider = ({ children }) => {
           setAuthError(null);
         }
       } catch (e) {
-        // Only clear token if it's specifically an auth error (401/403)
-        if (e.response?.status === 401 || e.response?.status === 403) {
+        // Only clear token for explicit auth failures on the /auth/me endpoint
+        if (e.response?.status === 401) {
           if (isMounted) {
-            console.warn("Session expired or invalid token");
-            localStorage.removeItem("token");
-            setToken(null);
-            setUser(null);
-            setAuthError("Session expired. Please log in again.");
+            console.warn("Token invalid or expired");
+            handleLogout("Session expired. Please log in again.");
+          }
+        } else if (e.response?.status === 403) {
+          // 403 might mean account disabled/banned
+          if (isMounted) {
+            console.warn("Access forbidden");
+            handleLogout("Your account access has been restricted.");
           }
         } else {
-          // For other errors (network, server), don't clear the session
-          console.error("Error fetching user:", e.message);
-          if (isMounted) {
-            setAuthError("Connection error. Please check your internet.");
+          // For network errors, server errors (5xx), don't clear session
+          // User's token might still be valid, just server issue
+          console.error("Error fetching user (keeping session):", e.message);
+          if (isMounted && user === null) {
+            // Only show error if we don't have cached user data
+            setAuthError("Connection issue. Retrying...");
           }
         }
       }
@@ -66,19 +116,24 @@ export const AuthProvider = ({ children }) => {
     return () => {
       isMounted = false;
     };
-  }, [token]);
+  }, [token, handleLogout, user]);
 
-  // Setup axios interceptor to handle 401 errors globally
+  // Setup axios interceptor to handle auth errors globally
+  // But ONLY for actual authentication failures, not all 401s
   useEffect(() => {
     const interceptor = axios.interceptors.response.use(
       (response) => response,
       (error) => {
-        // Only handle auth errors from specific auth endpoints
-        const isAuthEndpoint = error.config?.url?.includes('/auth/me');
+        const status = error.response?.status;
+        const url = error.config?.url || '';
         
-        if (error.response?.status === 401 && isAuthEndpoint) {
-          // Session definitely expired
-          handleLogout();
+        // Only auto-logout for 401 on auth-specific endpoints
+        // Other 401s (e.g., accessing protected content) should be handled by components
+        const isAuthEndpoint = url.includes('/auth/me') || url.includes('/auth/refresh');
+        
+        if (status === 401 && isAuthEndpoint && !logoutInProgress.current) {
+          console.warn("Auth endpoint returned 401, logging out");
+          handleLogout("Session expired. Please log in again.");
         }
         
         return Promise.reject(error);
