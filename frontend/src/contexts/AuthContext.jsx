@@ -174,7 +174,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const refreshUser = async () => {
-    if (token) {
+    if (token && !isTokenExpired(token)) {
       try {
         const res = await axios.get(`${API}/auth/me`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -183,11 +183,33 @@ export const AuthProvider = ({ children }) => {
         setAuthError(null);
       } catch (e) {
         if (e.response?.status === 401) {
-          handleLogout();
+          handleLogout("Session expired. Please log in again.");
         }
       }
     }
   };
+
+  // Allow components to clear the auth error
+  const clearAuthError = useCallback(() => {
+    setAuthError(null);
+  }, []);
+
+  // Check token validity periodically (every 5 minutes) to proactively detect expiration
+  useEffect(() => {
+    if (!token) return;
+    
+    const checkTokenValidity = () => {
+      if (isTokenExpired(token)) {
+        console.warn("Token expired during session, prompting re-login");
+        handleLogout("Session expired. Please log in again.");
+      }
+    };
+    
+    // Check every 5 minutes
+    const interval = setInterval(checkTokenValidity, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, [token, handleLogout]);
 
   return (
     <AuthContext.Provider value={{ 
@@ -198,7 +220,9 @@ export const AuthProvider = ({ children }) => {
       logout, 
       loading, 
       refreshUser,
-      authError 
+      authError,
+      clearAuthError,
+      isAuthenticated: !!token && !!user
     }}>
       {children}
     </AuthContext.Provider>
