@@ -1235,7 +1235,6 @@ async def publish_series_to_main(series_id: str, creator_id: str):
         # Publish if: encoding is ready, OR episode has a direct video URL
         is_ready = ep.get("encoding_status") == "ready"
         has_video_url = bool(ep.get("video_url"))
-        has_bunny_video = bool(ep.get("bunny_video_id"))
         
         if is_ready or has_video_url:
             # Determine the video URL
