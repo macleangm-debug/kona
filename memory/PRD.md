@@ -237,6 +237,18 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - **Modified:** `backend/routes/series.py` - added embed_url to GET /api/episodes/{id}
   - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback, embed error UI
 
+- [x] **Bunny.net Auto-Configuration (2026-02-20)**
+  - Added `BUNNY_ACCOUNT_API_KEY` environment variable for library management
+  - Implemented API endpoints: `GET /api/admin/bunny/referrers`, `POST /api/admin/bunny/referrers`
+  - Auto-configures allowed referrer domains on server startup
+  - Disabled `BlockNoneReferrer` and `PlayerTokenAuthenticationEnabled` for embed player access
+  - Added domains: `localhost`, `*.preview.emergentagent.com`, specific preview domain
+  - **Fixed 403 embed error** - Bunny.net now allows embedding from configured domains
+  - **Modified:** `backend/services/bunny.py` - added referrer management methods
+  - **Modified:** `backend/routes/admin.py` - added Bunny.net referrer endpoints
+  - **Modified:** `backend/server.py` - auto-configure referrers on startup
+  - **Note:** Video still shows black screen due to source video codec issue (needs re-encoding on Bunny.net)
+
 ### P1 (High)
 - [ ] **Fix Unstable Session Management** - Users experience frequent unexpected logouts
   - Investigate token storage and JWT expiration handling in `App.jsx`
