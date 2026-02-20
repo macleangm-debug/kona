@@ -1796,10 +1796,59 @@ export const CreatorSeriesDetailPage = () => {
             
             {/* Subtitle Upload Section */}
             <div className="border-t border-white/10 pt-4">
-              <label className="text-sm font-medium flex items-center gap-2 mb-3">
-                <Languages className="w-4 h-4 text-blue-400" />
-                Subtitles (Optional)
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Languages className="w-4 h-4 text-blue-400" />
+                  Subtitles (Optional)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const template = `WEBVTT
+
+1
+00:00:00.000 --> 00:00:03.000
+[Opening scene]
+
+2
+00:00:03.000 --> 00:00:06.500
+Welcome to this episode.
+
+3
+00:00:07.000 --> 00:00:10.000
+This is an example subtitle
+that spans two lines.
+
+4
+00:00:10.500 --> 00:00:14.000
+Character dialogue goes here.
+
+5
+00:00:15.000 --> 00:00:18.500
+Keep each subtitle under 2 lines.
+
+6
+00:00:19.000 --> 00:00:22.000
+Use [brackets] for sounds.
+`;
+                    const blob = new Blob([template], { type: 'text/vtt' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'subtitle_template.vtt';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    toast.success('Template downloaded!');
+                  }}
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                  data-testid="download-subtitle-template"
+                >
+                  <FileVideo className="w-3 h-3" />
+                  Download Template
+                </button>
+              </div>
               
               {Object.keys(episodeSubtitles).length > 0 && (
                 <div className="mb-3 space-y-2">
@@ -1822,7 +1871,7 @@ export const CreatorSeriesDetailPage = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              )}}
               
               <div className="space-y-2">
                 <div className="flex gap-2">
