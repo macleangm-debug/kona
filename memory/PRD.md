@@ -209,9 +209,15 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 - [x] **Video Preview Feature (2026-02-20)**
   - Creators can now preview their uploaded videos before publishing
   - Preview button in episode editor dialog
-  - Preview modal with Bunny.net iframe player
+  - Preview modal with HLS.js video player
+  - **Bunny.net embed player fallback** when HLS fails (codec issues)
   - Shows processing status for videos still encoding
   - Backend API: `GET /api/creator/episodes/{id}/preview`
+  - Installed hls.js library for browser HLS playback
+- [x] **Subtitle Template Download (2026-02-20)**
+  - Added "Download Template" button in episode editor
+  - Downloads `subtitle_template.vtt` with proper WebVTT format
+  - Format example shown in UI
 - [x] **Publishing Flow Enhancement (2026-02-20)**
   - Publish now strictly requires Bunny.net video encoding to be "ready"
   - Returns count of published episodes
