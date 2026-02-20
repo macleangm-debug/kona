@@ -2668,6 +2668,7 @@ export const AdminDashboard = () => {
                 {activeTab === "support" && "Manage customer support tickets"}
                 {activeTab === "checklist" && "Pre-launch verification checklist"}
                 {activeTab === "seeding" && "Boost engagement for launch traction"}
+                {activeTab === "platform-settings" && "Global pricing, video formats, and episode settings"}
                 {activeTab === "revenue-settings" && "Configure revenue distribution"}
                 {activeTab === "exchange-rates" && "Dynamic exchange rates and margin revenue"}
                 {activeTab === "ab-testing" && "Test pricing styles to optimize conversions"}
