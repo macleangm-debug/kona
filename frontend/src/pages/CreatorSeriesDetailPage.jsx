@@ -2201,7 +2201,7 @@ Use [brackets] for sounds.
               Add Episodes
             </DialogTitle>
             <DialogDescription>
-              Upload videos to Bunny.net CDN for smooth streaming performance
+              Upload videos to add new episodes to your series
             </DialogDescription>
           </DialogHeader>
 
@@ -2236,9 +2236,6 @@ Use [brackets] for sounds.
                 <p className="font-medium">Drop video files here or click to browse</p>
                 <p className="text-sm text-muted-foreground mt-1">
                   Supported formats: MP4, WebM, MOV (max 500MB each)
-                </p>
-                <p className="text-xs text-primary mt-2">
-                  Videos are uploaded to Bunny.net CDN for fast, reliable streaming
                 </p>
               </div>
               <input
