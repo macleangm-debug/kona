@@ -1,0 +1,112 @@
+{
+  "summary": "Tested HLS-to-embed fallback feature. Backend API (GET /api/episodes/{episode_id}) correctly returns embed_url field. However, CRITICAL FRONTEND BUG: HLS.js is NOT initializing - no network requests to the HLS playlist URL are made. Video shows black screen indefinitely because the HLS useEffect has a race condition with the video element render.",
+
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "VideoPlayerPage.jsx",
+        "issue": "Black screen on public video playback - video element has empty src, HLS.js not initializing",
+        "selector": "[data-testid='video-element']",
+        "priority": "CRITICAL"
+      }
+    ],
+    "integration_issues": [
+      {
+        "flow": "HLS Video Initialization",
+        "issue": "HLS.js useEffect (line 426-553) is not properly initializing video. videoRef.current is likely null when the effect runs due to race condition between episode state update and video element render. No network requests to HLS playlist URL are made.",
+        "affected_selectors": ["#main-video", "[data-testid='video-element']"],
+        "root_cause": "The useEffect at line 426 depends on episode?.video_url but the video element isn't rendered until after loading is false. When episode becomes available and triggers useEffect, videoRef.current is still null because React hasn't completed the render cycle yet.",
+        "evidence": [
+          "Video src is empty after 30+ seconds wait",
+          "No network requests to .m3u8 playlist URL detected",
+          "videoRef.current likely null at effect execution time"
+        ]
+      },
+      {
+        "flow": "Embed Fallback",
+        "issue": "Embed fallback (useEmbedFallback state) is correctly implemented but never triggers because HLS.js doesn't emit error events - it never even starts loading",
+        "affected_selectors": ["[data-testid='embed-fallback-player']"],
+        "root_cause": "Since HLS.js never initializes (due to race condition), no HLS.Events.ERROR events are fired, so setUseEmbedFallback(true) is never called"
+      }
+    ],
+    "design_issues": []
+  },
+
+  "test_results": {
+    "backend_api": {
+      "status": "PASS",
+      "endpoint": "GET /api/episodes/{episode_id}",
+      "notes": "API correctly returns embed_url field along with video_url. All 5 pytest tests passed.",
+      "verified_fields": ["video_url (HLS)", "embed_url (Bunny iframe)", "unlocked", "bunny_video_id"]
+    },
+    "hls_initialization": {
+      "status": "FAIL - CRITICAL",
+      "notes": "HLS.js useEffect at line 426-553 is not executing hls.loadSource() because videoRef.current is null when the effect runs. No network requests to HLS playlist URL."
+    },
+    "embed_fallback": {
+      "status": "NOT TESTED - BLOCKED",
+      "notes": "Cannot test embed fallback because HLS never starts loading, so no errors are emitted to trigger the fallback"
+    },
+    "video_player_page_load": {
+      "status": "PARTIAL",
+      "notes": "Page loads, video element exists with data-testid='video-element', but video has empty src and shows black screen"
+    }
+  },
+
+  "test_report_links": [
+    "/app/backend/tests/test_hls_fallback.py"
+  ],
+
+  "action_items": [
+    "CRITICAL FIX: VideoPlayerPage.jsx line 426-553 - HLS useEffect has race condition. videoRef.current is null when effect runs because video element isn't rendered yet when episode state updates. Need to ensure effect re-runs after video element mounts.",
+    "SUGGESTED FIX #1: Add a videoMounted state that updates in video's onLoadedMetadata or useLayoutEffect, and include it in the useEffect dependency array",
+    "SUGGESTED FIX #2: Use a callback ref that triggers HLS initialization when the video element is attached",
+    "SUGGESTED FIX #3: Add a setTimeout fallback in the useEffect to check if video loaded within X seconds and trigger embed fallback if not",
+    "ALTERNATIVE SOLUTION: If HLS continues to have codec issues, consider defaulting to embed player for public videos (simpler, more reliable)"
+  ],
+
+  "critical_code_review_comments": [
+    "VideoPlayerPage.jsx line 426-434: The early return `if (!video || !videoUrl) return;` prevents HLS initialization when videoRef.current is null, but doesn't re-run when video becomes available",
+    "VideoPlayerPage.jsx line 553: useEffect depends on [episode?.video_url, episode?.embed_url, useEmbedFallback] but not on videoRef.current (which wouldn't work anyway since refs don't trigger re-renders)",
+    "VideoPlayerPage.jsx line 1441-1448: Early return with loader means video element isn't in DOM when episode state first updates",
+    "The HLS error handling (line 470-531) is correctly implemented but never runs because HLS.js never starts"
+  ],
+
+  "updated_files": [
+    "/app/backend/tests/test_hls_fallback.py"
+  ],
+
+  "success_rate": {
+    "backend": "100% - All 5 API tests passed",
+    "frontend": "0% - HLS not initializing, black screen bug"
+  },
+
+  "test_credentials": {
+    "test_episode": "cs-8e6c36c6e4-s01e01",
+    "auth_required": "No - testing public episode playback"
+  },
+
+  "seed_data_creation": "None",
+
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+
+  "context_for_next_testing_agent": "The HLS-to-embed fallback code is correctly written in VideoPlayerPage.jsx (lines 425-553 for HLS init, line 1599-1612 for embed fallback render). The bug is a race condition: useEffect runs when episode?.video_url changes but videoRef.current is null at that moment because the video element is conditionally rendered (line 1441-1448 early returns with loader). The main agent needs to add a mechanism to re-run the HLS initialization effect after the video element is mounted.",
+
+  "rca_of_the_issue": {
+    "bug_description": "Black screen on public video playback at /watch/{episode_id}",
+    "root_cause": "Race condition between React state update and DOM render. When episode data loads, useEffect fires immediately but video element hasn't been rendered to DOM yet, so videoRef.current is null.",
+    "reproduction_steps": [
+      "1. Navigate to /watch/cs-8e6c36c6e4-s01e01",
+      "2. Observe black screen with no video playing",
+      "3. Check network tab - no requests to .m3u8 playlist",
+      "4. Check video element - src is empty string"
+    ],
+    "mitigation": "Need to ensure HLS initialization happens after video element is in DOM. Options: callback ref, useLayoutEffect with retry, state-based trigger after video element mounts"
+  }
+}
