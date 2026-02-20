@@ -518,10 +518,10 @@ const DroppableSeason = memo(({
       )}
     </div>
   );
-};
+});
 
 // ============ SEASON ACCORDION WITH DND ============
-const SeasonAccordion = ({ 
+const SeasonAccordion = memo(({ 
   seasons, 
   episodes, 
   expandedSeasons, 
