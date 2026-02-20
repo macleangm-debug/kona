@@ -77,7 +77,7 @@ class TestEnhancedSearch:
     
     def test_03_search_suggestions_autocomplete(self):
         """Test GET /api/search/suggestions?q=lo - Auto-complete"""
-        response = requests.get(f"{BASE_URL}/api/search/suggestions?q=lo")
+        response = requests.get(f"{BASE_URL}/api/search/suggestions?q=lo", headers=COMMON_HEADERS)
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
@@ -89,7 +89,7 @@ class TestEnhancedSearch:
     
     def test_04_search_suggestions_minimum_length(self):
         """Test suggestions with single character (should return empty)"""
-        response = requests.get(f"{BASE_URL}/api/search/suggestions?q=l")
+        response = requests.get(f"{BASE_URL}/api/search/suggestions?q=l", headers=COMMON_HEADERS)
         
         assert response.status_code == 200
         data = response.json()
@@ -98,7 +98,7 @@ class TestEnhancedSearch:
     
     def test_05_trending_searches(self):
         """Test GET /api/search/trending - Get trending searches"""
-        response = requests.get(f"{BASE_URL}/api/search/trending")
+        response = requests.get(f"{BASE_URL}/api/search/trending", headers=COMMON_HEADERS)
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
@@ -109,7 +109,7 @@ class TestEnhancedSearch:
     
     def test_06_search_history_requires_auth(self):
         """Test search history requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/search/history")
+        response = requests.get(f"{BASE_URL}/api/search/history", headers=COMMON_HEADERS)
         
         # Should require auth - 401 or 403
         assert response.status_code in [401, 403], f"Expected 401/403 without auth, got {response.status_code}"
@@ -124,7 +124,7 @@ class TestEnhancedSearch:
     
     def test_08_available_genres(self):
         """Test GET /api/search/genres - Get available genres"""
-        response = requests.get(f"{BASE_URL}/api/search/genres")
+        response = requests.get(f"{BASE_URL}/api/search/genres", headers=COMMON_HEADERS)
         
         assert response.status_code == 200
         data = response.json()
@@ -133,7 +133,7 @@ class TestEnhancedSearch:
     
     def test_09_quick_search(self):
         """Test quick search (navbar search - no auth required)"""
-        response = requests.get(f"{BASE_URL}/api/search/quick?q=romance")
+        response = requests.get(f"{BASE_URL}/api/search/quick?q=romance", headers=COMMON_HEADERS)
         
         assert response.status_code == 200
         data = response.json()
