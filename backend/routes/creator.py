@@ -1649,38 +1649,47 @@ async def get_episode_preview(episode_id: str, user: dict = Depends(get_current_
     if not episode.get("bunny_video_id"):
         raise HTTPException(status_code=400, detail="No video uploaded yet")
     
-    # Check encoding status
-    if episode.get("encoding_status") not in ["ready", "encoding"]:
-        # Refresh status from Bunny.net
-        bunny_status = await bunny_service.get_video_status(episode["bunny_video_id"])
-        if bunny_status["success"]:
-            await db.creator_episodes.update_one(
-                {"id": episode_id},
-                {"$set": {
-                    "encoding_status": bunny_status["status"],
-                    "duration": bunny_status.get("duration"),
-                    "thumbnail": bunny_status.get("thumbnail_url")
-                }}
-            )
-            if bunny_status["status"] == "pending":
-                raise HTTPException(status_code=400, detail="Video is still being processed. Please wait...")
+    # Check encoding status and refresh from Bunny.net if needed
+    bunny_status = await bunny_service.get_video_status(episode["bunny_video_id"])
+    if bunny_status["success"]:
+        await db.creator_episodes.update_one(
+            {"id": episode_id},
+            {"$set": {
+                "encoding_status": bunny_status["status"],
+                "duration": bunny_status.get("duration"),
+                "thumbnail": bunny_status.get("thumbnail_url")
+            }}
+        )
+        current_status = bunny_status["status"]
+    else:
+        current_status = episode.get("encoding_status", "pending")
     
-    # Get streaming URL from Bunny.net
-    video_url = bunny_service.get_direct_play_url(episode["bunny_video_id"])
+    if current_status == "pending" or current_status == "encoding":
+        return {
+            "episode_id": episode_id,
+            "title": episode.get("title"),
+            "episode_code": episode.get("episode_code"),
+            "encoding_status": current_status,
+            "can_preview": False,
+            "message": "Video is still being processed. Please wait a few minutes..."
+        }
     
-    # Get HLS manifest URL if available
-    hls_url = bunny_service.get_hls_url(episode["bunny_video_id"])
+    # Get streaming URLs from Bunny.net
+    video_id = episode["bunny_video_id"]
+    hls_url = bunny_service.get_direct_play_url(video_id)  # HLS playlist
+    embed_url = bunny_service.get_embed_url(video_id)  # iframe embed
+    thumbnail = bunny_service.get_thumbnail_url(video_id)
     
     return {
         "episode_id": episode_id,
         "title": episode.get("title"),
         "episode_code": episode.get("episode_code"),
-        "video_url": video_url,
         "hls_url": hls_url,
-        "thumbnail": episode.get("thumbnail"),
-        "duration": episode.get("duration"),
-        "encoding_status": episode.get("encoding_status"),
-        "can_preview": episode.get("encoding_status") == "ready"
+        "embed_url": embed_url,
+        "thumbnail": episode.get("thumbnail") or thumbnail,
+        "duration": episode.get("duration") or bunny_status.get("duration"),
+        "encoding_status": current_status,
+        "can_preview": current_status == "ready"
     }
 
 
