@@ -296,6 +296,7 @@ export const CreatorPortal = () => {
               series={series}
               submissions={submissions}
               onCreateSeries={() => setShowCreateSeries(true)}
+              onPublish={handlePublishSeries}
               loading={loading}
             />
           )}
