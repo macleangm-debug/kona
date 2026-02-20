@@ -85,7 +85,7 @@ class TestEpisodeEndpoint:
     def test_bunny_video_id_present(self):
         """Test that bunny_video_id is included in response"""
         episode_id = "cs-8e6c36c6e4-s01e01"
-        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}")
+        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}", headers=HEADERS)
         
         data = response.json()
         
