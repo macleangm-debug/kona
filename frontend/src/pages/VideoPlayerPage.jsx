@@ -1738,12 +1738,14 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             onError={(e) => {
               console.error('Video load error:', e);
               // Fallback chain: HLS -> MP4 -> Embed
-              // Only trigger fallback if MP4 hasn't been tried yet
-              if (!useMp4Fallback && episode?.mp4_url) {
+              // Use ref to check if fallbacks have been attempted (avoids async state issues)
+              if (!fallbackAttempted.current.mp4 && episode?.mp4_url) {
                 console.warn("Video error, trying MP4 fallback");
+                fallbackAttempted.current.mp4 = true;
                 setUseMp4Fallback(true);
-              } else if (!useEmbedFallback && episode?.embed_url) {
+              } else if (!fallbackAttempted.current.embed && episode?.embed_url) {
                 console.warn("Video error, switching to embed fallback");
+                fallbackAttempted.current.embed = true;
                 setUseEmbedFallback(true);
               } else {
                 setVideoError('Video unavailable - please try again later');
