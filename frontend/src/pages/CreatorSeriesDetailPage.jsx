@@ -2299,7 +2299,11 @@ Use [brackets] for sounds.
                 <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="font-medium">Drop video files here or click to browse</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Vertical videos only (portrait format) • MP4, WebM, MOV
+                  {platformSettings?.video?.format_help === "vertical" 
+                    ? "Vertical videos only (portrait format)" 
+                    : platformSettings?.video?.format_help === "landscape"
+                      ? "Landscape videos only (horizontal format)"
+                      : "Vertical or landscape videos"} • MP4, WebM, MOV
                 </p>
               </div>
               <input
