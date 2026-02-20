@@ -1798,6 +1798,26 @@ export const CreatorSeriesDetailPage = () => {
               </div>
             </div>
             
+            {/* Preview Button - Shows if episode has a video */}
+            {selectedEpisode?.bunny_video_id && (
+              <div className="border-t border-white/10 pt-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => handlePreviewEpisode(selectedEpisode)}
+                  className="w-full"
+                  data-testid="preview-episode-btn"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Preview Video
+                </Button>
+                {selectedEpisode?.encoding_status !== 'ready' && (
+                  <p className="text-xs text-yellow-400 text-center mt-2">
+                    Video is still processing. Preview may not be available yet.
+                  </p>
+                )}
+              </div>
+            )}
+            
             <Button 
               onClick={handleUpdateEpisode} 
               className="w-full"
