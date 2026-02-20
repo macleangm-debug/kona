@@ -18,6 +18,13 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 TEST_EMAIL = "superadmin@kona.com"
 TEST_PASSWORD = "SuperAdmin2025!"
 
+# Common headers to avoid bot detection
+COMMON_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
+
 
 class TestAuthentication:
     """Helper class to manage authentication"""
@@ -28,7 +35,7 @@ class TestAuthentication:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=COMMON_HEADERS)
         if response.status_code == 200:
             return response.json().get("token")
         return None
