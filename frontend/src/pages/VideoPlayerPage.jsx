@@ -491,9 +491,10 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         console.log("Falling back to MP4:", mp4Url);
         fallbackAttempted.current.mp4 = true;
         setUseMp4Fallback(true);
-      } else if (embedUrl) {
-        // If no MP4, try embed player
+      } else if (embedUrl && !fallbackAttempted.current.embed) {
+        // If no MP4 or MP4 failed, try embed player
         console.log("Falling back to embed player");
+        fallbackAttempted.current.embed = true;
         setUseEmbedFallback(true);
       } else {
         setVideoError("Video format not supported. Please try a different browser.");
