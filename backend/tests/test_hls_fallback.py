@@ -105,7 +105,7 @@ class TestStreamingConfig:
     
     def test_streaming_config_accessible(self):
         """Test streaming config endpoint works"""
-        response = requests.get(f"{BASE_URL}/api/streaming/config")
+        response = requests.get(f"{BASE_URL}/api/streaming/config", headers=HEADERS)
         
         assert response.status_code == 200, f"Streaming config failed: {response.status_code}"
         
