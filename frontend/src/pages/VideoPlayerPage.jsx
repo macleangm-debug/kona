@@ -349,6 +349,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   // HLS fallback state - switch to Bunny.net embed player when HLS fails
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
   
+  // Embed player error state (for 403/configuration issues)
+  const [embedError, setEmbedError] = useState(false);
+  
   // Subtitle states
   const [subtitles, setSubtitles] = useState({}); // { en: "url", sw: "url", fr: "url" }
   const [activeSubtitle, setActiveSubtitle] = useState("off");
