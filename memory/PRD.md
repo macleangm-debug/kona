@@ -228,8 +228,14 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Added `embed_url` field to public episode API response
   - Implemented automatic fallback to Bunny.net iframe player when HLS fails
   - Handles codec incompatibility errors (manifestIncompatibleCodecsError)
+  - **Added user-friendly error message** when embed player fails (403/config issues)
+    - Shows "Video Service Configuration Needed" with clear explanation
+    - Reassures users that their upload is fine
+    - Provides admin instructions for Bunny.net domain configuration
+    - "Video not loading?" button for users to trigger error display
+    - "Try Again" button to retry playback
   - **Modified:** `backend/routes/series.py` - added embed_url to GET /api/episodes/{id}
-  - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback
+  - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback, embed error UI
 
 ### P1 (High)
 - [ ] **Fix Unstable Session Management** - Users experience frequent unexpected logouts
