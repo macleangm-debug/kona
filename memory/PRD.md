@@ -232,6 +232,9 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback
 
 ### P1 (High)
+- [ ] **Fix Unstable Session Management** - Users experience frequent unexpected logouts
+  - Investigate token storage and JWT expiration handling in `App.jsx`
+  - Check auth token refresh logic
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
 - [ ] Real SMS provider for OTP (Africa's Talking)
 - [ ] Video encoding/CDN integration (Bunny.net already configured)
