@@ -86,9 +86,9 @@ class TestVideoPreview:
             assert thumbnail is not None, "Thumbnail should be present"
             assert thumbnail.startswith("http"), "Thumbnail should be a valid URL"
     
-    def test_preview_unauthorized_without_token(self):
+    def test_preview_unauthorized_without_token(self, session):
         """Test that preview endpoint requires authentication"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/cs-8e6c36c6e4-s01e01/preview"
         )
         
