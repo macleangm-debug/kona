@@ -35,9 +35,9 @@ class TestVideoPreview:
         assert response.status_code == 200, f"Login failed: {response.text}"
         return response.json().get("token")
     
-    def test_preview_endpoint_exists(self, auth_token):
+    def test_preview_endpoint_exists(self, session, auth_token):
         """Test that preview endpoint returns data for existing episode"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/cs-8e6c36c6e4-s01e01/preview",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
