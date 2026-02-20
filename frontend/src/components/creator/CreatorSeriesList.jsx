@@ -1,11 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Film, Eye, Coins, Plus } from "lucide-react";
+import { Film, Eye, Coins, Plus, Globe, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-export const CreatorSeriesList = ({ series, onCreateSeries }) => {
+export const CreatorSeriesList = ({ series, onCreateSeries, onPublish }) => {
   const navigate = useNavigate();
 
   if (!series || series.length === 0) {
@@ -25,9 +25,9 @@ export const CreatorSeriesList = ({ series, onCreateSeries }) => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      published: { variant: "default", label: "Published" },
+      published: { variant: "default", className: "bg-green-500/20 text-green-400 border-green-500/30", label: "Published" },
       approved: { variant: "outline", className: "border-green-500 text-green-400", label: "Approved" },
-      pending_review: { variant: "secondary", label: "Under Review" },
+      pending_review: { variant: "secondary", className: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30", label: "Under Review" },
       rejected: { variant: "destructive", label: "Rejected" },
       draft: { variant: "outline", label: "Draft" }
     };
@@ -51,7 +51,7 @@ export const CreatorSeriesList = ({ series, onCreateSeries }) => {
       {series.map(s => (
         <Card 
           key={s.id}
-          className="p-4 hover:bg-white/5 transition-colors cursor-pointer"
+          className="p-4 hover:bg-white/5 transition-colors cursor-pointer group"
           onClick={() => navigate(`/creator/series/${s.id}`)}
           data-testid={`series-card-${s.id}`}
         >
@@ -81,6 +81,29 @@ export const CreatorSeriesList = ({ series, onCreateSeries }) => {
                   <Coins className="w-3 h-3" /> {s.total_earnings || 0}
                 </span>
               </div>
+            </div>
+            
+            {/* Quick Actions */}
+            <div className="flex flex-col justify-center gap-2">
+              {s.status !== "published" && onPublish && (
+                <Button 
+                  size="sm"
+                  className="h-8 bg-green-600 hover:bg-green-700 text-xs"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPublish(s.id);
+                  }}
+                  data-testid={`publish-btn-${s.id}`}
+                >
+                  <Globe className="w-3 h-3 mr-1" /> Publish
+                </Button>
+              )}
+              {s.status === "published" && (
+                <Badge className="bg-green-500/20 text-green-400 border-0 text-[10px]">
+                  <Globe className="w-3 h-3 mr-1" /> Live
+                </Badge>
+              )}
+              <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
             </div>
           </div>
         </Card>
