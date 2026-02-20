@@ -849,6 +849,338 @@ const InvestmentCalculatorTab = ({ token }) => {
   );
 };
 
+// Platform Settings Tab Component - Global pricing, video formats, episode settings
+const PlatformSettingsTab = ({ token }) => {
+  const [settings, setSettings] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [series, setSeries] = useState([]);
+  const [selectedSeries, setSelectedSeries] = useState(null);
+  const [seriesPricing, setSeriesPricing] = useState(null);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/platform-settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSettings(res.data);
+    } catch (e) {
+      console.error(e);
+      // Default settings
+      setSettings({
+        pricing: { default_episode_price: 5, first_episode_free: true },
+        video: { allowed_formats: ["vertical"], max_file_size_mb: 500 }
+      });
+    }
+    setLoading(false);
+  };
+
+  const fetchSeries = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/series`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSeries(res.data.series || []);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const fetchSeriesPricing = async (seriesId) => {
+    try {
+      const res = await axios.get(`${API}/admin/series/${seriesId}/pricing`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSeriesPricing(res.data);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchSettings();
+      fetchSeries();
+    }
+  }, [token]);
+
+  const saveSettings = async () => {
+    setSaving(true);
+    try {
+      await axios.put(`${API}/admin/platform-settings`, settings, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Platform settings saved!");
+    } catch (e) {
+      toast.error("Failed to save settings");
+    }
+    setSaving(false);
+  };
+
+  const saveSeriesPricing = async () => {
+    if (!selectedSeries || !seriesPricing) return;
+    setSaving(true);
+    try {
+      await axios.put(`${API}/admin/series/${selectedSeries}/pricing`, seriesPricing, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Series pricing updated!");
+      fetchSeries();
+    } catch (e) {
+      toast.error("Failed to update series pricing");
+    }
+    setSaving(false);
+  };
+
+  const applyGlobalPricing = async () => {
+    setSaving(true);
+    try {
+      const res = await axios.post(`${API}/admin/apply-global-pricing`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(res.data.message);
+    } catch (e) {
+      toast.error("Failed to apply global pricing");
+    }
+    setSaving(false);
+  };
+
+  if (loading) return <div className="flex justify-center p-8"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+
+  return (
+    <div className="space-y-6">
+      {/* Global Pricing Settings */}
+      <Card className="p-6 bg-gray-900/50 border-white/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-primary/20">
+            <Coins className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Global Pricing Settings</h3>
+            <p className="text-sm text-muted-foreground">Default pricing for all episodes</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Default Episode Price (coins)</label>
+            <Input
+              type="number"
+              min={1}
+              max={100}
+              value={settings?.pricing?.default_episode_price || 5}
+              onChange={(e) => setSettings({
+                ...settings,
+                pricing: { ...settings?.pricing, default_episode_price: parseInt(e.target.value) || 5 }
+              })}
+              className="w-32"
+            />
+            <p className="text-xs text-muted-foreground mt-1">Applied to all non-exclusive series</p>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">First Episode Free</label>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setSettings({
+                  ...settings,
+                  pricing: { ...settings?.pricing, first_episode_free: !settings?.pricing?.first_episode_free }
+                })}
+                className={`w-12 h-6 rounded-full transition-colors ${
+                  settings?.pricing?.first_episode_free ? 'bg-green-500' : 'bg-white/20'
+                }`}
+              >
+                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                  settings?.pricing?.first_episode_free ? 'translate-x-6' : 'translate-x-0.5'
+                }`} />
+              </button>
+              <span className="text-sm">{settings?.pricing?.first_episode_free ? 'Yes' : 'No'}</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">First episode of each series is free by default</p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Video Format Settings */}
+      <Card className="p-6 bg-gray-900/50 border-white/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-purple-500/20">
+            <Monitor className="w-5 h-5 text-purple-400" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Video Format Settings</h3>
+            <p className="text-sm text-muted-foreground">Control which video formats creators can upload</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <label className="text-sm font-medium block">Allowed Video Formats</label>
+          <div className="flex gap-4">
+            {["vertical", "landscape", "both"].map((format) => (
+              <button
+                key={format}
+                onClick={() => setSettings({
+                  ...settings,
+                  video: { ...settings?.video, allowed_formats: [format] }
+                })}
+                className={`px-4 py-2 rounded-lg border transition-colors ${
+                  settings?.video?.allowed_formats?.includes(format)
+                    ? 'bg-primary border-primary text-white'
+                    : 'bg-white/5 border-white/20 hover:border-white/40'
+                }`}
+              >
+                {format === "vertical" && "📱 Vertical Only"}
+                {format === "landscape" && "🖥️ Landscape Only"}
+                {format === "both" && "📱🖥️ Both Formats"}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {settings?.video?.allowed_formats?.includes("vertical") && "Creators can only upload vertical (portrait) videos"}
+            {settings?.video?.allowed_formats?.includes("landscape") && "Creators can only upload landscape (horizontal) videos"}
+            {settings?.video?.allowed_formats?.includes("both") && "Creators can upload any video format"}
+          </p>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-white/10 flex gap-3">
+          <Button onClick={saveSettings} disabled={saving}>
+            {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+            Save Global Settings
+          </Button>
+          <Button variant="outline" onClick={applyGlobalPricing} disabled={saving}>
+            Apply to All Series
+          </Button>
+        </div>
+      </Card>
+
+      {/* Per-Series Pricing Override */}
+      <Card className="p-6 bg-gray-900/50 border-white/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-yellow-500/20">
+            <Crown className="w-5 h-5 text-yellow-400" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Series Pricing Override</h3>
+            <p className="text-sm text-muted-foreground">Set custom pricing for exclusive or premium series</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Series List */}
+          <div className="space-y-3 max-h-80 overflow-y-auto">
+            <p className="text-sm font-medium text-muted-foreground">Select a series:</p>
+            {series.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => {
+                  setSelectedSeries(s.id);
+                  fetchSeriesPricing(s.id);
+                }}
+                className={`w-full p-3 rounded-lg text-left transition-colors ${
+                  selectedSeries === s.id
+                    ? 'bg-primary/20 border border-primary'
+                    : 'bg-white/5 border border-white/10 hover:border-white/30'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{s.title}</p>
+                    <p className="text-xs text-muted-foreground">{s.total_episodes || 0} episodes</p>
+                  </div>
+                  {s.is_exclusive && (
+                    <Badge className="bg-yellow-500/20 text-yellow-400">Exclusive</Badge>
+                  )}
+                  {s.custom_episode_price && (
+                    <Badge className="bg-primary/20 text-primary">{s.custom_episode_price} coins</Badge>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Pricing Editor */}
+          {seriesPricing && (
+            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+              <h4 className="font-medium mb-4">{seriesPricing.title}</h4>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Mark as Exclusive</p>
+                    <p className="text-xs text-muted-foreground">Premium series with special pricing</p>
+                  </div>
+                  <button
+                    onClick={() => setSeriesPricing({
+                      ...seriesPricing,
+                      is_exclusive: !seriesPricing.is_exclusive
+                    })}
+                    className={`w-12 h-6 rounded-full transition-colors ${
+                      seriesPricing.is_exclusive ? 'bg-yellow-500' : 'bg-white/20'
+                    }`}
+                  >
+                    <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
+                      seriesPricing.is_exclusive ? 'translate-x-6' : 'translate-x-0.5'
+                    }`} />
+                  </button>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Custom Episode Price</label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={seriesPricing.custom_episode_price || ''}
+                      placeholder={`Default: ${seriesPricing.default_price}`}
+                      onChange={(e) => setSeriesPricing({
+                        ...seriesPricing,
+                        custom_episode_price: e.target.value ? parseInt(e.target.value) : null
+                      })}
+                      className="w-32"
+                    />
+                    <span className="text-sm text-muted-foreground">coins</span>
+                    {seriesPricing.custom_episode_price && (
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => setSeriesPricing({ ...seriesPricing, custom_episode_price: null })}
+                      >
+                        Reset to default
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">First Episode Free Override</label>
+                  <select
+                    value={seriesPricing.first_episode_free_override === null ? 'default' : seriesPricing.first_episode_free_override ? 'true' : 'false'}
+                    onChange={(e) => setSeriesPricing({
+                      ...seriesPricing,
+                      first_episode_free_override: e.target.value === 'default' ? null : e.target.value === 'true'
+                    })}
+                    className="w-full p-2 rounded-lg bg-secondary/50 border border-white/10"
+                  >
+                    <option value="default">Use global setting ({settings?.pricing?.first_episode_free ? 'Free' : 'Paid'})</option>
+                    <option value="true">Always Free</option>
+                    <option value="false">Not Free (Paid)</option>
+                  </select>
+                </div>
+
+                <Button onClick={saveSeriesPricing} disabled={saving} className="w-full mt-4">
+                  {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Save Series Pricing
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </Card>
+    </div>
+  );
+};
+
 // Revenue Settings Tab Component - Manage expenses, creator tiers, payouts
 const RevenueSettingsTab = ({ token }) => {
   const [settings, setSettings] = useState(null);
