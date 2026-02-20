@@ -44,18 +44,24 @@ const SUBTITLE_LANGUAGES = [
 ];
 
 // ============ HLS VIDEO PLAYER COMPONENT ============
-const HlsVideoPlayer = ({ src, poster }) => {
+const HlsVideoPlayer = ({ src, poster, embedUrl }) => {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const [error, setError] = useState(null);
+  const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
+    // Reset state when src changes
+    setError(null);
+    setUseFallback(false);
+    
     const video = videoRef.current;
-    if (!video || !src) return;
+    if (!video || !src || useFallback) return;
 
     // Clean up previous HLS instance
     if (hlsRef.current) {
       hlsRef.current.destroy();
+      hlsRef.current = null;
     }
 
     if (Hls.isSupported()) {
@@ -76,8 +82,13 @@ const HlsVideoPlayer = ({ src, poster }) => {
       
       hls.on(Hls.Events.ERROR, (event, data) => {
         if (data.fatal) {
-          setError("Failed to load video. Please try again.");
-          console.error("HLS error:", data);
+          console.warn("HLS error, falling back to embed player:", data);
+          // Fall back to Bunny.net embed player
+          if (embedUrl) {
+            setUseFallback(true);
+          } else {
+            setError("Failed to load video. Please try again.");
+          }
         }
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
@@ -86,16 +97,44 @@ const HlsVideoPlayer = ({ src, poster }) => {
       video.addEventListener('loadedmetadata', () => {
         video.play().catch(() => {});
       });
+      video.addEventListener('error', () => {
+        if (embedUrl) {
+          setUseFallback(true);
+        } else {
+          setError("Failed to load video.");
+        }
+      });
     } else {
-      setError("Your browser does not support HLS video playback.");
+      // No HLS support, use fallback
+      if (embedUrl) {
+        setUseFallback(true);
+      } else {
+        setError("Your browser does not support video playback.");
+      }
     }
 
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
+        hlsRef.current = null;
       }
     };
-  }, [src]);
+  }, [src, embedUrl, useFallback]);
+
+  // Show Bunny.net embed player as fallback
+  if (useFallback && embedUrl) {
+    return (
+      <div className="w-full h-full">
+        <iframe
+          src={embedUrl}
+          className="w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          title="Video Preview"
+        />
+      </div>
+    );
+  }
 
   if (error) {
     return (
