@@ -122,7 +122,8 @@ const NotificationsManagementTab = ({ token }) => {
   const toggleTrigger = async (triggerId, enabled) => {
     try {
       await axios.put(`${API}/notifications/admin/triggers/${triggerId}`, {
-        enabled: enabled
+        enabled: enabled,
+        config: {}
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
