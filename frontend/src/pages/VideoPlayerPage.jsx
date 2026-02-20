@@ -434,7 +434,8 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     // If using embed fallback, skip HLS initialization
     if (useEmbedFallback) return;
     
-    if (!video || !videoUrl) return;
+    // Wait for video element to be mounted before initializing HLS
+    if (!video || !videoUrl || !videoMounted) return;
     
     // Reset error state on new video
     setVideoError(null);
