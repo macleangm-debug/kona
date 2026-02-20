@@ -357,6 +357,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
 
   // Volume state (starts muted to allow autoplay)
   const [isMuted, setIsMuted] = useState(true);
+  
+  // HLS instance ref
+  const hlsRef = useRef(null);
 
   // Gesture Control states
   const [lastTapTime, setLastTapTime] = useState(0);
