@@ -347,7 +347,7 @@ class TestFirstEpisodeFreeEnforcement:
         # Get current global setting
         global_settings = requests.get(
             f"{BASE_URL}/api/admin/platform-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         first_ep_free = global_settings.get("pricing", {}).get("first_episode_free", True)
@@ -355,7 +355,7 @@ class TestFirstEpisodeFreeEnforcement:
         # Verify creator settings reflect this
         creator_settings = requests.get(
             f"{BASE_URL}/api/creator/upload-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         assert creator_settings["pricing"]["first_episode_free"] == first_ep_free
