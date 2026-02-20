@@ -306,12 +306,15 @@ const DroppableSeason = ({
       data-testid={`season-${seasonNum}`}
     >
       {/* Season Header */}
-      <div
-        onClick={() => onToggleSeason(seasonNum)}
-        className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer"
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && onToggleSeason(seasonNum)}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          onToggleSeason(seasonNum);
+        }}
+        className="w-full p-4 flex items-center justify-between hover:bg-white/5 transition-colors cursor-pointer text-left"
+        data-testid={`season-header-${seasonNum}`}
       >
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg ${isExpanded ? 'bg-primary/20' : 'bg-white/5'}`}>
