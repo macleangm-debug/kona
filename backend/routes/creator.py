@@ -1418,6 +1418,9 @@ async def create_episode_for_series(
     if bunny_result["success"]:
         bunny_video_id = bunny_result["video_id"]
     
+    # Get admin-controlled pricing for this episode
+    is_free, coins_required = await get_episode_pricing(series_id, episode_number, data.season_number)
+    
     episode = {
         "id": episode_id,
         "series_id": series_id,
@@ -1433,9 +1436,9 @@ async def create_episode_for_series(
         "encoding_status": "pending",
         "duration": None,
         "thumbnail": None,
-        "is_free": data.is_free or (data.season_number == 1 and episode_number == 1),
+        "is_free": is_free,  # Determined by admin settings
         "is_pilot": data.season_number == 1 and episode_number == 1,
-        "coins_required": 0 if (data.is_free or (data.season_number == 1 and episode_number == 1)) else data.coins_required,
+        "coins_required": coins_required,  # Determined by admin settings
         "intro_duration": data.intro_duration,
         "is_story_content": data.season_number == 1 and episode_number == 1,
         "requires_vertical": data.season_number == 1 and episode_number == 1,
