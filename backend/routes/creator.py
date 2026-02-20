@@ -1634,6 +1634,56 @@ async def get_episode_status(episode_id: str, user: dict = Depends(get_current_u
     return {"episode_id": episode_id, "status": episode.get("encoding_status", "unknown")}
 
 
+@router.get("/episodes/{episode_id}/preview")
+async def get_episode_preview(episode_id: str, user: dict = Depends(get_current_user)):
+    """Get preview/streaming URL for creator to watch their own episode"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    episode = await db.creator_episodes.find_one({"id": episode_id, "creator_id": creator["id"]})
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    if not episode.get("bunny_video_id"):
+        raise HTTPException(status_code=400, detail="No video uploaded yet")
+    
+    # Check encoding status
+    if episode.get("encoding_status") not in ["ready", "encoding"]:
+        # Refresh status from Bunny.net
+        bunny_status = await bunny_service.get_video_status(episode["bunny_video_id"])
+        if bunny_status["success"]:
+            await db.creator_episodes.update_one(
+                {"id": episode_id},
+                {"$set": {
+                    "encoding_status": bunny_status["status"],
+                    "duration": bunny_status.get("duration"),
+                    "thumbnail": bunny_status.get("thumbnail_url")
+                }}
+            )
+            if bunny_status["status"] == "pending":
+                raise HTTPException(status_code=400, detail="Video is still being processed. Please wait...")
+    
+    # Get streaming URL from Bunny.net
+    video_url = bunny_service.get_direct_play_url(episode["bunny_video_id"])
+    
+    # Get HLS manifest URL if available
+    hls_url = bunny_service.get_hls_url(episode["bunny_video_id"])
+    
+    return {
+        "episode_id": episode_id,
+        "title": episode.get("title"),
+        "episode_code": episode.get("episode_code"),
+        "video_url": video_url,
+        "hls_url": hls_url,
+        "thumbnail": episode.get("thumbnail"),
+        "duration": episode.get("duration"),
+        "encoding_status": episode.get("encoding_status"),
+        "can_preview": episode.get("encoding_status") == "ready"
+    }
+
+
 @router.patch("/episodes/{episode_id}")
 async def update_episode(
     episode_id: str, 
