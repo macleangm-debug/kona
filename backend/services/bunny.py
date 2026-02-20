@@ -187,7 +187,7 @@ class BunnyStreamService:
                     "error": error_data.get("Message", response.text),
                     "status_code": response.status_code
                 }
-            except:
+            except Exception:
                 return {"success": False, "error": response.text, "status_code": response.status_code}
     
     async def get_allowed_referrers(self) -> dict:
