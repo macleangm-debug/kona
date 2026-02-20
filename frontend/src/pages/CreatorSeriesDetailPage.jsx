@@ -162,7 +162,7 @@ const HlsVideoPlayer = memo(({ src, poster, embedUrl }) => {
 };
 
 // ============ UPLOAD PROGRESS PANEL COMPONENT ============
-const UploadProgressPanel = ({ uploads, onDismiss }) => {
+const UploadProgressPanel = memo(({ uploads, onDismiss }) => {
   if (!uploads || uploads.length === 0) return null;
   
   const activeUploads = uploads.filter(u => !u.dismissed);
