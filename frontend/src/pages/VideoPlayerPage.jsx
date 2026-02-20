@@ -433,10 +433,21 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   useEffect(() => {
     const video = videoRef.current;
     const videoUrl = episode?.video_url;
+    const mp4Url = episode?.mp4_url;
     const embedUrl = episode?.embed_url;
     
     // If using embed fallback, skip HLS initialization
     if (useEmbedFallback) return;
+    
+    // If using MP4 fallback, set the video source directly
+    if (useMp4Fallback && mp4Url) {
+      console.log("Using MP4 fallback:", mp4Url);
+      if (video) {
+        video.src = mp4Url;
+        video.load();
+      }
+      return;
+    }
     
     // Wait for video element to be mounted before initializing HLS
     if (!video || !videoUrl || !videoMounted) return;
@@ -456,6 +467,27 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     // Track recovery attempts to avoid infinite loops
     let mediaRecoveryAttempts = 0;
     const MAX_RECOVERY_ATTEMPTS = 1;
+    
+    // Helper function to fallback to MP4 or embed
+    const handleFallback = (errorType) => {
+      console.warn(`HLS ${errorType}, attempting fallback...`);
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+      
+      // First try MP4 fallback (most compatible)
+      if (mp4Url) {
+        console.log("Falling back to MP4:", mp4Url);
+        setUseMp4Fallback(true);
+      } else if (embedUrl) {
+        // If no MP4, try embed player
+        console.log("Falling back to embed player");
+        setUseEmbedFallback(true);
+      } else {
+        setVideoError("Video format not supported. Please try a different browser.");
+      }
+    };
     
     if (isHlsUrl && Hls.isSupported()) {
       // Use HLS.js for browsers that don't support HLS natively
@@ -487,14 +519,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         ];
         
         if (unrecoverableErrors.includes(data.details)) {
-          console.warn("Unrecoverable HLS error, switching to embed fallback:", data.details);
-          if (embedUrl) {
-            hls.destroy();
-            hlsRef.current = null;
-            setUseEmbedFallback(true);
-          } else {
-            setVideoError("Video format not supported. Please try a different browser.");
-          }
+          handleFallback(data.details);
           return;
         }
         
@@ -512,27 +537,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
                 console.log("Attempting HLS media recovery, attempt:", mediaRecoveryAttempts);
                 hls.recoverMediaError();
               } else {
-                // Recovery failed, fall back to embed player
-                console.warn("HLS media recovery failed, falling back to embed player");
-                if (embedUrl) {
-                  hls.destroy();
-                  hlsRef.current = null;
-                  setUseEmbedFallback(true);
-                } else {
-                  setVideoError("Failed to load video. Please try again.");
-                }
+                handleFallback("media recovery failed");
               }
               break;
             default:
-              // For other errors, use embed fallback
-              console.warn("HLS error, attempting fallback to embed player:", data.details);
-              if (embedUrl) {
-                hls.destroy();
-                hlsRef.current = null;
-                setUseEmbedFallback(true);
-              } else {
-                setVideoError("Failed to load video. Please try again.");
-              }
+              handleFallback(data.details);
               break;
           }
         }
@@ -541,7 +550,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       // Safari native HLS support
       video.src = videoUrl;
       video.addEventListener('error', () => {
-        if (embedUrl) {
+        if (mp4Url) {
+          setUseMp4Fallback(true);
+        } else if (embedUrl) {
           setUseEmbedFallback(true);
         } else {
           setVideoError("Failed to load video.");
@@ -558,7 +569,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         hlsRef.current = null;
       }
     };
-  }, [episode?.video_url, episode?.embed_url, useEmbedFallback, videoMounted]);
+  }, [episode?.video_url, episode?.mp4_url, episode?.embed_url, useEmbedFallback, useMp4Fallback, videoMounted]);
 
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
