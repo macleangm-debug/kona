@@ -498,6 +498,8 @@ export const HomePageResponsive = ({ onAuthClick }) => {
   const { t } = useTranslation();
   const [series, setSeries] = useState([]);
   const [featured, setFeatured] = useState([]);
+  const [forYou, setForYou] = useState([]);
+  const [forYouLoading, setForYouLoading] = useState(false);
   const [continueWatching, setContinueWatching] = useState([]);
   const [myList, setMyList] = useState([]);
   const [comingSoon, setComingSoon] = useState([]);
