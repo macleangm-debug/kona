@@ -157,6 +157,17 @@ class BunnyStreamService:
         """Get direct HLS playlist URL (for custom players)"""
         return f"https://{self.cdn_hostname}/{video_id}/playlist.m3u8"
     
+    def get_mp4_fallback_url(self, video_id: str, resolution: str = "720p") -> str:
+        """
+        Get direct MP4 URL for browsers that don't support HLS.
+        This is the fallback that ensures videos always play.
+        
+        Args:
+            video_id: Bunny.net video ID
+            resolution: Video quality (240p, 360p, 480p, 720p, 1080p)
+        """
+        return f"https://{self.cdn_hostname}/{video_id}/play_{resolution}.mp4"
+    
     def get_thumbnail_url(self, video_id: str) -> str:
         """Get thumbnail URL for a video"""
         return f"https://{self.cdn_hostname}/{video_id}/thumbnail.jpg"
