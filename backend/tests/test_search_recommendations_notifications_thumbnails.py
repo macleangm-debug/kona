@@ -302,7 +302,7 @@ class TestThumbnailABTesting:
         
         series_id = series_response.json()[0].get("id")
         
-        response = requests.get(f"{BASE_URL}/api/thumbnail-testing/series/{series_id}/thumbnail")
+        response = requests.get(f"{BASE_URL}/api/thumbnail-testing/series/{series_id}/thumbnail", headers=COMMON_HEADERS)
         
         assert response.status_code == 200
         data = response.json()
@@ -311,7 +311,7 @@ class TestThumbnailABTesting:
     
     def test_05_admin_all_requires_auth(self):
         """Test that admin/all requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/thumbnail-testing/admin/all")
+        response = requests.get(f"{BASE_URL}/api/thumbnail-testing/admin/all", headers=COMMON_HEADERS)
         
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
 
