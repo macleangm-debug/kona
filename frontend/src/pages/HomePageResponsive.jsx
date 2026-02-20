@@ -744,6 +744,37 @@ export const HomePageResponsive = ({ onAuthClick }) => {
           />
         )}
 
+        {/* For You - Personalized Recommendations */}
+        {user && forYou.length > 0 && (
+          <div className="mb-8 lg:mb-12" data-testid="for-you-section">
+            <div className="flex items-center gap-2 mb-3 lg:mb-4 px-4 lg:px-12">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <h2 className="font-heading text-base lg:text-xl font-semibold">For You</h2>
+            </div>
+            <div className="relative">
+              <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
+                {forYouLoading ? (
+                  <div className="flex items-center justify-center w-full py-8">
+                    <div className="animate-pulse text-muted-foreground text-sm">Loading recommendations...</div>
+                  </div>
+                ) : (
+                  forYou.map((s, index) => (
+                    <LazySeriesCardDesktop
+                      key={s.id}
+                      series={s}
+                      badge={index === 0 ? "hot" : index < 3 ? "top" : null}
+                      onClick={() => navigate(`/series/${s.id}`)}
+                      inMyList={myList?.includes(s.id)}
+                      onAddToList={handleAddToList}
+                      onRemoveFromList={handleRemoveFromList}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Trending Now */}
         <ContentRow
           title={`${t('home.trending')} 🔥`}
