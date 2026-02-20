@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, Eye, Bookmark, BookmarkCheck } from "lucide-react";
+import { Star, Eye, Bookmark, BookmarkCheck, Crown } from "lucide-react";
 
 export const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList = false, onAddToList, onRemoveFromList }) => {
   const formatViews = (views) => {
@@ -17,6 +17,9 @@ export const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList 
     }
   };
 
+  // Check if series is exclusive/premium
+  const isExclusive = series.is_exclusive || series.custom_episode_price;
+
   return (
     <div
       onClick={onClick}
@@ -32,8 +35,16 @@ export const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList 
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         
-        {/* Badge - Hot/New/Top */}
-        {badge && (
+        {/* Exclusive Badge - Premium content indicator */}
+        {isExclusive && (
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded bg-gradient-to-r from-amber-500 to-yellow-500 text-black text-[10px] font-bold uppercase shadow-lg">
+            <Crown className="w-3 h-3" />
+            <span>Exclusive</span>
+          </div>
+        )}
+        
+        {/* Badge - Hot/New/Top (only show if not exclusive) */}
+        {badge && !isExclusive && (
           <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
             badge === "hot" ? "bg-red-500" :
             badge === "new" ? "bg-green-500" :
@@ -84,7 +95,11 @@ export const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList 
       <h3 className="font-medium text-sm line-clamp-1 mb-0.5">{series.title}</h3>
       <div className="flex items-center gap-1.5 text-[11px]">
         <span className="text-muted-foreground">{series.genre}</span>
-        <span className="text-green-400 font-medium">• Free EP1</span>
+        {isExclusive ? (
+          <span className="text-amber-400 font-medium">• Premium</span>
+        ) : (
+          <span className="text-green-400 font-medium">• Free EP1</span>
+        )}
       </div>
     </div>
   );
