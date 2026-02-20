@@ -434,7 +434,7 @@ class TestAdminNotificationManagement:
     
     def test_08_admin_stats_requires_auth(self):
         """Test that admin stats requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/notifications/admin/stats")
+        response = requests.get(f"{BASE_URL}/api/notifications/admin/stats", headers=COMMON_HEADERS)
         
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
 
