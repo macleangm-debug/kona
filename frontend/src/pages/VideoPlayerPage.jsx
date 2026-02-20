@@ -312,6 +312,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [bufferingCount, setBufferingCount] = useState(0);
   const videoRef = useRef(null);
   
+  // Track when video element is mounted (to fix race condition in HLS init)
+  const [videoMounted, setVideoMounted] = useState(false);
+  
   // Mini-player states
   const [isMiniPlayer, setIsMiniPlayer] = useState(false);
   const [touchStartY, setTouchStartY] = useState(0);
