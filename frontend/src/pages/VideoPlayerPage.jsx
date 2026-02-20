@@ -242,7 +242,6 @@ const MiniPlayer = ({ episode, series, currentTime, duration, isPlaying, onExpan
         <div className="relative w-32 h-20 flex-shrink-0 bg-black" onClick={onExpand}>
           <video
             ref={videoRef}
-            src={episode?.video_url}
             className="w-full h-full object-cover"
             muted
           />
