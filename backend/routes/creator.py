@@ -1228,20 +1228,12 @@ async def publish_series_to_main(series_id: str, creator_id: str):
         upsert=True
     )
     
-    # Add episodes to main episodes
-    # Include episodes that are "ready" OR have a direct video_url
+    # Add episodes to main episodes - ONLY Bunny.net videos that are ready
     published_count = 0
     for ep in episodes:
-        # Publish if: encoding is ready, OR episode has a direct video URL
-        is_ready = ep.get("encoding_status") == "ready"
-        has_video_url = bool(ep.get("video_url"))
-        
-        if is_ready or has_video_url:
-            # Determine the video URL
-            if ep.get("bunny_video_id"):
-                video_url = bunny_service.get_direct_play_url(ep["bunny_video_id"])
-            else:
-                video_url = ep.get("video_url", "")
+        # Only publish episodes that have been fully processed by Bunny.net
+        if ep.get("encoding_status") == "ready" and ep.get("bunny_video_id"):
+            video_url = bunny_service.get_direct_play_url(ep["bunny_video_id"])
             
             main_episode = {
                 "id": ep["id"],
