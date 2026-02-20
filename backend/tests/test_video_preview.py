@@ -105,9 +105,9 @@ class TestVideoPreview:
         # Should return 404 for non-existent episode
         assert response.status_code == 404, f"Should return 404 for non-existent episode: {response.text}"
     
-    def test_preview_returns_duration(self, auth_token):
+    def test_preview_returns_duration(self, session, auth_token):
         """Test that preview returns video duration"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/cs-8e6c36c6e4-s01e01/preview",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
