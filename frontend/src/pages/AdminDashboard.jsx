@@ -2862,6 +2862,7 @@ export const AdminDashboard = () => {
     { id: "revenue", label: "Revenue", icon: DollarSign, section: "core" },
     { id: "creators", label: "Creators", icon: Crown, section: "core" },
     { id: "ads", label: "Ads Approval", icon: Megaphone, section: "core" },
+    { id: "notifications", label: "Notifications", icon: Bell, section: "core" },
     // HR & Content Management
     { id: "hr-applications", label: "Job Applications", icon: Briefcase, section: "hr" },
     { id: "press-articles", label: "Press & News", icon: Newspaper, section: "content-mgmt" },
@@ -2873,6 +2874,7 @@ export const AdminDashboard = () => {
       { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard, section: "super" },
       { id: "exchange-rates", label: "Exchange Rates", icon: Globe, section: "super" },
       { id: "ab-testing", label: "A/B Testing", icon: FlaskConical, section: "super" },
+      { id: "thumbnail-testing", label: "Thumbnail A/B", icon: ImageIcon, section: "super" },
       { id: "investment", label: "Investment Calculator", icon: Calculator, section: "super" },
       { id: "infrastructure", label: "Infrastructure Calculator", icon: Server, section: "super" },
       { id: "docs", label: "Docs & System", icon: FileText, section: "super" }
