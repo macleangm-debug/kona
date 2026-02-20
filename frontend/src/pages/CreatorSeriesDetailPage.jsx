@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Hls from "hls.js";
 import { 
   ChevronLeft, Clock, Film, Eye, Coins, Loader2, 
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
