@@ -1530,7 +1530,6 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         <video
           id="main-video"
           ref={videoRef}
-          src={episode.video_url}
           autoPlay
           muted
           playsInline
