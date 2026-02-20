@@ -2535,6 +2535,7 @@ export const AdminDashboard = () => {
     { id: "press-articles", label: "Press & News", icon: Newspaper, section: "content-mgmt" },
     { id: "support", label: "Support Tickets", icon: Ticket, section: "support" },
     ...(user?.is_super_admin ? [
+      { id: "platform-settings", label: "Platform Settings", icon: Settings2, section: "super" },
       { id: "checklist", label: "Launch Checklist", icon: Check, section: "super" },
       { id: "seeding", label: "Engagement Seeding", icon: Sparkles, section: "super" },
       { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard, section: "super" },
