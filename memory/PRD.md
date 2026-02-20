@@ -305,14 +305,54 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - **Modified:** `backend/server.py` - auto-configure referrers on startup
   - **Note:** Video still shows black screen due to source video codec issue (needs re-encoding on Bunny.net)
 
+### Session 7 (2026-02-20) - Session Stability & Creator Portal Performance
+
+1. **New Releases Sorting Fix (VERIFIED)**
+   - Backend now sorts series by `created_at` descending (newest first)
+   - API returns "Implementation Success" as first series (confirmed)
+   - Frontend displays series in correct order from API
+   - Added `created_at` field to SeriesResponse schema for client verification
+   - **Modified:** `backend/routes/series.py` (line 27: `.sort("created_at", -1)`)
+   - **Modified:** `backend/models/schemas.py` (added `created_at` to SeriesResponse)
+
+2. **Session Stability Enhancement**
+   - Added JWT token expiration check (`isTokenExpired` function)
+   - Debounced user fetch to prevent race conditions
+   - Improved 401 error handling - only logout on auth-specific endpoints
+   - Added `logoutInProgress` ref to prevent duplicate logout calls
+   - Added periodic token validity check (every 5 minutes)
+   - Added `clearAuthError` function for components
+   - Added `isAuthenticated` convenience boolean
+   - **Modified:** `frontend/src/contexts/AuthContext.jsx`
+
+3. **Episode Count Auto-Update Fix**
+   - When episodes are created for already-published series, the main `series` collection now updates
+   - Cache invalidation triggers when episode count changes
+   - **Modified:** `backend/routes/creator.py` (both episode creation endpoints)
+
+4. **Creator Portal Performance Optimization**
+   - Memoized all sub-components with React.memo:
+     - HlsVideoPlayer
+     - UploadProgressPanel
+     - DraggableEpisodeCard
+     - DroppableSeason
+     - SeasonAccordion
+   - Added useCallback to key handlers (toggleSeason, dismissUpload)
+   - Prevents unnecessary re-renders when parent state changes
+   - **Modified:** `frontend/src/pages/CreatorSeriesDetailPage.jsx`
+
 ### P1 (High)
-- [ ] **Fix Unstable Session Management** - Users experience frequent unexpected logouts
-  - Investigate token storage and JWT expiration handling in `App.jsx`
-  - Check auth token refresh logic
+- [x] **Fix Unstable Session Management** - COMPLETED
+  - Added token expiration checks and improved 401 handling
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
 - [ ] Real SMS provider for OTP (Africa's Talking)
 - [ ] Video encoding/CDN integration (Bunny.net already configured)
 - [ ] Creator payout automation UI in frontend
+- [ ] **Enforce Admin Platform Settings** - Connect admin settings to creator upload flow
+
+### P2 (Medium)
+- [ ] Per-series exclusive pricing implementation
+- [ ] Full regression test after high-priority fixes
 
 ### P3 (Low)
 - [ ] Analytics export (CSV/PDF)
