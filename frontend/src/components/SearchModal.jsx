@@ -1,24 +1,64 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, X, ChevronLeft, Loader2 } from "lucide-react";
+import { Search, X, ChevronLeft, Loader2, TrendingUp, Clock, Sparkles } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import axios from "axios";
 import { API } from "@/config";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const SearchModal = ({ open, onClose }) => {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
+  const [trendingSearches, setTrendingSearches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recentSearches, setRecentSearches] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const navigate = useNavigate();
+  const { token } = useAuth();
 
+  // Load recent searches and trending on mount
   useEffect(() => {
     const saved = localStorage.getItem("kona-recent-searches");
     if (saved) setRecentSearches(JSON.parse(saved));
-  }, []);
+    
+    // Fetch trending searches
+    const fetchTrending = async () => {
+      try {
+        const res = await axios.get(`${API}/search/trending`);
+        setTrendingSearches(res.data.trending || []);
+      } catch (e) {
+        console.error("Error fetching trending:", e);
+      }
+    };
+    if (open) fetchTrending();
+  }, [open]);
 
+  // Fetch auto-complete suggestions
+  useEffect(() => {
+    if (!query.trim() || query.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const fetchSuggestions = async () => {
+      try {
+        const res = await axios.get(`${API}/search/suggestions?q=${encodeURIComponent(query)}`);
+        setSuggestions(res.data.suggestions || []);
+        setShowSuggestions(true);
+      } catch (e) {
+        console.error("Error fetching suggestions:", e);
+      }
+    };
+
+    const debounce = setTimeout(fetchSuggestions, 150);
+    return () => clearTimeout(debounce);
+  }, [query]);
+
+  // Full search with filters
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -28,17 +68,24 @@ export const SearchModal = ({ open, onClose }) => {
     const search = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API}/search?q=${encodeURIComponent(query)}`);
-        setResults(res.data);
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`${API}/search?q=${encodeURIComponent(query)}`, { headers });
+        setResults(res.data.results || res.data || []);
+        setShowSuggestions(false);
       } catch (e) {
         console.error(e);
       }
       setLoading(false);
     };
 
-    const debounce = setTimeout(search, 300);
+    const debounce = setTimeout(search, 400);
     return () => clearTimeout(debounce);
-  }, [query]);
+  }, [query, token]);
+
+  const handleSuggestionClick = useCallback((suggestion) => {
+    setQuery(suggestion);
+    setShowSuggestions(false);
+  }, []);
 
   const handleSelect = (series) => {
     const updated = [series.title, ...recentSearches.filter(s => s !== series.title)].slice(0, 5);
