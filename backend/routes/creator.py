@@ -1304,7 +1304,7 @@ async def publish_series_to_main(series_id: str, creator_id: str):
     series = await db.creator_series.find_one({"id": series_id}, {"_id": 0})
     episodes = await db.creator_episodes.find({"series_id": series_id}, {"_id": 0}).to_list(100)
     
-    # Add to main series
+    # Add to main series (include created_at for sorting)
     main_series = {
         "id": series_id,
         "title": series["title"],
@@ -1315,7 +1315,8 @@ async def publish_series_to_main(series_id: str, creator_id: str):
         "total_episodes": len(episodes),
         "views": 0,
         "featured": False,
-        "creator_id": creator_id
+        "creator_id": creator_id,
+        "created_at": series.get("created_at", datetime.now(timezone.utc).isoformat())
     }
     
     await db.series.update_one(
@@ -1325,11 +1326,19 @@ async def publish_series_to_main(series_id: str, creator_id: str):
     )
     
     # Add episodes to main episodes - ONLY Bunny.net videos that are ready
+    # Apply admin pricing settings when publishing
     published_count = 0
     for ep in episodes:
         # Only publish episodes that have been fully processed by Bunny.net
         if ep.get("encoding_status") == "ready" and ep.get("bunny_video_id"):
             video_url = bunny_service.get_direct_play_url(ep["bunny_video_id"])
+            
+            # Get admin-controlled pricing for this episode
+            is_free, coins_required = await get_episode_pricing(
+                series_id, 
+                ep.get("episode_number", 1), 
+                ep.get("season_number", 1)
+            )
             
             main_episode = {
                 "id": ep["id"],
@@ -1340,8 +1349,8 @@ async def publish_series_to_main(series_id: str, creator_id: str):
                 "duration": f"{(ep.get('duration', 120) // 60)}:{str(ep.get('duration', 0) % 60).zfill(2)}",
                 "video_url": video_url,
                 "bunny_video_id": ep.get("bunny_video_id"),
-                "is_free": ep.get("is_free", False),
-                "coins_required": ep.get("coins_required", 5),
+                "is_free": is_free,  # Apply admin pricing
+                "coins_required": coins_required,  # Apply admin pricing
                 "intro_duration": ep.get("intro_duration", 30),
                 "creator_id": creator_id
             }
