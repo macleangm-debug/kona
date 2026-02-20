@@ -1438,7 +1438,7 @@ export const CreatorSeriesDetailPage = () => {
             <Button 
               className="w-full bg-green-600 hover:bg-green-700"
               onClick={handlePublishSeries}
-              disabled={publishing || episodes.length === 0}
+              disabled={publishing}
               data-testid="publish-series-btn"
             >
               {publishing ? (
