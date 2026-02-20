@@ -121,6 +121,21 @@ export const CreatorPortal = () => {
     }
   }, [token, navigate]);
 
+  // Handle quick publish from series list
+  const handlePublishSeries = useCallback(async (seriesId) => {
+    try {
+      const res = await axios.post(
+        `${API}/creator/series/${seriesId}/publish`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
+      toast.success(res.data.message);
+      fetchCreatorData(); // Refresh to update status
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to publish series");
+    }
+  }, [token]);
+
   // Loading state
   if (loading) {
     return <PageLoader message="Loading creator portal..." />;
