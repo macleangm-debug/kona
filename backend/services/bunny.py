@@ -207,11 +207,18 @@ class BunnyStreamService:
     
     async def get_allowed_referrers(self) -> dict:
         """Get the current list of allowed referrer domains"""
+        if not self.account_api_key:
+            return {
+                "success": False, 
+                "error": "BUNNY_ACCOUNT_API_KEY not configured",
+                "needs_config": True
+            }
+        
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"https://api.bunny.net/videolibrary/{self.library_id}",
                 headers={
-                    "AccessKey": self.api_key,
+                    "AccessKey": self.account_api_key,  # Use account API key
                     "Accept": "application/json"
                 }
             )
