@@ -703,6 +703,86 @@ async def get_notification_campaigns(
     return {"campaigns": campaigns}
 
 
+@router.post("/admin/broadcast")
+async def broadcast_notification(
+    title: str,
+    message: str,
+    type: str = "info",
+    segment: str = "all",
+    action_url: str = None,
+    priority: str = "normal",
+    user: dict = Depends(require_admin)
+):
+    """
+    Simple broadcast notification to user segments.
+    Segments: all, vip, creators, inactive, new, high_spenders
+    """
+    # Build target query based on segment
+    segment_queries = {
+        "all": {},
+        "vip": {"vip_status": True},
+        "creators": {"is_creator": True},
+        "inactive": {"last_active": {"$lt": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()}},
+        "new": {"created_at": {"$gte": (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()}},
+        "high_spenders": {"total_coins_spent": {"$gte": 100}}
+    }
+    
+    query = segment_queries.get(segment, {})
+    target_users = await db.users.find(query, {"_id": 0}).to_list(10000)
+    
+    if not target_users:
+        raise HTTPException(status_code=400, detail=f"No users in segment: {segment}")
+    
+    batch_id = f"broadcast-{uuid.uuid4().hex[:8]}"
+    
+    # Log the broadcast
+    campaign = {
+        "id": batch_id,
+        "title": title,
+        "message": message,
+        "type": type,
+        "segment": segment,
+        "recipients_count": len(target_users),
+        "priority": priority,
+        "action_url": action_url,
+        "sent_by": user["id"],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.notification_campaigns.insert_one(campaign)
+    
+    # Send notifications
+    sent_count = await send_bulk_notifications(
+        users=target_users,
+        title=title,
+        message=message,
+        notification_type=type,
+        priority=priority,
+        action_url=action_url,
+        batch_id=batch_id
+    )
+    
+    return {
+        "message": f"Notification sent to {sent_count} users",
+        "recipients_count": sent_count,
+        "segment": segment,
+        "batch_id": batch_id
+    }
+
+
+@router.get("/admin/recent")
+async def get_recent_notifications(
+    user: dict = Depends(require_admin),
+    limit: int = 10
+):
+    """Get recently sent notification campaigns"""
+    notifications = await db.notification_campaigns.find(
+        {},
+        {"_id": 0}
+    ).sort("created_at", -1).limit(limit).to_list(limit)
+    
+    return {"notifications": notifications}
+
+
 @router.delete("/admin/campaigns/{campaign_id}")
 async def delete_campaign(campaign_id: str, user: dict = Depends(require_admin)):
     """Delete a notification campaign"""
