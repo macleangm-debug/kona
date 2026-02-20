@@ -155,6 +155,61 @@ class BunnyStreamService:
     def get_thumbnail_url(self, video_id: str) -> str:
         """Get thumbnail URL for a video"""
         return f"https://{self.cdn_hostname}/{video_id}/thumbnail.jpg"
+    
+    async def add_allowed_referrer(self, hostname: str) -> dict:
+        """
+        Add a domain to the allowed referrers list for embed player access.
+        This is required for the embed player to work on a specific domain.
+        Uses the Bunny.net Core API (not Stream API).
+        
+        Args:
+            hostname: Domain to allow (e.g., "example.com" or "*.example.com")
+                     Do not include http/https or paths
+        """
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                f"https://api.bunny.net/videolibrary/{self.library_id}/addAllowedReferrer",
+                headers={
+                    "AccessKey": self.api_key,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                json={"Hostname": hostname}
+            )
+            
+            if response.status_code in [200, 204]:
+                return {"success": True, "message": f"Added {hostname} to allowed referrers"}
+            
+            try:
+                error_data = response.json()
+                return {
+                    "success": False, 
+                    "error": error_data.get("Message", response.text),
+                    "status_code": response.status_code
+                }
+            except:
+                return {"success": False, "error": response.text, "status_code": response.status_code}
+    
+    async def get_allowed_referrers(self) -> dict:
+        """Get the current list of allowed referrer domains"""
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"https://api.bunny.net/videolibrary/{self.library_id}",
+                headers={
+                    "AccessKey": self.api_key,
+                    "Accept": "application/json"
+                }
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "success": True,
+                    "allowed_referrers": data.get("AllowedReferrers", []),
+                    "block_none_referrer": data.get("BlockNoneReferrer", False)
+                }
+            
+            return {"success": False, "error": response.text}
 
 
 # Singleton instance
