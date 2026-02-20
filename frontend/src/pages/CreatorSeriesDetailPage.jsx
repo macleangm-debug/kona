@@ -43,6 +43,82 @@ const SUBTITLE_LANGUAGES = [
   { code: "fr", name: "French" }
 ];
 
+// ============ HLS VIDEO PLAYER COMPONENT ============
+const HlsVideoPlayer = ({ src, poster }) => {
+  const videoRef = useRef(null);
+  const hlsRef = useRef(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !src) return;
+
+    // Clean up previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+    }
+
+    if (Hls.isSupported()) {
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: true,
+      });
+      hlsRef.current = hls;
+      
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play().catch(() => {
+          // Autoplay was prevented, user needs to click play
+        });
+      });
+      
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          setError("Failed to load video. Please try again.");
+          console.error("HLS error:", data);
+        }
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS support
+      video.src = src;
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch(() => {});
+      });
+    } else {
+      setError("Your browser does not support HLS video playback.");
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+      }
+    };
+  }, [src]);
+
+  if (error) {
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-black">
+        <div className="text-center p-4">
+          <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-400" />
+          <p className="text-sm text-red-400">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <video
+      ref={videoRef}
+      controls
+      playsInline
+      poster={poster}
+      className="w-full h-full object-contain"
+    />
+  );
+};
+
 // ============ UPLOAD PROGRESS PANEL COMPONENT ============
 const UploadProgressPanel = ({ uploads, onDismiss }) => {
   if (!uploads || uploads.length === 0) return null;
