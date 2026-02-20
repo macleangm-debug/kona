@@ -1617,7 +1617,13 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         ) : (
           <video
             id="main-video"
-            ref={videoRef}
+            ref={(el) => {
+              videoRef.current = el;
+              // Signal that video element is mounted (fixes race condition in HLS init)
+              if (el && !videoMounted) {
+                setVideoMounted(true);
+              }
+            }}
             autoPlay
             muted
             playsInline
