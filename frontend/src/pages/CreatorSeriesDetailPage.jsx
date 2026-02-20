@@ -294,10 +294,10 @@ const UploadProgressPanel = memo(({ uploads, onDismiss }) => {
       )}
     </div>
   );
-};
+});
 
 // ============ DRAGGABLE EPISODE CARD ============
-const DraggableEpisodeCard = ({ ep, seasonNum, onEditEpisode, isDragging, isSelected, onToggleSelect, selectionMode }) => {
+const DraggableEpisodeCard = memo(({ ep, seasonNum, onEditEpisode, isDragging, isSelected, onToggleSelect, selectionMode }) => {
   const {
     attributes,
     listeners,
