@@ -261,8 +261,16 @@ async def lifespan(app: FastAPI):
 async def configure_bunny_referrers():
     """Auto-configure Bunny.net to allow embeds from this domain"""
     try:
-        from services.bunny import bunny_service
+        from services.bunny import bunny_service, BUNNY_ACCOUNT_API_KEY
         import os
+        
+        # Check if account API key is configured
+        if not BUNNY_ACCOUNT_API_KEY:
+            logger.warning(
+                "⚠️ BUNNY_ACCOUNT_API_KEY not set - embed player may show 403 errors on new domains. "
+                "To fix: Add BUNNY_ACCOUNT_API_KEY to .env (get it from Bunny.net Dashboard > Account > API Key)"
+            )
+            return
         
         # Get the frontend URL and extract hostname
         frontend_url = os.environ.get("FRONTEND_URL", "")
@@ -288,14 +296,21 @@ async def configure_bunny_referrers():
         # Add localhost for development
         domains_to_add.add("localhost")
         
+        added_count = 0
         for domain in domains_to_add:
             if domain:
                 result = await bunny_service.add_allowed_referrer(domain)
                 if result.get("success"):
                     logger.info(f"✅ Bunny.net: Added {domain} to allowed referrers")
+                    added_count += 1
+                elif result.get("needs_config"):
+                    break  # No point continuing without API key
                 else:
                     # Log but don't fail - domain might already be added
                     logger.debug(f"Bunny.net referrer config for {domain}: {result.get('error', 'unknown')}")
+        
+        if added_count > 0:
+            logger.info(f"✅ Bunny.net: Configured {added_count} allowed referrer domain(s)")
     except Exception as e:
         logger.warning(f"⚠️ Could not auto-configure Bunny.net referrers: {e}")
 
