@@ -2344,7 +2344,7 @@ Use [brackets] for sounds.
                               />
                             </div>
                             <p className="text-xs text-muted-foreground mt-1">
-                              {ep.uploaded ? 'Uploaded to Bunny CDN!' : `${ep.progress}% uploading...`}
+                              {ep.uploaded ? 'Upload complete!' : `${ep.progress}% uploading...`}
                             </p>
                           </div>
                         )}
