@@ -346,8 +346,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   // Video error state
   const [videoError, setVideoError] = useState(null);
   
-  // HLS fallback state - switch to Bunny.net embed player when HLS fails
+  // HLS fallback state - switch to MP4 or embed player when HLS fails
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
+  const [useMp4Fallback, setUseMp4Fallback] = useState(false);
   
   // Embed player error state (for 403/configuration issues)
   const [embedError, setEmbedError] = useState(false);
