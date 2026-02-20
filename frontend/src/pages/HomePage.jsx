@@ -93,6 +93,25 @@ export const HomePage = ({ onAuthClick }) => {
         
         // Fetch user-specific data
         if (token) {
+          // Fetch personalized "For You" recommendations
+          setForYouLoading(true);
+          try {
+            const forYouRes = await axios.get(`${API}/recommendations/for-you?limit=12`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            setForYou(forYouRes.data.recommendations || []);
+          } catch (e) {
+            console.error("Error fetching recommendations:", e);
+            // Fallback to trending if personalized fails
+            try {
+              const trendingRes = await axios.get(`${API}/recommendations/trending?limit=12`);
+              setForYou(trendingRes.data.trending || []);
+            } catch (e2) {
+              console.error("Error fetching trending:", e2);
+            }
+          }
+          setForYouLoading(false);
+          
           // Real Continue Watching data
           try {
             const continueRes = await axios.get(`${API}/user/continue-watching`, {
