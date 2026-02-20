@@ -333,17 +333,23 @@ const DroppableSeason = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 px-2"
+          <div
+            role="button"
+            tabIndex={0}
+            className="h-8 px-2 flex items-center justify-center rounded-md hover:bg-secondary transition-colors cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onAddEpisode(seasonNum);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.stopPropagation();
+                onAddEpisode(seasonNum);
+              }
+            }}
           >
             <Plus className="w-4 h-4" />
-          </Button>
+          </div>
           {isExpanded ? (
             <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
           ) : (
