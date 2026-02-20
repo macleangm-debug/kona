@@ -64,7 +64,13 @@ const NotificationsManagementTab = ({ token }) => {
       const triggersRes = await axios.get(`${API}/notifications/admin/triggers`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setTriggers(triggersRes.data.triggers || []);
+      // Convert triggers object to array
+      const triggersObj = triggersRes.data.triggers || {};
+      const triggersArray = Object.entries(triggersObj).map(([key, value]) => ({
+        id: key,
+        ...value
+      }));
+      setTriggers(triggersArray);
       
       // Fetch recent notifications
       const recentRes = await axios.get(`${API}/notifications/admin/recent?limit=10`, {
