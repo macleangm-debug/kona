@@ -53,9 +53,9 @@ class TestVideoPreview:
         assert "can_preview" in data
         assert "encoding_status" in data
     
-    def test_preview_returns_hls_url(self, auth_token):
+    def test_preview_returns_hls_url(self, session, auth_token):
         """Test that preview returns HLS streaming URL"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/cs-8e6c36c6e4-s01e01/preview",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
