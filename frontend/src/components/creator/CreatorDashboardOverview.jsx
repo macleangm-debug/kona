@@ -27,7 +27,7 @@ const StatCard = ({ icon: Icon, label, value, subValue, color = "text-primary" }
 );
 
 // Series Card for Carousel
-const SeriesCard = ({ series, onClick }) => {
+const SeriesCard = ({ series, onClick, onPublish }) => {
   const getStatusColor = (status) => {
     const colors = {
       published: "bg-green-500",
@@ -37,6 +37,17 @@ const SeriesCard = ({ series, onClick }) => {
       draft: "bg-gray-500"
     };
     return colors[status] || colors.draft;
+  };
+  
+  const getStatusLabel = (status) => {
+    const labels = {
+      published: "Live",
+      approved: "Approved",
+      pending_review: "Under Review",
+      rejected: "Rejected",
+      draft: "Draft"
+    };
+    return labels[status] || "Draft";
   };
 
   return (
@@ -59,11 +70,39 @@ const SeriesCard = ({ series, onClick }) => {
           </div>
         )}
         {/* Status Badge */}
-        <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${getStatusColor(series.status)}`} />
-        {/* Overlay on hover */}
-        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <PlayCircle className="w-10 h-10 text-white" />
+        <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-medium ${
+          series.status === 'published' 
+            ? 'bg-green-500/90 text-white' 
+            : series.status === 'pending_review'
+              ? 'bg-yellow-500/90 text-black'
+              : 'bg-black/60 text-white'
+        }`}>
+          {getStatusLabel(series.status)}
         </div>
+        
+        {/* Publish Button Overlay (for unpublished series) */}
+        {series.status !== 'published' && onPublish && (
+          <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2">
+            <PlayCircle className="w-8 h-8 text-white/80" />
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onPublish(series.id);
+              }}
+              className="px-3 py-1.5 bg-green-600 hover:bg-green-500 rounded-full text-xs font-medium text-white transition-colors flex items-center gap-1"
+              data-testid={`publish-btn-${series.id}`}
+            >
+              <Globe className="w-3 h-3" /> Publish Now
+            </button>
+          </div>
+        )}
+        
+        {/* Regular hover overlay for published series */}
+        {series.status === 'published' && (
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+            <PlayCircle className="w-10 h-10 text-white" />
+          </div>
+        )}
       </div>
       {/* Info */}
       <div className="p-3">
