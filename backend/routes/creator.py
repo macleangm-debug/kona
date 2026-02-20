@@ -1547,6 +1547,9 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
             bunny_video_id = bunny_result["video_id"]
             upload_url = await bunny_service.get_upload_url(bunny_video_id)
     
+    # Get admin-controlled pricing for this episode
+    is_free, coins_required = await get_episode_pricing(data.series_id, data.episode_number, data.season_number)
+    
     episode = {
         "id": episode_id,
         "series_id": data.series_id,
@@ -1562,9 +1565,9 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
         "encoding_status": "ready" if data.video_url else "pending",
         "duration": None,
         "thumbnail": None,
-        "is_free": data.is_free or (data.season_number == 1 and data.episode_number == 1),  # S01E01 is always free
+        "is_free": is_free,  # Determined by admin settings
         "is_pilot": data.season_number == 1 and data.episode_number == 1,
-        "coins_required": 0 if (data.is_free or (data.season_number == 1 and data.episode_number == 1)) else data.coins_required,
+        "coins_required": coins_required,  # Determined by admin settings
         "intro_duration": data.intro_duration,
         # Story content: Episode 1 of Season 1 is always story content (requires vertical video)
         "is_story_content": data.season_number == 1 and data.episode_number == 1,
