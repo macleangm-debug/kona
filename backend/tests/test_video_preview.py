@@ -13,9 +13,22 @@ class TestVideoPreview:
     """Tests for creator video preview feature"""
     
     @pytest.fixture
-    def auth_token(self):
+    def session(self):
+        """Create a session with proper headers"""
+        session = requests.Session()
+        session.headers.update({
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "Accept": "application/json",
+            "Origin": BASE_URL,
+            "Referer": f"{BASE_URL}/"
+        })
+        return session
+    
+    @pytest.fixture
+    def auth_token(self, session):
         """Get authentication token for superadmin"""
-        response = requests.post(f"{BASE_URL}/api/auth/login", json={
+        response = session.post(f"{BASE_URL}/api/auth/login", json={
             "email": "superadmin@kona.com",
             "password": "SuperAdmin2025!"
         })
