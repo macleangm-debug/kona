@@ -345,12 +345,12 @@ const DroppableSeason = ({
             <Plus className="w-4 h-4" />
           </Button>
           {isExpanded ? (
-            <ChevronDown className="w-5 h-5 text-muted-foreground" />
+            <ChevronDown className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
           ) : (
-            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+            <ChevronRight className="w-5 h-5 text-muted-foreground transition-transform duration-200" />
           )}
         </div>
-      </div>
+      </button>
       
       {/* Season Episodes */}
       {isExpanded && (
