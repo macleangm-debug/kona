@@ -103,6 +103,37 @@ MILESTONE_BONUSES = [
 ]
 
 
+# ============ PLATFORM SETTINGS (Public for creators) ============
+@router.get("/upload-settings")
+async def get_upload_settings(user: dict = Depends(get_current_user)):
+    """
+    Get platform settings for video upload validation.
+    Returns video format requirements, max file size, etc.
+    """
+    settings = await get_platform_settings()
+    
+    video_settings = settings.get("video", {})
+    pricing_settings = settings.get("pricing", {})
+    
+    return {
+        "video": {
+            "allowed_formats": video_settings.get("allowed_formats", ["vertical"]),
+            "max_file_size_mb": video_settings.get("max_file_size_mb", 500),
+            "max_duration_minutes": video_settings.get("max_duration_minutes", 60),
+            # Help text for creators
+            "format_help": "vertical" if "vertical" in video_settings.get("allowed_formats", ["vertical"]) and "landscape" not in video_settings.get("allowed_formats", []) else (
+                "landscape" if "landscape" in video_settings.get("allowed_formats", []) and "vertical" not in video_settings.get("allowed_formats", []) else "both"
+            )
+        },
+        "pricing": {
+            "default_episode_price": pricing_settings.get("default_episode_price", 5),
+            "first_episode_free": pricing_settings.get("first_episode_free", True),
+            # Note to creators that pricing is admin-controlled
+            "pricing_info": "Episode pricing is managed by the platform. First episode is free by default."
+        }
+    }
+
+
 # ============ CREATOR APPLICATION ============
 @router.post("/apply")
 async def apply_as_creator(application: CreatorApplication, user: dict = Depends(get_current_user)):
