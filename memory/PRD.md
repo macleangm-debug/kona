@@ -202,6 +202,21 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
     - "Select All" and "Cancel" buttons
     - Bulk actions: Move to Season, Make Free, Make Paid, Set Coin Price
     - Backend API: `POST /api/creator/series/{id}/bulk-edit-episodes`
+- [x] **UI/UX Fixes (2026-02-20)**
+  - Fixed profile dropdown responsiveness - added memoization, modal={false}, smooth animations
+  - Fixed season accordion click handling - changed from div to button with proper event propagation
+  - Fixed nested button HTML validation issue in season header
+- [x] **Video Preview Feature (2026-02-20)**
+  - Creators can now preview their uploaded videos before publishing
+  - Preview button in episode editor dialog
+  - Preview modal with Bunny.net iframe player
+  - Shows processing status for videos still encoding
+  - Backend API: `GET /api/creator/episodes/{id}/preview`
+- [x] **Publishing Flow Enhancement (2026-02-20)**
+  - Publish now strictly requires Bunny.net video encoding to be "ready"
+  - Returns count of published episodes
+  - Cache invalidation after publish for immediate visibility
+  - Removed direct video_url parameter from episode update (all videos must go through Bunny.net CDN)
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
