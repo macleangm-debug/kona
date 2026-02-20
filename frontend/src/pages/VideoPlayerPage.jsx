@@ -876,6 +876,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       setUseEmbedFallback(false);
       setVideoError(null);
       setVideoMounted(false); // Reset so HLS re-initializes for new video
+      setEmbedError(false); // Reset embed error state
       
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
