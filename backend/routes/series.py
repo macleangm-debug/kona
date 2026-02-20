@@ -15,7 +15,7 @@ router = APIRouter(tags=["Series"])
 @router.get("/series", response_model=List[SeriesResponse])
 @limiter.limit("60/minute")
 async def get_series(request: Request):
-    """Get all series with caching"""
+    """Get all series with caching - sorted by newest first"""
     cache_key = series_list_key("all")
     
     # Try cache first
@@ -23,12 +23,12 @@ async def get_series(request: Request):
     if cached:
         return cached
     
-    # Fetch from DB
-    series = await db.series.find({}, {"_id": 0}).to_list(100)
+    # Fetch from DB - sort by created_at descending (newest first)
+    series = await db.series.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     if not series:
         from server import seed_data
         await seed_data()
-        series = await db.series.find({}, {"_id": 0}).to_list(100)
+        series = await db.series.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     
     # Cache the result
     await cache.set(cache_key, series, CACHE_TTL["series_list"])
