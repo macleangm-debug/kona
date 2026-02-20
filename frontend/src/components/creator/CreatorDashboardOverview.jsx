@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Film, Eye, Coins, Plus, TrendingUp, Clock, PlayCircle, 
-  ChevronRight, Sparkles, DollarSign, Users, BarChart3 
+  ChevronRight, Sparkles, DollarSign, Users, BarChart3, Globe
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
