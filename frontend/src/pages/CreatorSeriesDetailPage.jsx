@@ -2326,28 +2326,17 @@ Use [brackets] for sounds.
                         />
                         
                         <div className="flex items-center gap-4 text-xs">
-                          <label className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              checked={ep.is_free}
-                              onChange={(e) => updateBatchEpisode(ep.id, 'is_free', e.target.checked)}
-                              disabled={ep.uploading || ep.uploaded}
-                              className="rounded border-white/20"
-                            />
-                            Free
-                          </label>
-                          
-                          {!ep.is_free && (
-                            <div className="flex items-center gap-1">
+                          {/* Pricing info - read only */}
+                          {ep.is_free ? (
+                            <span className="flex items-center gap-1 text-green-400">
+                              <CheckCircle className="w-3 h-3" />
+                              Free Episode
+                            </span>
+                          ) : (
+                            <span className="flex items-center gap-1 text-muted-foreground">
                               <Coins className="w-3 h-3 text-yellow-400" />
-                              <input
-                                type="number"
-                                value={ep.coins_required}
-                                onChange={(e) => updateBatchEpisode(ep.id, 'coins_required', parseInt(e.target.value) || 5)}
-                                className="w-14 px-2 py-1 text-xs bg-secondary/50 border border-white/10 rounded"
-                                disabled={ep.uploading || ep.uploaded}
-                              />
-                            </div>
+                              {ep.coins_required} coins
+                            </span>
                           )}
                           
                           <span className="text-muted-foreground ml-auto">
