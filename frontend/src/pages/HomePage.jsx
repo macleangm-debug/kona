@@ -634,7 +634,7 @@ export const HomePage = ({ onAuthClick }) => {
           >See All</button>
         </div>
         <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
-          {series.slice(-8).map((s, index) => (
+          {series.slice(0, 8).map((s, index) => (
             <div key={s.id} className="flex-shrink-0 w-28">
               <LazySeriesCard 
                 series={s}
