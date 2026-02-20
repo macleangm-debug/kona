@@ -1,0 +1,65 @@
+WEBVTT
+Kind: captions
+Language: en
+
+NOTE
+This is a WebVTT subtitle template for Kona video content.
+Replace the timestamps and text with your actual subtitles.
+Each cue consists of:
+1. An optional cue identifier
+2. Timing line (start --> end)
+3. The subtitle text
+
+NOTE Timing Format: HH:MM:SS.mmm or MM:SS.mmm
+
+1
+00:00:00.000 --> 00:00:03.000
+[Opening scene]
+
+2
+00:00:03.000 --> 00:00:06.500
+Welcome to this episode.
+
+3
+00:00:07.000 --> 00:00:10.000
+This is an example of a subtitle line
+that spans multiple lines.
+
+4
+00:00:10.500 --> 00:00:14.000
+<v Speaker1>Character dialogue can be marked with voice tags.
+
+5
+00:00:15.000 --> 00:00:18.500
+<i>Italics for emphasis or thoughts</i>
+
+6
+00:00:19.000 --> 00:00:22.000
+<b>Bold text for important information</b>
+
+7
+00:00:23.000 --> 00:00:26.000
+[Sound effect: door closing]
+
+8
+00:00:27.000 --> 00:00:30.000
+♪ Background music playing ♪
+
+NOTE
+Tips for creating good subtitles:
+- Keep each cue under 2 lines
+- Maximum 42 characters per line
+- Display time: 1-6 seconds per cue
+- Leave at least 0.2 seconds between cues
+- Use proper punctuation
+- Indicate speaker changes clearly
+- Describe important sounds in [brackets]
+- Use ♪ for music
+
+NOTE
+Supported languages on Kona:
+- English (en)
+- Swahili (sw)
+- French (fr)
+
+NOTE End of template
