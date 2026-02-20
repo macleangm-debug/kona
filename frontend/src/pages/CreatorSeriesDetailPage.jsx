@@ -944,21 +944,21 @@ export const CreatorSeriesDetailPage = () => {
     error: null
   });
 
-  // Toggle season expansion
-  const toggleSeason = (seasonNum) => {
+  // Toggle season expansion - memoized to prevent child re-renders
+  const toggleSeason = useCallback((seasonNum) => {
     setExpandedSeasons(prev => 
       prev.includes(seasonNum) 
         ? prev.filter(s => s !== seasonNum)
         : [...prev, seasonNum]
     );
-  };
+  }, []);
 
-  // Dismiss upload from progress panel
-  const dismissUpload = (uploadId) => {
+  // Dismiss upload from progress panel - memoized
+  const dismissUpload = useCallback((uploadId) => {
     setUploadQueue(prev => prev.map(u => 
       u.id === uploadId ? { ...u, dismissed: true } : u
     ));
-  };
+  }, []);
 
   // Reorder episodes (drag & drop)
   const handleReorderEpisodes = async (reorderData) => {
