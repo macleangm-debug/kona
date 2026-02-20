@@ -161,14 +161,22 @@ async def get_episodes(request: Request, series_id: str):
 @limiter.limit("100/minute")
 async def get_episode(request: Request, episode_id: str, user: dict = Depends(get_optional_user)):
     """Get episode details - allows guests for free episodes"""
+    from services.bunny import bunny_service
+    
     episode = await db.episodes.find_one({"id": episode_id}, {"_id": 0})
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
+    
+    # Generate embed_url from bunny_video_id if available (for HLS fallback)
+    embed_url = None
+    if episode.get("bunny_video_id"):
+        embed_url = bunny_service.get_embed_url(episode["bunny_video_id"])
     
     # Free episodes can be accessed by anyone
     if episode.get("is_free", False):
         return {
             **episode,
+            "embed_url": embed_url,
             "unlocked": True,
             "is_guest": user is None
         }
@@ -180,6 +188,7 @@ async def get_episode(request: Request, episode_id: str, user: dict = Depends(ge
     unlocked = episode_id in user.get("unlocked_episodes", [])
     return {
         **episode,
+        "embed_url": embed_url,
         "unlocked": unlocked
     }
 
