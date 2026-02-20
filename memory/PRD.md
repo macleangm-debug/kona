@@ -372,6 +372,44 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
    - Changed default episode price from 5 to 15 coins
    - Updated via `PUT /api/admin/platform-settings`
 
+9. **Enhanced Search System (2026-02-20)**
+   - Auto-complete suggestions as user types (`/api/search/suggestions`)
+   - Search with filters: genre, rating, episodes, sort order
+   - Search history per user with clear functionality
+   - Trending searches aggregated from user activity
+   - Quick search for navbar (no auth required)
+   - Admin search analytics dashboard
+   - **Created:** `backend/routes/search.py`
+
+10. **Recommendation Engine (2026-02-20)**
+    - Hybrid approach: Collaborative filtering + Content-based
+    - Personalized "For You" recommendations
+    - Similar series based on genre + user behavior
+    - "Because You Watched" recommendations
+    - Trending series from recent watch activity
+    - Genre-based recommendations
+    - Recommendation feedback system
+    - **Created:** `backend/routes/recommendations.py`
+
+11. **Thumbnail A/B Testing (2026-02-20)**
+    - Creators and admins can create thumbnail tests
+    - Multiple variants with traffic allocation weights
+    - Impression and click tracking with CTR calculation
+    - Consistent user variant assignment
+    - Winner declaration and auto-apply to series
+    - Admin dashboard with test statistics
+    - **Created:** `backend/routes/thumbnail_testing.py`
+    - **Created:** `frontend/src/components/admin/ThumbnailTestingTab.jsx`
+
+12. **Admin Notification Management (2026-02-20)**
+    - Broadcast notifications to user segments
+    - Segments: All, VIP, Creators, Inactive, New Users, High Spenders
+    - Notification types: Info, Success, Warning, Promo, New Content
+    - Automated trigger configuration
+    - Campaign history and analytics
+    - **Enhanced:** `backend/routes/notifications.py`
+    - **Created:** `frontend/src/components/admin/NotificationsManagementTab.jsx`
+
 ### P1 (High)
 - [x] **Fix Unstable Session Management** - COMPLETED
   - Added token expiration checks and improved 401 handling
