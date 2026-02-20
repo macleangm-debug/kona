@@ -2256,7 +2256,7 @@ Use [brackets] for sounds.
                 <Upload className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="font-medium">Drop video files here or click to browse</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Supported formats: MP4, WebM, MOV (max 500MB each)
+                  Vertical videos only (portrait format) • MP4, WebM, MOV
                 </p>
               </div>
               <input
