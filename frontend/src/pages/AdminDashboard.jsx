@@ -3007,6 +3007,8 @@ export const AdminDashboard = () => {
                 {activeTab === "revenue-settings" && "Configure revenue distribution"}
                 {activeTab === "exchange-rates" && "Dynamic exchange rates and margin revenue"}
                 {activeTab === "ab-testing" && "Test pricing styles to optimize conversions"}
+                {activeTab === "thumbnail-testing" && "A/B test thumbnails to optimize CTR"}
+                {activeTab === "notifications" && "Send notifications to users and manage triggers"}
                 {activeTab === "investment" && "Financial projections and ROI"}
                 {activeTab === "infrastructure" && "Server and hosting requirements"}
                 {activeTab === "docs" && "Platform documentation and guides"}
