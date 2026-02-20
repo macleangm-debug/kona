@@ -70,9 +70,9 @@ class TestVideoPreview:
             assert ".m3u8" in hls_url, "HLS URL should contain .m3u8 extension"
             assert "b-cdn.net" in hls_url, "HLS URL should be from Bunny.net CDN"
     
-    def test_preview_returns_thumbnail(self, auth_token):
+    def test_preview_returns_thumbnail(self, session, auth_token):
         """Test that preview returns thumbnail URL"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/cs-8e6c36c6e4-s01e01/preview",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
