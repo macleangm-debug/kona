@@ -19,6 +19,71 @@ from services.bunny import bunny_service
 
 router = APIRouter(prefix="/creator", tags=["Creator"])
 
+# ============ PLATFORM SETTINGS HELPER ============
+async def get_platform_settings():
+    """Get platform settings with defaults"""
+    settings = await db.platform_settings.find_one({"id": "global"}, {"_id": 0})
+    if not settings:
+        settings = {
+            "id": "global",
+            "pricing": {
+                "default_episode_price": 5,
+                "first_episode_free": True,
+            },
+            "video": {
+                "allowed_formats": ["vertical"],
+                "max_file_size_mb": 500,
+                "max_duration_minutes": 60,
+            }
+        }
+    return settings
+
+async def get_episode_pricing(series_id: str, episode_number: int, season_number: int = 1):
+    """
+    Calculate episode pricing based on admin settings.
+    Priority: Series-specific override > Global settings
+    
+    Returns: (is_free: bool, coins_required: int)
+    """
+    platform_settings = await get_platform_settings()
+    
+    # Get series-specific pricing overrides
+    series = await db.series.find_one({"id": series_id}, {"_id": 0})
+    if not series:
+        series = await db.creator_series.find_one({"id": series_id}, {"_id": 0})
+    
+    # Determine if first episode should be free
+    is_first_episode = (season_number == 1 and episode_number == 1)
+    
+    # Check series-specific first episode free override
+    first_episode_free_override = series.get("first_episode_free_override") if series else None
+    
+    # Determine first episode free setting
+    if first_episode_free_override is not None:
+        # Series has explicit override
+        first_ep_free = first_episode_free_override
+    else:
+        # Use global setting
+        first_ep_free = platform_settings.get("pricing", {}).get("first_episode_free", True)
+    
+    # Is this episode free?
+    is_free = is_first_episode and first_ep_free
+    
+    # Determine price
+    if is_free:
+        coins_required = 0
+    else:
+        # Check series-specific custom price
+        custom_price = series.get("custom_episode_price") if series else None
+        if custom_price is not None:
+            coins_required = custom_price
+        else:
+            # Use global default
+            coins_required = platform_settings.get("pricing", {}).get("default_episode_price", 5)
+    
+    return is_free, coins_required
+
+
 # ============ CREATOR TIER CONFIG ============
 # Revenue Model (Aligned with ReelShort): Creator share is % of POST-EXPENSE revenue
 # Example: $100 gross → $70 after 30% expenses → Creator gets 30-50% of $70
