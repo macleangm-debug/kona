@@ -1564,67 +1564,89 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       
       {/* Adaptive Video Player - Automatically adjusts for vertical/horizontal content */}
       <div className="absolute inset-0 flex items-center justify-center bg-black">
-        <video
-          id="main-video"
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onTimeUpdate={handleTimeUpdate}
-          onEnded={handleVideoEnded}
-          onWaiting={handleWaiting}
-          onClick={handleVideoTap}
-          onLoadedMetadata={handleVideoMetadataLoaded}
-          onLoadedData={() => {
-            // Start playing when video is loaded (after pre-roll if any)
-            if (preRollComplete && videoRef.current) {
-              videoRef.current.play().catch(() => {});
-              setIsPlaying(true);
-            }
-            setVideoError(null);
-          }}
-          onError={(e) => {
-            console.error('Video load error:', e);
-            setVideoError('Video unavailable - please try again later');
-          }}
-          className={`w-full h-full transition-all duration-300 ${getVideoDisplayStyle()}`}
-          style={{
-            // For vertical videos in portrait mode, ensure full coverage
-            maxHeight: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
-            maxWidth: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
-          }}
-          data-testid="video-element"
-        >
-          {/* Subtitle tracks */}
-          {subtitles.en && (
+        {/* Bunny.net Embed Player Fallback (when HLS fails due to codec issues) */}
+        {useEmbedFallback && episode?.embed_url ? (
+          <div className="w-full h-full" data-testid="embed-fallback-player">
+            <iframe
+              src={episode.embed_url}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+              allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
+              loading="lazy"
+              title={episode.title || "Video Player"}
+              style={{ border: 'none' }}
+            />
+          </div>
+        ) : (
+          <video
+            id="main-video"
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleVideoEnded}
+            onWaiting={handleWaiting}
+            onClick={handleVideoTap}
+            onLoadedMetadata={handleVideoMetadataLoaded}
+            onLoadedData={() => {
+              // Start playing when video is loaded (after pre-roll if any)
+              if (preRollComplete && videoRef.current) {
+                videoRef.current.play().catch(() => {});
+                setIsPlaying(true);
+              }
+              setVideoError(null);
+            }}
+            onError={(e) => {
+              console.error('Video load error:', e);
+              // If HLS fails and embed URL available, use fallback
+              if (episode?.embed_url && !useEmbedFallback) {
+                console.warn("Video error, switching to embed fallback");
+                setUseEmbedFallback(true);
+              } else {
+                setVideoError('Video unavailable - please try again later');
+              }
+            }}
+            className={`w-full h-full transition-all duration-300 ${getVideoDisplayStyle()}`}
+            style={{
+              // For vertical videos in portrait mode, ensure full coverage
+              maxHeight: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
+              maxWidth: isVerticalVideo && screenOrientation === 'portrait' ? '100%' : undefined,
+            }}
+            data-testid="video-element"
+          >
+            {/* Subtitle tracks */}
+            {subtitles.en && (
+              <track 
+                kind="subtitles" 
+                src={subtitles.en} 
+                srcLang="en" 
+                label="English"
+                default={activeSubtitle === "en"}
+              />
+            )}
+          {subtitles.sw && (
             <track 
               kind="subtitles" 
-              src={subtitles.en} 
-              srcLang="en" 
-              label="English"
-              default={activeSubtitle === "en"}
+              src={subtitles.sw} 
+              srcLang="sw" 
+              label="Kiswahili"
+              default={activeSubtitle === "sw"}
             />
           )}
-        {subtitles.sw && (
-          <track 
-            kind="subtitles" 
-            src={subtitles.sw} 
-            srcLang="sw" 
-            label="Kiswahili"
-            default={activeSubtitle === "sw"}
-          />
+          {subtitles.fr && (
+            <track 
+              kind="subtitles" 
+              src={subtitles.fr} 
+              srcLang="fr" 
+              label="Français"
+              default={activeSubtitle === "fr"}
+            />
+          )}
+          </video>
         )}
-        {subtitles.fr && (
-          <track 
-            kind="subtitles" 
-            src={subtitles.fr} 
-            srcLang="fr" 
-            label="Français"
-            default={activeSubtitle === "fr"}
-          />
-        )}
-        </video>
       </div>
 
       {/* Video Error Overlay */}
