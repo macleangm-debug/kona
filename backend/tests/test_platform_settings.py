@@ -217,7 +217,7 @@ class TestSeriesPricing:
         """Verify getting series-specific pricing for test series"""
         response = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 200, f"Failed: {response.text}"
         
@@ -234,7 +234,7 @@ class TestSeriesPricing:
         # Get current pricing
         current = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         original_price = current.get("custom_episode_price")
@@ -243,7 +243,7 @@ class TestSeriesPricing:
         new_price = 25
         response = requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"custom_episode_price": new_price}
         )
         assert response.status_code == 200
@@ -251,14 +251,14 @@ class TestSeriesPricing:
         # Verify update
         updated = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         assert updated["custom_episode_price"] == new_price
         
         # Restore original
         requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"custom_episode_price": original_price}
         )
         print(f"Custom price updated from {original_price} to {new_price} and restored")
@@ -268,7 +268,7 @@ class TestSeriesPricing:
         # Get current setting
         current = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         original_exclusive = current.get("is_exclusive", False)
@@ -277,7 +277,7 @@ class TestSeriesPricing:
         new_exclusive = not original_exclusive
         response = requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"is_exclusive": new_exclusive}
         )
         assert response.status_code == 200
@@ -285,14 +285,14 @@ class TestSeriesPricing:
         # Verify update
         updated = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         assert updated["is_exclusive"] == new_exclusive
         
         # Restore original
         requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"is_exclusive": original_exclusive}
         )
         print(f"Exclusive flag toggled from {original_exclusive} to {new_exclusive} and restored")
@@ -302,7 +302,7 @@ class TestSeriesPricing:
         # Get current setting
         current = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         
         original_override = current.get("first_episode_free_override")
@@ -310,7 +310,7 @@ class TestSeriesPricing:
         # Set override to False (first episode NOT free)
         response = requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"first_episode_free_override": False}
         )
         assert response.status_code == 200
@@ -318,14 +318,14 @@ class TestSeriesPricing:
         # Verify update
         updated = requests.get(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         ).json()
         assert updated["first_episode_free_override"] == False
         
         # Restore to null (use global setting)
         requests.put(
             f"{BASE_URL}/api/admin/series/{TEST_SERIES_ID}/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"},
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"},
             json={"first_episode_free_override": original_override}
         )
         print(f"First episode free override set to False and restored to {original_override}")
@@ -334,7 +334,7 @@ class TestSeriesPricing:
         """Verify 404 for non-existent series"""
         response = requests.get(
             f"{BASE_URL}/api/admin/series/invalid-series-id-12345/pricing",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 404
 
