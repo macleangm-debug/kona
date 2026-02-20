@@ -223,6 +223,13 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Returns count of published episodes
   - Cache invalidation after publish for immediate visibility
   - Removed direct video_url parameter from episode update (all videos must go through Bunny.net CDN)
+- [x] **Public Video Player HLS-to-Embed Fallback (2026-02-20)**
+  - Fixed race condition in HLS initialization (videoMounted state)
+  - Added `embed_url` field to public episode API response
+  - Implemented automatic fallback to Bunny.net iframe player when HLS fails
+  - Handles codec incompatibility errors (manifestIncompatibleCodecsError)
+  - **Modified:** `backend/routes/series.py` - added embed_url to GET /api/episodes/{id}
+  - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback
 
 ### P1 (High)
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
