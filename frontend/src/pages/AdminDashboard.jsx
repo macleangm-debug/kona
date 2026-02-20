@@ -3382,6 +3382,11 @@ export const AdminDashboard = () => {
           <SupportTicketsModule />
         )}
 
+        {/* Platform Settings Tab (Super Admin Only) */}
+        {activeTab === "platform-settings" && user?.is_super_admin && (
+          <PlatformSettingsTab token={token} />
+        )}
+
         {/* Launch Checklist Tab (Super Admin Only) */}
         {activeTab === "checklist" && user?.is_super_admin && (
           <LaunchChecklistTab token={token} />
