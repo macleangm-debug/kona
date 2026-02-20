@@ -1330,7 +1330,7 @@ export const CreatorSeriesDetailPage = () => {
       return;
     }
     
-    // Validate video dimensions (must be vertical)
+    // Validate video dimensions based on platform settings
     const validateVideoFormat = (file) => {
       return new Promise((resolve) => {
         const video = document.createElement('video');
@@ -1338,23 +1338,38 @@ export const CreatorSeriesDetailPage = () => {
         video.onloadedmetadata = () => {
           URL.revokeObjectURL(video.src);
           const isVertical = video.videoHeight > video.videoWidth;
-          resolve({ isVertical, width: video.videoWidth, height: video.videoHeight });
+          const isLandscape = video.videoWidth > video.videoHeight;
+          resolve({ isVertical, isLandscape, width: video.videoWidth, height: video.videoHeight });
         };
-        video.onerror = () => resolve({ isVertical: true, width: 0, height: 0 }); // Allow on error
+        video.onerror = () => resolve({ isVertical: true, isLandscape: false, width: 0, height: 0 }); // Allow on error
         video.src = URL.createObjectURL(file);
       });
     };
     
-    // Check all videos for vertical format
+    // Check all videos against platform format requirements
     const validationResults = await Promise.all(videoFiles.map(async (file) => {
-      const { isVertical, width, height } = await validateVideoFormat(file);
-      return { file, isVertical, width, height };
+      const { isVertical, isLandscape, width, height } = await validateVideoFormat(file);
+      return { file, isVertical, isLandscape, width, height };
     }));
     
-    const invalidVideos = validationResults.filter(v => !v.isVertical);
-    if (invalidVideos.length > 0) {
-      toast.error(`${invalidVideos.length} video${invalidVideos.length > 1 ? 's are' : ' is'} not in vertical format. Please upload vertical videos (portrait orientation).`);
-      return;
+    // Check format based on platform settings
+    const allowedFormats = platformSettings?.video?.allowed_formats || ["vertical"];
+    const requiresVertical = allowedFormats.includes("vertical") && !allowedFormats.includes("landscape");
+    const requiresLandscape = allowedFormats.includes("landscape") && !allowedFormats.includes("vertical");
+    const allowsBoth = allowedFormats.includes("vertical") && allowedFormats.includes("landscape");
+    
+    if (!allowsBoth) {
+      const invalidVideos = validationResults.filter(v => {
+        if (requiresVertical) return !v.isVertical;
+        if (requiresLandscape) return !v.isLandscape;
+        return false;
+      });
+      
+      if (invalidVideos.length > 0) {
+        const formatRequired = requiresVertical ? "vertical (portrait)" : "landscape (horizontal)";
+        toast.error(`${invalidVideos.length} video${invalidVideos.length > 1 ? 's are' : ' is'} not in ${formatRequired} format. Please upload ${formatRequired} videos.`);
+        return;
+      }
     }
     
     // Get current episode count for this season
