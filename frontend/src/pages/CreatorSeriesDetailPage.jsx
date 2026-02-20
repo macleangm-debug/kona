@@ -409,10 +409,10 @@ const DraggableEpisodeCard = memo(({ ep, seasonNum, onEditEpisode, isDragging, i
       </div>
     </Card>
   );
-};
+});
 
 // ============ DROPPABLE SEASON COMPONENT ============
-const DroppableSeason = ({ 
+const DroppableSeason = memo(({ 
   seasonNum, 
   season, 
   episodes, 
