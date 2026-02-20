@@ -168,6 +168,48 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
 
 ## Prioritized Backlog
 
+### Session 6 (2026-02-20) - Admin Platform Settings & Session Stability
+
+1. **Admin Platform Settings Panel**
+   - New "Platform Settings" tab in admin dashboard (Super Admin only)
+   - **Global Pricing Settings:**
+     - Default episode price (coins) - applied to all non-exclusive series
+     - First episode free toggle (default: enabled)
+   - **Video Format Settings:**
+     - Vertical Only / Landscape Only / Both Formats options
+     - Currently set to "Vertical Only" per creator feedback
+   - **Series Pricing Override:**
+     - Mark series as exclusive
+     - Custom episode price per series
+     - First episode free override per series
+   - **API Endpoints:**
+     - `GET /api/admin/platform-settings` - Get global settings
+     - `PUT /api/admin/platform-settings` - Update global settings
+     - `GET /api/admin/series/{id}/pricing` - Get series pricing
+     - `PUT /api/admin/series/{id}/pricing` - Update series pricing
+     - `POST /api/admin/apply-global-pricing` - Apply to all series
+   - **Modified:** `backend/routes/admin.py`, `frontend/src/pages/AdminDashboard.jsx`
+
+2. **Session Stability Fix**
+   - Fixed frequent unexpected logouts
+   - Only clear token on auth-specific 401 errors (not all API errors)
+   - Added cleanup for component unmount
+   - Added authError state for user feedback
+   - **Modified:** `frontend/src/contexts/AuthContext.jsx`
+
+3. **Creator Portal - Pricing Read-Only**
+   - Removed pricing controls from creator episode editor
+   - Pricing is now admin-controlled only
+   - Shows read-only pricing info: "Pricing is managed by admin"
+   - First episode automatically set to FREE (admin can override)
+   - **Modified:** `frontend/src/pages/CreatorSeriesDetailPage.jsx`
+
+4. **Vertical Video Format Enforcement**
+   - Added validation to reject landscape videos on upload
+   - Shows error: "Please upload vertical videos (portrait orientation)"
+   - Upload hint: "Vertical videos only (portrait format)"
+   - Admin can change format settings in Platform Settings
+
 ### P0 (Critical) - COMPLETED
 - [x] Security fixes (env vars)
 - [x] Creator analytics enhancements
