@@ -95,6 +95,8 @@ class SeriesResponse(BaseModel):
     views: int = 0
     featured: bool = False
     created_at: Optional[str] = None  # ISO format datetime string
+    is_exclusive: bool = False  # Premium content flag
+    custom_episode_price: Optional[int] = None  # Custom price (None = use global default)
 
 class EpisodeResponse(BaseModel):
     id: str
