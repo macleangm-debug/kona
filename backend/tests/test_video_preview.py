@@ -95,9 +95,9 @@ class TestVideoPreview:
         # Should return 401 or 403 without token
         assert response.status_code in [401, 403], "Should require authentication"
     
-    def test_preview_nonexistent_episode(self, auth_token):
+    def test_preview_nonexistent_episode(self, session, auth_token):
         """Test preview endpoint with non-existent episode"""
-        response = requests.get(
+        response = session.get(
             f"{BASE_URL}/api/creator/episodes/nonexistent-episode-id/preview",
             headers={"Authorization": f"Bearer {auth_token}"}
         )
