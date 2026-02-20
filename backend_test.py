@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 
 class KonaAnalyticsAPITester:
-    def __init__(self, base_url="https://hls-playback-fix.preview.emergentagent.com"):
+    def __init__(self, base_url="https://creator-hub-566.preview.emergentagent.com"):
         self.base_url = base_url
         self.token = None
         self.tests_run = 0

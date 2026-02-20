@@ -30,7 +30,7 @@
     "Leaderboard translations work - Swahili: Orodha ya Viongozi, Wiki, Mwezi, Wakati Wote, Zawadi",
     "Leaderboard translations work - French: Classement, Semaine, Mois, Tout Temps, Prix",
     "Mobile bottom navigation shows translated labels: EN (Home/Discover/Rewards/Store/Profile), SW (Nyumbani/Gundua/Zawadi/Duka/Wasifu), FR (Accueil/Découvrir/Récompenses/Boutique/Profil)",
-    "PWA service worker is registered (scope: https://hls-playback-fix.preview.emergentagent.com/)",
+    "PWA service worker is registered (scope: https://creator-hub-566.preview.emergentagent.com/)",
     "PushManager and Notification APIs are supported",
     "Notification bell icon visible in header when logged in (with red dot indicator)",
     "User dropdown menu includes Leaderboard link with trophy icon"

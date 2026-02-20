@@ -1,183 +1,186 @@
 <analysis>Here is the handover summary for the next agent.
 
 **original_problem_statement:**
-The user's initial high-level goal was to review, fix, and enhance a video streaming application from a GitHub repository ().
+The user's high-level goal is to review, fix, and enhance a video streaming application (). The focus has been on improving creator workflows, fixing critical bugs, and adding admin controls.
 
-Over the course of development, the requirements became more specific, focusing on the creator workflow and overall usability:
-1.  **Critical Bug Fixes:** Address video playback failures, non-functional UI elements (like buttons), significant input lag in modals, blank screens, and failed video uploads.
+**PRODUCT REQUIREMENTS:**
+1.  **Fix Critical Bugs:** Address UI lag, unstable sessions, and video playback issues.
 2.  **Creator Portal Enhancements:**
-    *   Redesign the creator dashboard to be more informative.
-    *   Implement season management for series.
-    *   Allow drag-and-drop reordering of episodes within and between seasons.
-    *   Implement bulk episode editing (e.g., changing season, pricing).
-    *   Add a visible Publish button to make series public.
-3.  **Performance Optimization:** Fix UI lag, specifically in modal inputs and profile dropdowns.
-4.  **Admin/Access Control:**
-    *   Ensure superadmins can access the creator portal without needing manual approval.
-    *   Remove restrictive device limits for admin users.
-5.  **Future Features:**
-    *   Implement creator payout automation.
-    *   Assist with application deployment.
+    *   Ensure a smooth video upload and management process.
+    *   Remove all user-facing technical jargon (e.g., Bunny.net, CDN).
+    *   The video upload modal should provide a clean UX, auto-closing upon success.
+    *   Enforce vertical-only video uploads.
+3.  **Public Video Playback:** Ensure that all published videos are visible and play flawlessly across devices, similar to Netflix/YouTube.
+4.  **Content & Pricing Model:**
+    *   The New Releases section on the homepage must show the most recently added series first (on the left).
+    *   Video pricing must be controlled exclusively by the admin, not the creator.
+    *   The first episode of a series must be free by default.
+    *   Admins need a settings panel to manage global episode price, series-specific price overrides, the first episode free rule, and video format restrictions (vertical/landscape).
+5.  **Technical Requirements:**
+    *   All video uploads and streaming must be handled by Bunny.net.
+    *   Video playback should use a robust fallback mechanism (HLS -> MP4).
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack video streaming platform (React frontend, FastAPI backend, MongoDB) with a focus on its creator-facing portal. The agent has successfully fixed numerous critical bugs and implemented several major features requested by the user.
+The application is a full-stack video streaming platform (React frontend, FastAPI backend, MongoDB) with a creator portal and a public viewing site.
 
-The creator portal now includes a functional dashboard, a Publish mechanism, and advanced content management features like season creation, drag-and-drop episode reordering, and bulk editing. Access control issues for admin users have been resolved, and device limits were removed for them. The core video upload functionality, which was previously broken, has been fixed and verified.
+In this session, the agent resolved the critical black screen video playback issue by implementing a robust HLS -> MP4 -> Embed player fallback strategy. The agent also fixed a 403 error from the video CDN by programmatically managing security settings via API. A new Platform Settings tab was added to the admin panel with the UI and backend APIs to control global pricing, video format, and the first episode free rule. Numerous creator UI/UX issues were addressed, including removing technical jargon, adding vertical video validation, and removing pricing controls.
 
 **Last working item**:
-*   **Last item agent was working:** The user reported that the profile dropdown menu in the header is not smooth and has responsiveness issues. The agent had just started investigating the  and  components.
+*   **Last item agent was working:** Fixing the New Releases section on the homepage to display the most recent series on the left. The agent found the backend was not sorting series and that older data lacked a  timestamp.
+    *   **Agent's Actions:**
+        1.  Wrote and executed a script to add a  timestamp to all existing series documents in the database.
+        2.  Modified the backend API () to sort series by  in descending order.
+        3.  Updated the frontend  to display the first 8 items from the now-sorted list.
 *   **Status:** IN PROGRESS
 *   **Agent Testing Done:** N
-*   **Which testing method agent to use?** screenshot tool to verify the dropdown's responsiveness and smoothness on different screen sizes after a fix is applied.
+*   **Which testing method agent to use?** Frontend testing agent. Take a screenshot of the homepage to verify that the New Releases section now correctly shows the most recently created series (e.g., Implementation Success) on the far left.
 *   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   **Issue 1 (P0): Profile dropdown is lagging and not responsive.**
+*   **Issue 1 (P0): Unstable client-side session.**
     *   **Issues Detail:**
-        *   **Issue 1.1:** The user provided a screenshot showing the profile dropdown in the header is not rendering correctly or smoothly.
-            *   **Attempted fixes:** The agent previously memoized the  component, but the issue persists or has resurfaced, possibly in the mobile view or due to new component interactions.
+        *   **Issue 1.1:** Users are being logged out unexpectedly, forcing them to log in again. This was noted in the previous handoff and observed again. It severely disrupts the user experience.
+            *   **Attempted fixes:** The agent started modifying  to prevent logout on any  error, but the fix is incomplete and untested.
             *   **Next debug checklist:**
-                1.  Examine  and .
-                2.  Analyze the components that make up the dropdown menu ( used by Shadcn) for performance bottlenecks.
-                3.  Check for excessive re-renders using React DevTools or by adding logs.
-                4.  Ensure CSS is optimized for responsiveness and transitions.
-            *   **Why fix this issue and what will be achieved with the fix?** A laggy core UI element creates a poor user experience and makes the application feel unprofessional.
+                1.  Review and complete the logic in  to intelligently handle API errors without unnecessarily logging the user out.
+                2.  Consider implementing a silent JWT refresh mechanism to keep the session alive.
+                3.  Perform a dedicated test to verify session stability over a longer period.
             *   **Status:** IN PROGRESS
             *   **Is recurring issue?** Y
             *   **Should Test frontend/backend/both after fix?** Frontend
             *   **Blocked on other issue:** None
-*   **Issue 2 (P1): Clicking on a season in the creator portal does nothing.**
+
+*   **Issue 2 (P1): Episode count on series cards is not updating on the homepage.**
     *   **Issues Detail:**
-        *   **Issue 2.1:** The user reported that the season accordions on the series detail page are not interactive (i.e., they don't expand or collapse on click).
-            *   **Attempted fixes:** None. This is a newly reported issue.
+        *   **Issue 2.1:** The user reported that after uploading multiple episodes to a series, the series card on the homepage still showed 1 Episode. The agent confirmed the  count is correct in the backend database. This points to a client-side data fetching or caching issue.
+            *   **Attempted fixes:** None.
             *   **Next debug checklist:**
-                1.  Investigate .
-                2.  Verify the  handlers and state management ( for open/closed state) for the accordion trigger.
-                3.  Check for CSS issues (e.g., z-index, pointer-events) that might be blocking the click event.
-                4.  Inspect the browser console for any runtime errors when a season header is clicked.
-            *   **Why fix this issue and what will be achieved with the fix?** The season management feature is unusable if creators cannot expand seasons to see or manage the episodes within them.
+                1.  Examine the data fetching logic in .
+                2.  Implement a mechanism to re-fetch the list of series or invalidate the cache after a new episode has been successfully uploaded via the creator portal.
             *   **Status:** NOT STARTED
             *   **Is recurring issue?** N
             *   **Should Test frontend/backend/both after fix?** Frontend
             *   **Blocked on other issue:** None
 
 **In progress Task List**:
-There are no other in-progress tasks.
+*   **Task 1 (P0): Verify New Releases sorting.**
+    *   **Where to resume:** The backend and frontend code changes are complete. The next step is to take a screenshot of the homepage to confirm the new sort order is visually correct.
+    *   **What will be achieved with this?** The homepage will correctly feature the newest content, as requested by the user.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** Frontend
+    *   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   **(P0) Full Regression Test of Creator Portal:** Given the number of new, complex features (seasons, drag-and-drop, bulk edit), a full regression test with  is critical to ensure stability before deployment.
-    *   **(P1) Deploy Application:** The user has a recurring interest in deploying the application. Provide guidance once the portal is stable.
+    *   **(P0) Enforce Admin Panel Settings:** Connect the newly created admin settings (video format, pricing) to the application logic. The creator upload process must read and enforce the vertical video format, and the backend must apply the global price and first episode free rules when episodes are created/published.
+    *   **(P1) Implement Per-Series Exclusive Pricing:** The UI for this exists in the admin panel, but the backend logic to save and apply these price overrides to specific series needs to be implemented.
+    *   **(P1) Fix Creator UI Lag:** The user reported that forms and dropdowns in the creator account lag significantly. This is likely due to the complexity and size of  causing excessive re-renders. This requires performance optimization.
+    *   **(P2) Full Regression Test:** After the current high-priority fixes are complete, run a comprehensive regression test on the creator and public-facing flows using .
 *   **Future Tasks:**
-    *   Creator Payout Automation (Frontend UI implementation).
+    *   Creator Payout Automation (Frontend UI).
     *   Admin panel UI for managing push notifications.
-    *   Frontend UI for the analytics export feature.
-    *   Full implementation of social sharing features.
+    *   Frontend UI for an analytics export feature.
+    *   Implementation of social sharing features.
+    *   Deploy Application.
 
 **Completed work in this session**
-*   **Episode Upload Bug Fix:** Resolved the Not Found error during batch episode uploads by adding a new backend endpoint () and aligning frontend/backend data structures. Verified with .
-*   **Season Management:** Implemented an accordion-style UI in  for creators to organize episodes into seasons.
-*   **Drag-and-Drop Reordering:** Added functionality for creators to reorder episodes within and between seasons using . This included a new backend endpoint ().
-*   **Bulk Episode Editing:** Implemented a selection mode and toolbar for creators to edit properties of multiple episodes at once, supported by a new backend endpoint ().
-*   **Series Publishing:** Added a Publish button and corresponding backend logic () to allow admins/creators to make series publicly visible. This fixed the issue of series not appearing for viewers.
-*   **Admin Access & Device Limits:**
-    - Modified backend logic in  and  to auto-approve superadmins as creators, granting them access to the Creator Portal.
-    - Removed the device limit check for admin users to prevent login failures.
-*   **UI/UX Fixes:**
-    - Fixed an issue where clicking on series cards in the creator dashboard did not navigate to the detail page.
-    - Added a publish button directly to series cards for quick actions.
-    - Memoized the  component in an initial attempt to fix dropdown lag.
+*   **Critical Video Playback Fix:** Resolved the black screen issue by implementing a robust HLS -> MP4 -> Embed Player fallback strategy, ensuring videos play on all browsers.
+*   **CDN Integration Fix:** Programmatically resolved a 403 Forbidden error on the embed player by using the Bunny.net API to manage allowed domains and security settings.
+*   **Admin Panel for Platform Settings:** Created a new Platform Settings tab in the admin dashboard with UI and backend APIs to manage global episode price, the first episode free rule, and video format restrictions.
+*   **Creator UX Overhaul:**
+    *   Removed all user-facing technical jargon like Bunny.net and CDN.
+    *   The video upload modal now provides clearer instructions and auto-closes on success.
+    *   Added client-side validation to enforce vertical-only video uploads.
+    *   Removed all pricing controls from the creator interface, making it admin-only.
+*   **Database Migration:** Updated all series documents in the database to include a  timestamp to enable proper sorting.
 
 **Earlier issues found/mentioned but not fixed**
-*   None.
+*   The UI lag in the creator portal was mentioned by the user but has not been addressed yet. It is now listed as an upcoming task.
 
 **Known issue recurrence from previous fork**
-*   None.
+*   The **unstable client-side session** issue from the previous fork recurred and is now a high-priority (P0) fix in progress.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-*   **Frontend:** React, Vite, Tailwind CSS,  for drag-and-drop, component memoization (), .
-*   **Backend:** FastAPI, Python, MongoDB.
-*   **Authentication:** JWT.
-*   **Integrations:** Bunny.net API.
+*   **Video Fallback Strategy:** A multi-layered approach to ensure video playback: try HLS first, then fall back to a direct MP4 file, and finally to an iframe embed player.
+*   **API-driven Infrastructure:** Interacting with the Bunny.net Account API to programmatically manage CDN security settings.
+*   **Database Migration & Seeding:** Updating existing database records with a script and understanding how data is seeded on application startup.
+*   **State Management & Race Conditions:** Using  and callback refs to handle asynchronous operations and avoid race conditions in React's render lifecycle, especially during video player initialization.
 
 **key DB schema**
-*   **creator_series:** 
-*   **creator_episodes:**  (new fields added)
-*   **series:** The public collection where published series are copied.
+*   **** (New Collection): Stores global configuration.
+    *   
+    *   
+    *   
+    *    (vertical, landscape, both)
+*   ****: A  (datetime) field was added to all documents to enable sorting by creation date.
 
 **changes in tech stack**
-*   **Added:**  and its dependencies (, ) were installed for the episode reordering feature.
+*   No new dependencies were added. The agent utilized the existing  library to interact with the Bunny.net API.
 
 **All files of reference**
-*   : **(Critical)** The hub for all recent creator features; likely related to the non-interactive season issue.
-*   : **(Critical)** The component implementing the season UI and drag-and-drop logic.
-*    & : **(Critical)** The source of the user-reported dropdown lag.
-*   : **(Critical)** Contains all backend logic for the new creator features (publishing, reordering, bulk editing).
-*   : Contains the fix for the admin device limit.
+*   : For verifying the New Releases sorting.
+*   : Contains the updated backend sorting logic.
+*   : For fixing the session stability issue.
+*   : The location of the new admin settings panel.
+*   : The API for the admin settings.
+*   : Location of the UI lag and where admin settings need to be enforced.
 
 **Areas that need refactoring**:
-*    is now extremely large and complex. The state management and logic for data fetching, drag-and-drop, bulk editing, and uploading should be extracted into custom hooks to improve readability and maintainability.
-*   Backend permission logic is still scattered. Centralizing it into a reusable FastAPI dependency remains a valuable refactoring task.
+*    remains a major performance bottleneck due to its large size and complexity. It should be broken down into smaller, memoized components and custom hooks to improve rendering performance and reduce lag.
+*   The session management logic, currently being patched in , would benefit from a more structured solution, potentially including a silent token refresh mechanism.
 
 **key api endpoints**
-*   : Creates an episode for a series.
-*   : (New) Updates the  and  for multiple episodes.
-*   : (New) Updates properties for multiple selected episodes.
-*   : (New) Copies a series from  to the public  collection.
-*   : (New) Clears login sessions for a user.
+*   : (Modified) Now sorts series by  descending.
+*   : (New) Fetches the global platform settings.
+*   : (New) Updates the global platform settings.
 
 **Critical Info for New Agent**
-*   The user's primary focus is on the quality and functionality of the **Creator Portal**. They test features immediately and provide direct feedback.
-*   There are two active, user-reported UI bugs that are high priority: the laggy profile dropdown and non-functional season accordions.
-*   The  has been used successfully multiple times to validate complex end-to-end flows. It is a reliable tool for verifying fixes and new features in the creator portal.
-*   The creator test account is  / . This user has admin privileges and is now auto-approved as a creator.
+*   The highest priority is to **verify the New Releases sorting fix** and then immediately address the **P0 session stability issue**.
+*   The admin settings for video format and pricing have been created, but they are **not yet enforced**. The next step is to connect this configuration to the relevant parts of the application (creator upload and backend episode creation).
+*   The video playback problem is **solved**. The implemented HLS -> MP4 fallback is robust. Do not revisit this unless the user reports a new, specific playback failure.
 
 **documents and test reports created in this job**
-*   
-*   
-*   
-*   
-*   
-*   
-*    (updated)
 *    (updated)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** The admin profile dropdown is laggy and not responsive. - **Status: IN PROGRESS**
-2.  **User:** Where is the green publish series button? - **Status: RESOLVED** (Agent added it to series cards).
-3.  **User:** Nothing happens when you click the season, and series aren't visible to viewers. - **Status: PARTIALLY RESOLVED** (Viewer visibility fixed; season click is now a pending issue).
-4.  **User:** Now it is telling me device limit reached!!?? - **Status: RESOLVED** (Agent removed device limits for admin).
-5.  **User:** I logged in as super admin but am not allowed to enter the creators page. Profile dropdown is lagging. Uploaded videos are not showing. - **Status: RESOLVED** (All three points were fixed and verified by the testing agent).
-6.  **User:** Requests bulk episode editing and asks for share link/credentials. - **Status: RESOLVED** (Feature implemented, credentials provided).
-7.  **User:** Requests drag-and-drop episode reordering. - **Status: RESOLVED** (Feature implemented).
-8.  **User:** Requests video upload progress indicator, confirms Bunny.net usage, and asks for season management. - **Status: RESOLVED** (All three features implemented).
-9.  **User:** Proceed. Regarding the season UI - choose the most modern and with a good experience. - **Status: RESOLVED** (Agent acknowledged and implemented an accordion UI).
-10. **User:** I believe this point of uploading is linked to Bunny.net - If so proceed - **Status: RESOLVED** (Agent confirmed and fixed the upload issue).
+1.  **User:** The drop down and forms in the creators account are not responsive and they lag a lot - Fix it. - **Status: NOT STARTED**
+2.  **User:** I did not see the Progress panel and also there is no need to show the creator that the video is uploading to Bunny.net. - **Status: RESOLVED** (UI text was fixed).
+3.  **User:** I can not see the video I added. - **Status: NOT STARTED** (Related to the episode count/refresh issue).
+4.  **User:** The skeletal loading kind of takes too long. - **Status: NOT STARTED** (Related to UI lag).
+5.  **User:** Ok I see it in new releases - i think it should use the approach where by the most recent is on the left side. - **Status: IN PROGRESS** (Agent implemented the fix, pending verification).
+6.  **User:** Still shows uploaded to Bunny.net also the modal is not showing what to do after upload completion. - **Status: RESOLVED**
+7.  **User:** I added Implementation Success - added 3 episodes but it shows 1 Episode. - **Status: NOT STARTED**
+8.  **User:** Creator is not allowed to change the price...Admin puts up the global price... - **Status: RESOLVED** (Creator UI fixed, Admin UI created).
+9.  **User:** ...the format of the videos uploaded needs to be vertical...The first episode HAS TO BE FREE. - **Status: IN PROGRESS** (Admin UI created, enforcement is pending).
+10. **User:** The recent episodes should be on the lft side of the screen. - **Status: IN PROGRESS** (This is the last working item).
 
 **Project Health Check:**
 *   **Broken:**
-    *   Profile dropdown menu performance/responsiveness.
-    *   Interactivity of season accordions in the creator portal (cannot be expanded/collapsed).
+    *   Client-side session management (causes frequent logouts).
+    *   Homepage data refresh (episode counts don't update without a manual refresh).
+    *   Creator Portal performance (significant UI lag).
 *   **Mocked:**
     *   None.
 
 **3rd Party Integrations**
-*   **Bunny.net:** Video hosting, streaming, and CDN.
+*   **Bunny.net:** Video hosting, streaming (HLS), and CDN. The integration now also uses the Account API key to manage security settings.
 *   **dnd-kit:** Frontend library for drag-and-drop functionality.
+*   **hls.js:** Frontend library for HLS playback.
 
 **Testing status**
-*   **Testing agent used after significant changes:** YES. The agent used  extensively to verify the fixes for video uploads, admin access, and the implementation of new features like publishing, reordering, and bulk editing.
+*   **Testing agent used after significant changes:** YES. The agent used it to diagnose a race condition in the video player.
 *   **Troubleshoot agent used after agent stuck in loop:** NO
 *   **Test files created:** []
-*   **Known regressions:** The profile dropdown lag is a recurring performance issue.
+*   **Known regressions:** The unstable session management issue has recurred and is more prominent.
 
 **Credentials to test flow:**
 *   **Creator/Admin:**  / 
 
 **What agent forgot to execute**
-*   The agent has not yet fixed the two most recent user-reported issues: the laggy profile dropdown and the non-interactive season accordions. These should be the next priority.</analysis>
+*   The agent did not address the UI lag in the creator portal, which the user explicitly mentioned.
+*   The agent has created the admin settings but has not yet implemented the logic to enforce those settings throughout the application.</analysis>
