@@ -1541,6 +1541,54 @@ export const CreatorSeriesDetailPage = () => {
               </Button>
             </div>
           </div>
+          
+          {/* Workflow Help Banner */}
+          {series.status !== "published" && episodes.length > 0 && (
+            <div className="mt-4 p-4 rounded-lg bg-gradient-to-r from-green-500/20 to-emerald-600/20 border border-green-500/30">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-500/30 flex items-center justify-center">
+                    <Globe className="w-5 h-5 text-green-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-green-300">Ready to go live?</p>
+                    <p className="text-sm text-green-400/80">Click Publish to make your series visible to all viewers</p>
+                  </div>
+                </div>
+                <Button 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={handlePublishSeries}
+                  disabled={publishing}
+                  data-testid="publish-series-btn-main"
+                >
+                  {publishing ? (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  ) : (
+                    <Globe className="w-4 h-4 mr-2" />
+                  )}
+                  {publishing ? "Publishing..." : "Publish Series"}
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {/* Published Status Banner */}
+          {series.status === "published" && (
+            <div className="mt-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-center justify-between">
+              <p className="text-sm text-green-400 flex items-center gap-2">
+                <Globe className="w-4 h-4" />
+                Your series is live and visible to all viewers!
+              </p>
+              <a 
+                href={`/series/${series.id}`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-green-300 hover:text-green-200 underline"
+              >
+                View Public Page →
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Mobile Series Info */}
