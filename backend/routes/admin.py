@@ -1319,3 +1319,4 @@ async def mark_all_admin_alerts_read(user: dict = Depends(require_admin)):
     
     return {"message": f"Marked {result.modified_count} alerts as read"}
 
+
