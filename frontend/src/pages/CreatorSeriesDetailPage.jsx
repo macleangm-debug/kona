@@ -1415,7 +1415,7 @@ export const CreatorSeriesDetailPage = () => {
           }
         );
         
-        // Mark as encoding (video is processing on Bunny CDN)
+        // Mark as encoding (video is processing)
         setBatchEpisodes(prev => prev.map(e => 
           e.id === ep.id ? { ...e, uploading: false, progress: 100, uploaded: true } : e
         ));
