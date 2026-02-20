@@ -420,6 +420,74 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   }, [episode, user]);
 
+  // ============ HLS VIDEO INITIALIZATION ============
+  useEffect(() => {
+    const video = videoRef.current;
+    const videoUrl = episode?.video_url;
+    
+    if (!video || !videoUrl) return;
+    
+    // Check if URL is an HLS playlist
+    const isHlsUrl = videoUrl.includes('.m3u8') || videoUrl.includes('playlist');
+    
+    // Clean up previous HLS instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+    
+    if (isHlsUrl && Hls.isSupported()) {
+      // Use HLS.js for browsers that don't support HLS natively
+      const hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+      });
+      hlsRef.current = hls;
+      
+      hls.loadSource(videoUrl);
+      hls.attachMedia(video);
+      
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        // Video is ready to play
+        setVideoError(null);
+      });
+      
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (data.fatal) {
+          console.error("HLS fatal error:", data);
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              // Try to recover from network error
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              // Try to recover from media error
+              hls.recoverMediaError();
+              break;
+            default:
+              setVideoError("Failed to load video. Please try again.");
+              break;
+          }
+        }
+      });
+    } else if (isHlsUrl && video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari native HLS support
+      video.src = videoUrl;
+    } else {
+      // Direct video URL (MP4, etc.)
+      video.src = videoUrl;
+    }
+    
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [episode?.video_url]);
+
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
     // Show pre-roll ad when video loads (if applicable)
