@@ -447,7 +447,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     
     // Track recovery attempts to avoid infinite loops
     let mediaRecoveryAttempts = 0;
-    const MAX_RECOVERY_ATTEMPTS = 2;
+    const MAX_RECOVERY_ATTEMPTS = 1;
     
     if (isHlsUrl && Hls.isSupported()) {
       // Use HLS.js for browsers that don't support HLS natively
@@ -468,6 +468,28 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       });
       
       hls.on(Hls.Events.ERROR, (event, data) => {
+        console.warn("HLS error event:", data.type, data.details, "fatal:", data.fatal);
+        
+        // Check for codec-related errors that can't be recovered
+        const unrecoverableErrors = [
+          'manifestIncompatibleCodecsError',
+          'bufferIncompatibleCodecsError',
+          'manifestParsingError',
+          'levelLoadError'
+        ];
+        
+        if (unrecoverableErrors.includes(data.details)) {
+          console.warn("Unrecoverable HLS error, switching to embed fallback:", data.details);
+          if (embedUrl) {
+            hls.destroy();
+            hlsRef.current = null;
+            setUseEmbedFallback(true);
+          } else {
+            setVideoError("Video format not supported. Please try a different browser.");
+          }
+          return;
+        }
+        
         if (data.fatal) {
           console.error("HLS fatal error:", data);
           switch (data.type) {
@@ -479,11 +501,14 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
               // Try to recover from media error (limited attempts)
               if (mediaRecoveryAttempts < MAX_RECOVERY_ATTEMPTS) {
                 mediaRecoveryAttempts++;
+                console.log("Attempting HLS media recovery, attempt:", mediaRecoveryAttempts);
                 hls.recoverMediaError();
               } else {
                 // Recovery failed, fall back to embed player
                 console.warn("HLS media recovery failed, falling back to embed player");
                 if (embedUrl) {
+                  hls.destroy();
+                  hlsRef.current = null;
                   setUseEmbedFallback(true);
                 } else {
                   setVideoError("Failed to load video. Please try again.");
@@ -491,9 +516,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
               }
               break;
             default:
-              // For other errors (including codec issues), use embed fallback
+              // For other errors, use embed fallback
               console.warn("HLS error, attempting fallback to embed player:", data.details);
               if (embedUrl) {
+                hls.destroy();
+                hlsRef.current = null;
                 setUseEmbedFallback(true);
               } else {
                 setVideoError("Failed to load video. Please try again.");
