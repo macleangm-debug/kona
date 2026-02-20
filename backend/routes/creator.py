@@ -1228,8 +1228,21 @@ async def publish_series_to_main(series_id: str, creator_id: str):
     )
     
     # Add episodes to main episodes
+    # Include episodes that are "ready" OR have a direct video_url
+    published_count = 0
     for ep in episodes:
-        if ep.get("encoding_status") == "ready":
+        # Publish if: encoding is ready, OR episode has a direct video URL
+        is_ready = ep.get("encoding_status") == "ready"
+        has_video_url = bool(ep.get("video_url"))
+        has_bunny_video = bool(ep.get("bunny_video_id"))
+        
+        if is_ready or has_video_url:
+            # Determine the video URL
+            if ep.get("bunny_video_id"):
+                video_url = bunny_service.get_direct_play_url(ep["bunny_video_id"])
+            else:
+                video_url = ep.get("video_url", "")
+            
             main_episode = {
                 "id": ep["id"],
                 "series_id": series_id,
@@ -1237,11 +1250,11 @@ async def publish_series_to_main(series_id: str, creator_id: str):
                 "title": ep["title"],
                 "thumbnail": ep.get("thumbnail") or series["thumbnail"],
                 "duration": f"{(ep.get('duration', 120) // 60)}:{str(ep.get('duration', 0) % 60).zfill(2)}",
-                "video_url": bunny_service.get_direct_play_url(ep["bunny_video_id"]) if ep.get("bunny_video_id") else "",
+                "video_url": video_url,
                 "bunny_video_id": ep.get("bunny_video_id"),
                 "is_free": ep.get("is_free", False),
                 "coins_required": ep.get("coins_required", 5),
-                "intro_duration": ep.get("intro_duration", 30),  # Default 30 seconds
+                "intro_duration": ep.get("intro_duration", 30),
                 "creator_id": creator_id
             }
             
@@ -1250,6 +1263,15 @@ async def publish_series_to_main(series_id: str, creator_id: str):
                 {"$set": main_episode},
                 upsert=True
             )
+            published_count += 1
+    
+    # Invalidate cache for the series
+    from services.cache import cache, series_key, series_list_key, episodes_key
+    await cache.delete(series_key(series_id))
+    await cache.delete(series_list_key("all"))
+    await cache.delete(episodes_key(series_id))
+    
+    return published_count
 
 
 # ============ EPISODE MANAGEMENT ============
