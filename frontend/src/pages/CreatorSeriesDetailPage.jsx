@@ -128,9 +128,12 @@ const HlsVideoPlayer = ({ src, poster, embedUrl }) => {
         <iframe
           src={embedUrl}
           className="w-full h-full"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
           allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+          loading="lazy"
           title="Video Preview"
+          style={{ border: 'none' }}
         />
       </div>
     );
