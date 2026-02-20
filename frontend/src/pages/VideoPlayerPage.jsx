@@ -426,8 +426,15 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   useEffect(() => {
     const video = videoRef.current;
     const videoUrl = episode?.video_url;
+    const embedUrl = episode?.embed_url;
+    
+    // If using embed fallback, skip HLS initialization
+    if (useEmbedFallback) return;
     
     if (!video || !videoUrl) return;
+    
+    // Reset error state on new video
+    setVideoError(null);
     
     // Check if URL is an HLS playlist
     const isHlsUrl = videoUrl.includes('.m3u8') || videoUrl.includes('playlist');
@@ -437,6 +444,10 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
+    
+    // Track recovery attempts to avoid infinite loops
+    let mediaRecoveryAttempts = 0;
+    const MAX_RECOVERY_ATTEMPTS = 2;
     
     if (isHlsUrl && Hls.isSupported()) {
       // Use HLS.js for browsers that don't support HLS natively
@@ -465,11 +476,28 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
               hls.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              // Try to recover from media error
-              hls.recoverMediaError();
+              // Try to recover from media error (limited attempts)
+              if (mediaRecoveryAttempts < MAX_RECOVERY_ATTEMPTS) {
+                mediaRecoveryAttempts++;
+                hls.recoverMediaError();
+              } else {
+                // Recovery failed, fall back to embed player
+                console.warn("HLS media recovery failed, falling back to embed player");
+                if (embedUrl) {
+                  setUseEmbedFallback(true);
+                } else {
+                  setVideoError("Failed to load video. Please try again.");
+                }
+              }
               break;
             default:
-              setVideoError("Failed to load video. Please try again.");
+              // For other errors (including codec issues), use embed fallback
+              console.warn("HLS error, attempting fallback to embed player:", data.details);
+              if (embedUrl) {
+                setUseEmbedFallback(true);
+              } else {
+                setVideoError("Failed to load video. Please try again.");
+              }
               break;
           }
         }
@@ -477,6 +505,13 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     } else if (isHlsUrl && video.canPlayType('application/vnd.apple.mpegurl')) {
       // Safari native HLS support
       video.src = videoUrl;
+      video.addEventListener('error', () => {
+        if (embedUrl) {
+          setUseEmbedFallback(true);
+        } else {
+          setVideoError("Failed to load video.");
+        }
+      });
     } else {
       // Direct video URL (MP4, etc.)
       video.src = videoUrl;
@@ -488,7 +523,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         hlsRef.current = null;
       }
     };
-  }, [episode?.video_url]);
+  }, [episode?.video_url, episode?.embed_url, useEmbedFallback]);
 
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
