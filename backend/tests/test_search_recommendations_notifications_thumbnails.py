@@ -165,7 +165,7 @@ class TestRecommendationEngine:
     
     def test_02_trending_series(self):
         """Test GET /api/recommendations/trending - Trending series"""
-        response = requests.get(f"{BASE_URL}/api/recommendations/trending")
+        response = requests.get(f"{BASE_URL}/api/recommendations/trending", headers=COMMON_HEADERS)
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
@@ -184,7 +184,7 @@ class TestRecommendationEngine:
             if series_list and len(series_list) > 0:
                 series_id = series_list[0].get("id")
                 
-                response = requests.get(f"{BASE_URL}/api/recommendations/similar/{series_id}")
+                response = requests.get(f"{BASE_URL}/api/recommendations/similar/{series_id}", headers=COMMON_HEADERS)
                 
                 assert response.status_code in [200, 404], f"Unexpected status: {response.status_code}"
                 if response.status_code == 200:
