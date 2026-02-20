@@ -18,13 +18,21 @@ import {
 // Memoized User Menu to prevent re-renders
 const UserMenu = memo(({ user, onNavigate, onLogout, t }) => (
   <DropdownMenu modal={false}>
-    <DropdownMenuTrigger className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/10 transition-colors">
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-sm font-bold">
+    <DropdownMenuTrigger 
+      className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/10 transition-colors outline-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+      data-testid="user-menu-trigger"
+    >
+      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center text-sm font-bold select-none">
         {user.name?.charAt(0).toUpperCase() || "U"}
       </div>
-      <ChevronDown className="w-4 h-4 text-gray-400" />
+      <ChevronDown className="w-4 h-4 text-gray-400 transition-transform duration-200" />
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-white/10" sideOffset={8}>
+    <DropdownMenuContent 
+      align="end" 
+      className="w-56 bg-gray-900 border-white/10 animate-in fade-in-0 zoom-in-95 duration-100" 
+      sideOffset={8}
+      data-testid="user-menu-content"
+    >
       <div className="px-3 py-2 border-b border-white/10">
         <p className="font-medium text-sm">{user.name}</p>
         <p className="text-xs text-gray-400">{user.email}</p>
