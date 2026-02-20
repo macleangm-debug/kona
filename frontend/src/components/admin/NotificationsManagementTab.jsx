@@ -330,41 +330,49 @@ const NotificationsManagementTab = ({ token }) => {
                 No triggers configured yet.
               </p>
             ) : (
-              triggers.map(trigger => (
-                <div 
-                  key={trigger.id} 
-                  className={`p-4 rounded-lg border ${
-                    trigger.enabled ? 'bg-green-500/5 border-green-500/20' : 'bg-white/5 border-white/10'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-medium">{trigger.name}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">{trigger.description}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Badge variant="outline" className="text-xs">
-                          {trigger.event}
-                        </Badge>
-                        {trigger.last_triggered && (
-                          <span className="text-xs text-muted-foreground">
-                            Last: {new Date(trigger.last_triggered).toLocaleDateString()}
-                          </span>
-                        )}
+              triggers.map(trigger => {
+                // Format trigger name from id (e.g., "new_episode" -> "New Episode")
+                const formatName = (id) => id.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                
+                return (
+                  <div 
+                    key={trigger.id} 
+                    className={`p-4 rounded-lg border ${
+                      trigger.enabled ? 'bg-green-500/5 border-green-500/20' : 'bg-white/5 border-white/10'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-white">{formatName(trigger.id)}</h4>
+                        <p className="text-sm text-gray-400 mt-1">
+                          {trigger.title_template || trigger.message_template || 'No description'}
+                        </p>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge variant="outline" className="text-xs capitalize border-white/20 text-gray-300">
+                            {trigger.priority || 'normal'} priority
+                          </Badge>
+                          {trigger.updated_at && (
+                            <span className="text-xs text-gray-500">
+                              Updated: {new Date(trigger.updated_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <button
+                        onClick={() => toggleTrigger(trigger.id, !trigger.enabled)}
+                        className={`p-2 rounded-full transition-all ${
+                          trigger.enabled 
+                            ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
+                            : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                        }`}
+                      >
+                        {trigger.enabled ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => toggleTrigger(trigger.id, !trigger.enabled)}
-                      className={`p-2 rounded-full transition-all ${
-                        trigger.enabled 
-                          ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' 
-                          : 'bg-white/10 text-muted-foreground hover:bg-white/20'
-                      }`}
-                    >
-                      {trigger.enabled ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
-                    </button>
                   </div>
-                </div>
-              ))
+                );
+              })
+            )}
             )}
             
             {/* Built-in triggers info */}
