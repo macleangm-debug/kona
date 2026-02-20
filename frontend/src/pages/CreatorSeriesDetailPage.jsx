@@ -2146,6 +2146,82 @@ export const CreatorSeriesDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Video Preview Dialog */}
+      <Dialog open={showPreview} onOpenChange={(open) => {
+        setShowPreview(open);
+        if (!open) setPreviewData(null);
+      }}>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+          <DialogHeader className="p-4 pb-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Play className="w-5 h-5 text-primary" />
+              Episode Preview
+            </DialogTitle>
+            <DialogDescription>
+              {previewData?.title || "Loading preview..."}
+              {previewData?.episode_code && ` - ${previewData.episode_code}`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="p-4">
+            {previewLoading ? (
+              <div className="aspect-video bg-black/50 rounded-lg flex items-center justify-center">
+                <div className="text-center">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-primary" />
+                  <p className="text-sm text-muted-foreground">Loading video...</p>
+                </div>
+              </div>
+            ) : previewData?.can_preview ? (
+              <div className="aspect-video bg-black rounded-lg overflow-hidden">
+                <iframe
+                  src={previewData.embed_url}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title="Episode Preview"
+                />
+              </div>
+            ) : previewData?.message ? (
+              <div className="aspect-video bg-black/50 rounded-lg flex items-center justify-center">
+                <div className="text-center p-4">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-yellow-400" />
+                  <p className="text-sm text-yellow-400 font-medium">{previewData.message}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Video encoding typically takes 2-5 minutes
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="aspect-video bg-black/50 rounded-lg flex items-center justify-center">
+                <div className="text-center p-4">
+                  <AlertCircle className="w-8 h-8 mx-auto mb-2 text-red-400" />
+                  <p className="text-sm text-red-400">Failed to load preview</p>
+                </div>
+              </div>
+            )}
+            
+            {previewData && (
+              <div className="mt-4 flex items-center justify-between text-sm">
+                <div className="flex items-center gap-4">
+                  {previewData.duration && (
+                    <span className="text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {Math.floor(previewData.duration / 60)}:{String(Math.floor(previewData.duration % 60)).padStart(2, '0')}
+                    </span>
+                  )}
+                  <Badge variant={previewData.encoding_status === 'ready' ? 'default' : 'secondary'}>
+                    {previewData.encoding_status === 'ready' ? 'Ready' : previewData.encoding_status}
+                  </Badge>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => setShowPreview(false)}>
+                  Close
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
