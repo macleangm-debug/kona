@@ -872,6 +872,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       // Reset embed fallback state when episode changes
       setUseEmbedFallback(false);
       setVideoError(null);
+      setVideoMounted(false); // Reset so HLS re-initializes for new video
       
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
