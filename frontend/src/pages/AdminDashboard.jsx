@@ -3417,6 +3417,16 @@ export const AdminDashboard = () => {
           <ABTestingManager token={token} />
         )}
 
+        {/* Thumbnail A/B Testing Tab (Super Admin Only) */}
+        {activeTab === "thumbnail-testing" && user?.is_super_admin && (
+          <ThumbnailTestingTab token={token} />
+        )}
+
+        {/* Notifications Management Tab */}
+        {activeTab === "notifications" && (
+          <NotificationsManagementTab token={token} />
+        )}
+
         {/* Investment Calculator Tab (Super Admin Only) */}
         {activeTab === "investment" && user?.is_super_admin && (
           <InvestmentCalculatorTab token={token} />
