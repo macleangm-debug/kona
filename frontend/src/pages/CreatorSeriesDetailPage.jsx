@@ -1907,56 +1907,9 @@ Use [brackets] for sounds.
                     />
                   </label>
                 </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-xs text-muted-foreground">
-                    Upload .vtt subtitle files. Adding subtitles increases your reach by 40%!
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const template = `WEBVTT
-
-1
-00:00:00.000 --> 00:00:03.000
-[Opening scene]
-
-2
-00:00:03.000 --> 00:00:06.500
-Welcome to this episode.
-
-3
-00:00:07.000 --> 00:00:10.000
-This is an example subtitle
-that spans two lines.
-
-4
-00:00:10.500 --> 00:00:14.000
-Character dialogue goes here.
-
-5
-00:00:15.000 --> 00:00:18.500
-Keep each subtitle under 2 lines.
-
-6
-00:00:19.000 --> 00:00:22.000
-Use [brackets] for sounds.
-`;
-                      const blob = new Blob([template], { type: 'text/vtt' });
-                      const url = URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'subtitle_template.vtt';
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      URL.revokeObjectURL(url);
-                      toast.success('Template downloaded!');
-                    }}
-                    className="text-xs text-primary hover:underline"
-                  >
-                    Download Template
-                  </button>
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Upload .vtt subtitle files. Adding subtitles increases your reach by 40%!
+                </p>
                 
                 {/* Format Example */}
                 <div className="p-2 rounded bg-secondary/30 border border-white/5">
