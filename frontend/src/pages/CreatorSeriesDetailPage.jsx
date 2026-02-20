@@ -798,6 +798,11 @@ export const CreatorSeriesDetailPage = () => {
   const [selectedSubtitleLanguage, setSelectedSubtitleLanguage] = useState("en");
   const subtitleFileInputRef = useRef(null);
   
+  // Video preview state
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  
   // Video validation state
   const [videoValidation, setVideoValidation] = useState({
     isValidating: false,
