@@ -159,6 +159,7 @@ export const CreatorDashboardOverview = ({
   series, 
   submissions,
   onCreateSeries,
+  onPublish,
   loading = false
 }) => {
   const navigate = useNavigate();
