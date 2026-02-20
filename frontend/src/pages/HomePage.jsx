@@ -442,6 +442,44 @@ export const HomePage = ({ onAuthClick }) => {
         </div>
       </div>
 
+      {/* For You Section - Personalized Recommendations */}
+      {user && forYou.length > 0 && (
+        <div className="mb-6" data-testid="for-you-section">
+          <div className="flex items-center justify-between px-4 mb-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <h2 className="font-heading text-sm font-semibold">For You</h2>
+            </div>
+            <button 
+              onClick={() => navigate("/category/for-you")}
+              className="text-xs text-primary"
+              data-testid="see-all-for-you"
+            >See All</button>
+          </div>
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+            {forYouLoading ? (
+              <div className="flex items-center justify-center w-full py-8">
+                <div className="animate-pulse text-muted-foreground text-sm">Loading recommendations...</div>
+              </div>
+            ) : (
+              forYou.map((s, index) => (
+                <div key={s.id} className="flex-shrink-0 w-28">
+                  <LazySeriesCard 
+                    series={s}
+                    badge={index === 0 ? "hot" : index < 3 ? "top" : null}
+                    onClick={() => navigate(`/series/${s.id}`)}
+                    showViews={false}
+                    inMyList={myList.includes(s.id)}
+                    onAddToList={handleAddToList}
+                    onRemoveFromList={handleRemoveFromList}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Trending Now - Horizontal Scroll */}
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
