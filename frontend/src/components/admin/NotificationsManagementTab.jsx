@@ -373,7 +373,6 @@ const NotificationsManagementTab = ({ token }) => {
                 );
               })
             )}
-            )}
             
             {/* Built-in triggers info */}
             <div className="mt-4 p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
