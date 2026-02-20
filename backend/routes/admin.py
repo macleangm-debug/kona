@@ -1320,3 +1320,37 @@ async def mark_all_admin_alerts_read(user: dict = Depends(require_admin)):
     return {"message": f"Marked {result.modified_count} alerts as read"}
 
 
+
+
+
+# ============ BUNNY.NET CDN CONFIGURATION ============
+@router.get("/bunny/referrers")
+async def get_bunny_referrers(user: dict = Depends(require_admin)):
+    """Get current allowed referrer domains for Bunny.net embed player"""
+    from services.bunny import bunny_service
+    result = await bunny_service.get_allowed_referrers()
+    return result
+
+@router.post("/bunny/referrers")
+async def add_bunny_referrer(hostname: str, user: dict = Depends(require_admin)):
+    """
+    Add a domain to Bunny.net allowed referrers for embed player access.
+    This fixes 403 errors when embedding videos on new domains.
+    
+    Args:
+        hostname: Domain to allow (e.g., "example.com" or "myapp.preview.emergentagent.com")
+    """
+    from services.bunny import bunny_service
+    
+    # Clean the hostname (remove protocol and paths)
+    hostname = hostname.replace("https://", "").replace("http://", "").split("/")[0]
+    
+    result = await bunny_service.add_allowed_referrer(hostname)
+    
+    if not result.get("success"):
+        raise HTTPException(
+            status_code=400, 
+            detail=result.get("error", "Failed to add referrer")
+        )
+    
+    return result
