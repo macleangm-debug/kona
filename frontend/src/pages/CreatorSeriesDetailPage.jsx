@@ -1441,7 +1441,7 @@ export const CreatorSeriesDetailPage = () => {
     setBatchUploading(false);
     
     if (successCount > 0) {
-      toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded to Bunny.net CDN!`);
+      toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded successfully!`);
       fetchSeriesDetail();
     }
     
