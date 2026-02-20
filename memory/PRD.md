@@ -341,14 +341,36 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
    - Prevents unnecessary re-renders when parent state changes
    - **Modified:** `frontend/src/pages/CreatorSeriesDetailPage.jsx`
 
+5. **Admin Platform Settings Enforcement (COMPLETED)**
+   - Created `get_platform_settings()` helper for retrieving global settings
+   - Created `get_episode_pricing()` function for calculating pricing based on admin rules
+   - Episode creation now uses admin pricing (global or series-specific)
+   - Publish flow applies admin pricing to all episodes
+   - New endpoint: `GET /api/creator/upload-settings` for frontend validation
+   - Frontend fetches platform settings and validates video format dynamically
+   - **Modified:** `backend/routes/creator.py`
+   - **Modified:** `frontend/src/pages/CreatorSeriesDetailPage.jsx`
+
+6. **Per-Series Exclusive Pricing (VERIFIED)**
+   - Backend endpoints already exist and working:
+     - `GET /api/admin/series/{id}/pricing` - Get series-specific pricing
+     - `PUT /api/admin/series/{id}/pricing` - Set custom price, exclusive flag, first-free override
+   - Frontend Admin Dashboard already has UI for this
+   - Custom episode prices override global defaults
+   - First episode free can be overridden per-series
+
 ### P1 (High)
 - [x] **Fix Unstable Session Management** - COMPLETED
   - Added token expiration checks and improved 401 handling
+- [x] **Enforce Admin Platform Settings** - COMPLETED
+  - Episode pricing controlled by admin (global and per-series)
+  - Video format validation enforced based on admin settings
+- [x] **Per-Series Exclusive Pricing** - VERIFIED WORKING
+  - Backend and frontend already implemented and tested
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
 - [ ] Real SMS provider for OTP (Africa's Talking)
 - [ ] Video encoding/CDN integration (Bunny.net already configured)
 - [ ] Creator payout automation UI in frontend
-- [ ] **Enforce Admin Platform Settings** - Connect admin settings to creator upload flow
 
 ### P2 (Medium)
 - [ ] Per-series exclusive pricing implementation
