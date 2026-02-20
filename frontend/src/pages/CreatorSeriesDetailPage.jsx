@@ -1302,20 +1302,53 @@ export const CreatorSeriesDetailPage = () => {
       return;
     }
     
+    // Validate video dimensions (must be vertical)
+    const validateVideoFormat = (file) => {
+      return new Promise((resolve) => {
+        const video = document.createElement('video');
+        video.preload = 'metadata';
+        video.onloadedmetadata = () => {
+          URL.revokeObjectURL(video.src);
+          const isVertical = video.videoHeight > video.videoWidth;
+          resolve({ isVertical, width: video.videoWidth, height: video.videoHeight });
+        };
+        video.onerror = () => resolve({ isVertical: true, width: 0, height: 0 }); // Allow on error
+        video.src = URL.createObjectURL(file);
+      });
+    };
+    
+    // Check all videos for vertical format
+    const validationResults = await Promise.all(videoFiles.map(async (file) => {
+      const { isVertical, width, height } = await validateVideoFormat(file);
+      return { file, isVertical, width, height };
+    }));
+    
+    const invalidVideos = validationResults.filter(v => !v.isVertical);
+    if (invalidVideos.length > 0) {
+      toast.error(`${invalidVideos.length} video${invalidVideos.length > 1 ? 's are' : ' is'} not in vertical format. Please upload vertical videos (portrait orientation).`);
+      return;
+    }
+    
     // Get current episode count for this season
     const seasonEpisodes = episodes.filter(ep => ep.season_number === selectedSeason);
     
-    const newEpisodes = await Promise.all(videoFiles.map(async (file, index) => {
+    // Check if this is the first episode of the series (for auto-free setting)
+    const totalEpisodes = episodes.length;
+    
+    const newEpisodes = await Promise.all(validationResults.map(async ({ file }, index) => {
       const thumbnail = await generateThumbnail(file);
+      const episodeNum = seasonEpisodes.length + index + 1;
+      const isFirstEpisodeOfSeries = totalEpisodes === 0 && index === 0;
+      
       return {
         id: `batch-${Date.now()}-${index}`,
         file,
         thumbnail,
         title: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "),
         season_number: selectedSeason,
-        episode_number: seasonEpisodes.length + index + 1,
-        is_free: seasonEpisodes.length + index === 0 && selectedSeason === 1, // S01E01 is free
-        coins_required: 5,
+        episode_number: episodeNum,
+        is_free: isFirstEpisodeOfSeries, // First episode of the series is automatically FREE
+        coins_required: 5, // Default pricing (admin-controlled)
         intro_duration: 30,
         uploading: false,
         progress: 0,
