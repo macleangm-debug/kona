@@ -167,15 +167,25 @@ class BunnyStreamService:
         This is required for the embed player to work on a specific domain.
         Uses the Bunny.net Core API (not Stream API).
         
+        Requires BUNNY_ACCOUNT_API_KEY environment variable (different from Stream API key).
+        Get this from: Bunny.net Dashboard > Account > API Key
+        
         Args:
             hostname: Domain to allow (e.g., "example.com" or "*.example.com")
                      Do not include http/https or paths
         """
+        if not self.account_api_key:
+            return {
+                "success": False, 
+                "error": "BUNNY_ACCOUNT_API_KEY not configured. Get it from Bunny.net Dashboard > Account > API Key",
+                "needs_config": True
+            }
+        
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"https://api.bunny.net/videolibrary/{self.library_id}/addAllowedReferrer",
                 headers={
-                    "AccessKey": self.api_key,
+                    "AccessKey": self.account_api_key,  # Use account API key, not stream API key
                     "Accept": "application/json",
                     "Content-Type": "application/json"
                 },
