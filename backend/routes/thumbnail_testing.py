@@ -232,7 +232,8 @@ async def create_thumbnail_test(
     }
     
     await db.thumbnail_tests.insert_one(test)
-    del test["_id"] if "_id" in test else None
+    if "_id" in test:
+        del test["_id"]
     
     return {
         "message": "Thumbnail A/B test created",
@@ -350,15 +351,6 @@ async def apply_winning_thumbnail(
     winner = test.get("winner")
     if not winner:
         raise HTTPException(status_code=400, detail="No winner declared for this test")
-    
-    # Check permission
-    is_admin = user.get("role") in ["admin", "superadmin"]
-    if not is_admin and test.get("created_by") != user["id"]:
-        raise HTTPException(status_code=403, detail="You don't have permission")
-    
-    # Update series thumbnail
-    series_id = test["series_id"]
-    winning_url = winner["url"]
     
     # Update both main series and creator series
     await db.series.update_one(
