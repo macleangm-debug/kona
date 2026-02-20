@@ -2298,18 +2298,11 @@ Use [brackets] for sounds.
               </div>
             ) : previewData?.can_preview ? (
               <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                {/* Use native video player with HLS */}
-                <video
-                  controls
-                  autoPlay
-                  playsInline
-                  className="w-full h-full"
+                {/* HLS Video Player */}
+                <HlsVideoPlayer 
+                  src={previewData.hls_url} 
                   poster={previewData.thumbnail}
-                >
-                  <source src={previewData.hls_url} type="application/x-mpegURL" />
-                  {/* Fallback message */}
-                  Your browser does not support HLS video playback.
-                </video>
+                />
               </div>
             ) : previewData?.message ? (
               <div className="aspect-video bg-black/50 rounded-lg flex items-center justify-center">
