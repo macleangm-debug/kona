@@ -1443,16 +1443,14 @@ export const CreatorSeriesDetailPage = () => {
     if (successCount > 0) {
       toast.success(`${successCount} episode${successCount > 1 ? 's' : ''} uploaded successfully!`);
       fetchSeriesDetail();
+      
+      // Auto-close modal immediately after successful upload
+      setBatchEpisodes([]);
+      setShowBatchUpload(false);
+    } else if (batchEpisodes.some(ep => ep.error)) {
+      // Keep modal open only if there were errors
+      toast.error("Some uploads failed. Please try again.");
     }
-    
-    // Close modal after delay if all done
-    setTimeout(() => {
-      const allDone = batchEpisodes.every(ep => ep.uploaded || ep.error);
-      if (allDone) {
-        setBatchEpisodes([]);
-        setShowBatchUpload(false);
-      }
-    }, 2000);
   };
 
   // ============ SEASON MANAGEMENT ============
