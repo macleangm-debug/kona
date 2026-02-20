@@ -1702,10 +1702,9 @@ async def update_episode(
     is_free: bool = None, 
     coins_required: int = None, 
     intro_duration: int = None,
-    thumbnail_url: str = None,
-    video_url: str = None
+    thumbnail_url: str = None
 ):
-    """Update episode settings including intro duration, thumbnail, and video URL"""
+    """Update episode settings including intro duration and thumbnail"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
@@ -1733,11 +1732,6 @@ async def update_episode(
         if not thumbnail_url.startswith(("http://", "https://", "data:")):
             raise HTTPException(status_code=400, detail="Invalid thumbnail URL format")
         update_data["thumbnail"] = thumbnail_url
-    if video_url is not None:
-        if not video_url.startswith(("http://", "https://")):
-            raise HTTPException(status_code=400, detail="Invalid video URL format")
-        update_data["video_url"] = video_url
-        update_data["encoding_status"] = "ready"
     
     if not update_data:
         raise HTTPException(status_code=400, detail="No fields to update")
