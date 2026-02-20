@@ -884,8 +884,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     const fetchData = async () => {
       if (!id) return;
       
-      // Reset embed fallback state when episode changes
+      // Reset all fallback states when episode changes
       setUseEmbedFallback(false);
+      setUseMp4Fallback(false);
       setVideoError(null);
       setVideoMounted(false); // Reset so HLS re-initializes for new video
       setEmbedError(false); // Reset embed error state
