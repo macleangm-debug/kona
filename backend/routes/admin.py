@@ -1353,4 +1353,175 @@ async def add_bunny_referrer(hostname: str, user: dict = Depends(require_admin))
             detail=result.get("error", "Failed to add referrer")
         )
     
+
+
+# ============ PLATFORM SETTINGS ============
+
+@router.get("/platform-settings")
+async def get_platform_settings(user: dict = Depends(require_super_admin)):
+    """Get global platform settings"""
+    settings = await db.platform_settings.find_one({"id": "global"}, {"_id": 0})
+    
+    if not settings:
+        # Create default settings if not exists
+        settings = {
+            "id": "global",
+            "pricing": {
+                "default_episode_price": 5,  # Default coins per episode
+                "first_episode_free": True,  # First episode of series is free by default
+            },
+            "video": {
+                "allowed_formats": ["vertical"],  # "vertical", "landscape", "both"
+                "max_file_size_mb": 500,
+                "max_duration_minutes": 60,
+            },
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.platform_settings.insert_one(settings)
+        del settings["_id"] if "_id" in settings else None
+    
+    return settings
+
+@router.put("/platform-settings")
+async def update_platform_settings(settings: dict, user: dict = Depends(require_super_admin)):
+    """Update global platform settings"""
+    settings["updated_at"] = datetime.now(timezone.utc).isoformat()
+    settings["updated_by"] = user.get("id")
+    
+    await db.platform_settings.update_one(
+        {"id": "global"},
+        {"$set": settings},
+        upsert=True
+    )
+    
+    return {"success": True, "message": "Platform settings updated"}
+
+@router.get("/series/{series_id}/pricing")
+async def get_series_pricing(series_id: str, user: dict = Depends(require_admin)):
+    """Get pricing settings for a specific series"""
+    series = await db.series.find_one({"id": series_id}, {"_id": 0})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    # Get global settings for defaults
+    global_settings = await db.platform_settings.find_one({"id": "global"}, {"_id": 0})
+    default_price = global_settings.get("pricing", {}).get("default_episode_price", 5) if global_settings else 5
+    
+    return {
+        "series_id": series_id,
+        "title": series.get("title"),
+        "is_exclusive": series.get("is_exclusive", False),
+        "custom_episode_price": series.get("custom_episode_price"),  # None = use global default
+        "first_episode_free_override": series.get("first_episode_free_override"),  # None = use global setting
+        "default_price": default_price,
+        "total_episodes": series.get("total_episodes", 0)
+    }
+
+@router.put("/series/{series_id}/pricing")
+async def update_series_pricing(series_id: str, pricing: dict, user: dict = Depends(require_super_admin)):
+    """
+    Update pricing settings for a specific series.
+    Super admin can:
+    - Set custom episode price (overrides global default)
+    - Mark series as exclusive
+    - Override first episode free setting
+    """
+    series = await db.series.find_one({"id": series_id})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    update_data = {}
+    
+    if "is_exclusive" in pricing:
+        update_data["is_exclusive"] = pricing["is_exclusive"]
+    
+    if "custom_episode_price" in pricing:
+        # None means use global default, otherwise set custom price
+        update_data["custom_episode_price"] = pricing["custom_episode_price"]
+    
+    if "first_episode_free_override" in pricing:
+        # None means use global setting, True/False overrides
+        update_data["first_episode_free_override"] = pricing["first_episode_free_override"]
+    
+    if update_data:
+        update_data["pricing_updated_at"] = datetime.now(timezone.utc).isoformat()
+        update_data["pricing_updated_by"] = user.get("id")
+        
+        await db.series.update_one(
+            {"id": series_id},
+            {"$set": update_data}
+        )
+        
+        # Update episode prices if custom price is set
+        if "custom_episode_price" in update_data and update_data["custom_episode_price"] is not None:
+            await db.episodes.update_many(
+                {"series_id": series_id, "is_free": False},
+                {"$set": {"coins_required": update_data["custom_episode_price"]}}
+            )
+        
+        # Handle first episode free override
+        if "first_episode_free_override" in update_data:
+            # Find first episode of series
+            first_episode = await db.episodes.find_one(
+                {"series_id": series_id},
+                sort=[("season_number", 1), ("episode_number", 1)]
+            )
+            if first_episode:
+                is_free = update_data["first_episode_free_override"]
+                if is_free is None:
+                    # Revert to global setting
+                    global_settings = await db.platform_settings.find_one({"id": "global"})
+                    is_free = global_settings.get("pricing", {}).get("first_episode_free", True) if global_settings else True
+                
+                await db.episodes.update_one(
+                    {"id": first_episode["id"]},
+                    {"$set": {"is_free": is_free, "coins_required": 0 if is_free else update_data.get("custom_episode_price", 5)}}
+                )
+    
+    return {"success": True, "message": "Series pricing updated"}
+
+@router.post("/apply-global-pricing")
+async def apply_global_pricing_to_all(user: dict = Depends(require_super_admin)):
+    """Apply global pricing settings to all series and episodes"""
+    global_settings = await db.platform_settings.find_one({"id": "global"}, {"_id": 0})
+    if not global_settings:
+        raise HTTPException(status_code=404, detail="Platform settings not found")
+    
+    default_price = global_settings.get("pricing", {}).get("default_episode_price", 5)
+    first_episode_free = global_settings.get("pricing", {}).get("first_episode_free", True)
+    
+    # Update all episodes without custom pricing
+    # Get series without custom pricing
+    series_without_custom = await db.series.find(
+        {"custom_episode_price": {"$exists": False}}
+    ).to_list(None)
+    
+    updated_episodes = 0
+    for series in series_without_custom:
+        # Update non-free episodes to default price
+        result = await db.episodes.update_many(
+            {"series_id": series["id"], "is_free": False},
+            {"$set": {"coins_required": default_price}}
+        )
+        updated_episodes += result.modified_count
+        
+        # Handle first episode free
+        if first_episode_free and series.get("first_episode_free_override") is None:
+            first_ep = await db.episodes.find_one(
+                {"series_id": series["id"]},
+                sort=[("season_number", 1), ("episode_number", 1)]
+            )
+            if first_ep and not first_ep.get("is_free"):
+                await db.episodes.update_one(
+                    {"id": first_ep["id"]},
+                    {"$set": {"is_free": True, "coins_required": 0}}
+                )
+                updated_episodes += 1
+    
+    return {
+        "success": True,
+        "message": f"Applied global pricing to {len(series_without_custom)} series, updated {updated_episodes} episodes"
+    }
+
     return result
