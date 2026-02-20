@@ -167,16 +167,20 @@ async def get_episode(request: Request, episode_id: str, user: dict = Depends(ge
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
     
-    # Generate embed_url from bunny_video_id if available (for HLS fallback)
+    # Generate video URLs from bunny_video_id if available
     embed_url = None
+    mp4_url = None
     if episode.get("bunny_video_id"):
         embed_url = bunny_service.get_embed_url(episode["bunny_video_id"])
+        # MP4 fallback for maximum compatibility (like YouTube/Netflix)
+        mp4_url = bunny_service.get_mp4_fallback_url(episode["bunny_video_id"], "480p")
     
     # Free episodes can be accessed by anyone
     if episode.get("is_free", False):
         return {
             **episode,
             "embed_url": embed_url,
+            "mp4_url": mp4_url,
             "unlocked": True,
             "is_guest": user is None
         }
@@ -189,6 +193,7 @@ async def get_episode(request: Request, episode_id: str, user: dict = Depends(ge
     return {
         **episode,
         "embed_url": embed_url,
+        "mp4_url": mp4_url,
         "unlocked": unlocked
     }
 
