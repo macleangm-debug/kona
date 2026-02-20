@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Star, Eye, Bookmark, BookmarkCheck, Play } from "lucide-react";
+import { Star, Eye, Bookmark, BookmarkCheck, Play, Crown } from "lucide-react";
 
 export const SeriesCardDesktop = ({ 
   series, 
@@ -33,6 +33,9 @@ export const SeriesCardDesktop = ({
     navigate(`/watch/${series.id}-ep1`);
   };
 
+  // Check if series is exclusive/premium
+  const isExclusive = series.is_exclusive || series.custom_episode_price;
+
   const sizeClasses = {
     small: "w-[140px]",
     default: "w-[180px] lg:w-[200px]",
@@ -56,8 +59,16 @@ export const SeriesCardDesktop = ({
         {/* Gradient overlay - enhanced on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
         
-        {/* Badge - Hot/New/Top */}
-        {badge && (
+        {/* Exclusive Badge - Premium content indicator */}
+        {isExclusive && (
+          <div className="absolute top-2 left-2 flex items-center gap-1 px-2 py-0.5 rounded bg-gradient-to-r from-amber-500 to-yellow-500 text-black text-[10px] lg:text-xs font-bold uppercase shadow-lg">
+            <Crown className="w-3 h-3" />
+            <span>Exclusive</span>
+          </div>
+        )}
+        
+        {/* Badge - Hot/New/Top (only show if not exclusive) */}
+        {badge && !isExclusive && (
           <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] lg:text-xs font-bold uppercase ${
             badge === "hot" ? "bg-red-500" :
             badge === "new" ? "bg-green-500" :
@@ -117,7 +128,11 @@ export const SeriesCardDesktop = ({
           
           {/* Tags */}
           <div className="flex items-center gap-2 text-[10px] text-gray-300">
-            <span className="text-green-400 font-medium">Free EP1</span>
+            {isExclusive ? (
+              <span className="text-amber-400 font-medium">Premium</span>
+            ) : (
+              <span className="text-green-400 font-medium">Free EP1</span>
+            )}
             <span>•</span>
             <span>{series.genre}</span>
           </div>
@@ -142,6 +157,9 @@ export const SeriesCardDesktop = ({
       </h3>
       <div className="flex items-center gap-1.5 text-[11px] lg:text-xs text-gray-400">
         <span>{series.genre}</span>
+        {isExclusive && (
+          <span className="text-amber-400">• Premium</span>
+        )}
       </div>
     </div>
   );
