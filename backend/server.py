@@ -247,6 +247,9 @@ async def lifespan(app: FastAPI):
     # Seed super admin
     await seed_super_admin()
     
+    # Auto-configure Bunny.net allowed referrers for this domain
+    await configure_bunny_referrers()
+    
     logger.info("✅ Kona Backend ready for 10M+ users!")
     yield
     
@@ -254,6 +257,47 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Kona Backend...")
     from services.cache import cache
     await cache.disconnect()
+
+async def configure_bunny_referrers():
+    """Auto-configure Bunny.net to allow embeds from this domain"""
+    try:
+        from services.bunny import bunny_service
+        import os
+        
+        # Get the frontend URL and extract hostname
+        frontend_url = os.environ.get("FRONTEND_URL", "")
+        
+        # Also check for common preview/production domains
+        domains_to_add = set()
+        
+        if frontend_url:
+            hostname = frontend_url.replace("https://", "").replace("http://", "").split("/")[0]
+            domains_to_add.add(hostname)
+        
+        # Add the current request origin from CORS settings
+        cors_origins = os.environ.get("CORS_ORIGINS", "*")
+        if cors_origins != "*":
+            for origin in cors_origins.split(","):
+                hostname = origin.strip().replace("https://", "").replace("http://", "").split("/")[0]
+                if hostname:
+                    domains_to_add.add(hostname)
+        
+        # Common Emergent preview domain pattern
+        domains_to_add.add("*.preview.emergentagent.com")
+        
+        # Add localhost for development
+        domains_to_add.add("localhost")
+        
+        for domain in domains_to_add:
+            if domain:
+                result = await bunny_service.add_allowed_referrer(domain)
+                if result.get("success"):
+                    logger.info(f"✅ Bunny.net: Added {domain} to allowed referrers")
+                else:
+                    # Log but don't fail - domain might already be added
+                    logger.debug(f"Bunny.net referrer config for {domain}: {result.get('error', 'unknown')}")
+    except Exception as e:
+        logger.warning(f"⚠️ Could not auto-configure Bunny.net referrers: {e}")
 
 # ============ CREATE APP ============
 app = FastAPI(
