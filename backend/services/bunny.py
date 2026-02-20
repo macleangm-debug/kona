@@ -17,12 +17,17 @@ BUNNY_TOKEN_KEY = os.environ.get("BUNNY_TOKEN_KEY", "")
 BUNNY_CDN_HOSTNAME = os.environ.get("BUNNY_CDN_HOSTNAME", "")
 BUNNY_BASE_URL = "https://video.bunnycdn.com"
 
+# Account API key for Video Library management (different from Stream API key)
+# Get this from: Bunny.net Dashboard > Account > API Key
+BUNNY_ACCOUNT_API_KEY = os.environ.get("BUNNY_ACCOUNT_API_KEY", "")
+
 
 class BunnyStreamService:
     """Service for interacting with Bunny.net Stream API"""
     
     def __init__(self):
         self.api_key = BUNNY_API_KEY
+        self.account_api_key = BUNNY_ACCOUNT_API_KEY  # For library management
         self.library_id = BUNNY_LIBRARY_ID
         self.base_url = BUNNY_BASE_URL
         self.token_key = BUNNY_TOKEN_KEY
