@@ -48,7 +48,7 @@ class TestEpisodeEndpoint:
     def test_episode_is_unlocked_for_guests(self):
         """Test that free episode is accessible without auth"""
         episode_id = "cs-8e6c36c6e4-s01e01"
-        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}")
+        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}", headers=HEADERS)
         
         assert response.status_code == 200, f"Guest access failed: {response.status_code}"
         
