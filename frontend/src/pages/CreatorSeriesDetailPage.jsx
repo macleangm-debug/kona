@@ -1654,17 +1654,29 @@ export const CreatorSeriesDetailPage = () => {
               </div>
             </Card>
           ) : (
-            <SeasonAccordion 
-              seasons={seasons}
-              episodes={episodes}
-              expandedSeasons={expandedSeasons}
-              onToggleSeason={toggleSeason}
-              onEditEpisode={openEpisodeEditor}
-              onAddSeason={() => setShowSeasonCreator(true)}
-              onAddEpisode={openBatchUploadForSeason}
-              onReorderEpisodes={handleReorderEpisodes}
-              onBulkEdit={handleBulkEdit}
-            />
+            <>
+              {/* Help Tip */}
+              <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <Play className="w-4 h-4 text-primary" />
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  <span className="text-foreground font-medium">Tip:</span> Click on any episode card to edit settings or preview your video
+                </p>
+              </div>
+              
+              <SeasonAccordion 
+                seasons={seasons}
+                episodes={episodes}
+                expandedSeasons={expandedSeasons}
+                onToggleSeason={toggleSeason}
+                onEditEpisode={openEpisodeEditor}
+                onAddSeason={() => setShowSeasonCreator(true)}
+                onAddEpisode={openBatchUploadForSeason}
+                onReorderEpisodes={handleReorderEpisodes}
+                onBulkEdit={handleBulkEdit}
+              />
+            </>
           )}
         </div>
       </main>
