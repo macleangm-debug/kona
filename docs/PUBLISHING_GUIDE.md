@@ -15,10 +15,19 @@ This guide explains how to publish your series so it becomes visible to all view
 1. Click on your series to open it
 2. Click **Add Episodes** button
 3. Upload video files (supported formats: MP4, WebM, MOV)
-4. Videos are automatically uploaded to Bunny.net CDN
-5. Wait for encoding to complete (status: "Processing" → "Ready")
+4. Videos are automatically uploaded to **Bunny.net CDN** for global streaming
+5. Wait for encoding to complete (status: "Queued" → "Processing" → "Ready")
 
-**Important:** Only episodes with "Ready" status will be published to viewers.
+**Important:** 
+- Only episodes with "Ready" status will be published to viewers
+- Encoding typically takes 2-5 minutes depending on video length
+- You can preview your video once encoding is complete
+
+### Preview Your Videos
+1. Click on any episode to open the editor
+2. If the video has been uploaded, click **Preview Video**
+3. A video player will open showing your content
+4. If still processing, you'll see a "Video is processing" message
 
 ### 3. Organize Seasons
 - Episodes are automatically grouped into seasons
