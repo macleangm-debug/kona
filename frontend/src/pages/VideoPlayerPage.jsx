@@ -554,7 +554,7 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         hlsRef.current = null;
       }
     };
-  }, [episode?.video_url, episode?.embed_url, useEmbedFallback]);
+  }, [episode?.video_url, episode?.embed_url, useEmbedFallback, videoMounted]);
 
   // ============ PRE-ROLL AD LOGIC ============
   useEffect(() => {
