@@ -837,6 +837,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
+      
+      // Reset embed fallback state when episode changes
+      setUseEmbedFallback(false);
+      setVideoError(null);
+      
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const epRes = await axios.get(`${API}/episodes/${id}`, { headers });
