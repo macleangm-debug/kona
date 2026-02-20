@@ -46,4 +46,4 @@ def generate_kona_promo():
 if __name__ == "__main__":
     result = generate_kona_promo()
     if result:
-        print(f"\n📥 Download URL: https://kona-creator-portal.preview.emergentagent.com/kona_promo.mp4")
+        print(f"\n📥 Download URL: https://hls-playback-fix.preview.emergentagent.com/kona_promo.mp4")
