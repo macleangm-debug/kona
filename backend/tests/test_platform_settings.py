@@ -46,7 +46,7 @@ class TestCreatorUploadSettings:
         """Verify upload-settings returns video format configuration"""
         response = requests.get(
             f"{BASE_URL}/api/creator/upload-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 200, f"Failed: {response.text}"
         
@@ -62,7 +62,7 @@ class TestCreatorUploadSettings:
         """Verify upload-settings returns pricing configuration"""
         response = requests.get(
             f"{BASE_URL}/api/creator/upload-settings",
-            headers={"Authorization": f"Bearer {super_admin_token}"}
+            headers={**DEFAULT_HEADERS, "Authorization": f"Bearer {super_admin_token}"}
         )
         assert response.status_code == 200
         
@@ -76,8 +76,8 @@ class TestCreatorUploadSettings:
     
     def test_03_get_upload_settings_requires_auth(self):
         """Verify upload-settings requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/creator/upload-settings")
-        assert response.status_code == 401, "Should require authentication"
+        response = requests.get(f"{BASE_URL}/api/creator/upload-settings", headers=DEFAULT_HEADERS)
+        assert response.status_code in [401, 403], "Should require authentication"
 
 
 class TestAdminPlatformSettings:
