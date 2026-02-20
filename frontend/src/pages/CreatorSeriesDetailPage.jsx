@@ -1391,7 +1391,7 @@ export const CreatorSeriesDetailPage = () => {
           u.id === uploadId ? { ...u, progress: 30, episodeId } : u
         ));
         
-        // Upload video file to Bunny.net
+        // Upload video file
         const formData = new FormData();
         formData.append('video', ep.file);
         
