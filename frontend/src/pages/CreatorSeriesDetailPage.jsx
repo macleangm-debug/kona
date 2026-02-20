@@ -159,7 +159,7 @@ const HlsVideoPlayer = memo(({ src, poster, embedUrl }) => {
       className="w-full h-full object-contain"
     />
   );
-};
+});
 
 // ============ UPLOAD PROGRESS PANEL COMPONENT ============
 const UploadProgressPanel = memo(({ uploads, onDismiss }) => {
