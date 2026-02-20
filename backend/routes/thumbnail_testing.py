@@ -352,6 +352,15 @@ async def apply_winning_thumbnail(
     if not winner:
         raise HTTPException(status_code=400, detail="No winner declared for this test")
     
+    # Check permission
+    is_admin = user.get("role") in ["admin", "superadmin"]
+    if not is_admin and test.get("created_by") != user["id"]:
+        raise HTTPException(status_code=403, detail="You don't have permission")
+    
+    # Update series thumbnail
+    series_id = test["series_id"]
+    winning_url = winner["url"]
+    
     # Update both main series and creator series
     await db.series.update_one(
         {"id": series_id},
