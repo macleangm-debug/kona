@@ -232,8 +232,10 @@ export const HomePage = ({ onAuthClick }) => {
     ? series 
     : series.filter(s => s.genre.toLowerCase() === activeCategory);
 
-  // Assign badges to series
+  // Assign badges to series - exclusive takes priority
   const getBadge = (s, index) => {
+    // Exclusive content doesn't get additional badges (handled in SeriesCard)
+    if (s.is_exclusive || s.custom_episode_price) return null;
     if (s.featured) return "hot";
     if (index < 2) return "new";
     if (s.rating >= 4.8) return "top";
