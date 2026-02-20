@@ -24,7 +24,10 @@ class TestNewReleasesAndSession:
     def setup(self):
         """Setup test session"""
         self.session = requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update({
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
         
     def test_01_series_api_returns_sorted_by_created_at(self):
         """GET /api/series should return series sorted by created_at descending (newest first)"""
