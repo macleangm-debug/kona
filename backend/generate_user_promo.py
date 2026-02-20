@@ -47,4 +47,4 @@ def generate_user_promo():
 if __name__ == "__main__":
     result = generate_user_promo()
     if result:
-        print(f"\n📥 Download URL: https://creator-hub-566.preview.emergentagent.com/kona_user_promo.mp4")
+        print(f"\n📥 Download URL: https://stream-manage-core.preview.emergentagent.com/kona_user_promo.mp4")
