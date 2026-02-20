@@ -60,7 +60,7 @@ class TestEpisodeEndpoint:
     def test_embed_url_format_is_valid(self):
         """Test that embed_url is correctly formatted for Bunny.net"""
         episode_id = "cs-8e6c36c6e4-s01e01"
-        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}")
+        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}", headers=HEADERS)
         
         data = response.json()
         embed_url = data.get("embed_url")
