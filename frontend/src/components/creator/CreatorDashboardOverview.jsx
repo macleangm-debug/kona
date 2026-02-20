@@ -275,6 +275,7 @@ export const CreatorDashboardOverview = ({
                     key={s.id} 
                     series={s} 
                     onClick={() => navigate(`/creator/series/${s.id}`)}
+                    onPublish={onPublish}
                   />
                 ))}
                 {/* Add new series card at the end */}
