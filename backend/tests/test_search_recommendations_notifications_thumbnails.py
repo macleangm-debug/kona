@@ -47,7 +47,7 @@ class TestEnhancedSearch:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.token = TestAuthentication.get_token()
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        self.headers = {**COMMON_HEADERS, "Authorization": f"Bearer {self.token}"} if self.token else COMMON_HEADERS.copy()
     
     def test_01_search_series_with_query(self):
         """Test GET /api/search/?q=love - Basic search"""
@@ -146,7 +146,7 @@ class TestRecommendationEngine:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.token = TestAuthentication.get_token()
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        self.headers = {**COMMON_HEADERS, "Authorization": f"Bearer {self.token}"} if self.token else COMMON_HEADERS.copy()
     
     def test_01_personalized_recommendations(self):
         """Test GET /api/recommendations/for-you - Personalized recommendations"""
@@ -223,7 +223,7 @@ class TestThumbnailABTesting:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.token = TestAuthentication.get_token()
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        self.headers = {**COMMON_HEADERS, "Authorization": f"Bearer {self.token}"} if self.token else COMMON_HEADERS.copy()
         self.test_series_id = f"test-series-{uuid.uuid4().hex[:8]}"
     
     def test_01_get_admin_thumbnail_tests(self):
@@ -322,7 +322,7 @@ class TestAdminNotificationManagement:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.token = TestAuthentication.get_token()
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        self.headers = {**COMMON_HEADERS, "Authorization": f"Bearer {self.token}"} if self.token else COMMON_HEADERS.copy()
     
     def test_01_get_notification_stats(self):
         """Test GET /api/notifications/admin/stats - Notification statistics"""
@@ -445,7 +445,7 @@ class TestSearchAnalytics:
     @pytest.fixture(autouse=True)
     def setup(self):
         self.token = TestAuthentication.get_token()
-        self.headers = {"Authorization": f"Bearer {self.token}"} if self.token else {}
+        self.headers = {**COMMON_HEADERS, "Authorization": f"Bearer {self.token}"} if self.token else COMMON_HEADERS.copy()
     
     def test_01_search_analytics(self):
         """Test GET /api/search/admin/analytics - Search analytics"""
