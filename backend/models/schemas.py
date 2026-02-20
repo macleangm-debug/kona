@@ -94,6 +94,7 @@ class SeriesResponse(BaseModel):
     total_episodes: int
     views: int = 0
     featured: bool = False
+    created_at: Optional[str] = None  # ISO format datetime string
 
 class EpisodeResponse(BaseModel):
     id: str
