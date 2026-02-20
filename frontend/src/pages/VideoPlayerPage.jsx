@@ -350,6 +350,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
   const [useMp4Fallback, setUseMp4Fallback] = useState(false);
   
+  // Ref to track fallback attempts (doesn't cause re-renders)
+  const fallbackAttempted = useRef({ mp4: false, embed: false });
+  
   // Embed player error state (for 403/configuration issues)
   const [embedError, setEmbedError] = useState(false);
   
