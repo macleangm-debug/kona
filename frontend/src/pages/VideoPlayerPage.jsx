@@ -487,8 +487,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       }
       
       // First try MP4 fallback (most compatible)
-      if (mp4Url) {
+      if (mp4Url && !fallbackAttempted.current.mp4) {
         console.log("Falling back to MP4:", mp4Url);
+        fallbackAttempted.current.mp4 = true;
         setUseMp4Fallback(true);
       } else if (embedUrl) {
         // If no MP4, try embed player
