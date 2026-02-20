@@ -359,6 +359,19 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
    - Custom episode prices override global defaults
    - First episode free can be overridden per-series
 
+7. **Exclusive Content Badge (2026-02-20)**
+   - Added golden "Exclusive" badge with Crown icon for premium series
+   - Shows on both mobile (SeriesCard) and desktop (SeriesCardDesktop) components
+   - Badge appears when `is_exclusive=true` OR `custom_episode_price` is set
+   - "Premium" text replaces "Free EP1" for exclusive content
+   - **Modified:** `frontend/src/components/SeriesCard.jsx`
+   - **Modified:** `frontend/src/components/SeriesCardDesktop.jsx`
+   - **Modified:** `frontend/src/pages/HomePage.jsx` (getBadge function)
+
+8. **Default Episode Price Updated**
+   - Changed default episode price from 5 to 15 coins
+   - Updated via `PUT /api/admin/platform-settings`
+
 ### P1 (High)
 - [x] **Fix Unstable Session Management** - COMPLETED
   - Added token expiration checks and improved 401 handling
