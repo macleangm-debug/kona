@@ -21,7 +21,7 @@ class TestEpisodeEndpoint:
     def test_episode_returns_embed_url(self):
         """Test that episode endpoint returns embed_url field"""
         episode_id = "cs-8e6c36c6e4-s01e01"
-        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}")
+        response = requests.get(f"{BASE_URL}/api/episodes/{episode_id}", headers=HEADERS)
         
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
