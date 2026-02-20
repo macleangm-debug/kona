@@ -44,7 +44,7 @@ const SUBTITLE_LANGUAGES = [
 ];
 
 // ============ HLS VIDEO PLAYER COMPONENT ============
-const HlsVideoPlayer = ({ src, poster, embedUrl }) => {
+const HlsVideoPlayer = memo(({ src, poster, embedUrl }) => {
   const videoRef = useRef(null);
   const hlsRef = useRef(null);
   const [error, setError] = useState(null);
