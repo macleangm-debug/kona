@@ -2413,10 +2413,11 @@ Use [brackets] for sounds.
               </div>
             ) : previewData?.can_preview ? (
               <div className="aspect-video bg-black rounded-lg overflow-hidden">
-                {/* HLS Video Player */}
+                {/* HLS Video Player with Bunny.net embed fallback */}
                 <HlsVideoPlayer 
                   src={previewData.hls_url} 
                   poster={previewData.thumbnail}
+                  embedUrl={previewData.embed_url}
                 />
               </div>
             ) : previewData?.message ? (
