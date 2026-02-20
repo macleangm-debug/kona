@@ -877,7 +877,7 @@ const SeasonAccordion = memo(({
       </button>
     </div>
   );
-};
+});
 
 // ============ MAIN COMPONENT ============
 export const CreatorSeriesDetailPage = () => {
