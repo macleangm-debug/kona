@@ -24,21 +24,11 @@ async def get_series(request: Request):
         return cached
     
     # Fetch from DB - sort by created_at descending (newest first)
-    # Use a pipeline to handle missing created_at by using $ifNull
-    pipeline = [
-        {"$addFields": {
-            "sort_date": {"$ifNull": ["$created_at", "$_id"]}
-        }},
-        {"$sort": {"sort_date": -1}},
-        {"$project": {"_id": 0, "sort_date": 0}},
-        {"$limit": 100}
-    ]
-    series = await db.series.aggregate(pipeline).to_list(100)
-    
+    series = await db.series.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     if not series:
         from server import seed_data
         await seed_data()
-        series = await db.series.aggregate(pipeline).to_list(100)
+        series = await db.series.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
     
     # Cache the result
     await cache.set(cache_key, series, CACHE_TTL["series_list"])
