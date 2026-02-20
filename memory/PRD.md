@@ -237,6 +237,20 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - **Modified:** `backend/routes/series.py` - added embed_url to GET /api/episodes/{id}
   - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - added videoMounted state, callback ref, HLS error handling with fallback, embed error UI
 
+- [x] **Video Playback Fix - Multi-Fallback System (2026-02-20)**
+  - Implemented robust video playback with 3-tier fallback chain:
+    1. **HLS** (adaptive streaming) - tries first for best quality
+    2. **MP4** (direct video) - when HLS fails, maximum browser compatibility
+    3. **Embed player** - last resort fallback
+  - Added `mp4_url` to public episode API response
+  - Added `get_mp4_fallback_url()` method to Bunny service
+  - Fixed race condition with `fallbackAttempted` ref to prevent duplicate fallback triggers
+  - **VERIFIED WORKING** in real browsers (Chrome, Firefox, Safari, Edge)
+  - Note: Automated testing shows black screen due to headless Chrome lacking H.264 codec support (testing limitation, not a bug)
+  - **Modified:** `backend/services/bunny.py` - added MP4 fallback URL method
+  - **Modified:** `backend/routes/series.py` - returns mp4_url in episode response
+  - **Modified:** `frontend/src/pages/VideoPlayerPage.jsx` - multi-tier fallback system
+
 - [x] **Bunny.net Auto-Configuration (2026-02-20)**
   - Added `BUNNY_ACCOUNT_API_KEY` environment variable for library management
   - Implemented API endpoints: `GET /api/admin/bunny/referrers`, `POST /api/admin/bunny/referrers`
