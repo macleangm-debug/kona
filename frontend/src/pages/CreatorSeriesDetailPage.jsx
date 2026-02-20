@@ -943,6 +943,34 @@ export const CreatorSeriesDetailPage = () => {
     dimensions: null,
     error: null
   });
+  
+  // Platform settings (from admin) - controls video format requirements and pricing
+  const [platformSettings, setPlatformSettings] = useState({
+    video: {
+      allowed_formats: ["vertical"],
+      format_help: "vertical"
+    },
+    pricing: {
+      default_episode_price: 5,
+      first_episode_free: true
+    }
+  });
+
+  // Fetch platform settings on mount
+  useEffect(() => {
+    const fetchPlatformSettings = async () => {
+      if (!token) return;
+      try {
+        const res = await axios.get(`${API}/creator/upload-settings`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setPlatformSettings(res.data);
+      } catch (e) {
+        console.error("Failed to fetch platform settings:", e);
+      }
+    };
+    fetchPlatformSettings();
+  }, [token]);
 
   // Toggle season expansion - memoized to prevent child re-renders
   const toggleSeason = useCallback((seasonNum) => {
