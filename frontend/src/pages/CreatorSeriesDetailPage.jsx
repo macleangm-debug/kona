@@ -1863,37 +1863,27 @@ export const CreatorSeriesDetailPage = () => {
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50 border border-white/10">
-              <div>
-                <p className="text-sm font-medium">Free Episode</p>
-                <p className="text-xs text-muted-foreground">No coins required</p>
+            {/* Pricing info - read only (admin controls pricing) */}
+            <div className="p-3 rounded-lg bg-secondary/30 border border-white/10">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium flex items-center gap-2">
+                    {episodeForm.is_free ? (
+                      <>
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        Free Episode
+                      </>
+                    ) : (
+                      <>
+                        <Coins className="w-4 h-4 text-yellow-400" />
+                        {episodeForm.coins_required} coins
+                      </>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Pricing is managed by admin</p>
+                </div>
               </div>
-              <button
-                onClick={() => setEpisodeForm({...episodeForm, is_free: !episodeForm.is_free})}
-                className={`w-12 h-6 rounded-full transition-colors ${episodeForm.is_free ? 'bg-green-500' : 'bg-white/20'}`}
-                data-testid="is-free-toggle"
-              >
-                <div className={`w-5 h-5 bg-white rounded-full transition-transform ${episodeForm.is_free ? 'translate-x-6' : 'translate-x-0.5'}`} />
-              </button>
             </div>
-            
-            {!episodeForm.is_free && (
-              <div>
-                <label className="text-sm text-muted-foreground flex items-center gap-2">
-                  <Coins className="w-4 h-4" />
-                  Coins Required
-                </label>
-                <Input 
-                  type="number"
-                  min={1}
-                  max={50}
-                  value={episodeForm.coins_required}
-                  onChange={(e) => setEpisodeForm({...episodeForm, coins_required: parseInt(e.target.value) || 5})}
-                  className="w-24"
-                  data-testid="coins-required-input"
-                />
-              </div>
-            )}
             
             {/* Thumbnail URL Section */}
             <div className="border-t border-white/10 pt-4">
