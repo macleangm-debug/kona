@@ -1179,7 +1179,7 @@ async def publish_series(series_id: str, user: dict = Depends(get_current_user))
         raise HTTPException(status_code=400, detail="Add at least 1 episode before publishing")
     
     # For admins, allow direct publish; for others, require approved status
-    if user.get("is_admin") or series["status"] == "approved":
+    if user.get("is_admin") or series["status"] == "approved" or series["status"] == "pending_review":
         await db.creator_series.update_one(
             {"id": series_id},
             {"$set": {
@@ -1189,11 +1189,12 @@ async def publish_series(series_id: str, user: dict = Depends(get_current_user))
         )
         
         # Add to main series collection for public viewing
-        await publish_series_to_main(series_id, creator["id"])
+        published_count = await publish_series_to_main(series_id, creator["id"])
         
         return {
-            "message": "Series published successfully! It's now visible to all viewers.",
-            "status": "published"
+            "message": f"Series published successfully! {published_count} episode(s) are now visible to all viewers.",
+            "status": "published",
+            "episodes_published": published_count
         }
     else:
         raise HTTPException(
