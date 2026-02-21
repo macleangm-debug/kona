@@ -94,7 +94,7 @@ class TestCreatorPortalAndAutoPayout:
     
     def test_06_creator_series_requires_auth(self):
         """GET /api/creator/series - should require authentication"""
-        response = requests.get(f"{BASE_URL}/api/creator/series")
+        response = requests.get(f"{BASE_URL}/api/creator/series", headers=DEFAULT_HEADERS)
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
         print("✅ Creator series requires auth")
     
