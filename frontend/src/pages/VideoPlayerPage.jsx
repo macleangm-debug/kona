@@ -446,17 +446,25 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     // Wait for video element to be mounted
     if (!video || !videoMounted) return;
     
-    // If using MP4 fallback, set the video source directly
-    if (useMp4Fallback && mp4Url) {
-      console.log("Setting MP4 source:", mp4Url);
-      // Clear any previous errors
-      setVideoError(null);
-      video.src = mp4Url;
-      video.load();
-      // Try to play
-      video.play().catch(err => {
-        console.log("MP4 autoplay blocked:", err.message);
-      });
+    // If using MP4 fallback, set the video source directly with quality selection
+    if (useMp4Fallback) {
+      const mp4Urls = episode?.mp4_urls || {};
+      const selectedMp4 = mp4Urls[mp4Quality] || mp4Url;
+      
+      if (selectedMp4) {
+        console.log(`Setting MP4 source (${mp4Quality}):`, selectedMp4);
+        // Clear any previous errors
+        setVideoError(null);
+        video.src = selectedMp4;
+        video.load();
+        // Try to play
+        video.play().catch(err => {
+          console.log("MP4 autoplay blocked:", err.message);
+        });
+      } else {
+        // No MP4 URL available for this quality, try next fallback
+        handleFallback(`no MP4 for ${mp4Quality}`);
+      }
       return;
     }
     
