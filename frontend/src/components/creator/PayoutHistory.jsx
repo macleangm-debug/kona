@@ -2,13 +2,16 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { 
   History, Coins, Clock, CheckCircle, XCircle, AlertCircle,
-  ChevronRight, Loader2, DollarSign, Wallet, Filter
+  ChevronRight, Loader2, DollarSign, Wallet, Filter, Settings, 
+  Zap, ToggleLeft, ToggleRight, Bell, RefreshCw
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { API } from "@/config";
 import { toast } from "sonner";
 
