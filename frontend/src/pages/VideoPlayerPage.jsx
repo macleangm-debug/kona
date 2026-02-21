@@ -479,26 +479,48 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     let mediaRecoveryAttempts = 0;
     const MAX_RECOVERY_ATTEMPTS = 1;
     
-    // Helper function to fallback to MP4 or embed
+    // Helper function to get MP4 URL for specific quality
+    const getMp4Url = (quality) => {
+      const mp4Urls = episode?.mp4_urls;
+      if (mp4Urls && mp4Urls[quality]) return mp4Urls[quality];
+      // Fallback to single mp4_url if mp4_urls not available
+      return quality === "720p" ? episode?.mp4_url : null;
+    };
+    
+    // Helper function to fallback to MP4 or embed - Netflix/YouTube style cascading fallback
     const handleFallback = (errorType) => {
-      console.warn(`HLS ${errorType}, attempting fallback...`);
+      console.warn(`Video playback issue (${errorType}), attempting fallback...`);
       if (hlsRef.current) {
         hlsRef.current.destroy();
         hlsRef.current = null;
       }
       
-      // First try MP4 fallback (most compatible)
-      if (mp4Url && !fallbackAttempted.current.mp4) {
-        console.log("Falling back to MP4:", mp4Url);
-        fallbackAttempted.current.mp4 = true;
+      // Cascade through MP4 qualities: 720p -> 480p -> 360p -> embed (last resort)
+      const mp4Urls = episode?.mp4_urls || {};
+      
+      if (!fallbackAttempted.current.mp4_720 && (mp4Urls["720p"] || episode?.mp4_url)) {
+        console.log("Falling back to MP4 720p");
+        fallbackAttempted.current.mp4_720 = true;
+        setMp4Quality("720p");
         setUseMp4Fallback(true);
-      } else if (embedUrl && !fallbackAttempted.current.embed) {
-        // If no MP4 or MP4 failed, try embed player
-        console.log("Falling back to embed player");
+      } else if (!fallbackAttempted.current.mp4_480 && mp4Urls["480p"]) {
+        console.log("Falling back to MP4 480p");
+        fallbackAttempted.current.mp4_480 = true;
+        setMp4Quality("480p");
+        setUseMp4Fallback(true);
+      } else if (!fallbackAttempted.current.mp4_360 && mp4Urls["360p"]) {
+        console.log("Falling back to MP4 360p");
+        fallbackAttempted.current.mp4_360 = true;
+        setMp4Quality("360p");
+        setUseMp4Fallback(true);
+      } else if (!fallbackAttempted.current.embed && embedUrl) {
+        // Embed player as last resort (may fail with 403 if not configured)
+        console.log("Falling back to embed player (last resort)");
         fallbackAttempted.current.embed = true;
         setUseEmbedFallback(true);
       } else {
-        setVideoError("Video format not supported. Please try a different browser.");
+        // All fallbacks exhausted
+        setVideoError("Unable to play video. Please try refreshing the page or contact support.");
       }
     };
     
