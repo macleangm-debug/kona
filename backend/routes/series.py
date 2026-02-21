@@ -168,19 +168,41 @@ async def get_episode(request: Request, episode_id: str, user: dict = Depends(ge
         raise HTTPException(status_code=404, detail="Episode not found")
     
     # Generate video URLs from bunny_video_id if available
+    # Priority order: HLS (best quality/adaptive) -> MP4 720p -> MP4 480p -> Embed (requires config)
     embed_url = None
     mp4_url = None
+    mp4_urls = {}  # Multiple quality options
+    hls_url = None
+    
     if episode.get("bunny_video_id"):
-        embed_url = bunny_service.get_embed_url(episode["bunny_video_id"])
-        # MP4 fallback for maximum compatibility (like YouTube/Netflix)
-        mp4_url = bunny_service.get_mp4_fallback_url(episode["bunny_video_id"], "480p")
+        video_id = episode["bunny_video_id"]
+        # HLS playlist URL (primary - adaptive bitrate streaming)
+        hls_url = bunny_service.get_direct_play_url(video_id)
+        
+        # MP4 fallback URLs for maximum compatibility (like YouTube/Netflix)
+        # These are direct CDN links that don't need referrer configuration
+        mp4_urls = {
+            "720p": bunny_service.get_mp4_fallback_url(video_id, "720p"),
+            "480p": bunny_service.get_mp4_fallback_url(video_id, "480p"),
+            "360p": bunny_service.get_mp4_fallback_url(video_id, "360p"),
+        }
+        mp4_url = mp4_urls.get("720p", mp4_urls.get("480p"))  # Default to best quality available
+        
+        # Embed URL (last resort - requires domain configuration)
+        embed_url = bunny_service.get_embed_url(video_id)
+    
+    # If video_url is set manually (e.g., external URL), use that as primary
+    video_url = episode.get("video_url") or hls_url
     
     # Free episodes can be accessed by anyone
     if episode.get("is_free", False):
         return {
             **episode,
-            "embed_url": embed_url,
+            "video_url": video_url,
+            "hls_url": hls_url,
             "mp4_url": mp4_url,
+            "mp4_urls": mp4_urls,
+            "embed_url": embed_url,
             "unlocked": True,
             "is_guest": user is None
         }
@@ -192,8 +214,11 @@ async def get_episode(request: Request, episode_id: str, user: dict = Depends(ge
     unlocked = episode_id in user.get("unlocked_episodes", [])
     return {
         **episode,
-        "embed_url": embed_url,
+        "video_url": video_url,
+        "hls_url": hls_url,
         "mp4_url": mp4_url,
+        "mp4_urls": mp4_urls,
+        "embed_url": embed_url,
         "unlocked": unlocked
     }
 
