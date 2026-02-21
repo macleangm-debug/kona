@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="10" failures="1" skipped="0" tests="16" time="1.145" timestamp="2026-02-21T13:32:43.999577+00:00" hostname="agent-env-bbda6e6b-762c-4ced-b05c-8323ecf39597"><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_01_creator_status_endpoint" time="0.246"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_02_creator_status_requires_auth" time="0.115" /><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_03_creator_dashboard_endpoint" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_04_creator_dashboard_requires_auth" time="0.117" /><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_05_creator_series_list" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_06_creator_series_requires_auth" time="0.150" /><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_07_upload_settings_endpoint" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_08_upload_settings_requires_auth" time="0.099" /><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_09_auto_payout_settings_get" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_10_auto_payout_settings_requires_auth" time="0.115" /><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_11_auto_payout_settings_update_threshold" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_12_auto_payout_settings_update_status" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_13_auto_payout_settings_update_method" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_14_auto_payout_settings_validate_min_threshold" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_15_payout_history_endpoint" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_creator_payout_automation.py:30: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_creator_payout_automation.TestCreatorPortalAndAutoPayout" name="test_16_payout_providers_endpoint" time="0.130"><failure message="AssertionError: Providers failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code">backend/tests/test_creator_payout_automation.py:245: in test_16_payout_providers_endpoint
+    assert response.status_code == 200, f"Providers failed: {response.text}"
+E   AssertionError: Providers failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase></testsuite></testsuites>
