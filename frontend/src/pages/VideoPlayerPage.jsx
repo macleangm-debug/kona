@@ -1770,17 +1770,32 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
             }}
             onError={(e) => {
               console.error('Video load error:', e);
-              // Fallback chain: HLS -> MP4 -> Embed
-              // Use ref to check if fallbacks have been attempted (avoids async state issues)
-              if (!fallbackAttempted.current.mp4 && episode?.mp4_url) {
-                console.warn("Video error, trying MP4 fallback");
-                fallbackAttempted.current.mp4 = true;
+              // Netflix/YouTube style cascading fallback: HLS -> MP4 720p -> 480p -> 360p -> Embed
+              const mp4Urls = episode?.mp4_urls || {};
+              
+              if (!fallbackAttempted.current.mp4_720 && (mp4Urls["720p"] || episode?.mp4_url)) {
+                console.warn("Video error, trying MP4 720p fallback");
+                fallbackAttempted.current.mp4_720 = true;
+                setMp4Quality("720p");
+                setUseMp4Fallback(true);
+              } else if (!fallbackAttempted.current.mp4_480 && mp4Urls["480p"]) {
+                console.warn("Video error, trying MP4 480p fallback");
+                fallbackAttempted.current.mp4_480 = true;
+                setMp4Quality("480p");
+                setUseMp4Fallback(true);
+              } else if (!fallbackAttempted.current.mp4_360 && mp4Urls["360p"]) {
+                console.warn("Video error, trying MP4 360p fallback");
+                fallbackAttempted.current.mp4_360 = true;
+                setMp4Quality("360p");
                 setUseMp4Fallback(true);
               } else if (!fallbackAttempted.current.embed && episode?.embed_url) {
-                console.warn("Video error, switching to embed fallback");
+                console.warn("Video error, switching to embed fallback (last resort)");
                 fallbackAttempted.current.embed = true;
                 setUseEmbedFallback(true);
               } else {
+                setVideoError("Unable to play video. Please try refreshing the page.");
+              }
+            }} else {
                 setVideoError('Video unavailable - please try again later');
               }
             }}
