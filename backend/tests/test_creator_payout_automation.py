@@ -246,8 +246,8 @@ class TestCreatorPortalAndAutoPayout:
     
     def test_16_payout_providers_endpoint(self):
         """GET /api/payouts/providers - should return supported countries"""
-        # This endpoint doesn't require auth
-        response = requests.get(f"{BASE_URL}/api/payouts/providers")
+        # This endpoint doesn't require auth but needs User-Agent
+        response = requests.get(f"{BASE_URL}/api/payouts/providers", headers=DEFAULT_HEADERS)
         assert response.status_code == 200, f"Providers failed: {response.text}"
         
         data = response.json()
