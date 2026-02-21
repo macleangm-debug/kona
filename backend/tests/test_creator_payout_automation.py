@@ -16,6 +16,12 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 TEST_EMAIL = "superadmin@kona.com"
 TEST_PASSWORD = "SuperAdmin2025!"
 
+# User-Agent header to bypass bot detection
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Content-Type": "application/json"
+}
+
 
 class TestCreatorPortalAndAutoPayout:
     """Creator Portal and Auto-Payout Tests"""
