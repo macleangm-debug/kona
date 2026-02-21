@@ -34,12 +34,25 @@ export const PayoutHistory = ({ token }) => {
   const [summary, setSummary] = useState(null);
   const [statusFilter, setStatusFilter] = useState(null);
   const [showRequestDialog, setShowRequestDialog] = useState(false);
+  const [activeView, setActiveView] = useState("history");
   const [requestForm, setRequestForm] = useState({
     amount: "",
     payout_method: "mpesa",
     payout_details: ""
   });
   const [requesting, setRequesting] = useState(false);
+  
+  // Auto-payout settings state
+  const [autoSettings, setAutoSettings] = useState(null);
+  const [autoSettingsLoading, setAutoSettingsLoading] = useState(false);
+  const [savingAutoSettings, setSavingAutoSettings] = useState(false);
+  const [editAutoSettings, setEditAutoSettings] = useState({
+    status: "disabled",
+    threshold_coins: 5000,
+    payout_method: "mobile_money",
+    country_code: "KE",
+    payout_details: {}
+  });
 
   const fetchPayouts = async () => {
     if (!token) return;
