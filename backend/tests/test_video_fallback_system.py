@@ -19,9 +19,12 @@ class TestVideoFallbackSystem:
     
     @pytest.fixture(scope="class")
     def session(self):
-        """Create a requests session"""
+        """Create a requests session with browser-like headers"""
         session = requests.Session()
-        session.headers.update({"Content-Type": "application/json"})
+        session.headers.update({
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
         return session
     
     @pytest.fixture(scope="class")
@@ -288,7 +291,10 @@ class TestVideoFallbackEdgeCases:
     @pytest.fixture(scope="class")
     def session(self):
         session = requests.Session()
-        session.headers.update({"Content-Type": "application/json"})
+        session.headers.update({
+            "Content-Type": "application/json",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        })
         return session
     
     def test_nonexistent_episode_returns_404(self, session):
