@@ -431,10 +431,20 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Shows sparkle icon with section title
   - **Modified:** `frontend/src/pages/HomePage.jsx`
   - **Modified:** `frontend/src/pages/HomePageResponsive.jsx`
+- [x] **Bunny.net API Key Error Handling (2026-02-21)**
+  - Improved error handling for invalid/expired Bunny.net API keys
+  - Added pre-check validation before attempting referrer configuration
+  - Videos continue to work via HLS/MP4 fallback when embed player config fails
+  - **Modified:** `backend/server.py`
+- [x] **Creator Payout Automation UI (2026-02-21)**
+  - Added Auto-Payout tab to PayoutHistory component
+  - Features: threshold settings, payment method selection, toggle enable/disable
+  - Progress bar showing current balance vs threshold
+  - Settings form with M-Pesa/Bank/PayPal options
+  - **Modified:** `frontend/src/components/creator/PayoutHistory.jsx`
 - [ ] Real payment gateway integration (Flutterwave/Stripe for Africa)
 - [ ] Real SMS provider for OTP (Africa's Talking)
 - [ ] Video encoding/CDN integration (Bunny.net already configured)
-- [ ] Creator payout automation UI in frontend
 
 ### P2 (Medium)
 - [x] **Enhanced Search Frontend Integration** - COMPLETED
