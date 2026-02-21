@@ -349,9 +349,10 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   // HLS fallback state - switch to MP4 or embed player when HLS fails
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
   const [useMp4Fallback, setUseMp4Fallback] = useState(false);
+  const [mp4Quality, setMp4Quality] = useState("720p");  // Track current MP4 quality
   
   // Ref to track fallback attempts (doesn't cause re-renders)
-  const fallbackAttempted = useRef({ mp4: false, embed: false });
+  const fallbackAttempted = useRef({ mp4_720: false, mp4_480: false, mp4_360: false, embed: false });
   
   // Embed player error state (for 403/configuration issues)
   const [embedError, setEmbedError] = useState(false);
