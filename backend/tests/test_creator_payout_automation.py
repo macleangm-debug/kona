@@ -32,7 +32,7 @@ class TestCreatorPortalAndAutoPayout:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=DEFAULT_HEADERS)
         assert response.status_code == 200, f"Login failed: {response.text}"
         data = response.json()
         assert "token" in data, f"No token in response: {data}"
@@ -41,7 +41,7 @@ class TestCreatorPortalAndAutoPayout:
     @pytest.fixture(scope="class")
     def auth_headers(self, auth_token):
         """Auth headers for requests"""
-        return {"Authorization": f"Bearer {auth_token}"}
+        return {**DEFAULT_HEADERS, "Authorization": f"Bearer {auth_token}"}
     
     # ============ CREATOR STATUS TESTS ============
     def test_01_creator_status_endpoint(self, auth_headers):
