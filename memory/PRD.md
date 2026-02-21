@@ -436,6 +436,12 @@ Pull GitHub repository `https://github.com/macleangm-debug/kona` for code qualit
   - Added pre-check validation before attempting referrer configuration
   - Videos continue to work via HLS/MP4 fallback when embed player config fails
   - **Modified:** `backend/server.py`
+- [x] **Netflix/YouTube-Style Video Playback (2026-02-21)**
+  - Multi-quality MP4 fallback system (720p → 480p → 360p → embed)
+  - Direct CDN URLs work everywhere (CORS: access-control-allow-origin: *)
+  - No dependency on Bunny.net Account API key for viewer playback
+  - Episode API returns: video_url, hls_url, mp4_url, mp4_urls (720p/480p/360p), embed_url
+  - **Modified:** `backend/routes/series.py`, `frontend/src/pages/VideoPlayerPage.jsx`
 - [x] **Creator Payout Automation UI (2026-02-21)**
   - Added Auto-Payout tab to PayoutHistory component
   - Features: threshold settings, payment method selection, toggle enable/disable
