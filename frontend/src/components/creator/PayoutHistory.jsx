@@ -76,8 +76,64 @@ export const PayoutHistory = ({ token }) => {
 
   useEffect(() => {
     fetchPayouts();
+    fetchAutoSettings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, statusFilter]);
+  
+  const fetchAutoSettings = async () => {
+    if (!token) return;
+    setAutoSettingsLoading(true);
+    try {
+      const res = await axios.get(`${API}/payouts/auto/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAutoSettings(res.data);
+      setEditAutoSettings({
+        status: res.data.status || "disabled",
+        threshold_coins: res.data.threshold_coins || 5000,
+        payout_method: res.data.payout_method || "mobile_money",
+        country_code: res.data.country_code || "KE",
+        payout_details: res.data.payout_details || {}
+      });
+    } catch (e) {
+      console.error("Failed to fetch auto-payout settings:", e);
+    }
+    setAutoSettingsLoading(false);
+  };
+  
+  const handleSaveAutoSettings = async () => {
+    setSavingAutoSettings(true);
+    try {
+      await axios.put(
+        `${API}/payouts/auto/settings`,
+        editAutoSettings,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success("Auto-payout settings saved!");
+      fetchAutoSettings();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to save settings");
+    }
+    setSavingAutoSettings(false);
+  };
+  
+  const handleToggleAutoPayout = async () => {
+    const newStatus = editAutoSettings.status === "enabled" ? "disabled" : "enabled";
+    setEditAutoSettings({ ...editAutoSettings, status: newStatus });
+    
+    try {
+      await axios.put(
+        `${API}/payouts/auto/settings`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(newStatus === "enabled" ? "Auto-payout enabled!" : "Auto-payout disabled");
+      fetchAutoSettings();
+    } catch (e) {
+      toast.error("Failed to update auto-payout status");
+      setEditAutoSettings({ ...editAutoSettings, status: editAutoSettings.status });
+    }
+  };
 
   const handleRequestPayout = async () => {
     if (!requestForm.amount || parseFloat(requestForm.amount) < 100) {
