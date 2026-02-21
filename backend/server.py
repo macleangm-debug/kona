@@ -272,6 +272,20 @@ async def configure_bunny_referrers():
             )
             return
         
+        # Test if the API key is valid first
+        test_result = await bunny_service.get_allowed_referrers()
+        if not test_result.get("success"):
+            error_msg = test_result.get("error", "Unknown error")
+            if "401" in str(error_msg) or "Unauthorized" in str(error_msg):
+                logger.warning(
+                    "⚠️ BUNNY_ACCOUNT_API_KEY is invalid or expired. "
+                    "Embed player configuration skipped. Videos will still work via direct HLS/MP4 URLs. "
+                    "To enable embed player: Update BUNNY_ACCOUNT_API_KEY in .env"
+                )
+            else:
+                logger.warning(f"⚠️ Bunny.net API error: {error_msg}")
+            return
+        
         # Get the frontend URL and extract hostname
         frontend_url = os.environ.get("FRONTEND_URL", "")
         
