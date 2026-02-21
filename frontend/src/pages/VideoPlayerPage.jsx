@@ -1795,9 +1795,6 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
               } else {
                 setVideoError("Unable to play video. Please try refreshing the page.");
               }
-            }} else {
-                setVideoError('Video unavailable - please try again later');
-              }
             }}
             className={`w-full h-full transition-all duration-300 ${getVideoDisplayStyle()}`}
             style={{
