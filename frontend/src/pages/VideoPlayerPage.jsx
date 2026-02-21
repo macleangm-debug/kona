@@ -930,10 +930,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
       // Reset all fallback states when episode changes
       setUseEmbedFallback(false);
       setUseMp4Fallback(false);
+      setMp4Quality("720p");  // Reset to best quality
       setVideoError(null);
       setVideoMounted(false); // Reset so HLS re-initializes for new video
       setEmbedError(false); // Reset embed error state
-      fallbackAttempted.current = { mp4: false, embed: false }; // Reset ref
+      fallbackAttempted.current = { mp4_720: false, mp4_480: false, mp4_360: false, embed: false }; // Reset ref
       
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
