@@ -122,7 +122,7 @@ class TestCreatorPortalAndAutoPayout:
     
     def test_08_upload_settings_requires_auth(self):
         """GET /api/creator/upload-settings - should require authentication"""
-        response = requests.get(f"{BASE_URL}/api/creator/upload-settings")
+        response = requests.get(f"{BASE_URL}/api/creator/upload-settings", headers=DEFAULT_HEADERS)
         assert response.status_code in [401, 403], f"Expected 401/403, got {response.status_code}"
         print("✅ Upload settings requires auth")
     
