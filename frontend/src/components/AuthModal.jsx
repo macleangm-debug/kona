@@ -699,7 +699,7 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                     <button
                       type="button"
                       onClick={() => setShowCountryPicker(true)}
-                      className="flex items-center gap-1 h-10 px-3 rounded-lg bg-secondary/50 border border-white/10 hover:border-white/20 transition-colors"
+                      className="flex items-center gap-1 h-10 px-3 rounded-lg bg-secondary/50 border border-white/10 hover:border-primary/50 hover:bg-secondary/70 transition-all duration-150 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50"
                       data-testid="country-selector"
                     >
                       <span className="text-lg">{selectedCountry.flag}</span>
