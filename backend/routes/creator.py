@@ -1499,10 +1499,11 @@ async def create_episode_for_series(
     # This ensures the homepage shows the correct episode count
     if series.get("status") == "published":
         await db.series.update_one({"id": series_id}, {"$inc": {"total_episodes": 1}})
-        # Invalidate cache so homepage reflects new count
-        from services.cache import cache, series_list_key, series_key
+        # Invalidate cache so homepage and series page reflects new episode
+        from services.cache import cache, series_list_key, series_key, episodes_key
         await cache.delete(series_list_key("all"))
         await cache.delete(series_key(series_id))
+        await cache.delete(episodes_key(series_id))  # Critical: invalidate episodes cache
     
     # Return response with 'episode' key for frontend compatibility
     return {
@@ -1636,10 +1637,11 @@ async def create_episode(data: CreatorEpisodeCreate, user: dict = Depends(get_cu
     # If series is already published, also update the main series collection
     if series.get("status") == "published":
         await db.series.update_one({"id": data.series_id}, {"$inc": {"total_episodes": 1}})
-        # Invalidate cache so homepage reflects new count
-        from services.cache import cache, series_list_key, series_key
+        # Invalidate cache so homepage and series page reflects new episode
+        from services.cache import cache, series_list_key, series_key, episodes_key
         await cache.delete(series_list_key("all"))
         await cache.delete(series_key(data.series_id))
+        await cache.delete(episodes_key(data.series_id))  # Critical: invalidate episodes cache
     
     response = {
         "message": f"Episode {episode_code} created successfully",
