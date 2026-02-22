@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="8" failures="0" skipped="0" tests="8" time="1.302" timestamp="2026-02-22T14:57:01.838195+00:00" hostname="agent-env-0d8a46b0-04db-49f6-94eb-9e2234619949"><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_providers_status_endpoint" time="0.253"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_library_endpoint_returns_empty_initially" time="0.111"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_library_endpoint_with_pagination" time="0.102"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_library_endpoint_with_series_filter" time="0.113"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_providers_status_requires_auth" time="0.114"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_library_requires_auth" time="0.118"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_generate_endpoint_validation" time="0.249"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_ai_thumbnails.TestAIThumbnailEndpoints" name="test_generate_from_genre_validation" time="0.141"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_ai_thumbnails.py:27: in setup
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase></testsuite></testsuites>
