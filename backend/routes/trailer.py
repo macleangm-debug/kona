@@ -248,7 +248,7 @@ async def process_trailer_job(trailer_id: str, creator_id: str):
         for path in clip_paths:
             try:
                 os.remove(path)
-            except:
+            except OSError:
                 pass
         
     except Exception as e:
