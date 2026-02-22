@@ -491,3 +491,39 @@ CORS_ORIGINS=*                        # Optional, comma-separated
 # Frontend (.env)
 REACT_APP_BACKEND_URL=<backend-url>
 ```
+
+### Session 9 (2026-02-22) - UI/UX Bug Fixes & Episode Caching
+
+1. **Episode Not Appearing After Upload (FIXED)**
+   - Root cause: Episodes cache (`episodes_key`) was not being invalidated when episodes were added to published series
+   - Added `episodes_key(series_id)` cache invalidation in both episode creation endpoints
+   - Episodes now appear immediately on the series page after upload without refresh
+   - **Modified:** `backend/routes/creator.py` (lines 1499-1507 and 1636-1644)
+
+2. **Auth Modal Input Lag (FIXED)**
+   - Root cause: Referral code validation API was called on every keystroke
+   - Added 500ms debouncing to referral code validation using useRef timer
+   - Improved form state management with proper cleanup
+   - Phone input and email input now respond immediately with no lag
+   - **Modified:** `frontend/src/components/AuthModal.jsx` (lines 311-340)
+
+3. **Dropdown Hover States (FIXED)**
+   - Enhanced hover states on country selector: `hover:border-primary/50 hover:bg-secondary/70 cursor-pointer`
+   - Improved country list items: `hover:bg-white/10 active:bg-white/15` with better contrast
+   - Enhanced verification method buttons: `hover:border-primary/40 hover:bg-white/5 hover:text-white`
+   - All interactive elements now have visible hover feedback
+   - **Modified:** `frontend/src/components/AuthModal.jsx` (lines 700-708, 754-762, 778-793)
+
+4. **Close Button UX Improvement (FIXED)**
+   - Enhanced X close button visibility with background styling
+   - Close button now has: `bg-secondary/80`, `rounded-full`, `p-1.5`, `border border-white/10`
+   - Properly positioned in top-right corner with `top-3 right-3`
+   - Added padding to tabs area (`pt-2`) to accommodate close button
+   - **Modified:** `frontend/src/components/AuthModal.jsx` (lines 540-545)
+
+**Testing Status:** All fixes verified by testing agent (iteration_48.json)
+- ✅ Episode caching - episodes_key invalidation working
+- ✅ Input responsiveness - Phone: 0.98s, Email: 0.82s typing time
+- ✅ Hover states - All elements have proper hover classes
+- ✅ Close button - Visible X icon in top-right corner
+
