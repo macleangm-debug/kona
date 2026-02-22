@@ -1794,6 +1794,9 @@ async def get_episode_status(episode_id: str, user: dict = Depends(get_current_u
     bunny_status = await bunny_service.get_video_status(episode["bunny_video_id"])
     
     if bunny_status["success"]:
+        was_pending = episode.get("encoding_status") != "ready"
+        is_now_ready = bunny_status["status"] == "ready"
+        
         # Update local status
         await db.creator_episodes.update_one(
             {"id": episode_id},
@@ -1804,12 +1807,26 @@ async def get_episode_status(episode_id: str, user: dict = Depends(get_current_u
             }}
         )
         
+        # Auto-publish to main episodes if series is published and episode just became ready
+        published_to_public = False
+        if was_pending and is_now_ready:
+            series = await db.creator_series.find_one({"id": episode["series_id"]}, {"_id": 0})
+            if series and series.get("status") == "published":
+                # Update episode with new status info before publishing
+                updated_episode = {**episode, 
+                    "encoding_status": "ready", 
+                    "duration": bunny_status.get("duration"),
+                    "thumbnail": bunny_status.get("thumbnail_url")
+                }
+                published_to_public = await publish_episode_to_main(updated_episode, series, creator["id"])
+        
         return {
             "episode_id": episode_id,
             "status": bunny_status["status"],
             "duration": bunny_status.get("duration"),
             "thumbnail": bunny_status.get("thumbnail_url"),
-            "resolutions": bunny_status.get("available_resolutions", [])
+            "resolutions": bunny_status.get("available_resolutions", []),
+            "published_to_public": published_to_public
         }
     
     return {"episode_id": episode_id, "status": episode.get("encoding_status", "unknown")}
