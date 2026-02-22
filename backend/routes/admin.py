@@ -378,6 +378,10 @@ DOC_METADATA = {
     "localization_expansion": {"title": "Localization & Expansion Guide", "icon": "🌍", "category": "P2"},
     "creator_partnership": {"title": "Creator Partnership Program", "icon": "🤝", "category": "P2"},
     "security_data_protection": {"title": "Security & Data Protection", "icon": "🔒", "category": "P2"},
+    # Technical Documentation
+    "creator_video_architecture": {"title": "Creator & Video Architecture", "icon": "🎥", "category": "P0"},
+    "api_documentation": {"title": "API Documentation", "icon": "📡", "category": "P1"},
+    "disaster_recovery": {"title": "Disaster Recovery Plan", "icon": "🛡️", "category": "P1"},
 }
 
 @router.get("/docs/{doc_id}")
