@@ -169,16 +169,11 @@ export const CreatorPortal = () => {
     );
   }
 
-  // Still loading user from token - but set a reasonable timeout
-  // If authLoading is done but user still null with valid token, refetch
-  if (!user && hasToken && !authLoading) {
-    // Show verifying only briefly, then navigate home if user doesn't load
+  // Still loading user from token
+  // If authLoading is false but we have token and no user, show verifying briefly
+  // This handles the edge case where authLoading completes but user not yet set
+  if (!user && hasToken) {
     return <PageLoader message="Verifying session..." />;
-  }
-  
-  // If we have token but no user after auth loading finished, redirect
-  if (!user && hasToken && authLoading) {
-    return <PageLoader message="Loading authentication..." />;
   }
 
   // Not a creator yet - show application
