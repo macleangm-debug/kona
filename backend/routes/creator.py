@@ -1299,6 +1299,57 @@ async def publish_series(series_id: str, user: dict = Depends(get_current_user))
         )
 
 
+async def publish_episode_to_main(episode: dict, series: dict, creator_id: str):
+    """Publish a single ready episode to the main episodes collection"""
+    if episode.get("encoding_status") != "ready" or not episode.get("bunny_video_id"):
+        return False
+    
+    video_url = bunny_service.get_direct_play_url(episode["bunny_video_id"])
+    
+    # Get admin-controlled pricing for this episode
+    is_free, coins_required = await get_episode_pricing(
+        episode["series_id"], 
+        episode.get("episode_number", 1), 
+        episode.get("season_number", 1)
+    )
+    
+    main_episode = {
+        "id": episode["id"],
+        "series_id": episode["series_id"],
+        "episode_number": episode["episode_number"],
+        "title": episode["title"],
+        "thumbnail": episode.get("thumbnail") or series.get("thumbnail"),
+        "duration": f"{(episode.get('duration', 120) // 60)}:{str(episode.get('duration', 0) % 60).zfill(2)}",
+        "video_url": video_url,
+        "bunny_video_id": episode.get("bunny_video_id"),
+        "is_free": is_free,
+        "coins_required": coins_required,
+        "intro_duration": episode.get("intro_duration", 30),
+        "creator_id": creator_id
+    }
+    
+    await db.episodes.update_one(
+        {"id": episode["id"]},
+        {"$set": main_episode},
+        upsert=True
+    )
+    
+    # Update series episode count in main collection
+    episode_count = await db.episodes.count_documents({"series_id": episode["series_id"]})
+    await db.series.update_one(
+        {"id": episode["series_id"]},
+        {"$set": {"total_episodes": episode_count}}
+    )
+    
+    # Invalidate cache
+    from services.cache import cache, series_key, series_list_key, episodes_key
+    await cache.delete(series_key(episode["series_id"]))
+    await cache.delete(series_list_key("all"))
+    await cache.delete(episodes_key(episode["series_id"]))
+    
+    return True
+
+
 async def publish_series_to_main(series_id: str, creator_id: str):
     """Copy series to main series collection for public viewing"""
     series = await db.creator_series.find_one({"id": series_id}, {"_id": 0})
