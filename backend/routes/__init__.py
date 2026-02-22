@@ -31,6 +31,9 @@ from .analytics_export import router as analytics_export_router
 from .recommendations import router as recommendations_router
 from .search import router as search_router
 from .thumbnail_testing import router as thumbnail_testing_router
+from .merchandise import router as merchandise_router
+from .sponsorship import router as sponsorship_router
+from .trailer import router as trailer_router
 
 # Create main API router
 api_router = APIRouter()
@@ -66,3 +69,6 @@ api_router.include_router(analytics_export_router)
 api_router.include_router(recommendations_router)
 api_router.include_router(search_router)
 api_router.include_router(thumbnail_testing_router)
+api_router.include_router(merchandise_router)
+api_router.include_router(sponsorship_router)
+api_router.include_router(trailer_router)
