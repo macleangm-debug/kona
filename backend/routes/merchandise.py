@@ -407,6 +407,9 @@ async def create_order(
     
     await db.merchandise_orders.insert_one(order_doc)
     
+    # Remove _id that MongoDB adds
+    order_doc.pop("_id", None)
+    
     return {
         "message": "Order placed successfully",
         "order_id": order_id,
