@@ -413,6 +413,12 @@ export const CreatorPortal = () => {
             </div>
           )}
 
+          {activeTab === "thumbnails" && (
+            <div className="max-w-7xl">
+              <AIThumbnailGenerator token={token} series={series} />
+            </div>
+          )}
+
           {activeTab === "payouts" && (
             <div className="max-w-7xl">
               <PayoutHistory token={token} />
