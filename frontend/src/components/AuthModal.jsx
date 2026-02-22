@@ -749,8 +749,10 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                                 setShowCountryPicker(false);
                                 setCountrySearch("");
                               }}
-                              className={`w-full flex items-center gap-3 px-3 py-3 text-left hover:bg-white/5 rounded-lg transition-colors ${
-                                selectedCountry.code === country.code ? 'bg-primary/10 border border-primary/30' : ''
+                              className={`w-full flex items-center gap-3 px-3 py-3 text-left rounded-lg transition-all duration-150 cursor-pointer ${
+                                selectedCountry.code === country.code 
+                                  ? 'bg-primary/10 border border-primary/30' 
+                                  : 'hover:bg-white/10 active:bg-white/15'
                               }`}
                             >
                               <span className="text-xl">{country.flag}</span>
