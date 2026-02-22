@@ -1727,6 +1727,21 @@ export const CreatorSeriesDetailPage = () => {
             <Plus className="w-4 h-4 mr-2" /> Add Episodes
           </Button>
           
+          {/* Quick Generate AI Thumbnail */}
+          <Button 
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            onClick={handleQuickGenerateThumbnail}
+            disabled={generatingThumbnail}
+            data-testid="quick-generate-thumbnail-btn"
+          >
+            {generatingThumbnail ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Wand2 className="w-4 h-4 mr-2" />
+            )}
+            {generatingThumbnail ? "Generating..." : "AI Thumbnail"}
+          </Button>
+          
           {/* Publish Button */}
           {series.status !== "published" && (
             <Button 
