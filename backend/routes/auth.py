@@ -103,7 +103,7 @@ async def register(data: UserCreate, request: Request):
     """Register with email or phone"""
     
     # Anti-bot validation (honeypot + timing)
-    bot_check = getattr(data, '_bot_check', None) or {}
+    bot_check = data.bot_check or {}
     if isinstance(bot_check, dict):
         # Check 1: Honeypot should be empty
         if bot_check.get('hp') == 'filled':
