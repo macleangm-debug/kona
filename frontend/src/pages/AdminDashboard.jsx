@@ -2721,6 +2721,8 @@ export const AdminDashboard = () => {
     { id: "localization_expansion", name: "Localization Guide", icon: "🌍", category: "P2 - Scale", color: "green" },
     { id: "creator_partnership", name: "Creator Partnership", icon: "🤝", category: "P2 - Scale", color: "green" },
     { id: "security_data_protection", name: "Security & Data", icon: "🔒", category: "P2 - Scale", color: "green" },
+    // Technical Documentation
+    { id: "creator_video_architecture", name: "Creator & Video Architecture", icon: "🎥", category: "Technical", color: "purple" },
     // New Documents
     { id: "investor_pitch_deck", name: "Investor Pitch Deck", icon: "💼", category: "P0 - Launch Critical", color: "red" },
     { id: "financial_projections", name: "Financial Projections", icon: "📉", category: "P0 - Launch Critical", color: "red" },
