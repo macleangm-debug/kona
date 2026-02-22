@@ -85,6 +85,25 @@ export const CreatorPortal = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
+  // Handle session timeout - if we have token but no user after 5 seconds, try to refresh or redirect
+  useEffect(() => {
+    const hasToken = token || localStorage.getItem("token");
+    if (!user && hasToken && !authLoading) {
+      const timeoutId = setTimeout(() => {
+        // If still no user after 5 seconds, try refreshing or redirect to login
+        if (refreshUser) {
+          refreshUser().catch(() => {
+            setSessionTimeout(true);
+          });
+        } else {
+          setSessionTimeout(true);
+        }
+      }, 5000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [user, token, authLoading, refreshUser]);
+
   const handleApply = async () => {
     if (applyForm.bio.length < 20) {
       toast.error("Please write at least 20 characters in your bio");
