@@ -304,6 +304,9 @@ async def create_trailer(
     
     await db.trailers.insert_one(trailer_doc)
     
+    # Remove _id that MongoDB adds
+    trailer_doc.pop("_id", None)
+    
     return {"message": "Trailer project created", "trailer_id": trailer_id, "trailer": trailer_doc}
 
 
