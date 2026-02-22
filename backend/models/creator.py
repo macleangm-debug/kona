@@ -246,3 +246,112 @@ class PayoutRecord(BaseModel):
     status: str = "pending"  # pending, processing, completed, failed
     created_at: str
     processed_at: Optional[str] = None
+
+
+# ============ EPISODE SCHEDULER MODELS ============
+class ScheduledRelease(BaseModel):
+    """Scheduled episode release"""
+    episode_id: str
+    series_id: str
+    scheduled_for: str  # ISO datetime
+    timezone: str = "Africa/Dar_es_Salaam"
+    notify_subscribers: bool = True
+    early_access_hours: int = 0  # Hours before public release for premium subscribers
+
+class EpisodeScheduleCreate(BaseModel):
+    """Create a scheduled release for an episode"""
+    scheduled_for: str  # ISO datetime string
+    timezone: str = "Africa/Dar_es_Salaam"
+    notify_subscribers: bool = True
+    early_access_hours: int = Field(default=0, ge=0, le=72)
+
+class EpisodeScheduleResponse(BaseModel):
+    """Response for scheduled episode"""
+    schedule_id: str
+    episode_id: str
+    series_id: str
+    episode_title: str
+    scheduled_for: str
+    timezone: str
+    status: str  # scheduled, released, cancelled
+    early_access_hours: int
+    notify_subscribers: bool
+    created_at: str
+
+
+# ============ CREATOR MILESTONES & BADGES MODELS ============
+class CreatorMilestone(BaseModel):
+    """Milestone achievement for creators"""
+    id: str
+    creator_id: str
+    milestone_type: str  # views, episodes, earnings, subscribers, streaks
+    milestone_name: str
+    milestone_value: int  # The threshold reached
+    achieved_at: str
+    badge_icon: str
+    badge_color: str
+    is_celebrated: bool = False  # Has the creator seen/celebrated this
+
+class MilestoneDefinition(BaseModel):
+    """Definition of available milestones"""
+    type: str
+    name: str
+    description: str
+    thresholds: List[int]  # e.g., [100, 1000, 10000, 100000] for views
+    badge_icons: List[str]  # Icons for each threshold
+    badge_colors: List[str]  # Colors for each threshold
+    rewards: Optional[List[int]] = None  # Bonus coins for each milestone
+
+# Pre-defined milestone definitions
+MILESTONE_DEFINITIONS = {
+    "views": {
+        "type": "views",
+        "name": "View Milestones",
+        "description": "Total views across all content",
+        "thresholds": [100, 1000, 10000, 50000, 100000, 500000, 1000000],
+        "names": ["First Hundred", "Rising Star", "Trending", "Popular", "Viral", "Superstar", "Legend"],
+        "badge_icons": ["eye", "star", "trending-up", "flame", "zap", "crown", "trophy"],
+        "badge_colors": ["gray", "blue", "green", "yellow", "orange", "purple", "gold"],
+        "rewards": [10, 50, 100, 250, 500, 1000, 5000]
+    },
+    "episodes": {
+        "type": "episodes",
+        "name": "Episode Milestones",
+        "description": "Total episodes published",
+        "thresholds": [1, 10, 25, 50, 100, 250, 500],
+        "names": ["First Episode", "Getting Started", "Prolific", "Content Machine", "Century Club", "Master Creator", "Epic Storyteller"],
+        "badge_icons": ["play", "film", "video", "tv", "layers", "award", "sparkles"],
+        "badge_colors": ["gray", "blue", "green", "yellow", "orange", "purple", "gold"],
+        "rewards": [5, 25, 50, 100, 250, 500, 1000]
+    },
+    "earnings": {
+        "type": "earnings",
+        "name": "Earnings Milestones",
+        "description": "Total coins earned from content",
+        "thresholds": [100, 1000, 5000, 25000, 100000, 500000, 1000000],
+        "names": ["First Hundred", "Monetized", "Earning Well", "High Earner", "Top Creator", "Elite", "Millionaire"],
+        "badge_icons": ["coins", "wallet", "banknote", "piggy-bank", "gem", "diamond", "crown"],
+        "badge_colors": ["gray", "green", "blue", "yellow", "orange", "purple", "gold"],
+        "rewards": [0, 0, 0, 0, 0, 0, 0]  # No bonus for earnings milestones (already earning)
+    },
+    "series": {
+        "type": "series",
+        "name": "Series Milestones",
+        "description": "Total series published",
+        "thresholds": [1, 3, 5, 10, 20, 50],
+        "names": ["First Series", "Multi-Series Creator", "Portfolio Builder", "Franchise Owner", "Studio", "Media Empire"],
+        "badge_icons": ["bookmark", "library", "folder", "folders", "building", "castle"],
+        "badge_colors": ["gray", "blue", "green", "yellow", "orange", "gold"],
+        "rewards": [10, 25, 50, 100, 250, 1000]
+    },
+    "streak": {
+        "type": "streak",
+        "name": "Upload Streak",
+        "description": "Consecutive weeks with uploads",
+        "thresholds": [2, 4, 8, 12, 26, 52],
+        "names": ["2 Week Streak", "Month Streak", "2 Month Streak", "Quarterly Streak", "Half Year Streak", "Year Streak"],
+        "badge_icons": ["flame", "fire", "flame", "fire-extinguisher", "rocket", "medal"],
+        "badge_colors": ["orange", "orange", "red", "red", "purple", "gold"],
+        "rewards": [10, 25, 50, 100, 500, 2000]
+    }
+}
