@@ -19,11 +19,10 @@ class UserCreate(BaseModel):
     password: str
     name: str
     referral_code: Optional[str] = None
-    _bot_check: Optional[BotCheck] = None  # Anti-bot metadata
+    bot_check: Optional[dict] = None  # Anti-bot metadata (renamed from _bot_check)
     
     class Config:
-        # Allow underscore-prefixed fields
-        extra = "allow"
+        extra = "ignore"  # Ignore extra fields
     
     @field_validator('phone')
     @classmethod
