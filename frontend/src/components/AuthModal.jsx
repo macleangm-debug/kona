@@ -412,6 +412,25 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
+    
+    // Anti-bot checks (invisible to users)
+    const timeTaken = Date.now() - formLoadTime;
+    
+    // Check 1: Honeypot field should be empty (bots fill hidden fields)
+    if (honeypot) {
+      console.log("Bot detected: honeypot filled");
+      // Silently reject - don't alert the bot
+      toast.error("Something went wrong. Please try again.");
+      return;
+    }
+    
+    // Check 2: Form submitted too fast (< 3 seconds = likely bot)
+    if (timeTaken < 3000 && !isLogin) {
+      console.log("Bot detected: form submitted too fast", timeTaken);
+      toast.error("Please take your time filling the form.");
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -424,11 +443,16 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
         }
         setShowLoginSuccess(true);
       } else {
-        // Register
+        // Register - include anti-bot metadata
         const registerData = {
           name,
           password,
-          referral_code: referralValid ? referralCode : null
+          referral_code: referralValid ? referralCode : null,
+          // Anti-bot metadata (backend will validate)
+          _bot_check: {
+            form_time: timeTaken,
+            hp: honeypot ? "filled" : "empty"
+          }
         };
         
         if (authMethod === "email") {
