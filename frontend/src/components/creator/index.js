@@ -6,3 +6,6 @@ export { CreatorPendingSubmissions } from "./CreatorPendingSubmissions";
 export { PayoutHistory } from "./PayoutHistory";
 export { CreatorNotifications } from "./CreatorNotifications";
 export { CreatorDashboardOverview } from "./CreatorDashboardOverview";
+export { EarningsDashboard } from "./EarningsDashboard";
+export { EpisodeScheduler } from "./EpisodeScheduler";
+export { CreatorMilestones } from "./CreatorMilestones";
