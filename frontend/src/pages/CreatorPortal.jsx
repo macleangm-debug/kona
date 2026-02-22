@@ -144,13 +144,16 @@ export const CreatorPortal = () => {
     return <PageLoader message="Loading..." />;
   }
 
-  // Loading creator data
+  // Loading creator data while we have a user
   if (loading && user) {
     return <PageLoader message="Loading creator portal..." />;
   }
 
-  // Not logged in
-  if (!user) {
+  // Check if we have a token but no user yet (still loading)
+  const hasToken = token || localStorage.getItem("token");
+  
+  // Not logged in - only show if no token at all
+  if (!user && !hasToken) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
         <Card className="p-6 text-center max-w-sm">
@@ -161,6 +164,11 @@ export const CreatorPortal = () => {
         </Card>
       </div>
     );
+  }
+
+  // Still loading user from token
+  if (!user && hasToken) {
+    return <PageLoader message="Verifying session..." />;
   }
 
   // Not a creator yet - show application
