@@ -31,14 +31,6 @@ async def generate_with_openai(prompt: str, size: str = "1024x1024") -> Optional
         
         image_gen = OpenAIImageGeneration(api_key=api_key)
         
-        # Map size to OpenAI format
-        size_map = {
-            "1024x1024": "1024x1024",
-            "1792x1024": "1792x1024",  # Landscape
-            "1024x1792": "1024x1792",  # Portrait (video thumbnail)
-        }
-        openai_size = size_map.get(size, "1024x1024")
-        
         images = await image_gen.generate_images(
             prompt=prompt,
             model="gpt-image-1",
