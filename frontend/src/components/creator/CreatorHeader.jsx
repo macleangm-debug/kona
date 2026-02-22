@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, Plus, LayoutDashboard, LineChart, Bell, History,
-  Film, Settings, LogOut, Trophy, Coins
+  Film, Settings, LogOut, Trophy, Coins, Calendar, TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,14 +17,17 @@ export const CreatorHeader = ({
 
   const tabs = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "earnings", label: "Earnings", icon: TrendingUp },
     { id: "analytics", label: "Analytics", icon: LineChart },
+    { id: "scheduler", label: "Scheduler", icon: Calendar },
+    { id: "milestones", label: "Milestones", icon: Trophy },
     { id: "payouts", label: "Payouts", icon: History },
   ];
 
   return (
     <>
       {/* Desktop Sidebar - Hidden on mobile, positioned below main header */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-16 bottom-0 w-64 bg-card border-r border-white/10 z-40">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-white/10 z-40">
         {/* Logo/Brand */}
         <div className="p-6 border-b border-white/10">
           <h1 className="font-heading text-xl font-bold">Creator Studio</h1>
