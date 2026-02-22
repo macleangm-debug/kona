@@ -104,10 +104,7 @@ async def detect_exciting_scenes(video_url: str, episode_id: str) -> List[dict]:
     scenes = []
     
     try:
-        # Download video temporarily
-        temp_video = f"{TEMP_DIR}/temp_{uuid.uuid4().hex[:8]}.mp4"
-        
-        # Use ffmpeg to download and analyze
+        # Use ffmpeg to analyze audio for peaks
         # This is a simplified version - real implementation would use ML models
         subprocess.run([
             "ffmpeg", "-y",
