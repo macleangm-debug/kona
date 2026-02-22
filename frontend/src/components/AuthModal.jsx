@@ -280,6 +280,10 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   const [showLoginSuccess, setShowLoginSuccess] = useState(false);
   const [showSignupSuccess, setShowSignupSuccess] = useState(false);
   const [signupBonusInfo, setSignupBonusInfo] = useState({ welcome: 0, referral: 0 });
+  
+  // Anti-bot protection (invisible to users)
+  const [honeypot, setHoneypot] = useState(""); // Should remain empty - bots fill this
+  const [formLoadTime] = useState(Date.now()); // Track when form loaded
 
   // Update referral code when initialReferralCode changes
   useEffect(() => {
