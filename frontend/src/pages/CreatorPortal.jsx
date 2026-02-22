@@ -20,7 +20,10 @@ import {
   CreatorPendingSubmissions,
   PayoutHistory,
   CreatorNotifications,
-  CreatorDashboardOverview
+  CreatorDashboardOverview,
+  EarningsDashboard,
+  EpisodeScheduler,
+  CreatorMilestones
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
