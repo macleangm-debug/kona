@@ -781,10 +781,10 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                             key={method.value}
                             type="button"
                             onClick={() => setVerificationMethod(method.value)}
-                            className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 text-xs rounded-lg border transition-colors ${
+                            className={`flex-1 flex items-center justify-center gap-1 py-2 px-2 text-xs rounded-lg border transition-all duration-150 cursor-pointer ${
                               verificationMethod === method.value
                                 ? 'border-primary bg-primary/10 text-primary'
-                                : 'border-white/10 text-muted-foreground hover:border-white/20'
+                                : 'border-white/10 text-muted-foreground hover:border-primary/40 hover:bg-white/5 hover:text-white'
                             }`}
                           >
                             <span>{method.icon}</span>
