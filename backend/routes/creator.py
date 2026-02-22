@@ -3011,7 +3011,7 @@ async def get_realtime_earnings(user: dict = Depends(get_current_user)):
 
 
 @router.get("/earnings/history")
-async def get_earnings_history(
+async def get_detailed_earnings_history(
     period: str = Query("30d", description="7d, 30d, 90d, 1y, all"),
     user: dict = Depends(get_current_user)
 ):
