@@ -3,6 +3,7 @@ Authentication routes
 """
 import uuid
 import random
+import logging
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends, Request
 
@@ -12,6 +13,8 @@ from models.schemas import (
 )
 from services import db, hash_password, verify_password, create_token, generate_referral_code, get_current_user, detect_country_from_ip
 from config.settings import REFERRAL_REWARD_REFERRER, REFERRAL_REWARD_REFEREE
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
