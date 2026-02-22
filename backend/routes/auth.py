@@ -99,6 +99,20 @@ async def verify_otp(data: VerifyOTPRequest):
 async def register(data: UserCreate, request: Request):
     """Register with email or phone"""
     
+    # Anti-bot validation (honeypot + timing)
+    bot_check = getattr(data, '_bot_check', None) or {}
+    if isinstance(bot_check, dict):
+        # Check 1: Honeypot should be empty
+        if bot_check.get('hp') == 'filled':
+            logger.warning(f"[AUTH] Bot detected: honeypot filled - IP: {request.client.host}")
+            raise HTTPException(status_code=400, detail="Registration failed. Please try again.")
+        
+        # Check 2: Form submitted too fast (< 2 seconds = likely bot)
+        form_time = bot_check.get('form_time', 10000)
+        if form_time < 2000:
+            logger.warning(f"[AUTH] Bot detected: form too fast ({form_time}ms) - IP: {request.client.host}")
+            raise HTTPException(status_code=400, detail="Please take your time filling the form.")
+    
     # Detect user's geo-location from IP
     client_ip = request.client.host
     forwarded_for = request.headers.get("X-Forwarded-For")
