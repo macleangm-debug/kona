@@ -26,7 +26,8 @@ import {
   CreatorMilestones,
   MerchandiseManager,
   SponsorshipMarketplace,
-  TrailerCreator
+  TrailerCreator,
+  AIThumbnailGenerator
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
