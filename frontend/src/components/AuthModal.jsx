@@ -308,10 +308,18 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
     }
   }, [resendTimer]);
 
-  // Validate referral code
+  // Validate referral code with debouncing to prevent lag
+  const referralValidationTimer = useRef(null);
+  
   useEffect(() => {
-    const validateCode = async () => {
-      if (referralCode.length >= 6) {
+    // Clear previous timer
+    if (referralValidationTimer.current) {
+      clearTimeout(referralValidationTimer.current);
+    }
+    
+    if (!isLogin && referralCode && referralCode.length >= 6) {
+      // Debounce validation by 500ms
+      referralValidationTimer.current = setTimeout(async () => {
         try {
           const res = await axios.get(`${API}/referral/validate/${referralCode}`);
           setReferralValid(res.data.valid);
@@ -321,13 +329,16 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
         } catch (e) {
           setReferralValid(false);
         }
-      } else {
-        setReferralValid(null);
+      }, 500);
+    } else if (referralCode.length < 6) {
+      setReferralValid(null);
+    }
+    
+    return () => {
+      if (referralValidationTimer.current) {
+        clearTimeout(referralValidationTimer.current);
       }
     };
-    if (!isLogin && referralCode) {
-      validateCode();
-    }
   }, [referralCode, isLogin]);
 
   const handleSendOTP = async () => {
