@@ -31,7 +31,7 @@ import {
 
 export const CreatorPortal = () => {
   const navigate = useNavigate();
-  const { user, token, loading: authLoading } = useAuth();
+  const { user, token, loading: authLoading, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [creatorStatus, setCreatorStatus] = useState(null);
   const [dashboard, setDashboard] = useState(null);
@@ -43,6 +43,7 @@ export const CreatorPortal = () => {
   const [showSubmitSeries, setShowSubmitSeries] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const [creatingSeriesLoading, setCreatingSeriesLoading] = useState(false);
+  const [sessionTimeout, setSessionTimeout] = useState(false);
 
   // Application form state
   const [applyForm, setApplyForm] = useState({
