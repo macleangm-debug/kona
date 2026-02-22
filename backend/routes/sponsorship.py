@@ -10,7 +10,7 @@ from typing import Optional, List
 from datetime import datetime, timezone
 import uuid
 
-from config.database import db
+from services.database import db
 from routes.auth import get_current_user
 from models.sponsorship import (
     SponsorshipStatus, ApplicationStatus, SponsorshipType, PaymentType,

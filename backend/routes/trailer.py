@@ -13,7 +13,7 @@ import os
 import json
 import asyncio
 
-from config.database import db
+from services.database import db
 from routes.auth import get_current_user
 from services.bunny import bunny_service
 from models.trailer import (
