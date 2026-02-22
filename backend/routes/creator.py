@@ -1422,6 +1422,42 @@ async def publish_series_to_main(series_id: str, creator_id: str):
     return published_count
 
 
+@router.post("/series/{series_id}/sync-episodes")
+async def sync_episodes_to_public(series_id: str, user: dict = Depends(get_current_user)):
+    """
+    Sync all ready episodes from a published series to the public episodes collection.
+    Use this when episodes were added after initial publish or to fix missing episodes.
+    """
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    series = await db.creator_series.find_one({"id": series_id, "creator_id": creator["id"]})
+    if not series:
+        raise HTTPException(status_code=404, detail="Series not found")
+    
+    if series.get("status") != "published":
+        raise HTTPException(status_code=400, detail="Series must be published first")
+    
+    # Get all ready episodes
+    episodes = await db.creator_episodes.find({
+        "series_id": series_id,
+        "encoding_status": "ready"
+    }, {"_id": 0}).to_list(100)
+    
+    synced_count = 0
+    for ep in episodes:
+        if await publish_episode_to_main(ep, series, creator["id"]):
+            synced_count += 1
+    
+    return {
+        "message": f"Synced {synced_count} episodes to public collection",
+        "synced_count": synced_count,
+        "total_ready_episodes": len(episodes)
+    }
+
+
 # ============ EPISODE MANAGEMENT ============
 
 # Model for series-specific episode creation (simpler, used by batch upload)
