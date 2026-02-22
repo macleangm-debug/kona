@@ -6,6 +6,12 @@ from typing import Optional, List
 import re
 
 # ============ AUTH MODELS ============
+
+# Anti-bot check model
+class BotCheck(BaseModel):
+    form_time: Optional[int] = None  # Time taken to fill form in ms
+    hp: Optional[str] = None  # Honeypot status
+
 class UserCreate(BaseModel):
     email: Optional[EmailStr] = None
     phone: Optional[str] = None
@@ -13,6 +19,11 @@ class UserCreate(BaseModel):
     password: str
     name: str
     referral_code: Optional[str] = None
+    _bot_check: Optional[BotCheck] = None  # Anti-bot metadata
+    
+    class Config:
+        # Allow underscore-prefixed fields
+        extra = "allow"
     
     @field_validator('phone')
     @classmethod
