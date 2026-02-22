@@ -80,7 +80,8 @@ class TestSponsorshipAPIs:
     
     def test_browse_campaigns(self):
         """Test GET /api/sponsorship/campaigns/browse - should return active campaigns (public endpoint)"""
-        response = requests.get(f"{BASE_URL}/api/sponsorship/campaigns/browse")
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        response = requests.get(f"{BASE_URL}/api/sponsorship/campaigns/browse", headers=headers)
         assert response.status_code == 200
         
         data = response.json()
