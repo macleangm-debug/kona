@@ -175,7 +175,7 @@ export const CreatorPortal = () => {
   // Check if we have a token but no user yet (still loading)
   const hasToken = token || localStorage.getItem("token");
   
-  // Not logged in - only show if no token at all
+  // Not logged in - only show if no token at all or session timed out
   if (!user && !hasToken) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -184,6 +184,23 @@ export const CreatorPortal = () => {
           <h2 className="font-heading text-xl font-bold mb-2">Sign In Required</h2>
           <p className="text-sm text-muted-foreground mb-4">Please sign in to access the Creator Portal</p>
           <Button onClick={() => navigate("/")}>Go to Home</Button>
+        </Card>
+      </div>
+    );
+  }
+
+  // Session timed out - show error and redirect option
+  if (sessionTimeout) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="p-6 text-center max-w-sm">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
+          <h2 className="font-heading text-xl font-bold mb-2">Session Issue</h2>
+          <p className="text-sm text-muted-foreground mb-4">Unable to verify your session. Please sign in again.</p>
+          <Button onClick={() => {
+            localStorage.removeItem("token");
+            navigate("/");
+          }}>Return to Home</Button>
         </Card>
       </div>
     );
