@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="12" failures="2" skipped="0" tests="14" time="0.565" timestamp="2026-02-22T14:44:47.317129+00:00" hostname="agent-env-0d8a46b0-04db-49f6-94eb-9e2234619949"><testcase classname="tests.test_creator_new_tabs.TestMerchandiseAPIs" name="test_get_my_merchandise_items" time="0.155"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestMerchandiseAPIs" name="test_get_merchandise_analytics" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestMerchandiseAPIs" name="test_get_pending_orders" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestSponsorshipAPIs" name="test_browse_campaigns" time="0.123"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code">tests/test_creator_new_tabs.py:79: in test_browse_campaigns
+    assert response.status_code == 200
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase><testcase classname="tests.test_creator_new_tabs.TestSponsorshipAPIs" name="test_get_my_applications" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestSponsorshipAPIs" name="test_get_received_outreach" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestSponsorshipAPIs" name="test_get_creator_sponsorship_analytics" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestTrailersAPIs" name="test_get_my_trailers" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestTrailersAPIs" name="test_get_music_library" time="0.116"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code">tests/test_creator_new_tabs.py:135: in test_get_music_library
+    assert response.status_code == 200
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase><testcase classname="tests.test_creator_new_tabs.TestExistingCreatorTabs" name="test_get_earnings_realtime" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestExistingCreatorTabs" name="test_get_schedules" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestExistingCreatorTabs" name="test_get_milestones" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestCreatorStatus" name="test_get_creator_status" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="tests.test_creator_new_tabs.TestCreatorStatus" name="test_get_creator_dashboard" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">tests/test_creator_new_tabs.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase></testsuite></testsuites>
