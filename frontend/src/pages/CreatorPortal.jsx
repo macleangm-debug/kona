@@ -294,6 +294,9 @@ export const CreatorPortal = () => {
               {activeTab === "analytics" && "Track your performance and growth"}
               {activeTab === "scheduler" && "Schedule episodes for timed release"}
               {activeTab === "milestones" && "Track achievements and earn rewards"}
+              {activeTab === "merchandise" && "Sell physical and digital merchandise"}
+              {activeTab === "sponsorships" && "Connect with brands for sponsorships"}
+              {activeTab === "trailers" && "Create promotional trailers for your series"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
             </p>
@@ -348,6 +351,24 @@ export const CreatorPortal = () => {
           {activeTab === "milestones" && (
             <div className="max-w-7xl">
               <CreatorMilestones token={token} />
+            </div>
+          )}
+
+          {activeTab === "merchandise" && (
+            <div className="max-w-7xl">
+              <MerchandiseManager token={token} />
+            </div>
+          )}
+
+          {activeTab === "sponsorships" && (
+            <div className="max-w-7xl">
+              <SponsorshipMarketplace token={token} />
+            </div>
+          )}
+
+          {activeTab === "trailers" && (
+            <div className="max-w-7xl">
+              <TrailerCreator token={token} />
             </div>
           )}
 
