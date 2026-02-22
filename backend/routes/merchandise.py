@@ -83,6 +83,9 @@ async def create_merchandise_item(
     
     await db.merchandise.insert_one(item_doc)
     
+    # Remove _id that MongoDB adds
+    item_doc.pop("_id", None)
+    
     return {"message": "Merchandise item created", "item_id": item_id, "item": item_doc}
 
 
