@@ -274,7 +274,10 @@ export const CreatorPortal = () => {
             <h2 className="font-heading text-2xl font-bold capitalize">{activeTab}</h2>
             <p className="text-sm text-muted-foreground">
               {activeTab === "dashboard" && "Overview of your creator account"}
+              {activeTab === "earnings" && "Real-time revenue tracking and insights"}
               {activeTab === "analytics" && "Track your performance and growth"}
+              {activeTab === "scheduler" && "Schedule episodes for timed release"}
+              {activeTab === "milestones" && "Track achievements and earn rewards"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
             </p>
@@ -304,9 +307,31 @@ export const CreatorPortal = () => {
             />
           )}
 
+          {activeTab === "earnings" && (
+            <div className="max-w-7xl">
+              <EarningsDashboard token={token} />
+            </div>
+          )}
+
           {activeTab === "analytics" && (
             <div className="max-w-7xl">
               <CreatorAnalytics token={token} />
+            </div>
+          )}
+
+          {activeTab === "scheduler" && (
+            <div className="max-w-7xl">
+              <EpisodeScheduler 
+                token={token} 
+                episodes={series.flatMap(s => s.episodes || [])}
+                onScheduleChange={fetchCreatorData}
+              />
+            </div>
+          )}
+
+          {activeTab === "milestones" && (
+            <div className="max-w-7xl">
+              <CreatorMilestones token={token} />
             </div>
           )}
 
