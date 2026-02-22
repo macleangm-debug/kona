@@ -34,6 +34,7 @@ from .thumbnail_testing import router as thumbnail_testing_router
 from .merchandise import router as merchandise_router
 from .sponsorship import router as sponsorship_router
 from .trailer import router as trailer_router
+from .ai_thumbnails import router as ai_thumbnails_router
 
 # Create main API router
 api_router = APIRouter()
