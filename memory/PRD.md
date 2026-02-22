@@ -595,3 +595,118 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Episode sync endpoint synced 4 episodes to public collection
 - ✅ Series page now shows all 4 episodes
 
+
+### Session 11 (2026-02-22) - Creator Portal Session 2 Features
+
+1. **Merchandise Store (NEW FEATURE)**
+   - Full in-app merchandise store for creators
+   - Digital and physical product types supported
+   - Product management: Create, edit, delete products
+   - Pricing in coins with stock management
+   - Order management with shipping address tracking
+   - Analytics dashboard: total sales, revenue, pending orders
+   - **New File:** `frontend/src/components/creator/MerchandiseManager.jsx`
+   - **Backend Routes:** `backend/routes/merchandise.py`
+   - **Backend Models:** `backend/models/merchandise.py`
+   - **Endpoints:**
+     - `GET /api/merchandise/items/my` - Get creator's products
+     - `POST /api/merchandise/items` - Create product
+     - `PUT /api/merchandise/items/{id}` - Update product
+     - `DELETE /api/merchandise/items/{id}` - Delete product
+     - `GET /api/merchandise/orders/creator/pending` - Pending orders
+     - `GET /api/merchandise/analytics` - Sales analytics
+
+2. **Sponsorship Marketplace (NEW FEATURE)**
+   - Platform connecting creators with brands
+   - Browse active sponsorship campaigns
+   - Apply to campaigns with pitch, timeline, and asking price
+   - Track application status (pending/shortlisted/accepted/rejected)
+   - Receive and respond to brand outreach
+   - Analytics: applications sent, accepted, total earnings
+   - Filter campaigns by type, budget, genre
+   - **New File:** `frontend/src/components/creator/SponsorshipMarketplace.jsx`
+   - **Backend Routes:** `backend/routes/sponsorship.py`
+   - **Backend Models:** `backend/models/sponsorship.py`
+   - **Endpoints:**
+     - `GET /api/sponsorship/campaigns/browse` - Browse campaigns
+     - `POST /api/sponsorship/applications` - Apply to campaign
+     - `GET /api/sponsorship/applications/my` - My applications
+     - `DELETE /api/sponsorship/applications/{id}` - Withdraw application
+     - `GET /api/sponsorship/outreach/received` - Brand outreach
+     - `POST /api/sponsorship/outreach/{id}/respond` - Respond to outreach
+     - `GET /api/sponsorship/analytics/creator` - Sponsorship analytics
+
+3. **Series Trailer Creator (NEW FEATURE)**
+   - Auto-compile highlights from episodes into promotional trailers
+   - AI-powered scene detection for exciting moments
+   - Manual scene selection with start/end timestamps
+   - Background music library integration
+   - Target duration control (15-60 seconds)
+   - Title card and end card options
+   - Export in multiple formats: 1080p, 720p, vertical (9:16), square (1:1)
+   - **New File:** `frontend/src/components/creator/TrailerCreator.jsx`
+   - **Backend Routes:** `backend/routes/trailer.py`
+   - **Backend Models:** `backend/models/trailer.py`
+   - **Endpoints:**
+     - `POST /api/trailers/` - Create trailer project
+     - `GET /api/trailers/my` - Get creator's trailers
+     - `GET /api/trailers/{id}` - Get trailer details
+     - `DELETE /api/trailers/{id}` - Delete trailer
+     - `POST /api/trailers/{id}/detect-scenes` - AI scene detection
+     - `POST /api/trailers/{id}/scenes` - Add manual scenes
+     - `POST /api/trailers/{id}/process` - Start trailer generation
+     - `GET /api/trailers/{id}/status` - Check processing status
+     - `POST /api/trailers/{id}/export` - Export trailer
+     - `GET /api/trailers/music/library` - Available music tracks
+
+4. **Creator Portal Navigation Enhanced**
+   - Added 3 new tabs to sidebar: Merch, Sponsors, Trailers
+   - Total tabs now: Dashboard, Earnings, Analytics, Scheduler, Milestones, Merch, Sponsors, Trailers, Payouts, Notifications
+   - Updated tab descriptions in header
+   - **Modified:** `frontend/src/components/creator/CreatorHeader.jsx`
+   - **Modified:** `frontend/src/pages/CreatorPortal.jsx`
+
+5. **Session Persistence Fix**
+   - Added sessionTimeout state to handle authentication edge cases
+   - 5-second timeout for session verification to prevent infinite loading
+   - Added refreshUser call to attempt session recovery
+   - Shows helpful message when session times out instead of stuck spinner
+   - **Modified:** `frontend/src/pages/CreatorPortal.jsx`
+
+**Testing Status:** All 10 tabs verified working (iteration_50.json)
+- ✅ Backend: 100% (14/14 API tests passed)
+- ✅ Frontend: 100% (all tabs visible and functional)
+- ✅ Merchandise API: Returns 4 products, analytics working
+- ✅ Sponsorship API: Browse campaigns, applications, outreach all functional
+- ✅ Trailers API: Returns 1 trailer project, music library with 5 tracks
+
+
+## Upcoming Features (P1)
+
+1. **AI Thumbnail Generator**
+   - Multi-provider strategy (OpenAI GPT Image 1, Gemini Nano Banana, Stable Diffusion)
+   - Automatic fallback between providers
+   - Generate thumbnails from video frames or text prompts
+   - A/B testing integration for thumbnail variants
+
+2. **Fan Engagement Tools**
+   - Fan Polls & Q&A - Creators post questions, fans vote
+   - Exclusive Early Access - Premium subscribers get episodes early (configurable hours)
+
+3. **Tip Jar / Super Coins**
+   - Viewers can send extra coins as tips during playback
+   - Tiered tip amounts with visual effects
+   - Leaderboard of top supporters
+
+
+## Future/Backlog (P2-P3)
+
+- Refactor AdminDashboard.jsx (large monolithic component)
+- Analytics Export feature (CSV/PDF) - backend done
+- Social sharing features - backend done, need more frontend polish
+- Production deployment
+- Real payment gateway integration (Flutterwave/Stripe)
+- Real SMS provider (Africa's Talking)
+- Recommendation engine improvements (ML models)
+- Social features (comments, reactions)
+
