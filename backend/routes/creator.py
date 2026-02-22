@@ -2607,3 +2607,473 @@ async def download_subtitle_template():
         }
     )
 
+
+# ============ EPISODE SCHEDULER ============
+
+from models.creator import EpisodeScheduleCreate, MILESTONE_DEFINITIONS
+
+@router.post("/episodes/{episode_id}/schedule")
+async def schedule_episode_release(
+    episode_id: str,
+    schedule: EpisodeScheduleCreate,
+    user: dict = Depends(get_current_user)
+):
+    """Schedule an episode for future release"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    episode = await db.creator_episodes.find_one({
+        "id": episode_id,
+        "creator_id": creator["id"]
+    })
+    
+    if not episode:
+        raise HTTPException(status_code=404, detail="Episode not found")
+    
+    # Parse and validate scheduled time
+    try:
+        scheduled_time = datetime.fromisoformat(schedule.scheduled_for.replace('Z', '+00:00'))
+        if scheduled_time <= datetime.now(timezone.utc):
+            raise HTTPException(status_code=400, detail="Scheduled time must be in the future")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid datetime format. Use ISO format.")
+    
+    schedule_id = f"sched-{uuid.uuid4().hex[:12]}"
+    
+    schedule_doc = {
+        "id": schedule_id,
+        "episode_id": episode_id,
+        "series_id": episode["series_id"],
+        "creator_id": creator["id"],
+        "episode_title": episode["title"],
+        "scheduled_for": scheduled_time.isoformat(),
+        "timezone": schedule.timezone,
+        "status": "scheduled",
+        "early_access_hours": schedule.early_access_hours,
+        "notify_subscribers": schedule.notify_subscribers,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Insert or update schedule
+    await db.episode_schedules.update_one(
+        {"episode_id": episode_id},
+        {"$set": schedule_doc},
+        upsert=True
+    )
+    
+    # Update episode with scheduled status
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$set": {
+            "release_status": "scheduled",
+            "scheduled_for": scheduled_time.isoformat()
+        }}
+    )
+    
+    return {
+        "message": "Episode scheduled successfully",
+        "schedule": schedule_doc
+    }
+
+
+@router.get("/schedules")
+async def get_scheduled_episodes(user: dict = Depends(get_current_user)):
+    """Get all scheduled episodes for a creator"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    schedules = await db.episode_schedules.find(
+        {"creator_id": creator["id"], "status": "scheduled"},
+        {"_id": 0}
+    ).sort("scheduled_for", 1).to_list(50)
+    
+    return {"schedules": schedules, "count": len(schedules)}
+
+
+@router.delete("/episodes/{episode_id}/schedule")
+async def cancel_scheduled_release(
+    episode_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Cancel a scheduled episode release"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator or creator["status"] != "approved":
+        raise HTTPException(status_code=403, detail="Not an approved creator")
+    
+    result = await db.episode_schedules.delete_one({
+        "episode_id": episode_id,
+        "creator_id": creator["id"]
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="No schedule found for this episode")
+    
+    # Update episode status
+    await db.creator_episodes.update_one(
+        {"id": episode_id},
+        {"$unset": {"release_status": "", "scheduled_for": ""}}
+    )
+    
+    return {"message": "Schedule cancelled successfully"}
+
+
+# ============ CREATOR MILESTONES & BADGES ============
+
+@router.get("/milestones")
+async def get_creator_milestones(user: dict = Depends(get_current_user)):
+    """Get all milestones achieved by the creator"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    # Get achieved milestones
+    milestones = await db.creator_milestones.find(
+        {"creator_id": creator["id"]},
+        {"_id": 0}
+    ).sort("achieved_at", -1).to_list(100)
+    
+    # Get current stats for progress tracking
+    total_views = creator.get("total_views", 0)
+    total_earnings = creator.get("total_earnings", 0)
+    total_episodes = await db.creator_episodes.count_documents({
+        "creator_id": creator["id"],
+        "encoding_status": "ready"
+    })
+    total_series = await db.creator_series.count_documents({
+        "creator_id": creator["id"],
+        "status": "published"
+    })
+    
+    # Calculate progress to next milestones
+    progress = {}
+    for milestone_type, definition in MILESTONE_DEFINITIONS.items():
+        current_value = {
+            "views": total_views,
+            "episodes": total_episodes,
+            "earnings": total_earnings,
+            "series": total_series,
+            "streak": 0  # TODO: Calculate actual streak
+        }.get(milestone_type, 0)
+        
+        # Find next threshold
+        next_threshold = None
+        next_index = 0
+        for i, threshold in enumerate(definition["thresholds"]):
+            if current_value < threshold:
+                next_threshold = threshold
+                next_index = i
+                break
+        
+        if next_threshold:
+            progress[milestone_type] = {
+                "current": current_value,
+                "next_threshold": next_threshold,
+                "next_name": definition["names"][next_index],
+                "progress_percent": round((current_value / next_threshold) * 100, 1)
+            }
+        else:
+            progress[milestone_type] = {
+                "current": current_value,
+                "next_threshold": None,
+                "next_name": "All milestones achieved!",
+                "progress_percent": 100
+            }
+    
+    return {
+        "milestones": milestones,
+        "progress": progress,
+        "stats": {
+            "total_views": total_views,
+            "total_episodes": total_episodes,
+            "total_earnings": total_earnings,
+            "total_series": total_series
+        }
+    }
+
+
+@router.post("/milestones/check")
+async def check_and_award_milestones(user: dict = Depends(get_current_user)):
+    """Check and award any new milestones the creator has achieved"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    # Get current stats
+    total_views = creator.get("total_views", 0)
+    total_earnings = creator.get("total_earnings", 0)
+    total_episodes = await db.creator_episodes.count_documents({
+        "creator_id": creator["id"],
+        "encoding_status": "ready"
+    })
+    total_series = await db.creator_series.count_documents({
+        "creator_id": creator["id"],
+        "status": "published"
+    })
+    
+    stats = {
+        "views": total_views,
+        "episodes": total_episodes,
+        "earnings": total_earnings,
+        "series": total_series
+    }
+    
+    # Get existing milestones
+    existing = await db.creator_milestones.find(
+        {"creator_id": creator["id"]},
+        {"_id": 0, "milestone_type": 1, "milestone_value": 1}
+    ).to_list(100)
+    
+    existing_set = {(m["milestone_type"], m["milestone_value"]) for m in existing}
+    
+    new_milestones = []
+    bonus_coins = 0
+    
+    for milestone_type, definition in MILESTONE_DEFINITIONS.items():
+        if milestone_type == "streak":
+            continue  # Skip streak for now
+        
+        current_value = stats.get(milestone_type, 0)
+        
+        for i, threshold in enumerate(definition["thresholds"]):
+            if current_value >= threshold and (milestone_type, threshold) not in existing_set:
+                # Award new milestone
+                milestone_id = f"mile-{uuid.uuid4().hex[:12]}"
+                milestone = {
+                    "id": milestone_id,
+                    "creator_id": creator["id"],
+                    "milestone_type": milestone_type,
+                    "milestone_name": definition["names"][i],
+                    "milestone_value": threshold,
+                    "achieved_at": datetime.now(timezone.utc).isoformat(),
+                    "badge_icon": definition["badge_icons"][i],
+                    "badge_color": definition["badge_colors"][i],
+                    "is_celebrated": False
+                }
+                
+                await db.creator_milestones.insert_one(milestone)
+                new_milestones.append(milestone)
+                
+                # Award bonus coins
+                reward = definition.get("rewards", [0] * len(definition["thresholds"]))[i]
+                if reward > 0:
+                    bonus_coins += reward
+    
+    # Update creator's coins if bonus awarded
+    if bonus_coins > 0:
+        await db.creators.update_one(
+            {"id": creator["id"]},
+            {"$inc": {"bonus_coins": bonus_coins}}
+        )
+        
+        # Also add to user's coins
+        await db.users.update_one(
+            {"id": user["id"]},
+            {"$inc": {"coins": bonus_coins}}
+        )
+    
+    return {
+        "new_milestones": new_milestones,
+        "bonus_coins_awarded": bonus_coins,
+        "message": f"Awarded {len(new_milestones)} new milestone(s)!" if new_milestones else "No new milestones"
+    }
+
+
+@router.post("/milestones/{milestone_id}/celebrate")
+async def celebrate_milestone(
+    milestone_id: str,
+    user: dict = Depends(get_current_user)
+):
+    """Mark a milestone as celebrated (seen by creator)"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    result = await db.creator_milestones.update_one(
+        {"id": milestone_id, "creator_id": creator["id"]},
+        {"$set": {"is_celebrated": True}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Milestone not found")
+    
+    return {"message": "Milestone celebrated!"}
+
+
+# ============ REAL-TIME EARNINGS DASHBOARD ============
+
+@router.get("/earnings/realtime")
+async def get_realtime_earnings(user: dict = Depends(get_current_user)):
+    """Get real-time earnings data for live dashboard"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=today_start.weekday())
+    month_start = today_start.replace(day=1)
+    
+    # Get earnings for different time periods
+    async def get_period_earnings(start_time):
+        cursor = db.view_records.aggregate([
+            {"$match": {
+                "creator_id": creator["id"],
+                "timestamp": {"$gte": start_time.isoformat()}
+            }},
+            {"$group": {
+                "_id": None,
+                "total": {"$sum": "$creator_share"},
+                "count": {"$sum": 1}
+            }}
+        ])
+        result = await cursor.to_list(1)
+        return result[0] if result else {"total": 0, "count": 0}
+    
+    today_stats = await get_period_earnings(today_start)
+    week_stats = await get_period_earnings(week_start)
+    month_stats = await get_period_earnings(month_start)
+    
+    # Get hourly breakdown for today (for live chart)
+    hourly_cursor = db.view_records.aggregate([
+        {"$match": {
+            "creator_id": creator["id"],
+            "timestamp": {"$gte": today_start.isoformat()}
+        }},
+        {"$addFields": {
+            "hour": {"$hour": {"$dateFromString": {"dateString": "$timestamp"}}}
+        }},
+        {"$group": {
+            "_id": "$hour",
+            "earnings": {"$sum": "$creator_share"},
+            "views": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ])
+    hourly_data = await hourly_cursor.to_list(24)
+    
+    # Fill in missing hours
+    hourly_chart = []
+    for hour in range(24):
+        hour_data = next((h for h in hourly_data if h["_id"] == hour), None)
+        hourly_chart.append({
+            "hour": hour,
+            "label": f"{hour:02d}:00",
+            "earnings": hour_data["earnings"] if hour_data else 0,
+            "views": hour_data["views"] if hour_data else 0
+        })
+    
+    # Get recent transactions (last 10)
+    recent = await db.view_records.find(
+        {"creator_id": creator["id"]},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(10).to_list(10)
+    
+    # Enrich with episode titles
+    for record in recent:
+        episode = await db.creator_episodes.find_one(
+            {"id": record.get("episode_id")},
+            {"_id": 0, "title": 1, "episode_code": 1}
+        )
+        if episode:
+            record["episode_title"] = episode.get("title", "Unknown")
+            record["episode_code"] = episode.get("episode_code", "")
+    
+    return {
+        "today": {
+            "earnings": today_stats["total"],
+            "views": today_stats["count"]
+        },
+        "this_week": {
+            "earnings": week_stats["total"],
+            "views": week_stats["count"]
+        },
+        "this_month": {
+            "earnings": month_stats["total"],
+            "views": month_stats["count"]
+        },
+        "total": {
+            "earnings": creator.get("total_earnings", 0),
+            "views": creator.get("total_views", 0)
+        },
+        "hourly_chart": hourly_chart,
+        "recent_transactions": recent,
+        "last_updated": now.isoformat()
+    }
+
+
+@router.get("/earnings/history")
+async def get_earnings_history(
+    period: str = Query("30d", description="7d, 30d, 90d, 1y, all"),
+    user: dict = Depends(get_current_user)
+):
+    """Get historical earnings data"""
+    creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
+    
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    now = datetime.now(timezone.utc)
+    
+    # Determine start date based on period
+    period_days = {
+        "7d": 7,
+        "30d": 30,
+        "90d": 90,
+        "1y": 365,
+        "all": 3650  # ~10 years
+    }
+    
+    days = period_days.get(period, 30)
+    start_date = now - timedelta(days=days)
+    
+    # Get daily aggregated data
+    daily_cursor = db.view_records.aggregate([
+        {"$match": {
+            "creator_id": creator["id"],
+            "timestamp": {"$gte": start_date.isoformat()}
+        }},
+        {"$addFields": {
+            "date": {"$dateToString": {
+                "format": "%Y-%m-%d",
+                "date": {"$dateFromString": {"dateString": "$timestamp"}}
+            }}
+        }},
+        {"$group": {
+            "_id": "$date",
+            "earnings": {"$sum": "$creator_share"},
+            "views": {"$sum": 1}
+        }},
+        {"$sort": {"_id": 1}}
+    ])
+    
+    daily_data = await daily_cursor.to_list(400)
+    
+    # Calculate totals and averages
+    total_earnings = sum(d["earnings"] for d in daily_data)
+    total_views = sum(d["views"] for d in daily_data)
+    avg_daily_earnings = total_earnings / len(daily_data) if daily_data else 0
+    
+    # Find best day
+    best_day = max(daily_data, key=lambda x: x["earnings"]) if daily_data else None
+    
+    return {
+        "period": period,
+        "data": daily_data,
+        "summary": {
+            "total_earnings": total_earnings,
+            "total_views": total_views,
+            "average_daily_earnings": round(avg_daily_earnings, 2),
+            "best_day": best_day
+        }
+    }
+
+
