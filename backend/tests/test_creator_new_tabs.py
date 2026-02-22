@@ -16,10 +16,12 @@ TEST_PASSWORD = "SuperAdmin2025!"
 @pytest.fixture(scope="module")
 def auth_token():
     """Get authentication token for superadmin user"""
+    # Add User-Agent to avoid bot detection
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     response = requests.post(f"{BASE_URL}/api/auth/login", json={
         "email": TEST_EMAIL,
         "password": TEST_PASSWORD
-    })
+    }, headers=headers)
     assert response.status_code == 200, f"Login failed: {response.text}"
     return response.json()["token"]
 
@@ -27,7 +29,10 @@ def auth_token():
 @pytest.fixture(scope="module")
 def headers(auth_token):
     """Get headers with auth token"""
-    return {"Authorization": f"Bearer {auth_token}"}
+    return {
+        "Authorization": f"Bearer {auth_token}",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    }
 
 
 # ==================== MERCHANDISE API TESTS ====================
