@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, Plus, LayoutDashboard, LineChart, Bell, History,
   Film, Settings, LogOut, Trophy, Coins, Calendar, TrendingUp,
-  ShoppingBag, Handshake
+  ShoppingBag, Handshake, Wand2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -25,6 +25,7 @@ export const CreatorHeader = ({
     { id: "merchandise", label: "Merch", icon: ShoppingBag },
     { id: "sponsorships", label: "Sponsors", icon: Handshake },
     { id: "trailers", label: "Trailers", icon: Film },
+    { id: "thumbnails", label: "AI Thumbs", icon: Wand2 },
     { id: "payouts", label: "Payouts", icon: History },
   ];
 
