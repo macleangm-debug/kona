@@ -919,6 +919,30 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
                 </div>
               )}
 
+              {/* Honeypot field - invisible to users, bots will fill it */}
+              <div 
+                aria-hidden="true" 
+                style={{ 
+                  position: 'absolute', 
+                  left: '-9999px', 
+                  opacity: 0, 
+                  height: 0, 
+                  overflow: 'hidden',
+                  pointerEvents: 'none'
+                }}
+              >
+                <label htmlFor="website_url">Website</label>
+                <input
+                  type="text"
+                  id="website_url"
+                  name="website_url"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </div>
+
               {/* Submit Button */}
               <Button 
                 type="submit" 
