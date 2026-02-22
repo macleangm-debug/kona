@@ -537,9 +537,12 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
   return (
     <>
       <Dialog open={open && !showLoginSuccess && !showSignupSuccess} onOpenChange={onClose}>
-        <DialogContent className="max-w-[380px] bg-card border-white/10 p-0 overflow-hidden" data-testid="auth-modal">
+        <DialogContent 
+          className="max-w-[380px] bg-card border-white/10 p-0 overflow-hidden [&>button]:top-3 [&>button]:right-3 [&>button]:bg-secondary/80 [&>button]:rounded-full [&>button]:p-1.5 [&>button]:hover:bg-secondary [&>button]:border [&>button]:border-white/10" 
+          data-testid="auth-modal"
+        >
           {/* Auth Method Tabs */}
-          <div className="flex border-b border-white/10">
+          <div className="flex border-b border-white/10 pt-2">
             <button
               onClick={() => switchAuthMethod("phone")}
               className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-medium transition-colors ${
