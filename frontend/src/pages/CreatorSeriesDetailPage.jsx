@@ -956,6 +956,9 @@ export const CreatorSeriesDetailPage = () => {
       first_episode_free: true
     }
   });
+  
+  // AI Thumbnail generation state
+  const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
 
   // Fetch platform settings on mount
   useEffect(() => {
