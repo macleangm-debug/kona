@@ -28,7 +28,7 @@ import {
 
 export const CreatorPortal = () => {
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [creatorStatus, setCreatorStatus] = useState(null);
   const [dashboard, setDashboard] = useState(null);
