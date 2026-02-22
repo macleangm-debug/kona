@@ -137,7 +137,8 @@ class TestTrailersAPIs:
     
     def test_get_music_library(self):
         """Test GET /api/trailers/music/library - should return available music tracks (public endpoint)"""
-        response = requests.get(f"{BASE_URL}/api/trailers/music/library")
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+        response = requests.get(f"{BASE_URL}/api/trailers/music/library", headers=headers)
         assert response.status_code == 200
         
         data = response.json()
