@@ -19,14 +19,28 @@ class TestAIThumbnailEndpoints:
     @pytest.fixture(autouse=True)
     def setup(self):
         """Login and get auth token"""
+        # Browser-like headers to bypass automation detection
+        browser_headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Content-Type": "application/json",
+            "Origin": BASE_URL,
+            "Referer": f"{BASE_URL}/"
+        }
+        
         # Login to get token
         response = requests.post(
             f"{BASE_URL}/api/auth/login",
-            json={"email": TEST_EMAIL, "password": TEST_PASSWORD}
+            json={"email": TEST_EMAIL, "password": TEST_PASSWORD},
+            headers=browser_headers
         )
         assert response.status_code == 200, f"Login failed: {response.text}"
         self.token = response.json()["token"]
-        self.headers = {"Authorization": f"Bearer {self.token}"}
+        self.headers = {
+            **browser_headers,
+            "Authorization": f"Bearer {self.token}"
+        }
 
     def test_providers_status_endpoint(self):
         """Test /api/ai-thumbnails/providers/status returns provider info"""
