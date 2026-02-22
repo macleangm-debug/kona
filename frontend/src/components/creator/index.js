@@ -12,3 +12,4 @@ export { CreatorMilestones } from "./CreatorMilestones";
 export { MerchandiseManager } from "./MerchandiseManager";
 export { SponsorshipMarketplace } from "./SponsorshipMarketplace";
 export { TrailerCreator } from "./TrailerCreator";
+export { AIThumbnailGenerator } from "./AIThumbnailGenerator";
