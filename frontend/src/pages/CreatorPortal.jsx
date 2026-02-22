@@ -23,7 +23,10 @@ import {
   CreatorDashboardOverview,
   EarningsDashboard,
   EpisodeScheduler,
-  CreatorMilestones
+  CreatorMilestones,
+  MerchandiseManager,
+  SponsorshipMarketplace,
+  TrailerCreator
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
