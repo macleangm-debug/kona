@@ -139,8 +139,13 @@ export const CreatorPortal = () => {
     }
   }, [token]);
 
-  // Loading state
-  if (loading) {
+  // Wait for auth to load first
+  if (authLoading) {
+    return <PageLoader message="Loading..." />;
+  }
+
+  // Loading creator data
+  if (loading && user) {
     return <PageLoader message="Loading creator portal..." />;
   }
 
