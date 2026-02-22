@@ -449,7 +449,7 @@ export const AuthModal = ({ open, onClose, initialReferralCode = "", forceSignUp
           password,
           referral_code: referralValid ? referralCode : null,
           // Anti-bot metadata (backend will validate)
-          _bot_check: {
+          bot_check: {
             form_time: timeTaken,
             hp: honeypot ? "filled" : "empty"
           }
