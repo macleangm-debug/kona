@@ -1051,6 +1051,61 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // Quick Generate AI Thumbnail
+  const handleQuickGenerateThumbnail = async () => {
+    if (!series) return;
+    
+    setGeneratingThumbnail(true);
+    try {
+      // Create an optimized prompt based on series title and genre
+      const genreHints = {
+        romance: "romantic atmosphere, soft lighting, emotional connection",
+        drama: "intense emotions, dramatic lighting, compelling moment",
+        action: "dynamic energy, exciting movement, powerful composition",
+        thriller: "suspenseful mood, mysterious shadows, tension",
+        comedy: "bright and cheerful, fun energy, lighthearted",
+        horror: "dark atmosphere, creepy mood, suspenseful",
+        fantasy: "magical elements, otherworldly beauty, enchanting",
+        historical: "period-accurate, epic scale, grand setting"
+      };
+      
+      const genreHint = genreHints[series.genre?.toLowerCase()] || genreHints.drama;
+      const prompt = `A professional thumbnail for "${series.title}" - a ${series.genre || 'drama'} series. ${genreHint}. Cinematic quality, eye-catching, suitable for video streaming platform.`;
+      
+      const res = await axios.post(`${API}/ai-thumbnails/generate`, {
+        prompt,
+        series_id: seriesId,
+        style: "cinematic",
+        size: "1024x1792", // Portrait for video thumbnails
+        preferred_provider: "openai",
+        save_to_library: true
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.data.success && res.data.image_url) {
+        // Apply the thumbnail to the series
+        await axios.post(`${API}/ai-thumbnails/${res.data.thumbnail_id}/apply`, {
+          thumbnail_id: res.data.thumbnail_id,
+          target_type: "series",
+          target_id: seriesId
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        toast.success(`AI thumbnail generated and applied! (${res.data.provider_used})`);
+        fetchSeriesDetail(); // Refresh to show new thumbnail
+      } else {
+        toast.error("Failed to generate thumbnail");
+      }
+    } catch (e) {
+      console.error("Failed to generate AI thumbnail:", e);
+      toast.error(e.response?.data?.detail || "Failed to generate thumbnail. Try again later.");
+    } finally {
+      setGeneratingThumbnail(false);
+    }
+  };
+
   // Generate video thumbnail from file
   const generateThumbnail = (file) => {
     return new Promise((resolve) => {
