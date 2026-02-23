@@ -25,6 +25,7 @@ const NAV_GROUPS = [
       { id: "earnings", label: "Earnings", icon: TrendingUp },
       { id: "analytics", label: "Analytics", icon: LineChart },
       { id: "tips", label: "Tip Jar", icon: Gift },
+      { id: "tip-goals", label: "Tip Goals", icon: Target },
       { id: "payouts", label: "Payouts", icon: History }
     ]
   },
