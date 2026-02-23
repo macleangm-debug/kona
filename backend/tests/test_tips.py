@@ -221,7 +221,7 @@ class TestCreatorLeaderboard:
     
     def test_creator_leaderboard(self, creator_id):
         """Test creator-specific leaderboard"""
-        response = requests.get(f"{BASE_URL}/api/tips/creator/{creator_id}/leaderboard")
+        response = requests.get(f"{BASE_URL}/api/tips/creator/{creator_id}/leaderboard", headers=HEADERS)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
