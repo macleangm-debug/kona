@@ -27,7 +27,8 @@ import {
   MerchandiseManager,
   SponsorshipMarketplace,
   TrailerCreator,
-  AIThumbnailGenerator
+  AIThumbnailGenerator,
+  FanPollsQA
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
