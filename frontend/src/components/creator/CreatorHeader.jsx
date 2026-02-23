@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, ChevronDown, ChevronRight, Plus, LayoutDashboard, LineChart, Bell, History,
   Film, Settings, LogOut, Trophy, Coins, Calendar, TrendingUp,
-  ShoppingBag, Handshake, Wand2, PieChart, Rocket, Briefcase, Vote
+  ShoppingBag, Handshake, Wand2, PieChart, Rocket, Briefcase, Vote, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +24,7 @@ const NAV_GROUPS = [
     items: [
       { id: "earnings", label: "Earnings", icon: TrendingUp },
       { id: "analytics", label: "Analytics", icon: LineChart },
+      { id: "tips", label: "Tip Jar", icon: Gift },
       { id: "payouts", label: "Payouts", icon: History }
     ]
   },
