@@ -341,6 +341,7 @@ export const CreatorPortal = () => {
               {activeTab === "trailers" && "Create promotional trailers for your series"}
               {activeTab === "thumbnails" && "Generate AI-powered thumbnails for your content"}
               {activeTab === "polls" && "Engage fans with polls and answer their questions"}
+              {activeTab === "tips" && "Track tips and see your top supporters"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
             </p>
