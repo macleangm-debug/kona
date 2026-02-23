@@ -249,13 +249,14 @@ class TestSendTip:
     
     def test_send_tip_invalid_tier(self, auth_token):
         """Test sending with invalid tier"""
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
         response = requests.post(
             f"{BASE_URL}/api/tips/send",
             json={
                 "creator_id": "some-creator",
                 "tier": "invalid_tier"
             },
-            headers={"Authorization": f"Bearer {auth_token}"}
+            headers=auth_headers
         )
         # Should return 422 (validation error) or 400 (bad request)
         assert response.status_code in [400, 422], \
@@ -263,13 +264,14 @@ class TestSendTip:
     
     def test_send_tip_to_nonexistent_creator(self, auth_token):
         """Test sending tip to non-existent creator"""
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
         response = requests.post(
             f"{BASE_URL}/api/tips/send",
             json={
                 "creator_id": "nonexistent-creator-id-12345",
                 "tier": "small"
             },
-            headers={"Authorization": f"Bearer {auth_token}"}
+            headers=auth_headers
         )
         assert response.status_code == 404, "Should return 404 for non-existent creator"
 
@@ -283,7 +285,7 @@ class TestUserTipHistory:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=HEADERS)
         if response.status_code == 200:
             return response.json().get("token")
         pytest.skip("Authentication failed")
@@ -295,10 +297,8 @@ class TestUserTipHistory:
     
     def test_user_history_returns_structure(self, auth_token):
         """Verify user tip history response structure"""
-        response = requests.get(
-            f"{BASE_URL}/api/tips/user/history",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/tips/user/history", headers=auth_headers)
         assert response.status_code == 200
         
         data = response.json()
