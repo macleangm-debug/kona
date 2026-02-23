@@ -24,7 +24,7 @@ class TestTipTiers:
     
     def test_get_tip_tiers_returns_5_tiers(self):
         """Verify all 5 tip tiers are returned"""
-        response = requests.get(f"{BASE_URL}/api/tips/tiers")
+        response = requests.get(f"{BASE_URL}/api/tips/tiers", headers=HEADERS)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
@@ -35,7 +35,7 @@ class TestTipTiers:
         
     def test_tip_tiers_have_correct_amounts(self):
         """Verify tier amounts: small=10, medium=50, large=100, super=500, mega=1000"""
-        response = requests.get(f"{BASE_URL}/api/tips/tiers")
+        response = requests.get(f"{BASE_URL}/api/tips/tiers", headers=HEADERS)
         assert response.status_code == 200
         
         tiers = response.json()["tiers"]
