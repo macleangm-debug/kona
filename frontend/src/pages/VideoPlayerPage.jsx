@@ -2605,6 +2605,49 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Tip Panel - Slide-up modal for tipping */}
+      <Sheet open={showTipPanel} onOpenChange={setShowTipPanel}>
+        <SheetContent side="bottom" className="h-auto max-h-[80vh] bg-background/95 backdrop-blur-lg rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-2">
+              <Coins className="w-5 h-5 text-yellow-400" />
+              Support {creatorInfo?.name || series?.creator_name || "Creator"}
+            </SheetTitle>
+          </SheetHeader>
+          <div className="py-4 space-y-4">
+            {/* Tip Goal Progress (if creator has active goals) */}
+            {(creatorInfo?.id || series?.creator_id) && (
+              <TipGoalProgress
+                creatorId={creatorInfo?.id || series?.creator_id}
+                creatorName={creatorInfo?.name || series?.creator_name || "Creator"}
+                token={token}
+                onContribute={(data) => {
+                  toast.success(`Thanks for contributing ${data.contribution?.amount || 0} coins!`);
+                }}
+              />
+            )}
+
+            {/* Tip Jar Button (expanded view) */}
+            {(creatorInfo?.id || series?.creator_id) && (
+              <div className="mt-4">
+                <TipJarButton
+                  creatorId={creatorInfo?.id || series?.creator_id}
+                  creatorName={creatorInfo?.name || series?.creator_name || "Creator"}
+                  seriesId={series?.id}
+                  episodeId={episode?.id}
+                  token={token}
+                  userBalance={user?.coins || 0}
+                  onTipSent={(tip) => {
+                    toast.success(`Sent ${tip.amount} coins!`);
+                    setShowTipPanel(false);
+                  }}
+                />
+              </div>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 
