@@ -344,7 +344,9 @@ export const CreatorPortal = () => {
               {activeTab === "thumbnails" && "Generate AI-powered thumbnails for your content"}
               {activeTab === "polls" && "Engage fans with polls and answer their questions"}
               {activeTab === "tips" && "Track tips and see your top supporters"}
+              {activeTab === "tip-goals" && "Create funding goals for your fans to support"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
+              {activeTab === "early-access" && "Offer premium subscribers early access to content"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
             </p>
           </div>
