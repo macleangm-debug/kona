@@ -14,3 +14,4 @@ export { SponsorshipMarketplace } from "./SponsorshipMarketplace";
 export { TrailerCreator } from "./TrailerCreator";
 export { AIThumbnailGenerator } from "./AIThumbnailGenerator";
 export { FanPollsQA } from "./FanPollsQA";
+export { TipDashboard } from "./TipDashboard";
