@@ -2942,6 +2942,11 @@ export const AdminDashboard = () => {
   
   const [expandedGroups, setExpandedGroups] = useState(getInitialExpanded);
 
+  // Early return for loading state - MUST be after all hook declarations
+  if (loading) {
+    return <PageLoader message="Loading admin dashboard..." />;
+  }
+
   const toggleGroup = (groupId) => {
     setExpandedGroups(prev => 
       prev.includes(groupId) 
