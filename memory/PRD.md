@@ -801,14 +801,14 @@ REACT_APP_BACKEND_URL=<backend-url>
 
 ## Upcoming Features (P1)
 
-1. **Fan Engagement Tools**
-   - Fan Polls & Q&A - Creators post questions, fans vote
-   - Exclusive Early Access - Premium subscribers get episodes early (configurable hours)
-
-2. **Tip Jar / Super Coins**
+1. **Tip Jar / Super Coins**
    - Viewers can send extra coins as tips during playback
    - Tiered tip amounts with visual effects
    - Leaderboard of top supporters
+
+2. **Exclusive Early Access**
+   - Premium subscribers get episodes early (configurable hours)
+   - Episode-level early access settings
 
 
 ## Future/Backlog (P2-P3)
