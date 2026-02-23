@@ -16,9 +16,16 @@ TEST_PASSWORD = "SuperAdmin2025!"
 
 @pytest.fixture(scope="module")
 def api_client():
-    """Shared requests session"""
+    """Shared requests session with browser-like headers"""
     session = requests.Session()
-    session.headers.update({"Content-Type": "application/json"})
+    session.headers.update({
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Origin": BASE_URL,
+        "Referer": f"{BASE_URL}/"
+    })
     return session
 
 
