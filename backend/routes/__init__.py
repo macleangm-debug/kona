@@ -36,6 +36,7 @@ from .sponsorship import router as sponsorship_router
 from .trailer import router as trailer_router
 from .ai_thumbnails import router as ai_thumbnails_router
 from .polls import router as polls_router
+from .tips import router as tips_router
 
 # Create main API router
 api_router = APIRouter()
@@ -76,3 +77,4 @@ api_router.include_router(sponsorship_router)
 api_router.include_router(trailer_router)
 api_router.include_router(ai_thumbnails_router)
 api_router.include_router(polls_router)
+api_router.include_router(tips_router)
