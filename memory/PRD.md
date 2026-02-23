@@ -799,6 +799,45 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ All 3 poll types work (multiple choice, yes/no, rating)
 
 
+### Session 15 (2026-02-22) - Tip Jar / Super Coins
+
+1. **Tip Jar / Super Coins (NEW FEATURE - P1)**
+   - Tiered tipping system for viewers to support creators
+   - 5 Tiers: Small (10), Medium (50), Large (100), Super (500), Mega (1000) coins
+   - Visual effects for each tier (sparkle, hearts, fireworks, rainbow, explosion)
+   - Creators receive 70% of tips
+   - **New Files:**
+     - `backend/models/tips.py` - Pydantic models
+     - `backend/routes/tips.py` - API routes
+     - `frontend/src/components/creator/TipDashboard.jsx` - Creator dashboard
+     - `frontend/src/components/TipJarButton.jsx` - Tip button for video player
+   - **Endpoints:**
+     - `GET /api/tips/tiers` - Get available tip tiers
+     - `POST /api/tips/send` - Send a tip
+     - `GET /api/tips/creator/stats` - Get creator's tip statistics
+     - `GET /api/tips/creator/{id}/leaderboard` - Creator's top supporters
+     - `GET /api/tips/global/leaderboard` - Global top tippers
+     - `GET /api/tips/series/{id}/recent` - Recent tips for series
+     - `GET /api/tips/episode/{id}/recent` - Recent tips for episode
+     - `GET /api/tips/user/history` - User's tip history
+   - **Features:**
+     - Anonymous tipping option
+     - Custom message with tips (200 chars)
+     - Time-based statistics (today, week, month, all-time)
+     - Top supporter highlight
+     - Recent tips feed
+     - Global leaderboard with timeframe filters
+
+2. **Creator Portal Navigation Updated**
+   - Added 'Tip Jar' tab to Revenue group
+   - Revenue group now: Earnings, Analytics, Tip Jar, Payouts
+
+**Testing Status:** All features verified working (iteration_55.json)
+- ✅ Backend: 100% (18/18 tests passed)
+- ✅ Frontend: 100% (all UI checks passed)
+- ✅ All 5 tip tiers working with visual effects
+
+
 ## Upcoming Features (P1)
 
 1. **Tip Jar / Super Coins**
