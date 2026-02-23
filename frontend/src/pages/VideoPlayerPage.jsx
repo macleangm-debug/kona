@@ -386,6 +386,10 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const DOUBLE_TAP_DELAY = 300; // ms
   const SWIPE_THRESHOLD = 80; // px
 
+  // Tip Jar states
+  const [showTipPanel, setShowTipPanel] = useState(false);
+  const [creatorInfo, setCreatorInfo] = useState(null);
+
   // Format time as MM:SS
   const formatTime = (seconds) => {
     if (!seconds || isNaN(seconds)) return '00:00';
