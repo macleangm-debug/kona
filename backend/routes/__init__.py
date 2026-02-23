@@ -37,6 +37,8 @@ from .trailer import router as trailer_router
 from .ai_thumbnails import router as ai_thumbnails_router
 from .polls import router as polls_router
 from .tips import router as tips_router
+from .tip_goals import router as tip_goals_router
+from .early_access import router as early_access_router
 
 # Create main API router
 api_router = APIRouter()
@@ -78,3 +80,5 @@ api_router.include_router(trailer_router)
 api_router.include_router(ai_thumbnails_router)
 api_router.include_router(polls_router)
 api_router.include_router(tips_router)
+api_router.include_router(tip_goals_router)
+api_router.include_router(early_access_router)
