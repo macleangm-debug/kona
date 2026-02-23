@@ -2854,11 +2854,8 @@ export const AdminDashboard = () => {
     fetchDocsData();
   }, [activeTab, user?.is_super_admin, activeDocId, token]);
 
-  if (loading) {
-    return <PageLoader message="Loading admin dashboard..." />;
-  }
-
-  // Grouped navigation structure for Admin
+  // Grouped navigation structure for Admin - MUST be defined before early return
+  // to ensure consistent hook order
   const NAV_GROUPS = [
     {
       id: "overview",
