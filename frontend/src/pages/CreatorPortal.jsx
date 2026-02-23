@@ -439,6 +439,18 @@ export const CreatorPortal = () => {
             </div>
           )}
 
+          {activeTab === "tip-goals" && (
+            <div className="max-w-7xl">
+              <TipGoalsManager token={token} series={series} />
+            </div>
+          )}
+
+          {activeTab === "early-access" && (
+            <div className="max-w-7xl">
+              <EarlyAccessSettings token={token} series={series} />
+            </div>
+          )}
+
           {activeTab === "payouts" && (
             <div className="max-w-7xl">
               <PayoutHistory token={token} />
