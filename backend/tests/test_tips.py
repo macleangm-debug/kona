@@ -94,8 +94,8 @@ class TestCreatorTipStats:
     
     def test_creator_stats_requires_auth(self):
         """Verify endpoint returns 401 without auth"""
-        response = requests.get(f"{BASE_URL}/api/tips/creator/stats")
-        assert response.status_code == 401, "Should require authentication"
+        response = requests.get(f"{BASE_URL}/api/tips/creator/stats", headers=HEADERS)
+        assert response.status_code == 401, f"Should require authentication, got {response.status_code}"
     
     def test_creator_stats_returns_statistics(self, auth_token):
         """Verify creator stats response structure"""
