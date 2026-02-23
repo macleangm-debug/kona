@@ -12,6 +12,12 @@ BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 TEST_EMAIL = "superadmin@kona.com"
 TEST_PASSWORD = "SuperAdmin2025!"
 
+# Common headers
+HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json"
+}
+
 
 class TestTipTiers:
     """Test GET /api/tips/tiers endpoint - returns 5 tiers with amounts and effects"""
