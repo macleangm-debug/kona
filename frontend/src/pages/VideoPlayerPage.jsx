@@ -964,6 +964,20 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           setLikesCount(epRes.data.likes || 0);
         }
         
+        // Fetch creator info for tipping (if series has creator_id)
+        if (seriesRes.data.creator_id) {
+          try {
+            const creatorRes = await axios.get(`${API}/users/profile/${seriesRes.data.creator_id}`);
+            setCreatorInfo(creatorRes.data);
+          } catch (e) {
+            // Use series data as fallback
+            setCreatorInfo({
+              id: seriesRes.data.creator_id,
+              name: seriesRes.data.creator_name || "Creator"
+            });
+          }
+        }
+        
         // Load subtitles if available
         if (epRes.data.subtitles) {
           setSubtitles(epRes.data.subtitles);
