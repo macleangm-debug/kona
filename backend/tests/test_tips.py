@@ -249,8 +249,8 @@ class TestSendTip:
         response = requests.post(f"{BASE_URL}/api/tips/send", json={
             "creator_id": "test-creator",
             "tier": "small"
-        })
-        assert response.status_code == 401, "Should require authentication"
+        }, headers=HEADERS)
+        assert response.status_code == 401, f"Should require authentication, got {response.status_code}"
     
     def test_send_tip_invalid_tier(self, auth_token):
         """Test sending with invalid tier"""
