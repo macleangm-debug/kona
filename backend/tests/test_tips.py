@@ -88,7 +88,7 @@ class TestCreatorTipStats:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=HEADERS)
         if response.status_code == 200:
             return response.json().get("token")
         pytest.skip("Authentication failed")
@@ -100,10 +100,8 @@ class TestCreatorTipStats:
     
     def test_creator_stats_returns_statistics(self, auth_token):
         """Verify creator stats response structure"""
-        response = requests.get(
-            f"{BASE_URL}/api/tips/creator/stats",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/tips/creator/stats", headers=auth_headers)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
