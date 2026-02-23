@@ -895,13 +895,13 @@ REACT_APP_BACKEND_URL=<backend-url>
 
 ## Upcoming Features (P1)
 
-1. **Exclusive Early Access**
-   - Premium subscribers get episodes early (configurable hours)
-   - Episode-level early access settings
+1. **Creator Portal Tip Goals Management**
+   - Add TipGoalsManager component to Creator Portal
+   - Create/Edit/Delete goals UI in Revenue group
 
-2. **Video Player Tip Integration**
-   - Integrate TipJarButton into video player UI
-   - Real-time tip animations during playback
+2. **Creator Portal Early Access Settings**
+   - Add EarlyAccessSettings component to Creator Portal
+   - Configure series/episode early access rules
 
 
 ## Future/Backlog (P2-P3)
