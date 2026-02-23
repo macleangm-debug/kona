@@ -2,14 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { 
-  ChevronLeft, Users, Film, CreditCard, TrendingUp, 
+  ChevronLeft, ChevronDown, ChevronRight, Users, Film, CreditCard, TrendingUp, 
   DollarSign, Eye, Crown, Check, X, Clock, Loader2,
   BarChart3, PieChart, ArrowUpRight, ArrowDownRight,
   FileText, Server, Shield, Database, Calculator, Cpu, 
   HardDrive, Wifi, Globe, Zap, AlertTriangle, CheckCircle,
   Heart, Sparkles, Trash2, Play, Megaphone, Video, ExternalLink, Target,
   FlaskConical, Ticket, Briefcase, Newspaper, Settings2, Coins, Monitor,
-  Bell, Send, Image as ImageIcon, Filter, Search
+  Bell, Send, Image as ImageIcon, Filter, Search, LayoutDashboard, Rocket, Building2
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
