@@ -29,7 +29,9 @@ import {
   TrailerCreator,
   AIThumbnailGenerator,
   FanPollsQA,
-  TipDashboard
+  TipDashboard,
+  TipGoalsManager,
+  EarlyAccessSettings
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
