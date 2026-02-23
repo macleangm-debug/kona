@@ -15,3 +15,5 @@ export { TrailerCreator } from "./TrailerCreator";
 export { AIThumbnailGenerator } from "./AIThumbnailGenerator";
 export { FanPollsQA } from "./FanPollsQA";
 export { TipDashboard } from "./TipDashboard";
+export { TipGoalsManager } from "./TipGoalsManager";
+export { EarlyAccessSettings } from "./EarlyAccessSettings";
