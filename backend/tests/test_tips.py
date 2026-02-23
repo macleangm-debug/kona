@@ -124,10 +124,8 @@ class TestCreatorTipStats:
     
     def test_creator_stats_numeric_values(self, auth_token):
         """Verify numeric stats are integers"""
-        response = requests.get(
-            f"{BASE_URL}/api/tips/creator/stats",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/tips/creator/stats", headers=auth_headers)
         assert response.status_code == 200
         
         data = response.json()
