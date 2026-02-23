@@ -153,7 +153,7 @@ class TestGlobalLeaderboard:
     
     def test_global_leaderboard_returns_leaderboard(self):
         """Verify global leaderboard endpoint works"""
-        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard")
+        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard", headers=HEADERS)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
         data = response.json()
@@ -163,7 +163,7 @@ class TestGlobalLeaderboard:
     
     def test_global_leaderboard_default_timeframe(self):
         """Verify default timeframe is 'all'"""
-        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard")
+        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard", headers=HEADERS)
         assert response.status_code == 200
         
         data = response.json()
@@ -171,7 +171,7 @@ class TestGlobalLeaderboard:
     
     def test_global_leaderboard_week_timeframe(self):
         """Test leaderboard with week timeframe"""
-        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?timeframe=week")
+        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?timeframe=week", headers=HEADERS)
         assert response.status_code == 200
         
         data = response.json()
@@ -179,7 +179,7 @@ class TestGlobalLeaderboard:
     
     def test_global_leaderboard_month_timeframe(self):
         """Test leaderboard with month timeframe"""
-        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?timeframe=month")
+        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?timeframe=month", headers=HEADERS)
         assert response.status_code == 200
         
         data = response.json()
@@ -187,7 +187,7 @@ class TestGlobalLeaderboard:
     
     def test_global_leaderboard_limit_parameter(self):
         """Test leaderboard respects limit parameter"""
-        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?limit=5")
+        response = requests.get(f"{BASE_URL}/api/tips/global/leaderboard?limit=5", headers=HEADERS)
         assert response.status_code == 200
         
         data = response.json()
