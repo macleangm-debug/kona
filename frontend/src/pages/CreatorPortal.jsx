@@ -339,6 +339,7 @@ export const CreatorPortal = () => {
               {activeTab === "sponsorships" && "Connect with brands for sponsorships"}
               {activeTab === "trailers" && "Create promotional trailers for your series"}
               {activeTab === "thumbnails" && "Generate AI-powered thumbnails for your content"}
+              {activeTab === "polls" && "Engage fans with polls and answer their questions"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
             </p>
