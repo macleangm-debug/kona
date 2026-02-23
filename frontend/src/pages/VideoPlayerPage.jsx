@@ -12,6 +12,8 @@ import { API } from "@/config";
 import { KonaLoader } from "@/components/SplashScreen";
 import { toast } from "sonner";
 import { initContentProtection, removeContentProtection } from "@/services/contentProtection";
+import { TipJarButton } from "@/components/TipJarButton";
+import { TipGoalProgress } from "@/components/TipGoalProgress";
 
 // ============ SUBTITLE LANGUAGES ============
 const SUBTITLE_LANGUAGES = [
