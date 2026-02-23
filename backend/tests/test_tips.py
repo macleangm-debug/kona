@@ -200,7 +200,7 @@ class TestCreatorLeaderboard:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=HEADERS)
         if response.status_code == 200:
             return response.json().get("token")
         pytest.skip("Authentication failed")
@@ -208,10 +208,8 @@ class TestCreatorLeaderboard:
     @pytest.fixture
     def creator_id(self, auth_token):
         """Get creator ID from auth"""
-        response = requests.get(
-            f"{BASE_URL}/api/auth/me",
-            headers={"Authorization": f"Bearer {auth_token}"}
-        )
+        auth_headers = {**HEADERS, "Authorization": f"Bearer {auth_token}"}
+        response = requests.get(f"{BASE_URL}/api/auth/me", headers=auth_headers)
         if response.status_code == 200:
             return response.json().get("id")
         pytest.skip("Could not get creator ID")
@@ -236,7 +234,7 @@ class TestSendTip:
         response = requests.post(f"{BASE_URL}/api/auth/login", json={
             "email": TEST_EMAIL,
             "password": TEST_PASSWORD
-        })
+        }, headers=HEADERS)
         if response.status_code == 200:
             return response.json().get("token")
         pytest.skip("Authentication failed")
