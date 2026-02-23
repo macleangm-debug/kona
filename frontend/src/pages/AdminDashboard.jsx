@@ -2858,59 +2858,171 @@ export const AdminDashboard = () => {
     return <PageLoader message="Loading admin dashboard..." />;
   }
 
-  const tabs = [
-    // Core Operations
-    { id: "overview", label: "Overview", icon: BarChart3, section: "core" },
-    { id: "users", label: "Users", icon: Users, section: "core" },
-    { id: "content", label: "Content", icon: Film, section: "core" },
-    { id: "submissions", label: "Submissions", icon: FileText, section: "core" },
-    { id: "revenue", label: "Revenue", icon: DollarSign, section: "core" },
-    { id: "creators", label: "Creators", icon: Crown, section: "core" },
-    { id: "ads", label: "Ads Approval", icon: Megaphone, section: "core" },
-    { id: "notifications", label: "Notifications", icon: Bell, section: "core" },
-    // HR & Content Management
-    { id: "hr-applications", label: "Job Applications", icon: Briefcase, section: "hr" },
-    { id: "press-articles", label: "Press & News", icon: Newspaper, section: "content-mgmt" },
-    { id: "support", label: "Support Tickets", icon: Ticket, section: "support" },
-    ...(user?.is_super_admin ? [
-      { id: "platform-settings", label: "Platform Settings", icon: Settings2, section: "super" },
-      { id: "checklist", label: "Launch Checklist", icon: Check, section: "super" },
-      { id: "seeding", label: "Engagement Seeding", icon: Sparkles, section: "super" },
-      { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard, section: "super" },
-      { id: "exchange-rates", label: "Exchange Rates", icon: Globe, section: "super" },
-      { id: "ab-testing", label: "A/B Testing", icon: FlaskConical, section: "super" },
-      { id: "thumbnail-testing", label: "Thumbnail A/B", icon: ImageIcon, section: "super" },
-      { id: "investment", label: "Investment Calculator", icon: Calculator, section: "super" },
-      { id: "infrastructure", label: "Infrastructure Calculator", icon: Server, section: "super" },
-      { id: "docs", label: "Docs & System", icon: FileText, section: "super" }
-    ] : [])
+  // Grouped navigation structure for Admin
+  const NAV_GROUPS = [
+    {
+      id: "overview",
+      label: "Overview",
+      icon: LayoutDashboard,
+      items: [
+        { id: "overview", label: "Dashboard", icon: BarChart3 }
+      ]
+    },
+    {
+      id: "operations",
+      label: "Operations",
+      icon: Users,
+      items: [
+        { id: "users", label: "Users", icon: Users },
+        { id: "content", label: "Content", icon: Film },
+        { id: "submissions", label: "Submissions", icon: FileText },
+        { id: "creators", label: "Creators", icon: Crown },
+        { id: "ads", label: "Ads Approval", icon: Megaphone }
+      ]
+    },
+    {
+      id: "finance",
+      label: "Finance",
+      icon: DollarSign,
+      items: [
+        { id: "revenue", label: "Revenue", icon: DollarSign },
+        ...(user?.is_super_admin ? [
+          { id: "revenue-settings", label: "Revenue Settings", icon: CreditCard },
+          { id: "exchange-rates", label: "Exchange Rates", icon: Globe }
+        ] : [])
+      ]
+    },
+    {
+      id: "engagement",
+      label: "Engagement",
+      icon: Bell,
+      items: [
+        { id: "notifications", label: "Notifications", icon: Bell },
+        ...(user?.is_super_admin ? [
+          { id: "ab-testing", label: "A/B Testing", icon: FlaskConical },
+          { id: "thumbnail-testing", label: "Thumbnail A/B", icon: ImageIcon },
+          { id: "seeding", label: "Engagement Seeding", icon: Sparkles }
+        ] : [])
+      ]
+    },
+    {
+      id: "business",
+      label: "Business",
+      icon: Building2,
+      items: [
+        { id: "hr-applications", label: "Job Applications", icon: Briefcase },
+        { id: "press-articles", label: "Press & News", icon: Newspaper },
+        { id: "support", label: "Support Tickets", icon: Ticket }
+      ]
+    },
+    ...(user?.is_super_admin ? [{
+      id: "super",
+      label: "Super Admin",
+      icon: Shield,
+      items: [
+        { id: "platform-settings", label: "Platform Settings", icon: Settings2 },
+        { id: "checklist", label: "Launch Checklist", icon: Check },
+        { id: "investment", label: "Investment Calc", icon: Calculator },
+        { id: "infrastructure", label: "Infrastructure", icon: Server },
+        { id: "docs", label: "Docs & System", icon: FileText }
+      ]
+    }] : [])
   ];
+
+  // Flat tabs for mobile and finding active
+  const tabs = NAV_GROUPS.flatMap(group => group.items);
+  
+  // Track expanded groups
+  const getInitialExpanded = () => {
+    const expanded = ["overview"];
+    NAV_GROUPS.forEach(group => {
+      if (group.items.some(item => item.id === activeTab)) {
+        expanded.push(group.id);
+      }
+    });
+    return [...new Set(expanded)];
+  };
+  
+  const [expandedGroups, setExpandedGroups] = useState(getInitialExpanded);
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupId) 
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
+
+  const handleTabClick = (tabId, groupId) => {
+    setActiveTab(tabId);
+    if (!expandedGroups.includes(groupId)) {
+      setExpandedGroups(prev => [...prev, groupId]);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white" data-testid="admin-dashboard">
-      {/* Desktop Sidebar */}
+      {/* Desktop Sidebar with Collapsible Groups */}
       <aside className="hidden xl:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-gray-950 border-r border-white/10 z-50">
         <div className="p-6 border-b border-white/10">
           <h1 className="font-heading text-xl font-bold">Admin Dashboard</h1>
           <p className="text-xs text-muted-foreground">Kona Platform Management</p>
         </div>
         
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab.id 
-                  ? "bg-primary/20 text-primary border border-primary/30" 
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-              data-testid={`admin-tab-${tab.id}`}
-            >
-              <tab.icon className="w-5 h-5" />
-              {tab.label}
-            </button>
-          ))}
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {NAV_GROUPS.map(group => {
+            const isExpanded = expandedGroups.includes(group.id);
+            const hasActiveItem = group.items.some(item => item.id === activeTab);
+            const GroupIcon = group.icon;
+            
+            return (
+              <div key={group.id} className="mb-1">
+                {/* Group Header */}
+                <button
+                  onClick={() => toggleGroup(group.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    hasActiveItem 
+                      ? "bg-primary/10 text-primary" 
+                      : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <GroupIcon className="w-4 h-4" />
+                    {group.label}
+                  </span>
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+                
+                {/* Group Items */}
+                {isExpanded && (
+                  <div className="ml-3 mt-1 space-y-1 border-l border-white/10 pl-3">
+                    {group.items.map(item => {
+                      const ItemIcon = item.icon;
+                      return (
+                        <button
+                          key={item.id}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                            activeTab === item.id 
+                              ? "bg-primary/20 text-primary font-medium" 
+                              : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                          }`}
+                          onClick={() => handleTabClick(item.id, group.id)}
+                          data-testid={`admin-tab-${item.id}`}
+                        >
+                          <ItemIcon className="w-4 h-4" />
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
         
         <div className="p-4 border-t border-white/10">
@@ -2967,22 +3079,28 @@ export const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Mobile Tabs */}
+        {/* Mobile Tabs - Grouped */}
         <div className="xl:hidden px-4 py-4">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
-                  activeTab === tab.id 
-                    ? "bg-primary text-white" 
-                    : "bg-white/5 text-muted-foreground hover:bg-white/10"
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
+            {NAV_GROUPS.map(group => (
+              <div key={group.id} className="flex gap-2">
+                {group.items.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-all ${
+                      activeTab === tab.id 
+                        ? "bg-primary text-white" 
+                        : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                    }`}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                ))}
+                {/* Divider */}
+                <div className="w-px bg-white/10 my-1" />
+              </div>
             ))}
           </div>
         </div>
