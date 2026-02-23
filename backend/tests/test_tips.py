@@ -295,8 +295,8 @@ class TestUserTipHistory:
     
     def test_user_history_requires_auth(self):
         """Verify endpoint returns 401 without auth"""
-        response = requests.get(f"{BASE_URL}/api/tips/user/history")
-        assert response.status_code == 401, "Should require authentication"
+        response = requests.get(f"{BASE_URL}/api/tips/user/history", headers=HEADERS)
+        assert response.status_code == 401, f"Should require authentication, got {response.status_code}"
     
     def test_user_history_returns_structure(self, auth_token):
         """Verify user tip history response structure"""
