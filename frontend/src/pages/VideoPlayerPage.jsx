@@ -2197,6 +2197,20 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
           <span className="text-white text-xs">{formatLikeCount(likesCount)}</span>
         </button>
 
+        {/* Tip Creator - Only show if creator has content to tip */}
+        {(creatorInfo || series?.creator_id) && token && (
+          <button 
+            onClick={() => setShowTipPanel(true)}
+            className="flex flex-col items-center gap-1"
+            data-testid="video-tip-btn"
+          >
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500/30 to-amber-500/30 backdrop-blur-sm flex items-center justify-center">
+              <Coins className="w-5 h-5 text-yellow-400" />
+            </div>
+            <span className="text-yellow-400 text-xs font-medium">Tip</span>
+          </button>
+        )}
+
         {/* Picture-in-Picture */}
         {isPipSupported && (
           <button 
