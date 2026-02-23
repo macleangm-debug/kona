@@ -728,6 +728,32 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Quick Generate button: All 5 features verified (visibility, styling, icon, handler, loading state)
 
 
+### Session 13 (2026-02-22) - Collapsible Grouped Sidebar Navigation
+
+1. **Creator Portal Sidebar - Collapsible Groups**
+   - Reorganized 11 tabs into 4 logical groups for easier navigation
+   - Groups: **Overview** (Dashboard), **Revenue** (Earnings, Analytics, Payouts), **Content Tools** (Scheduler, Trailers, AI Thumbnails), **Growth** (Merchandise, Sponsorships, Milestones)
+   - Notifications standalone at bottom
+   - Expand/collapse with chevron icons
+   - Auto-expands group containing active tab
+   - **Modified:** `frontend/src/components/creator/CreatorHeader.jsx`
+
+2. **Admin Dashboard Sidebar - Collapsible Groups**
+   - Reorganized 20+ tabs into 6 logical groups
+   - Groups: **Overview** (Dashboard), **Operations** (Users, Content, Submissions, Creators, Ads), **Finance** (Revenue, Revenue Settings, Exchange Rates), **Engagement** (Notifications, A/B Testing, Thumbnail A/B, Seeding), **Business** (Job Applications, Press & News, Support), **Super Admin** (Platform Settings, Launch Checklist, Investment Calc, Infrastructure, Docs)
+   - Same expand/collapse pattern as Creator Portal
+   - **Modified:** `frontend/src/pages/AdminDashboard.jsx`
+
+3. **Bug Fix: React Hooks Order**
+   - Fixed critical React hooks order violation in AdminDashboard.jsx
+   - Moved NAV_GROUPS and useState before early return statement
+   - Prevented dashboard from crashing due to conditional hook calls
+
+**Testing Status:** All groups verified working (iteration_53.json)
+- ✅ Creator Portal: 4 groups, collapse/expand works, chevron icons toggle
+- ✅ Admin Dashboard: 6 groups, collapse/expand works, auto-expand active tab
+
+
 ## Upcoming Features (P1)
 
 1. **Fan Engagement Tools**
