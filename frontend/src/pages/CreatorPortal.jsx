@@ -421,6 +421,12 @@ export const CreatorPortal = () => {
             </div>
           )}
 
+          {activeTab === "polls" && (
+            <div className="max-w-7xl">
+              <FanPollsQA token={token} series={series} />
+            </div>
+          )}
+
           {activeTab === "payouts" && (
             <div className="max-w-7xl">
               <PayoutHistory token={token} />
