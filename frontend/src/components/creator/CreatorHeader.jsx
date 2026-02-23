@@ -1,11 +1,53 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  ChevronLeft, Plus, LayoutDashboard, LineChart, Bell, History,
+  ChevronLeft, ChevronDown, ChevronRight, Plus, LayoutDashboard, LineChart, Bell, History,
   Film, Settings, LogOut, Trophy, Coins, Calendar, TrendingUp,
-  ShoppingBag, Handshake, Wand2
+  ShoppingBag, Handshake, Wand2, PieChart, Rocket, Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+// Grouped navigation structure
+const NAV_GROUPS = [
+  {
+    id: "overview",
+    label: "Overview",
+    icon: LayoutDashboard,
+    items: [
+      { id: "dashboard", label: "Dashboard", icon: LayoutDashboard }
+    ]
+  },
+  {
+    id: "revenue",
+    label: "Revenue",
+    icon: Coins,
+    items: [
+      { id: "earnings", label: "Earnings", icon: TrendingUp },
+      { id: "analytics", label: "Analytics", icon: LineChart },
+      { id: "payouts", label: "Payouts", icon: History }
+    ]
+  },
+  {
+    id: "content",
+    label: "Content Tools",
+    icon: Film,
+    items: [
+      { id: "scheduler", label: "Scheduler", icon: Calendar },
+      { id: "trailers", label: "Trailers", icon: Film },
+      { id: "thumbnails", label: "AI Thumbnails", icon: Wand2 }
+    ]
+  },
+  {
+    id: "growth",
+    label: "Growth",
+    icon: Rocket,
+    items: [
+      { id: "merchandise", label: "Merchandise", icon: ShoppingBag },
+      { id: "sponsorships", label: "Sponsorships", icon: Handshake },
+      { id: "milestones", label: "Milestones", icon: Trophy }
+    ]
+  }
+];
 
 export const CreatorHeader = ({ 
   dashboard, 
@@ -15,23 +57,42 @@ export const CreatorHeader = ({
   unreadNotifications = 0
 }) => {
   const navigate = useNavigate();
+  
+  // Track expanded groups - expand the group containing active tab by default
+  const getInitialExpanded = () => {
+    const expanded = ["overview"]; // Always expand overview
+    NAV_GROUPS.forEach(group => {
+      if (group.items.some(item => item.id === activeTab)) {
+        expanded.push(group.id);
+      }
+    });
+    return [...new Set(expanded)];
+  };
+  
+  const [expandedGroups, setExpandedGroups] = useState(getInitialExpanded);
 
-  const tabs = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "earnings", label: "Earnings", icon: TrendingUp },
-    { id: "analytics", label: "Analytics", icon: LineChart },
-    { id: "scheduler", label: "Scheduler", icon: Calendar },
-    { id: "milestones", label: "Milestones", icon: Trophy },
-    { id: "merchandise", label: "Merch", icon: ShoppingBag },
-    { id: "sponsorships", label: "Sponsors", icon: Handshake },
-    { id: "trailers", label: "Trailers", icon: Film },
-    { id: "thumbnails", label: "AI Thumbs", icon: Wand2 },
-    { id: "payouts", label: "Payouts", icon: History },
-  ];
+  const toggleGroup = (groupId) => {
+    setExpandedGroups(prev => 
+      prev.includes(groupId) 
+        ? prev.filter(id => id !== groupId)
+        : [...prev, groupId]
+    );
+  };
+
+  const handleTabClick = (tabId, groupId) => {
+    setActiveTab(tabId);
+    // Ensure group is expanded when item is clicked
+    if (!expandedGroups.includes(groupId)) {
+      setExpandedGroups(prev => [...prev, groupId]);
+    }
+  };
+
+  // Flat tabs for mobile
+  const allTabs = NAV_GROUPS.flatMap(group => group.items);
 
   return (
     <>
-      {/* Desktop Sidebar - Hidden on mobile, positioned below main header */}
+      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-card border-r border-white/10 z-40">
         {/* Logo/Brand */}
         <div className="p-6 border-b border-white/10">
@@ -41,42 +102,82 @@ export const CreatorHeader = ({
           </p>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {tabs.map(tab => (
+        {/* Grouped Navigation */}
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+          {NAV_GROUPS.map(group => {
+            const isExpanded = expandedGroups.includes(group.id);
+            const hasActiveItem = group.items.some(item => item.id === activeTab);
+            const GroupIcon = group.icon;
+            
+            return (
+              <div key={group.id} className="mb-1">
+                {/* Group Header */}
+                <button
+                  onClick={() => toggleGroup(group.id)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    hasActiveItem 
+                      ? "bg-primary/10 text-primary" 
+                      : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <GroupIcon className="w-4 h-4" />
+                    {group.label}
+                  </span>
+                  {isExpanded ? (
+                    <ChevronDown className="w-4 h-4" />
+                  ) : (
+                    <ChevronRight className="w-4 h-4" />
+                  )}
+                </button>
+                
+                {/* Group Items */}
+                {isExpanded && (
+                  <div className="ml-3 mt-1 space-y-1 border-l border-white/10 pl-3">
+                    {group.items.map(item => {
+                      const ItemIcon = item.icon;
+                      return (
+                        <button
+                          key={item.id}
+                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                            activeTab === item.id 
+                              ? "bg-primary/20 text-primary font-medium" 
+                              : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                          }`}
+                          onClick={() => handleTabClick(item.id, group.id)}
+                          data-testid={`tab-${item.id}`}
+                        >
+                          <ItemIcon className="w-4 h-4" />
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+          
+          {/* Notifications - Standalone */}
+          <div className="pt-2 border-t border-white/10 mt-2">
             <button
-              key={tab.id}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                activeTab === tab.id 
-                  ? "bg-primary/20 text-primary border border-primary/30" 
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                activeTab === "notifications" 
+                  ? "bg-primary/20 text-primary font-medium" 
                   : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
               }`}
-              onClick={() => setActiveTab(tab.id)}
-              data-testid={`tab-${tab.id}`}
+              onClick={() => setActiveTab("notifications")}
+              data-testid="tab-notifications"
             >
-              <tab.icon className="w-5 h-5" />
-              {tab.label}
+              <Bell className="w-4 h-4" />
+              Notifications
+              {unreadNotifications > 0 && (
+                <span className="ml-auto px-2 py-0.5 bg-red-500 rounded-full text-[10px] font-bold text-white">
+                  {unreadNotifications > 9 ? "9+" : unreadNotifications}
+                </span>
+              )}
             </button>
-          ))}
-          
-          {/* Notifications in sidebar */}
-          <button
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-              activeTab === "notifications" 
-                ? "bg-primary/20 text-primary border border-primary/30" 
-                : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-            }`}
-            onClick={() => setActiveTab("notifications")}
-            data-testid="tab-notifications"
-          >
-            <Bell className="w-5 h-5" />
-            Notifications
-            {unreadNotifications > 0 && (
-              <span className="ml-auto px-2 py-0.5 bg-red-500 rounded-full text-[10px] font-bold text-white">
-                {unreadNotifications > 9 ? "9+" : unreadNotifications}
-              </span>
-            )}
-          </button>
+          </div>
         </nav>
 
         {/* Stats Summary */}
@@ -116,7 +217,7 @@ export const CreatorHeader = ({
         </div>
       </aside>
 
-      {/* Mobile Header - Hidden on desktop */}
+      {/* Mobile Header */}
       <div className="lg:hidden sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-white/10">
         <div className="flex items-center justify-between p-4">
           <div className="flex items-center gap-3">
@@ -149,21 +250,27 @@ export const CreatorHeader = ({
           </div>
         </div>
         
-        {/* Mobile Tab Navigation */}
-        <div className="flex border-t border-white/5 overflow-x-auto">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              className={`flex-1 min-w-[80px] py-3 text-xs font-medium flex flex-col items-center gap-1 transition-colors ${
-                activeTab === tab.id 
-                  ? "text-primary border-b-2 border-primary" 
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
+        {/* Mobile Tab Navigation - Grouped */}
+        <div className="flex border-t border-white/5 overflow-x-auto hide-scrollbar">
+          {NAV_GROUPS.map(group => (
+            <div key={group.id} className="flex">
+              {group.items.map(tab => (
+                <button
+                  key={tab.id}
+                  className={`min-w-[70px] py-3 px-2 text-xs font-medium flex flex-col items-center gap-1 transition-colors ${
+                    activeTab === tab.id 
+                      ? "text-primary border-b-2 border-primary bg-primary/5" 
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  onClick={() => setActiveTab(tab.id)}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  <span className="truncate max-w-[60px]">{tab.label}</span>
+                </button>
+              ))}
+              {/* Divider between groups */}
+              <div className="w-px bg-white/10 my-2" />
+            </div>
           ))}
         </div>
       </div>
