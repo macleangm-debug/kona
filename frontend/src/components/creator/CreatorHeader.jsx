@@ -44,6 +44,7 @@ const NAV_GROUPS = [
     label: "Growth",
     icon: Rocket,
     items: [
+      { id: "early-access", label: "Early Access", icon: Clock },
       { id: "merchandise", label: "Merchandise", icon: ShoppingBag },
       { id: "sponsorships", label: "Sponsorships", icon: Handshake },
       { id: "milestones", label: "Milestones", icon: Trophy },
