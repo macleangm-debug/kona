@@ -24,8 +24,11 @@ async def create_poll(
     request: CreatePollRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Create a new poll (creators only)"""
-    if current_user.get("role") not in ["creator", "admin"]:
+    """Create a new poll (creators and admins)"""
+    is_creator = current_user.get("role") == "creator"
+    is_admin = current_user.get("is_admin") or current_user.get("role") == "admin"
+    
+    if not (is_creator or is_admin):
         raise HTTPException(status_code=403, detail="Only creators can create polls")
     
     # Validate options for multiple choice
