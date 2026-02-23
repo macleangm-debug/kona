@@ -68,7 +68,7 @@ class TestTipTiers:
     
     def test_tip_tiers_have_labels(self):
         """Verify each tier has a label"""
-        response = requests.get(f"{BASE_URL}/api/tips/tiers")
+        response = requests.get(f"{BASE_URL}/api/tips/tiers", headers=HEADERS)
         assert response.status_code == 200
         
         tiers = response.json()["tiers"]
