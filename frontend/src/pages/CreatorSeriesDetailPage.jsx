@@ -397,15 +397,39 @@ const DraggableEpisodeCard = memo(({ ep, seasonNum, onEditEpisode, isDragging, i
         
         {/* Edit Button (hidden in selection mode) */}
         {!selectionMode && (
-          <button 
-            className="p-2 hover:bg-secondary rounded-lg opacity-0 group-hover:opacity-100 transition-opacity self-center"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditEpisode(ep);
-            }}
-          >
-            <Edit className="w-4 h-4 text-muted-foreground" />
-          </button>
+          <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity self-center">
+            {/* Quick Actions */}
+            <button 
+              className="p-1.5 hover:bg-primary/20 rounded-lg transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreateShort && onCreateShort(ep);
+              }}
+              title="Create Short"
+            >
+              <Scissors className="w-4 h-4 text-primary" />
+            </button>
+            <button 
+              className="p-1.5 hover:bg-purple-500/20 rounded-lg transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onGenerateThumbnail && onGenerateThumbnail(ep);
+              }}
+              title="Generate Thumbnail"
+            >
+              <Wand2 className="w-4 h-4 text-purple-400" />
+            </button>
+            <button 
+              className="p-1.5 hover:bg-secondary rounded-lg transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditEpisode(ep);
+              }}
+              title="Edit Episode"
+            >
+              <Edit className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
         )}
       </div>
     </Card>
