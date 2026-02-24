@@ -6,19 +6,10 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime, timezone
 from bson import ObjectId
-import os
+
+from services import db, get_current_user
 
 router = APIRouter(prefix="/shorts", tags=["shorts"])
-
-# Database dependency
-def get_db():
-    from server import db
-    return db
-
-# Auth dependency
-def get_current_user(token: str = None):
-    from routes.auth import get_current_user as auth_get_user
-    return auth_get_user
 
 class CreateShortRequest(BaseModel):
     episode_id: str
