@@ -7,7 +7,7 @@ import {
   Play, Edit, Plus, FileVideo, Upload, Trash2, 
   Languages, CheckCircle, AlertCircle, Image, Link, Video, XCircle, X,
   ChevronDown, ChevronRight, FolderPlus, Layers, GripVertical, Move, Send, Globe,
-  Wand2, Sparkles
+  Wand2, Sparkles, Scissors
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
