@@ -17,6 +17,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
+import { CreateShortModal } from "@/components/creator/CreateShortModal";
 
 // DnD Kit imports
 import {
