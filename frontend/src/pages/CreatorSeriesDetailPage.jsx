@@ -993,6 +993,10 @@ export const CreatorSeriesDetailPage = () => {
   // AI Thumbnail generation state
   const [generatingThumbnail, setGeneratingThumbnail] = useState(false);
 
+  // Create Short modal state
+  const [showCreateShort, setShowCreateShort] = useState(false);
+  const [shortEpisode, setShortEpisode] = useState(null);
+
   // Fetch platform settings on mount
   useEffect(() => {
     const fetchPlatformSettings = async () => {
