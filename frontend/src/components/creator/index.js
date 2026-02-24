@@ -17,3 +17,4 @@ export { FanPollsQA } from "./FanPollsQA";
 export { TipDashboard } from "./TipDashboard";
 export { TipGoalsManager } from "./TipGoalsManager";
 export { EarlyAccessSettings } from "./EarlyAccessSettings";
+export { CreateShortModal } from "./CreateShortModal";
