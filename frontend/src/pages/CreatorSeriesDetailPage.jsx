@@ -448,7 +448,9 @@ const DroppableSeason = memo(({
   activeId,
   selectionMode,
   selectedEpisodes,
-  onToggleSelect
+  onToggleSelect,
+  onCreateShort,
+  onGenerateThumbnail
 }) => {
   const episodeIds = episodes.map(ep => ep.id);
   
