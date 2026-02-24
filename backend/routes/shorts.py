@@ -38,8 +38,7 @@ class ShortResponse(BaseModel):
 @router.post("/create")
 async def create_short(
     request: CreateShortRequest,
-    db=Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """Create a short clip from an episode for social media sharing"""
     
