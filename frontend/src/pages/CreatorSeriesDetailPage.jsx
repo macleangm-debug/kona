@@ -2047,6 +2047,8 @@ export const CreatorSeriesDetailPage = () => {
                 onAddEpisode={openBatchUploadForSeason}
                 onReorderEpisodes={handleReorderEpisodes}
                 onBulkEdit={handleBulkEdit}
+                onCreateShort={handleCreateShortFromEpisode}
+                onGenerateThumbnail={handleGenerateEpisodeThumbnail}
               />
             </>
           )}
