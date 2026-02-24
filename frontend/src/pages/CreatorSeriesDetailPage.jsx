@@ -2698,6 +2698,15 @@ Use [brackets] for sounds.
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Short Modal */}
+      <CreateShortModal
+        open={showCreateShort}
+        onOpenChange={setShowCreateShort}
+        episode={shortEpisode}
+        series={series}
+        token={token}
+      />
     </div>
   );
 };
