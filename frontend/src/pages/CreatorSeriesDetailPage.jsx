@@ -1143,6 +1143,42 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // Fetch series detail - must be defined before handlers that reference it
+  const fetchSeriesDetail = useCallback(async () => {
+    if (!seriesId) {
+      setLoading(false);
+      return;
+    }
+    
+    if (!token) {
+      toast.error("Please login to access creator dashboard");
+      navigate("/");
+      return;
+    }
+    
+    try {
+      const res = await axios.get(`${API}/creator/series/${seriesId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSeries(res.data);
+      setEpisodes(res.data.episodes || []);
+      
+      // Fetch seasons
+      try {
+        const seasonsRes = await axios.get(`${API}/creator/series/${seriesId}/seasons`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSeasons(seasonsRes.data || []);
+      } catch (e) {
+        console.error("Failed to fetch seasons:", e);
+      }
+    } catch (e) {
+      console.error("Failed to fetch series:", e);
+      toast.error("Failed to load series details");
+    }
+    setLoading(false);
+  }, [seriesId, token, navigate]);
+
   // Handle creating a short from an episode
   const handleCreateShortFromEpisode = useCallback((episode) => {
     setShortEpisode(episode);
