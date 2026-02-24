@@ -39,6 +39,7 @@ from .polls import router as polls_router
 from .tips import router as tips_router
 from .tip_goals import router as tip_goals_router
 from .early_access import router as early_access_router
+from .shorts import router as shorts_router
 
 # Create main API router
 api_router = APIRouter()
