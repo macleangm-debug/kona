@@ -559,7 +559,9 @@ const SeasonAccordion = memo(({
   onAddSeason,
   onAddEpisode,
   onReorderEpisodes,
-  onBulkEdit
+  onBulkEdit,
+  onCreateShort,
+  onGenerateThumbnail
 }) => {
   const [activeId, setActiveId] = useState(null);
   const [localEpisodes, setLocalEpisodes] = useState(episodes);
