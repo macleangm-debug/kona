@@ -64,7 +64,7 @@ class TestShortsAPI:
     
     def test_get_my_shorts_requires_authentication(self):
         """GET /api/shorts/my should require authentication"""
-        response = requests.get(f"{BASE_URL}/api/shorts/my")
+        response = requests.get(f"{BASE_URL}/api/shorts/my", headers={"User-Agent": BROWSER_UA})
         
         assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
         print("✓ GET /api/shorts/my requires authentication")
