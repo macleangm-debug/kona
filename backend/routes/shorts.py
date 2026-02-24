@@ -43,12 +43,12 @@ async def create_short(
     """Create a short clip from an episode for social media sharing"""
     
     # Validate episode exists and user has access
-    episode = db.episodes.find_one({"id": request.episode_id})
+    episode = await db.episodes.find_one({"id": request.episode_id})
     if not episode:
         raise HTTPException(status_code=404, detail="Episode not found")
     
     # Check user owns the series/episode
-    series = db.series.find_one({"id": episode.get("series_id")})
+    series = await db.series.find_one({"id": episode.get("series_id")})
     if not series:
         raise HTTPException(status_code=404, detail="Series not found")
     
