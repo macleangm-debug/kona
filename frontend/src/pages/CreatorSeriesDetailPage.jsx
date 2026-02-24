@@ -536,6 +536,8 @@ const DroppableSeason = memo(({
                     selectionMode={selectionMode}
                     isSelected={selectedEpisodes?.includes(ep.id)}
                     onToggleSelect={onToggleSelect}
+                    onCreateShort={onCreateShort}
+                    onGenerateThumbnail={onGenerateThumbnail}
                   />
                 ))}
               </SortableContext>
