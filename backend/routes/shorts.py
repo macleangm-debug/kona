@@ -126,8 +126,7 @@ async def create_short(
 
 @router.get("/my")
 async def get_my_shorts(
-    db=Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """Get all shorts created by the current user"""
     
@@ -143,8 +142,7 @@ async def get_my_shorts(
 
 @router.get("/{short_id}")
 async def get_short(
-    short_id: str,
-    db=Depends(get_db)
+    short_id: str
 ):
     """Get a specific short by ID"""
     
@@ -157,8 +155,7 @@ async def get_short(
 @router.delete("/{short_id}")
 async def delete_short(
     short_id: str,
-    db=Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user: dict = Depends(get_current_user)
 ):
     """Delete a short"""
     
