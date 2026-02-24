@@ -31,7 +31,7 @@ class TestShortsAPI:
         self.token = response.json().get("token")
         assert self.token, "No token in login response"
         
-        self.headers = {"Authorization": f"Bearer {self.token}"}
+        self.headers = {"Authorization": f"Bearer {self.token}", "User-Agent": BROWSER_UA}
         
         # Get creator series to find an episode
         series_res = requests.get(f"{BASE_URL}/api/creator/series", headers=self.headers)
