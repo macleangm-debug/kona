@@ -130,10 +130,10 @@ async def get_my_shorts(
 ):
     """Get all shorts created by the current user"""
     
-    shorts = list(db.shorts.find(
+    shorts = await db.shorts.find(
         {"creator_id": current_user["id"]},
         {"_id": 0}
-    ).sort("created_at", -1))
+    ).sort("created_at", -1).to_list(length=100)
     
     return {
         "shorts": shorts,
@@ -146,7 +146,7 @@ async def get_short(
 ):
     """Get a specific short by ID"""
     
-    short = db.shorts.find_one({"id": short_id}, {"_id": 0})
+    short = await db.shorts.find_one({"id": short_id}, {"_id": 0})
     if not short:
         raise HTTPException(status_code=404, detail="Short not found")
     
@@ -159,14 +159,14 @@ async def delete_short(
 ):
     """Delete a short"""
     
-    short = db.shorts.find_one({"id": short_id})
+    short = await db.shorts.find_one({"id": short_id})
     if not short:
         raise HTTPException(status_code=404, detail="Short not found")
     
     if short.get("creator_id") != current_user["id"] and current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="Not authorized to delete this short")
     
-    db.shorts.delete_one({"id": short_id})
+    await db.shorts.delete_one({"id": short_id})
     
     return {"message": "Short deleted successfully"}
 
@@ -177,7 +177,7 @@ async def track_share(
 ):
     """Track when a short is shared"""
     
-    result = db.shorts.update_one(
+    result = await db.shorts.update_one(
         {"id": short_id},
         {"$inc": {"shares": 1}}
     )
