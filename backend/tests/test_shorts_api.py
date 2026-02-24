@@ -172,7 +172,7 @@ class TestShortsAPI:
             "format": "tiktok"
         }
         
-        response = requests.post(f"{BASE_URL}/api/shorts/create", json=payload)
+        response = requests.post(f"{BASE_URL}/api/shorts/create", json=payload, headers={"User-Agent": BROWSER_UA})
         
         assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
         print("✓ POST /api/shorts/create requires authentication")
