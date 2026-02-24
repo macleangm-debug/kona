@@ -106,7 +106,7 @@ async def create_short(
     short_data["short_url"] = f"/api/shorts/{short_id}/preview"
     short_data["download_url"] = f"/api/shorts/{short_id}/download"
     
-    db.shorts.insert_one(short_data)
+    await db.shorts.insert_one(short_data)
     
     return ShortResponse(
         id=short_id,
