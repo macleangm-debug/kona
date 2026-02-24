@@ -298,7 +298,7 @@ const UploadProgressPanel = memo(({ uploads, onDismiss }) => {
 });
 
 // ============ DRAGGABLE EPISODE CARD ============
-const DraggableEpisodeCard = memo(({ ep, seasonNum, onEditEpisode, isDragging, isSelected, onToggleSelect, selectionMode }) => {
+const DraggableEpisodeCard = memo(({ ep, seasonNum, onEditEpisode, isDragging, isSelected, onToggleSelect, selectionMode, onCreateShort, onGenerateThumbnail }) => {
   const {
     attributes,
     listeners,
