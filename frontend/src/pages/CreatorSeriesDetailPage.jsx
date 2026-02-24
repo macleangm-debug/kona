@@ -1143,6 +1143,66 @@ export const CreatorSeriesDetailPage = () => {
     }
   };
 
+  // Handle creating a short from an episode
+  const handleCreateShortFromEpisode = useCallback((episode) => {
+    setShortEpisode(episode);
+    setShowCreateShort(true);
+  }, []);
+
+  // Handle generating AI thumbnail for an episode
+  const handleGenerateEpisodeThumbnail = useCallback(async (episode) => {
+    if (!episode || generatingThumbnail) return;
+    
+    setGeneratingThumbnail(true);
+    try {
+      const genreHints = {
+        romance: "romantic atmosphere, soft lighting, emotional connection",
+        drama: "intense emotions, dramatic lighting, compelling moment",
+        action: "dynamic energy, exciting movement, powerful composition",
+        thriller: "suspenseful mood, mysterious shadows, tension",
+        comedy: "bright and cheerful, fun energy, lighthearted",
+        horror: "dark atmosphere, creepy mood, suspenseful",
+        fantasy: "magical elements, otherworldly beauty, enchanting"
+      };
+      
+      const genreHint = genreHints[series?.genre?.toLowerCase()] || genreHints.drama;
+      const prompt = `A professional thumbnail for episode "${episode.title}" from "${series?.title || 'series'}". ${genreHint}. Cinematic quality, engaging, suitable for video streaming.`;
+      
+      const res = await axios.post(`${API}/ai-thumbnails/generate`, {
+        prompt,
+        series_id: seriesId,
+        episode_id: episode.id,
+        style: "cinematic",
+        size: "1024x1792",
+        preferred_provider: "openai",
+        save_to_library: true
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (res.data.success && res.data.image_url) {
+        // Apply the thumbnail to the episode
+        await axios.post(`${API}/ai-thumbnails/${res.data.thumbnail_id}/apply`, {
+          thumbnail_id: res.data.thumbnail_id,
+          target_type: "episode",
+          target_id: episode.id
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        toast.success(`AI thumbnail generated for "${episode.title}"!`);
+        fetchSeriesDetail();
+      } else {
+        toast.error("Failed to generate thumbnail");
+      }
+    } catch (e) {
+      console.error("Failed to generate episode thumbnail:", e);
+      toast.error(e.response?.data?.detail || "Failed to generate thumbnail");
+    } finally {
+      setGeneratingThumbnail(false);
+    }
+  }, [series, seriesId, token, generatingThumbnail, fetchSeriesDetail]);
+
   // Generate video thumbnail from file
   const generateThumbnail = (file) => {
     return new Promise((resolve) => {
