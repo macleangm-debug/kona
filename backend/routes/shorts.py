@@ -173,8 +173,7 @@ async def delete_short(
 @router.post("/{short_id}/share")
 async def track_share(
     short_id: str,
-    platform: str = "unknown",
-    db=Depends(get_db)
+    platform: str = "unknown"
 ):
     """Track when a short is shared"""
     
