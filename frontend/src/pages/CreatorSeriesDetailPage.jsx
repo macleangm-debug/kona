@@ -868,6 +868,8 @@ const SeasonAccordion = memo(({
               selectionMode={selectionMode}
               selectedEpisodes={selectedEpisodes}
               onToggleSelect={toggleSelect}
+              onCreateShort={onCreateShort}
+              onGenerateThumbnail={onGenerateThumbnail}
             />
           );
         })}
