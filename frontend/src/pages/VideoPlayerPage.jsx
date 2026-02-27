@@ -918,11 +918,11 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     }
   };
 
-  // Auto-hide controls after 3 seconds
+  // Auto-hide controls after 4 seconds for immersive viewing
   useEffect(() => {
     let timer;
     if (showControls) {
-      timer = setTimeout(() => setShowControls(false), 3000);
+      timer = setTimeout(() => setShowControls(false), 4000);
     }
     return () => {
       if (timer) clearTimeout(timer);
