@@ -186,6 +186,7 @@ const AppContent = () => {
         <Route path="/creator" element={<CreatorPortal />} />
         <Route path="/creator/series/:id" element={<CreatorSeriesDetailPage />} />
         <Route path="/creator/login" element={<CreatorLoginPage />} />
+        <Route path="/creator/super" element={<SuperCreatorDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
