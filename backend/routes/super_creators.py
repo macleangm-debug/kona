@@ -9,7 +9,7 @@ from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 import uuid
 
-from database import db
+from services import db
 from auth import get_current_user
 
 router = APIRouter(prefix="/super-creator", tags=["Super Creator"])
