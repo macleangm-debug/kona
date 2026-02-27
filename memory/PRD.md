@@ -1179,6 +1179,28 @@ REACT_APP_BACKEND_URL=<backend-url>
    - Dedicated dashboard for Super Creators to manage sub-creators in their territory
    - Sub-creator onboarding and performance tracking
 
+2. **Contract Edit Feature**
+   - Allow admins to edit contract details (draft/sent status)
+   - Activate signed contracts with start date
+
+
+### Session 16 Part 9 (2026-02-27) - Immersive Video Player
+
+1. **Immersive Mode for Video Player (COMPLETED)**
+   - Side action buttons (like, tip, PiP, subtitles, episodes) now hidden during playback
+   - Single tap anywhere on video reveals controls (auto-hide after 4 seconds)
+   - Double-tap center to like (with heart animation)
+   - Double-tap left/right to seek ±10 seconds (unchanged)
+   - One-time gesture hint when controls first hide
+   - Smooth fade in/out transitions for controls
+   - **Modified:** `/app/frontend/src/pages/VideoPlayerPage.jsx`
+
+**Gestures:**
+- Single tap → Show/hide controls
+- Double-tap center → Like video
+- Double-tap left → Rewind 10s
+- Double-tap right → Forward 10s
+
 
 ## Future/Backlog (P2-P3)
 
