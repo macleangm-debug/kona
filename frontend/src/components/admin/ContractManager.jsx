@@ -692,7 +692,81 @@ export const ContractManager = ({ token }) => {
                     >
                       <option value="platform">Full Platform Exclusivity</option>
                       <option value="category">Category Exclusivity</option>
+                      <option value="territory">Territory Exclusivity</option>
                     </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Territory & Super Creator Section */}
+              <div className="p-4 bg-purple-500/10 rounded-lg border border-purple-500/20 space-y-4">
+                <h4 className="font-medium flex items-center gap-2">
+                  <Crown className="w-4 h-4 text-purple-400" />
+                  Territory & Super Creator
+                </h4>
+                
+                <div>
+                  <label className="text-sm">Territory / Region</label>
+                  <Input
+                    value={form.territory}
+                    onChange={(e) => setForm({...form, territory: e.target.value})}
+                    placeholder="e.g., United Republic of Tanzania"
+                  />
+                </div>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.territory_exclusive}
+                    onChange={(e) => setForm({...form, territory_exclusive: e.target.checked})}
+                    className="w-4 h-4"
+                  />
+                  <span>Exclusive rights to this territory</span>
+                </label>
+
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.is_super_creator}
+                    onChange={(e) => setForm({
+                      ...form, 
+                      is_super_creator: e.target.checked,
+                      can_manage_creators: e.target.checked,
+                      exclusivity: e.target.checked || form.exclusivity,
+                      exclusivity_scope: e.target.checked ? "territory" : form.exclusivity_scope
+                    })}
+                    className="w-4 h-4"
+                  />
+                  <span className="font-medium text-purple-400">Designate as Super Creator</span>
+                </label>
+
+                {form.is_super_creator && (
+                  <div className="ml-6 space-y-3 p-3 bg-white/5 rounded-lg">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={form.can_manage_creators}
+                        onChange={(e) => setForm({...form, can_manage_creators: e.target.checked})}
+                        className="w-4 h-4"
+                      />
+                      <span>Can recruit & manage other creators</span>
+                    </label>
+                    
+                    {form.can_manage_creators && (
+                      <div>
+                        <label className="text-sm">Sub-Creator Commission %</label>
+                        <Input
+                          type="number"
+                          value={form.sub_creator_commission}
+                          onChange={(e) => setForm({...form, sub_creator_commission: parseFloat(e.target.value) || 10})}
+                          min={0}
+                          max={50}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Super Creator earns this % from sub-creators' net revenue
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
