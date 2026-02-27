@@ -3,12 +3,13 @@ Creator Contracts API
 Manage partnership contracts with creators
 """
 from fastapi import APIRouter, HTTPException, Depends, Response
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, StreamingResponse
 from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
 import uuid
+import io
 
 from services import db, get_current_user
 
