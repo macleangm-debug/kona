@@ -274,14 +274,22 @@ def generate_contract_html(contract: dict) -> str:
     
     creator = contract.get("creator", {})
     platform = contract.get("platform", {})
+    platform_provider = contract.get("platform_provider", {"name": "Kona Streaming Services", "role": "Technology Platform Provider"})
     revenue = contract.get("revenue_terms", {})
     terms = contract.get("contract_terms", {})
     tax = contract.get("tax_terms", {})
     
-    # Calculate actual shares after platform fee
+    # Get currency symbol
+    currency = revenue.get("currency", "USD")
+    currency_symbols = {
+        "USD": "$", "EUR": "€", "GBP": "£", "TZS": "TZS ", "KES": "KES ", 
+        "NGN": "₦", "ZAR": "R", "GHS": "GH₵", "UGX": "UGX ", "RWF": "RWF ",
+        "INR": "₹"
+    }
+    currency_symbol = currency_symbols.get(currency, currency + " ")
+    
+    # Calculate net after platform fee (simplified - no gross calculation)
     net_after_platform = 100 - revenue.get("platform_fee_percent", 25)
-    creator_actual = (net_after_platform * revenue.get("creator_share_percent", 60)) / 100
-    platform_actual = (net_after_platform * revenue.get("platform_share_percent", 40)) / 100
     
     # VAT handling text
     vat_handling_text = {
