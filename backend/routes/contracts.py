@@ -718,27 +718,44 @@ def generate_contract_html(contract: dict) -> str:
 async def get_platform_defaults():
     """Get default platform information for contracts"""
     return {
-        "name": "Kona Streaming Platform",
-        "company_name": "Kona Media Inc.",
-        "email": "partnerships@kona.com",
-        "address": "",
+        "name": "Dar24 Media Limited",
+        "company_name": "Dar24 Media Limited",
+        "email": "partnerships@dar24media.com",
+        "address": "Dar es Salaam, Tanzania",
+        "platform_provider": {
+            "name": "Kona Streaming Services",
+            "role": "Technology Platform Provider"
+        },
         "default_revenue_terms": {
             "platform_fee_percent": 25,
             "creator_share_percent": 60,
             "platform_share_percent": 40,
-            "minimum_payout_threshold": 50,
+            "minimum_payout_threshold": 50000,
             "payout_frequency": "monthly",
-            "currency": "USD"
+            "currency": "TZS"
         },
         "default_contract_terms": {
             "duration_months": 12,
             "auto_renewal": True,
             "exclusivity": False,
             "content_ownership": "creator",
-            "termination_notice_days": 30
+            "termination_notice_days": 30,
+            "show_sub_creator_distribution": False
         },
         "default_tax_terms": {
             "vat_handling": "creator_responsible",
             "withholding_tax_percent": 0
-        }
+        },
+        "available_currencies": [
+            {"code": "TZS", "name": "Tanzanian Shilling", "symbol": "TZS"},
+            {"code": "KES", "name": "Kenyan Shilling", "symbol": "KES"},
+            {"code": "UGX", "name": "Ugandan Shilling", "symbol": "UGX"},
+            {"code": "RWF", "name": "Rwandan Franc", "symbol": "RWF"},
+            {"code": "NGN", "name": "Nigerian Naira", "symbol": "₦"},
+            {"code": "GHS", "name": "Ghanaian Cedi", "symbol": "GH₵"},
+            {"code": "ZAR", "name": "South African Rand", "symbol": "R"},
+            {"code": "USD", "name": "US Dollar", "symbol": "$"},
+            {"code": "EUR", "name": "Euro", "symbol": "€"},
+            {"code": "GBP", "name": "British Pound", "symbol": "£"}
+        ]
     }
