@@ -55,9 +55,9 @@ export const ContractManager = ({ token }) => {
     platform_fee: 25,
     creator_share: 60,
     platform_share: 40,
-    min_payout: 50,
+    min_payout: 50000,
     payout_frequency: "monthly",
-    currency: "USD",
+    currency: "TZS",
     // Contract terms
     duration_months: 12,
     auto_renewal: true,
