@@ -138,7 +138,7 @@ const AppContent = () => {
   const isWelcomePage = location.pathname === "/welcome";
   
   // Pages that should have their own layout (no header/nav)
-  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome", "/creator"];
+  const fullScreenPages = ["/watch", "/admin", "/admin/login", "/business", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome", "/creator", "/creator/super"];
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Pages that skip splash screen
