@@ -95,6 +95,9 @@ class CreatorSeriesCreate(BaseModel):
     description: str = Field(..., min_length=20, max_length=1000)
     genre: str
     thumbnail_url: Optional[str] = None
+    # For Super Creators creating content on behalf of sub-creators
+    attributed_to: Optional[str] = Field(default=None, description="Sub-creator ID to attribute this series to")
+    attributed_name: Optional[str] = Field(default=None, description="Sub-creator name for display")
 
 class CreatorEpisodeCreate(BaseModel):
     """Create a new episode as a creator"""
