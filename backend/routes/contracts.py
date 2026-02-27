@@ -549,11 +549,14 @@ def generate_contract_html(contract: dict) -> str:
 
     <div class="parties">
         <div class="party">
-            <h3>The Platform</h3>
-            <p class="name">{platform.get('company_name') or platform.get('name', 'Kona Streaming Platform')}</p>
+            <h3>The Company</h3>
+            <p class="name">{platform.get('company_name') or platform.get('name', 'Dar24 Media Limited')}</p>
             <p>{platform.get('address', '')}</p>
             <p>Email: {platform.get('email', '')}</p>
             {f"<p>Tax ID: {platform.get('tax_id')}</p>" if platform.get('tax_id') else ''}
+            <p style="font-size: 11px; color: #888; margin-top: 8px;">
+                <em>Platform powered by {platform_provider.get('name', 'Kona Streaming Services')}</em>
+            </p>
         </div>
         <div class="party">
             <h3>The {'Super Creator' if is_super_creator else 'Creator'}</h3>
@@ -568,9 +571,10 @@ def generate_contract_html(contract: dict) -> str:
 
     <div class="section">
         <h2>1. Recitals</h2>
-        <p>WHEREAS, the Platform operates a digital video streaming service enabling creators to publish, distribute, and monetize their content;</p>
-        {'<p>WHEREAS, the Platform wishes to expand its presence in ' + territory + ' and requires a trusted local partner to manage operations and creator relations in this territory;</p>' if territory and is_super_creator else ''}
-        <p>WHEREAS, the {'Super ' if is_super_creator else ''}Creator wishes to {'serve as the Platform representative in ' + territory + ' and ' if territory and is_super_creator else ''}publish content on the Platform and participate in the Platform's revenue sharing program;</p>
+        <p>WHEREAS, {platform.get('company_name', 'the Company')} ("the Company") has partnered with {platform_provider.get('name', 'Kona Streaming Services')} as the {platform_provider.get('role', 'Technology Platform Provider')} to engage African creators in different countries;</p>
+        <p>WHEREAS, the Company operates a digital video streaming service enabling creators to publish, distribute, and monetize their content through the Platform;</p>
+        {'<p>WHEREAS, the Company wishes to expand its presence in ' + territory + ' and requires a trusted local partner to manage operations and creator relations in this territory;</p>' if territory and is_super_creator else ''}
+        <p>WHEREAS, the {'Super ' if is_super_creator else ''}Creator wishes to {'serve as the Company representative in ' + territory + ' and ' if territory and is_super_creator else ''}publish content on the Platform and participate in the Company's revenue sharing program;</p>
         {'<p>WHEREAS, the Super Creator has demonstrated expertise in content creation and management, and is qualified to recruit, mentor, and oversee other creators within the designated territory;</p>' if is_super_creator else ''}
         <p>NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinafter set forth, the parties agree as follows:</p>
     </div>
