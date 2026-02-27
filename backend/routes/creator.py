@@ -1091,6 +1091,32 @@ async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_curr
         "published_at": None
     }
     
+    # Handle attribution for Super Creator creating for sub-creator
+    if data.attributed_to:
+        # Verify the user is a super creator with this sub-creator
+        contract = await db.contracts.find_one({
+            "creator.user_id": user["id"],
+            "contract_terms.is_super_creator": True,
+            "status": {"$in": ["active", "signed"]}
+        }, {"_id": 0})
+        
+        if not contract:
+            raise HTTPException(status_code=403, detail="Only Super Creators can create content for sub-creators")
+        
+        # Verify sub-creator belongs to this super creator
+        sub_creator = await db.sub_creators.find_one({
+            "id": data.attributed_to,
+            "super_creator_id": user["id"],
+            "status": "active"
+        }, {"_id": 0})
+        
+        if not sub_creator:
+            raise HTTPException(status_code=404, detail="Sub-creator not found or not active")
+        
+        series["attributed_to"] = data.attributed_to
+        series["attributed_name"] = data.attributed_name or sub_creator.get("name")
+        series["super_creator_id"] = user["id"]
+    
     await db.creator_series.insert_one(series)
     
     # Create Season 1 by default
