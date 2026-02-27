@@ -216,7 +216,7 @@ async def create_sub_creator(
     }
     
     await db.sub_creators.insert_one(sub_creator)
-    del sub_creator["_id"] if "_id" in sub_creator else None
+    sub_creator.pop("_id", None)
     
     return {"success": True, "sub_creator": sub_creator}
 
