@@ -153,6 +153,10 @@ export const ContractManager = ({ token }) => {
           tax_id: form.platform_tax_id || null,
           company_name: form.platform_company || null
         },
+        platform_provider: {
+          name: form.platform_provider_name,
+          role: form.platform_provider_role
+        },
         revenue_terms: {
           platform_fee_percent: form.platform_fee,
           creator_share_percent: form.creator_share,
@@ -173,7 +177,8 @@ export const ContractManager = ({ token }) => {
           is_super_creator: form.is_super_creator,
           can_manage_creators: form.can_manage_creators,
           sub_creator_commission_percent: form.sub_creator_commission,
-          sub_creator_negotiable_terms: form.sub_creator_negotiable_terms
+          sub_creator_negotiable_terms: form.sub_creator_negotiable_terms,
+          show_sub_creator_distribution: form.show_sub_creator_distribution
         },
         tax_terms: {
           vat_handling: form.vat_handling,
