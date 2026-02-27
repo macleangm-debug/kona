@@ -472,8 +472,11 @@ export const ContractManager = ({ token }) => {
                     <Button variant="ghost" size="icon" onClick={() => handlePreview(contract)} title="Preview">
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => handleExport(contract, "html")} title="Download HTML">
-                      <Download className="w-4 h-4" />
+                    <Button variant="ghost" size="icon" onClick={() => handleExport(contract, "pdf")} title="Download PDF" data-testid={`download-pdf-${contract.id}`}>
+                      <FileText className="w-4 h-4 text-red-400" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleExport(contract, "docx")} title="Download Word" data-testid={`download-docx-${contract.id}`}>
+                      <FileType className="w-4 h-4 text-blue-400" />
                     </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleExport(contract, "print")} title="Print">
                       <Printer className="w-4 h-4" />
