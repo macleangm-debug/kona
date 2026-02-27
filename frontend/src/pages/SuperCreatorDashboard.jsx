@@ -5,7 +5,8 @@ import {
   Crown, Users, DollarSign, TrendingUp, Plus, UserPlus,
   Mail, Phone, Settings, ChevronRight, Check, X, Clock,
   Edit, Trash2, BarChart3, Calendar, Filter, Download,
-  AlertCircle, Search, ArrowLeft, Loader2, Eye, Play
+  AlertCircle, Search, ArrowLeft, Loader2, Eye, Play,
+  Film, Upload, Image
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
