@@ -63,6 +63,7 @@ class TaxTerms(BaseModel):
 class CreateContractRequest(BaseModel):
     creator: ContractParty
     platform: ContractParty
+    platform_provider: Optional[PlatformProvider] = None  # Technology partner (e.g., Kona)
     revenue_terms: RevenueTerms
     contract_terms: ContractTerms
     tax_terms: TaxTerms
