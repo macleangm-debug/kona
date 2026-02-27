@@ -485,7 +485,10 @@ class TestSuperCreatorDashboard:
     
     def test_super_creator_dashboard_requires_auth(self):
         """Test that dashboard requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/super-creator/dashboard")
+        response = requests.get(
+            f"{BASE_URL}/api/super-creator/dashboard",
+            headers={"User-Agent": TEST_USER_AGENT}
+        )
         assert response.status_code == 401
 
 
