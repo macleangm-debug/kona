@@ -423,6 +423,7 @@ class TestContractActivate:
         """Test that activating contract requires authentication"""
         response = requests.post(
             f"{BASE_URL}/api/contracts/{signed_contract_id}/activate",
+            headers={"User-Agent": TEST_USER_AGENT},
             json={"start_date": "2026-02-01"}
         )
         assert response.status_code == 401
