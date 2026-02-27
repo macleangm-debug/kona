@@ -263,6 +263,177 @@ export const ContractManager = ({ token }) => {
     });
   };
 
+  // Populate form for editing
+  const handleEdit = (contract) => {
+    setEditMode(true);
+    setEditingContract(contract);
+    setForm({
+      creator_name: contract.creator?.name || "",
+      creator_email: contract.creator?.email || "",
+      creator_address: contract.creator?.address || "",
+      creator_tax_id: contract.creator?.tax_id || "",
+      creator_company: contract.creator?.company_name || "",
+      platform_name: contract.platform?.name || "Dar24 Media Limited",
+      platform_email: contract.platform?.email || "partnerships@dar24media.com",
+      platform_address: contract.platform?.address || "Dar es Salaam, Tanzania",
+      platform_tax_id: contract.platform?.tax_id || "",
+      platform_company: contract.platform?.company_name || "Dar24 Media Limited",
+      platform_provider_name: contract.platform_provider?.name || "Kona Streaming Services",
+      platform_provider_role: contract.platform_provider?.role || "Technology Platform Provider",
+      platform_fee: contract.revenue_terms?.platform_fee_percent || 25,
+      creator_share: contract.revenue_terms?.creator_share_percent || 60,
+      platform_share: contract.revenue_terms?.platform_share_percent || 40,
+      min_payout: contract.revenue_terms?.minimum_payout_threshold || 50000,
+      payout_frequency: contract.revenue_terms?.payout_frequency || "monthly",
+      currency: contract.revenue_terms?.currency || "TZS",
+      duration_months: contract.contract_terms?.duration_months || 12,
+      auto_renewal: contract.contract_terms?.auto_renewal ?? true,
+      exclusivity: contract.contract_terms?.exclusivity || false,
+      exclusivity_scope: contract.contract_terms?.exclusivity_scope || "none",
+      content_ownership: contract.contract_terms?.content_ownership || "creator",
+      termination_notice: contract.contract_terms?.termination_notice_days || 30,
+      territory: contract.contract_terms?.territory || "",
+      territory_exclusive: contract.contract_terms?.territory_exclusive || false,
+      is_super_creator: contract.contract_terms?.is_super_creator || false,
+      can_manage_creators: contract.contract_terms?.can_manage_creators || false,
+      sub_creator_commission: contract.contract_terms?.sub_creator_commission_percent || 10,
+      sub_creator_negotiable_terms: contract.contract_terms?.sub_creator_negotiable_terms || false,
+      show_sub_creator_distribution: contract.contract_terms?.show_sub_creator_distribution || false,
+      vat_handling: contract.tax_terms?.vat_handling || "creator_responsible",
+      withholding_percent: contract.tax_terms?.withholding_tax_percent || 0,
+      tax_jurisdiction: contract.tax_terms?.tax_jurisdiction || "",
+      creator_vat_number: contract.tax_terms?.creator_vat_number || "",
+      additional_clauses: contract.additional_clauses?.join('\n') || "",
+      notes: contract.notes || ""
+    });
+    setShowCreate(true);
+  };
+
+  // Update existing contract
+  const handleUpdate = async () => {
+    if (!editingContract) return;
+    
+    // Validation
+    if (!form.creator_name || !form.creator_email) {
+      toast.error("Creator name and email are required");
+      return;
+    }
+    if (form.creator_share + form.platform_share !== 100) {
+      toast.error("Creator and Platform shares must equal 100%");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      const payload = {
+        creator: {
+          name: form.creator_name,
+          email: form.creator_email,
+          address: form.creator_address || null,
+          tax_id: form.creator_tax_id || null,
+          company_name: form.creator_company || null
+        },
+        platform: {
+          name: form.platform_name,
+          email: form.platform_email,
+          address: form.platform_address || null,
+          tax_id: form.platform_tax_id || null,
+          company_name: form.platform_company || null
+        },
+        platform_provider: {
+          name: form.platform_provider_name,
+          role: form.platform_provider_role
+        },
+        revenue_terms: {
+          platform_fee_percent: form.platform_fee,
+          creator_share_percent: form.creator_share,
+          platform_share_percent: form.platform_share,
+          minimum_payout_threshold: form.min_payout,
+          payout_frequency: form.payout_frequency,
+          currency: form.currency
+        },
+        contract_terms: {
+          duration_months: form.duration_months,
+          auto_renewal: form.auto_renewal,
+          exclusivity: form.exclusivity,
+          exclusivity_scope: form.exclusivity_scope,
+          content_ownership: form.content_ownership,
+          termination_notice_days: form.termination_notice,
+          territory: form.territory || null,
+          territory_exclusive: form.territory_exclusive,
+          is_super_creator: form.is_super_creator,
+          can_manage_creators: form.can_manage_creators,
+          sub_creator_commission_percent: form.sub_creator_commission,
+          sub_creator_negotiable_terms: form.sub_creator_negotiable_terms,
+          show_sub_creator_distribution: form.show_sub_creator_distribution
+        },
+        tax_terms: {
+          vat_handling: form.vat_handling,
+          withholding_tax_percent: form.withholding_percent,
+          tax_jurisdiction: form.tax_jurisdiction || null,
+          creator_tax_registered: !!form.creator_vat_number,
+          creator_vat_number: form.creator_vat_number || null
+        },
+        additional_clauses: form.additional_clauses ? form.additional_clauses.split('\n').filter(c => c.trim()) : null,
+        notes: form.notes || null
+      };
+
+      const res = await axios.put(`${API}/contracts/${editingContract.id}`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success(res.data.message || "Contract updated successfully!");
+      setShowCreate(false);
+      setEditMode(false);
+      setEditingContract(null);
+      resetForm();
+      fetchContracts();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to update contract");
+    }
+    setCreating(false);
+  };
+
+  // Open activate modal
+  const handleOpenActivate = (contract) => {
+    setActivatingContract(contract);
+    setActivateDate(new Date().toISOString().split('T')[0]); // Default to today
+    setActivateNotes("");
+    setShowActivate(true);
+  };
+
+  // Activate contract
+  const handleActivate = async () => {
+    if (!activatingContract || !activateDate) {
+      toast.error("Please select a start date");
+      return;
+    }
+
+    try {
+      const res = await axios.post(`${API}/contracts/${activatingContract.id}/activate`, {
+        start_date: activateDate,
+        notes: activateNotes || null
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success(res.data.message || "Contract activated!");
+      setShowActivate(false);
+      setActivatingContract(null);
+      fetchContracts();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to activate contract");
+    }
+  };
+
+  // Close create/edit dialog
+  const handleCloseForm = () => {
+    setShowCreate(false);
+    setEditMode(false);
+    setEditingContract(null);
+    resetForm();
+  };
+
   const handlePreview = async (contract) => {
     try {
       const res = await axios.get(`${API}/contracts/${contract.id}/html`, {
