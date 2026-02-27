@@ -24,6 +24,10 @@ class ContractParty(BaseModel):
     tax_id: Optional[str] = None
     company_name: Optional[str] = None
 
+class PlatformProvider(BaseModel):
+    name: str = Field(default="Kona Streaming Services")
+    role: str = Field(default="Technology Platform Provider")
+
 class RevenueTerms(BaseModel):
     platform_fee_percent: float = Field(default=25.0, ge=0, le=100)
     creator_share_percent: float = Field(default=60.0, ge=0, le=100)
