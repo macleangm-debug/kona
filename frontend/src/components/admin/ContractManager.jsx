@@ -545,27 +545,28 @@ export const ContractManager = ({ token }) => {
                 </div>
               </div>
 
-              <h4 className="font-medium text-sm text-muted-foreground mt-6">Platform Information</h4>
+              <h4 className="font-medium text-sm text-muted-foreground mt-6">Company Information</h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm">Platform Name</label>
+                  <label className="text-sm">Company Name</label>
                   <Input
-                    value={form.platform_name}
-                    onChange={(e) => setForm({...form, platform_name: e.target.value})}
+                    value={form.platform_company}
+                    onChange={(e) => setForm({...form, platform_company: e.target.value, platform_name: e.target.value})}
                   />
                 </div>
                 <div>
-                  <label className="text-sm">Platform Email</label>
+                  <label className="text-sm">Company Email</label>
                   <Input
                     value={form.platform_email}
                     onChange={(e) => setForm({...form, platform_email: e.target.value})}
                   />
                 </div>
                 <div>
-                  <label className="text-sm">Company Name</label>
+                  <label className="text-sm">Address</label>
                   <Input
-                    value={form.platform_company}
-                    onChange={(e) => setForm({...form, platform_company: e.target.value})}
+                    value={form.platform_address}
+                    onChange={(e) => setForm({...form, platform_address: e.target.value})}
+                    placeholder="Dar es Salaam, Tanzania"
                   />
                 </div>
                 <div>
@@ -575,6 +576,29 @@ export const ContractManager = ({ token }) => {
                     onChange={(e) => setForm({...form, platform_tax_id: e.target.value})}
                   />
                 </div>
+              </div>
+
+              <h4 className="font-medium text-sm text-muted-foreground mt-6">Technology Platform Partner</h4>
+              <div className="p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm">Platform Provider</label>
+                    <Input
+                      value={form.platform_provider_name}
+                      onChange={(e) => setForm({...form, platform_provider_name: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm">Role</label>
+                    <Input
+                      value={form.platform_provider_role}
+                      onChange={(e) => setForm({...form, platform_provider_role: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  The platform provider will be mentioned in the contract as the technology partner
+                </p>
               </div>
             </TabsContent>
 
