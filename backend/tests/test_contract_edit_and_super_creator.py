@@ -556,7 +556,10 @@ class TestSuperCreatorEarnings:
     
     def test_earnings_requires_auth(self):
         """Test that earnings endpoint requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/super-creator/earnings")
+        response = requests.get(
+            f"{BASE_URL}/api/super-creator/earnings",
+            headers={"User-Agent": TEST_USER_AGENT}
+        )
         assert response.status_code == 401
 
 
