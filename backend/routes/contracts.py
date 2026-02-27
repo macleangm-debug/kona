@@ -304,6 +304,7 @@ def generate_contract_html(contract: dict) -> str:
     is_super_creator = terms.get("is_super_creator", False)
     can_manage_creators = terms.get("can_manage_creators", False)
     sub_creator_commission = terms.get("sub_creator_commission_percent", 10)
+    show_sub_creator_distribution = terms.get("show_sub_creator_distribution", False)
     
     if terms.get("exclusivity"):
         scope = terms.get("exclusivity_scope", "platform")
