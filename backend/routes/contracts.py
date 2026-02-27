@@ -251,24 +251,274 @@ async def export_contract(
     format: str = "html",
     current_user: dict = Depends(get_current_user)
 ):
-    """Export contract in various formats"""
+    """Export contract in various formats: html, pdf, docx, json"""
     
     contract = await db.contracts.find_one({"id": contract_id}, {"_id": 0})
     if not contract:
         raise HTTPException(status_code=404, detail="Contract not found")
+    
+    contract_number = contract.get('contract_number', 'contract')
     
     if format == "html":
         html = generate_contract_html(contract)
         return HTMLResponse(
             content=html,
             headers={
-                "Content-Disposition": f"attachment; filename={contract['contract_number']}.html"
+                "Content-Disposition": f"attachment; filename={contract_number}.html"
+            }
+        )
+    elif format == "pdf":
+        html = generate_contract_html(contract)
+        pdf_bytes = generate_pdf_from_html(html)
+        return StreamingResponse(
+            io.BytesIO(pdf_bytes),
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={contract_number}.pdf"
+            }
+        )
+    elif format == "docx":
+        docx_bytes = generate_docx_from_contract(contract)
+        return StreamingResponse(
+            io.BytesIO(docx_bytes),
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            headers={
+                "Content-Disposition": f"attachment; filename={contract_number}.docx"
             }
         )
     elif format == "json":
         return contract
     else:
-        raise HTTPException(status_code=400, detail="Unsupported format. Use 'html' or 'json'")
+        raise HTTPException(status_code=400, detail="Unsupported format. Use 'html', 'pdf', 'docx', or 'json'")
+
+
+def generate_pdf_from_html(html: str) -> bytes:
+    """Generate PDF from HTML using WeasyPrint"""
+    try:
+        from weasyprint import HTML
+        pdf = HTML(string=html).write_pdf()
+        return pdf
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"PDF generation failed: {str(e)}")
+
+
+def generate_docx_from_contract(contract: dict) -> bytes:
+    """Generate Word document from contract data"""
+    try:
+        from docx import Document
+        from docx.shared import Inches, Pt
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
+        from docx.enum.table import WD_TABLE_ALIGNMENT
+        
+        doc = Document()
+        
+        # Get contract data
+        creator = contract.get("creator", {})
+        platform = contract.get("platform", {})
+        platform_provider = contract.get("platform_provider", {"name": "Kona Streaming Services", "role": "Technology Platform Provider"})
+        revenue = contract.get("revenue_terms", {})
+        terms = contract.get("contract_terms", {})
+        tax = contract.get("tax_terms", {})
+        
+        is_super_creator = terms.get("is_super_creator", False)
+        territory = terms.get("territory", "")
+        
+        # Currency
+        currency = revenue.get("currency", "USD")
+        currency_symbols = {
+            "USD": "$", "EUR": "€", "GBP": "£", "TZS": "TZS ", "KES": "KES ", 
+            "NGN": "₦", "ZAR": "R", "GHS": "GH₵", "UGX": "UGX ", "RWF": "RWF "
+        }
+        currency_symbol = currency_symbols.get(currency, currency + " ")
+        
+        # Title
+        title = doc.add_heading(
+            'Super Creator Territory Partnership Agreement' if is_super_creator else 'Creator Partnership Agreement',
+            0
+        )
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        # Territory subtitle
+        if territory:
+            subtitle = doc.add_paragraph(f"Exclusive Territory: {territory}")
+            subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        
+        # Contract details
+        details = doc.add_paragraph()
+        details.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        details.add_run(f"Contract No: {contract.get('contract_number', 'DRAFT')}\n").bold = True
+        details.add_run(f"Effective Date: {contract.get('effective_date', '')[:10] if contract.get('effective_date') else 'TBD'}")
+        
+        doc.add_paragraph()
+        
+        # Parties Section
+        doc.add_heading('PARTIES', level=1)
+        
+        # Company
+        p = doc.add_paragraph()
+        p.add_run('THE COMPANY: ').bold = True
+        p.add_run(f"{platform.get('company_name', platform.get('name', 'Dar24 Media Limited'))}\n")
+        if platform.get('address'):
+            p.add_run(f"Address: {platform.get('address')}\n")
+        p.add_run(f"Email: {platform.get('email', '')}\n")
+        p.add_run(f"Platform powered by {platform_provider.get('name', 'Kona Streaming Services')}")
+        
+        doc.add_paragraph()
+        
+        # Creator
+        p = doc.add_paragraph()
+        p.add_run(f'THE {"SUPER CREATOR" if is_super_creator else "CREATOR"}: ').bold = True
+        p.add_run(f"{creator.get('name', '')}\n")
+        if creator.get('company_name'):
+            p.add_run(f"Company: {creator.get('company_name')}\n")
+        if creator.get('address'):
+            p.add_run(f"Address: {creator.get('address')}\n")
+        p.add_run(f"Email: {creator.get('email', '')}")
+        if territory:
+            p.add_run(f"\nTerritory: {territory}")
+        
+        doc.add_paragraph()
+        
+        # Recitals
+        doc.add_heading('1. RECITALS', level=1)
+        doc.add_paragraph(
+            f"WHEREAS, {platform.get('company_name', 'the Company')} has partnered with {platform_provider.get('name', 'Kona Streaming Services')} "
+            f"as the {platform_provider.get('role', 'Technology Platform Provider')} to engage African creators in different countries;"
+        )
+        doc.add_paragraph(
+            "WHEREAS, the Company operates a digital video streaming service enabling creators to publish, distribute, and monetize their content through the Platform;"
+        )
+        if is_super_creator:
+            doc.add_paragraph(
+                f"WHEREAS, the Super Creator wishes to serve as the Company representative in {territory} and publish content on the Platform and participate in the Company's revenue sharing program;"
+            )
+        else:
+            doc.add_paragraph(
+                "WHEREAS, the Creator wishes to publish content on the Platform and participate in the Company's revenue sharing program;"
+            )
+        doc.add_paragraph(
+            "NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinafter set forth, the parties agree as follows:"
+        )
+        
+        # Revenue Sharing
+        doc.add_heading('2. REVENUE SHARING', level=1)
+        
+        net_after_platform = 100 - revenue.get("platform_fee_percent", 25)
+        
+        # Revenue table
+        table = doc.add_table(rows=5, cols=2)
+        table.style = 'Table Grid'
+        
+        headers = table.rows[0].cells
+        headers[0].text = 'Revenue Component'
+        headers[1].text = 'Percentage'
+        
+        row1 = table.rows[1].cells
+        row1[0].text = 'Platform Fee'
+        row1[1].text = f"{revenue.get('platform_fee_percent', 25)}%"
+        
+        row2 = table.rows[2].cells
+        row2[0].text = 'Net Revenue'
+        row2[1].text = f"{net_after_platform}%"
+        
+        row3 = table.rows[3].cells
+        row3[0].text = f"{'Super ' if is_super_creator else ''}Creator Share"
+        row3[1].text = f"{revenue.get('creator_share_percent', 60)}% of Net"
+        
+        row4 = table.rows[4].cells
+        row4[0].text = 'Company Share'
+        row4[1].text = f"{revenue.get('platform_share_percent', 40)}% of Net"
+        
+        doc.add_paragraph()
+        
+        # Payment Terms
+        doc.add_heading('3. PAYMENT TERMS', level=1)
+        doc.add_paragraph(f"3.1 Payout Frequency: {revenue.get('payout_frequency', 'monthly').capitalize()}")
+        doc.add_paragraph(f"3.2 Minimum Threshold: {currency_symbol}{revenue.get('minimum_payout_threshold', 50):,.0f}")
+        doc.add_paragraph(f"3.3 Currency: {currency}")
+        doc.add_paragraph("3.4 Payment Method: Bank transfer, mobile money, or other approved methods")
+        
+        # Tax
+        doc.add_heading('4. TAX OBLIGATIONS', level=1)
+        vat_text = {
+            "creator_responsible": "The Creator is solely responsible for their own VAT/tax obligations.",
+            "platform_withholds": f"The Platform will withhold {tax.get('withholding_tax_percent', 0)}% for tax purposes.",
+            "gross_up": "Payments will be adjusted so the Creator receives the net amount after any withholding."
+        }
+        doc.add_paragraph(vat_text.get(tax.get("vat_handling", "creator_responsible"), ""))
+        
+        # Content Rights
+        doc.add_heading('5. CONTENT RIGHTS & OWNERSHIP', level=1)
+        ownership_text = {
+            "creator": "The Creator retains full ownership of all intellectual property rights in the Content.",
+            "shared": "Ownership of Content is shared between Creator and Platform.",
+            "platform": "Upon upload, ownership of Content transfers to the Platform."
+        }
+        doc.add_paragraph(ownership_text.get(terms.get("content_ownership", "creator"), ""))
+        
+        # Exclusivity
+        doc.add_heading('6. EXCLUSIVITY & TERRITORY', level=1)
+        if terms.get("exclusivity") and terms.get("exclusivity_scope") == "territory" and territory:
+            doc.add_paragraph(
+                f"Creator is granted exclusive rights to operate and represent the Platform in {territory}. "
+                f"No other creator shall be appointed as the primary representative in this territory without Creator's consent."
+            )
+        elif terms.get("exclusivity"):
+            doc.add_paragraph("During the term of this Agreement, Creator agrees to publish content exclusively on the Platform.")
+        else:
+            doc.add_paragraph("This Agreement is non-exclusive. Creator may publish content on other platforms.")
+        
+        # Super Creator Rights (if applicable)
+        if is_super_creator and terms.get("can_manage_creators"):
+            doc.add_heading('7. SUPER CREATOR RIGHTS AND RESPONSIBILITIES', level=1)
+            doc.add_paragraph(
+                f"7.1 Creator is designated as a Super Creator for {territory if territory else 'the Platform'}."
+            )
+            doc.add_paragraph(
+                "7.2 Sub-Creator Management: Creator is authorized to recruit, onboard, and mentor new creators within the designated territory."
+            )
+            doc.add_paragraph(
+                f"7.3 Sub-Creator Commission: {terms.get('sub_creator_commission_percent', 10)}% of sub-creator net revenue."
+            )
+            doc.add_paragraph("7.4 Quality Control: Creator is responsible for ensuring sub-creators comply with Platform policies.")
+            doc.add_paragraph("7.5 Reporting: Monthly reports on sub-creator activities required.")
+        
+        # Term & Termination
+        section_num = '8' if is_super_creator else '7'
+        doc.add_heading(f'{section_num}. TERM & TERMINATION', level=1)
+        doc.add_paragraph(f"{section_num}.1 Initial Term: {terms.get('duration_months', 12)} months")
+        doc.add_paragraph(f"{section_num}.2 Auto-Renewal: {'Yes' if terms.get('auto_renewal') else 'No'}")
+        doc.add_paragraph(f"{section_num}.3 Termination Notice: {terms.get('termination_notice_days', 30)} days")
+        
+        # Signatures
+        doc.add_paragraph()
+        doc.add_heading('SIGNATURES', level=1)
+        doc.add_paragraph()
+        
+        sig_table = doc.add_table(rows=4, cols=2)
+        sig_table.rows[0].cells[0].text = "For the Company:"
+        sig_table.rows[0].cells[1].text = f"For the {'Super ' if is_super_creator else ''}Creator:"
+        sig_table.rows[1].cells[0].text = "_________________________"
+        sig_table.rows[1].cells[1].text = "_________________________"
+        sig_table.rows[2].cells[0].text = platform.get('company_name', '')
+        sig_table.rows[2].cells[1].text = creator.get('name', '')
+        sig_table.rows[3].cells[0].text = "Date: _______________"
+        sig_table.rows[3].cells[1].text = "Date: _______________"
+        
+        # Footer
+        doc.add_paragraph()
+        footer = doc.add_paragraph()
+        footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        footer.add_run(f"Contract ID: {contract.get('id', '')} | Generated: {datetime.now().strftime('%Y-%m-%d')}")
+        
+        # Save to bytes
+        file_stream = io.BytesIO()
+        doc.save(file_stream)
+        file_stream.seek(0)
+        return file_stream.getvalue()
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Word document generation failed: {str(e)}")
 
 def generate_contract_html(contract: dict) -> str:
     """Generate a professional HTML contract document"""
