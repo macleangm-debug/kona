@@ -1670,6 +1670,27 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         </div>
       )}
 
+      {/* Gesture hint - shows once when controls first hide */}
+      {showGestureHint && (
+        <div className="absolute inset-0 z-40 pointer-events-none flex items-end justify-center pb-24 animate-fade-in">
+          <div className="bg-black/70 backdrop-blur-sm rounded-xl px-5 py-3 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+                <span className="text-white text-sm">👆</span>
+              </div>
+              <span className="text-white/90 text-sm">Tap to show controls</span>
+            </div>
+            <div className="w-px h-6 bg-white/20" />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                <Heart className="w-4 h-4 text-red-400" />
+              </div>
+              <span className="text-white/90 text-sm">Double-tap to like</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Horizontal swipe feedback */}
       {swipeDirection && (
         <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
