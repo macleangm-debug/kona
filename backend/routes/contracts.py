@@ -581,7 +581,7 @@ def generate_contract_html(contract: dict) -> str:
 
     <div class="section">
         <h2>2. Revenue Sharing</h2>
-        <p>The parties agree to the following revenue sharing arrangement for all revenue generated from Creator's content on the Platform:</p>
+        <p>The parties agree to the following revenue sharing arrangement for all revenue generated from {'Super ' if is_super_creator else ''}Creator's content on the Platform:</p>
         
         <table class="revenue-table">
             <tr>
@@ -605,26 +605,26 @@ def generate_contract_html(contract: dict) -> str:
                 <td>Remaining after platform fee deduction</td>
             </tr>
             <tr class="highlight">
-                <td>Creator Share</td>
-                <td>{revenue.get('creator_share_percent', 60)}% of Net ({creator_actual:.1f}% of Gross)</td>
-                <td>Paid to Creator per payout schedule</td>
+                <td>{'Super ' if is_super_creator else ''}Creator Share</td>
+                <td>{revenue.get('creator_share_percent', 60)}% of Net Revenue</td>
+                <td>Paid to {'Super ' if is_super_creator else ''}Creator per payout schedule</td>
             </tr>
             <tr>
-                <td>Platform Share</td>
-                <td>{revenue.get('platform_share_percent', 40)}% of Net ({platform_actual:.1f}% of Gross)</td>
-                <td>Retained by Platform</td>
+                <td>Company Share</td>
+                <td>{revenue.get('platform_share_percent', 40)}% of Net Revenue</td>
+                <td>Retained by {platform.get('company_name', 'the Company')}</td>
             </tr>
         </table>
 
-        <p><strong>Example:</strong> For every $100 in gross revenue, the Platform deducts ${revenue.get('platform_fee_percent', 25)} as platform fee. From the remaining ${net_after_platform}, Creator receives ${creator_actual:.2f} and Platform retains ${platform_actual:.2f}.</p>
+        <p><strong>Example:</strong> For every {currency_symbol}100 in gross revenue, the Platform Fee of {currency_symbol}{revenue.get('platform_fee_percent', 25)} is deducted first. The remaining {currency_symbol}{net_after_platform} (Net Revenue) is then split {revenue.get('creator_share_percent', 60)}% to {'Super ' if is_super_creator else ''}Creator and {revenue.get('platform_share_percent', 40)}% to {platform.get('company_name', 'the Company')}.</p>
     </div>
 
     <div class="section">
         <h2>3. Payment Terms</h2>
         <p><span class="clause-number">3.1</span> <strong>Payout Frequency:</strong> Payments shall be made on a {revenue.get('payout_frequency', 'monthly')} basis, within 15 business days following the end of each payment period.</p>
-        <p><span class="clause-number">3.2</span> <strong>Minimum Threshold:</strong> Payments will only be processed when the Creator's accumulated balance reaches {revenue.get('currency', 'USD')} {revenue.get('minimum_payout_threshold', 50)}. Balances below this threshold will roll over to the next payment period.</p>
-        <p><span class="clause-number">3.3</span> <strong>Currency:</strong> All payments shall be made in {revenue.get('currency', 'USD')}. Currency conversion fees, if applicable, shall be borne by the Creator.</p>
-        <p><span class="clause-number">3.4</span> <strong>Payment Method:</strong> Payments will be made via the Creator's designated payment method on file (bank transfer, PayPal, or other approved methods).</p>
+        <p><span class="clause-number">3.2</span> <strong>Minimum Threshold:</strong> Payments will only be processed when the {'Super ' if is_super_creator else ''}Creator's accumulated balance reaches {currency_symbol}{revenue.get('minimum_payout_threshold', 50):,.0f}. Balances below this threshold will roll over to the next payment period.</p>
+        <p><span class="clause-number">3.3</span> <strong>Currency:</strong> All payments shall be made in {currency} ({currency_symbol.strip()}). Currency conversion fees, if applicable, shall be borne by the {'Super ' if is_super_creator else ''}Creator.</p>
+        <p><span class="clause-number">3.4</span> <strong>Payment Method:</strong> Payments will be made via the {'Super ' if is_super_creator else ''}Creator's designated payment method on file (bank transfer, mobile money, or other approved methods).</p>
     </div>
 
     <div class="section">
