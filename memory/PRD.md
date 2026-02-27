@@ -1100,6 +1100,45 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Minimum commission and template clauses present
 
 
+### Session 16 Part 7 (2026-02-27) - Dar24 Media & Configurable Contract Updates
+
+1. **Dar24 Media Limited as Contracting Party (COMPLETED)**
+   - Changed default company from "Kona" to "Dar24 Media Limited"
+   - Added "Platform Provider" section for technology partner (Kona Streaming Services)
+   - Contract header shows "The Company" instead of "The Platform"
+   - Recitals mention: "Dar24 Media Limited has partnered with Kona Streaming Services as the Technology Platform Provider to engage African creators"
+
+2. **Local Currency Support (COMPLETED)**
+   - Default currency: TZS (Tanzanian Shilling)
+   - Added African currencies: TZS, KES, UGX, RWF, NGN, GHS, ZAR
+   - Currency selector grouped by region (African / International)
+   - Contract uses currency symbol throughout
+
+3. **Simplified Revenue Display (COMPLETED)**
+   - Removed "45% of Gross" calculation
+   - Now shows clean: "60% of Net Revenue" / "40% of Net Revenue"
+   - Example calculation in local currency
+
+4. **Configurable Sub-Creator Distribution (COMPLETED)**
+   - Added toggle: "Show sub-creator revenue table in contract"
+   - When OFF: Sub-creator revenue table is hidden from contract
+   - Sub-creator commission clause still included, just not the detailed table
+   - Useful for territories where detailed distribution isn't needed
+
+5. **Updated Contract Example (Tanzania)**
+   - Company: Dar24 Media Limited
+   - Currency: TZS (Tanzanian Shilling)
+   - Minimum Payout: TZS 100,000
+   - Sub-creator table: Hidden
+
+**Testing Status:** Manually verified via API
+- ✅ Contract created: KON-202602-A7F6A6
+- ✅ Company: Dar24 Media Limited
+- ✅ Platform Provider: Kona Streaming Services
+- ✅ Currency: TZS
+- ✅ Sub-creator table hidden when toggle is OFF
+
+
 ## Upcoming Features (P1)
 
 1. **PDF Export for Contracts**
