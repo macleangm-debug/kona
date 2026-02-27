@@ -524,12 +524,16 @@ class TestSuperCreatorSubCreators:
     def test_sub_creators_requires_auth(self):
         """Test that sub-creators endpoints require authentication"""
         # List
-        response = requests.get(f"{BASE_URL}/api/super-creator/sub-creators")
+        response = requests.get(
+            f"{BASE_URL}/api/super-creator/sub-creators",
+            headers={"User-Agent": TEST_USER_AGENT}
+        )
         assert response.status_code == 401
         
         # Create
         response = requests.post(
             f"{BASE_URL}/api/super-creator/sub-creators",
+            headers={"User-Agent": TEST_USER_AGENT},
             json={"name": "Test", "email": "test@test.com"}
         )
         assert response.status_code == 401
