@@ -35,7 +35,7 @@ class TestCreatorSeriesAPI:
             headers=HEADERS
         )
         assert response.status_code == 200, f"Login failed: {response.text}"
-        return response.json().get("access_token")
+        return response.json().get("token")
     
     @pytest.fixture(scope="class")
     def auth_headers(self, admin_token):
@@ -144,7 +144,7 @@ class TestSuperCreatorStatus:
             headers=HEADERS
         )
         assert response.status_code == 200
-        return response.json().get("access_token")
+        return response.json().get("token")
     
     @pytest.fixture(scope="class")
     def auth_headers(self, admin_token):
