@@ -705,6 +705,103 @@ export default function SuperCreatorDashboard() {
             </div>
           </TabsContent>
 
+          {/* Content Tab */}
+          <TabsContent value="content" className="space-y-4">
+            {/* Header with Create Button */}
+            <div className="flex justify-between items-center">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Film className="w-5 h-5 text-purple-400" />
+                Content Management
+              </h3>
+              <Button onClick={() => { resetContentForm(); setShowCreateContent(true); }} data-testid="create-content-btn">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Series
+              </Button>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card className="p-4 hover:bg-white/5 cursor-pointer transition-colors" onClick={() => { resetContentForm(); setShowCreateContent(true); }}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center">
+                    <Upload className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Create My Content</h4>
+                    <p className="text-sm text-muted-foreground">Add a new series to your own profile</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 hover:bg-white/5 cursor-pointer transition-colors" onClick={() => setActiveTab("creators")}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+                    <Users className="w-6 h-6 text-blue-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold">Create for Sub-Creator</h4>
+                    <p className="text-sm text-muted-foreground">Select a sub-creator and add content for them</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+
+            {/* My Series List */}
+            <Card className="p-4">
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Film className="w-4 h-4 text-purple-400" />
+                My Series ({seriesList.length})
+              </h4>
+              <div className="space-y-3">
+                {seriesList.map(series => (
+                  <div key={series.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-16 h-10 rounded bg-gray-700 overflow-hidden flex-shrink-0">
+                        {series.thumbnail_url ? (
+                          <img src={series.thumbnail_url} alt={series.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Image className="w-6 h-6 text-gray-500" />
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        <p className="font-medium">{series.title}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {series.genre} • {series.total_episodes || 0} episodes
+                          {series.attributed_name && (
+                            <span className="ml-2 text-blue-400">• For: {series.attributed_name}</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        series.status === 'published' ? 'bg-green-500/20 text-green-400' :
+                        series.status === 'draft' ? 'bg-yellow-500/20 text-yellow-400' :
+                        'bg-gray-500/20 text-gray-400'
+                      }`}>
+                        {series.status || 'Draft'}
+                      </span>
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/creator/series/${series.id}`)}>
+                        <Edit className="w-4 h-4 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+                {seriesList.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Film className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>No series created yet</p>
+                    <Button variant="link" onClick={() => { resetContentForm(); setShowCreateContent(true); }}>
+                      Create your first series
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </TabsContent>
+
           {/* Earnings Tab */}
           <TabsContent value="earnings" className="space-y-4">
             {/* Period Selector */}
