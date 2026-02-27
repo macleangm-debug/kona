@@ -108,10 +108,15 @@ export const ContractManager = ({ token }) => {
         ...prev,
         platform_name: res.data.name || prev.platform_name,
         platform_email: res.data.email || prev.platform_email,
+        platform_address: res.data.address || prev.platform_address,
         platform_company: res.data.company_name || prev.platform_company,
+        platform_provider_name: res.data.platform_provider?.name || prev.platform_provider_name,
+        platform_provider_role: res.data.platform_provider?.role || prev.platform_provider_role,
         platform_fee: res.data.default_revenue_terms?.platform_fee_percent || prev.platform_fee,
         creator_share: res.data.default_revenue_terms?.creator_share_percent || prev.creator_share,
-        platform_share: res.data.default_revenue_terms?.platform_share_percent || prev.platform_share
+        platform_share: res.data.default_revenue_terms?.platform_share_percent || prev.platform_share,
+        min_payout: res.data.default_revenue_terms?.minimum_payout_threshold || prev.min_payout,
+        currency: res.data.default_revenue_terms?.currency || prev.currency
       }));
     } catch (e) {
       console.error("Error fetching defaults:", e);
