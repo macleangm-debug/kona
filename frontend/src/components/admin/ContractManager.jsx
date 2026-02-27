@@ -62,6 +62,12 @@ export const ContractManager = ({ token }) => {
     exclusivity_scope: "none",
     content_ownership: "creator",
     termination_notice: 30,
+    // Territory & Super Creator
+    territory: "",
+    territory_exclusive: false,
+    is_super_creator: false,
+    can_manage_creators: false,
+    sub_creator_commission: 10,
     // Tax terms
     vat_handling: "creator_responsible",
     withholding_percent: 0,
