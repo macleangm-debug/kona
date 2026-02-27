@@ -43,11 +43,14 @@ export const ContractManager = ({ token }) => {
     creator_tax_id: "",
     creator_company: "",
     // Platform details (loaded from defaults)
-    platform_name: "Kona Streaming Platform",
-    platform_email: "partnerships@kona.com",
-    platform_address: "",
+    platform_name: "Dar24 Media Limited",
+    platform_email: "partnerships@dar24media.com",
+    platform_address: "Dar es Salaam, Tanzania",
     platform_tax_id: "",
-    platform_company: "Kona Media Inc.",
+    platform_company: "Dar24 Media Limited",
+    // Platform provider (technology partner)
+    platform_provider_name: "Kona Streaming Services",
+    platform_provider_role: "Technology Platform Provider",
     // Revenue terms
     platform_fee: 25,
     creator_share: 60,
