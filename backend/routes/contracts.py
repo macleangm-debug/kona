@@ -246,6 +246,151 @@ async def delete_contract(
     
     return {"success": True, "message": "Contract deleted"}
 
+@router.put("/{contract_id}")
+async def update_contract(
+    contract_id: str,
+    request: UpdateContractRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Update contract details with version tracking"""
+    
+    if current_user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Only admins can update contracts")
+    
+    # Get existing contract
+    contract = await db.contracts.find_one({"id": contract_id}, {"_id": 0})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    # Store previous version in amendments for audit trail
+    current_version = contract.get("version", 1)
+    amendment_record = {
+        "version": current_version,
+        "amended_at": datetime.now(timezone.utc).isoformat(),
+        "amended_by": current_user["id"],
+        "previous_values": {}
+    }
+    
+    # Build update data
+    update_data = {
+        "version": current_version + 1,
+        "last_modified_at": datetime.now(timezone.utc).isoformat(),
+        "last_modified_by": current_user["id"]
+    }
+    
+    # Update each section if provided
+    if request.creator:
+        amendment_record["previous_values"]["creator"] = contract.get("creator")
+        update_data["creator"] = request.creator.dict()
+    
+    if request.platform:
+        amendment_record["previous_values"]["platform"] = contract.get("platform")
+        update_data["platform"] = request.platform.dict()
+    
+    if request.platform_provider:
+        amendment_record["previous_values"]["platform_provider"] = contract.get("platform_provider")
+        update_data["platform_provider"] = request.platform_provider.dict()
+    
+    if request.revenue_terms:
+        amendment_record["previous_values"]["revenue_terms"] = contract.get("revenue_terms")
+        update_data["revenue_terms"] = request.revenue_terms.dict()
+    
+    if request.contract_terms:
+        amendment_record["previous_values"]["contract_terms"] = contract.get("contract_terms")
+        update_data["contract_terms"] = request.contract_terms.dict()
+        
+        # Recalculate expiry date if duration changed
+        if request.contract_terms.duration_months:
+            effective_date = datetime.fromisoformat(contract.get("effective_date", datetime.now(timezone.utc).isoformat()).replace('Z', '+00:00'))
+            new_expiry = effective_date + timedelta(days=request.contract_terms.duration_months * 30)
+            update_data["expiry_date"] = new_expiry.isoformat()
+    
+    if request.tax_terms:
+        amendment_record["previous_values"]["tax_terms"] = contract.get("tax_terms")
+        update_data["tax_terms"] = request.tax_terms.dict()
+    
+    if request.additional_clauses is not None:
+        amendment_record["previous_values"]["additional_clauses"] = contract.get("additional_clauses")
+        update_data["additional_clauses"] = request.additional_clauses
+    
+    if request.notes is not None:
+        amendment_record["previous_values"]["notes"] = contract.get("notes")
+        update_data["notes"] = request.notes
+    
+    # Add amendment to history if there were actual changes
+    if amendment_record["previous_values"]:
+        amendments = contract.get("amendments", [])
+        amendments.append(amendment_record)
+        update_data["amendments"] = amendments
+    
+    # Perform update
+    result = await db.contracts.update_one(
+        {"id": contract_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    # Get updated contract
+    updated_contract = await db.contracts.find_one({"id": contract_id}, {"_id": 0})
+    
+    return {
+        "success": True,
+        "message": f"Contract updated to version {current_version + 1}",
+        "contract": updated_contract
+    }
+
+@router.post("/{contract_id}/activate")
+async def activate_contract(
+    contract_id: str,
+    request: ActivateContractRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Activate a signed contract with a specific start date"""
+    
+    if current_user.get("role") not in ["admin", "superadmin"]:
+        raise HTTPException(status_code=403, detail="Only admins can activate contracts")
+    
+    contract = await db.contracts.find_one({"id": contract_id}, {"_id": 0})
+    if not contract:
+        raise HTTPException(status_code=404, detail="Contract not found")
+    
+    if contract.get("status") != "signed":
+        raise HTTPException(status_code=400, detail="Only signed contracts can be activated")
+    
+    # Parse start date and calculate new expiry
+    try:
+        start_date = datetime.fromisoformat(request.start_date.replace('Z', '+00:00'))
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format. Use ISO format (YYYY-MM-DD)")
+    
+    duration_months = contract.get("contract_terms", {}).get("duration_months", 12)
+    expiry_date = start_date + timedelta(days=duration_months * 30)
+    
+    update_data = {
+        "status": "active",
+        "effective_date": start_date.isoformat(),
+        "expiry_date": expiry_date.isoformat(),
+        "activated_at": datetime.now(timezone.utc).isoformat(),
+        "activated_by": current_user["id"]
+    }
+    
+    if request.notes:
+        update_data["activation_notes"] = request.notes
+    
+    await db.contracts.update_one(
+        {"id": contract_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "success": True,
+        "message": f"Contract activated starting {request.start_date}",
+        "effective_date": start_date.isoformat(),
+        "expiry_date": expiry_date.isoformat()
+    }
+
 @router.get("/{contract_id}/html")
 async def get_contract_html(
     contract_id: str,
