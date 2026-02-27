@@ -924,12 +924,20 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   useEffect(() => {
     let timer;
     if (showControls) {
-      timer = setTimeout(() => setShowControls(false), 4000);
+      timer = setTimeout(() => {
+        setShowControls(false);
+        // Show gesture hint once when controls first hide during playback
+        if (!gestureHintShown.current && isPlaying) {
+          gestureHintShown.current = true;
+          setShowGestureHint(true);
+          setTimeout(() => setShowGestureHint(false), 3000);
+        }
+      }, 4000);
     }
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [showControls]);
+  }, [showControls, isPlaying]);
 
   useEffect(() => {
     const fetchData = async () => {
