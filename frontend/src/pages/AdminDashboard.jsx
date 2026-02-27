@@ -3500,6 +3500,11 @@ export const AdminDashboard = () => {
           <AdsApprovalTab token={token} />
         )}
 
+        {/* Creator Contracts Tab */}
+        {activeTab === "contracts" && (
+          <ContractManager token={token} />
+        )}
+
         {/* HR Job Applications Tab */}
         {activeTab === "hr-applications" && (
           <JobApplicationsModule token={token} />
