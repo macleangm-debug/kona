@@ -1069,6 +1069,37 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Sub-Creator commission table in contract
 
 
+### Session 16 Part 6 (2026-02-27) - Negotiable Sub-Creator Terms
+
+1. **Negotiable Terms Toggle (COMPLETED)**
+   - Added toggle: "Allow negotiable sub-creator terms"
+   - When ON: Super Creator can negotiate individual revenue splits with sub-creators
+   - When OFF: Standard platform terms apply to all sub-creators
+
+2. **Contract Clause Updates (COMPLETED)**
+   - **When Negotiable (ON):**
+     - Section 7.7: "Negotiable Sub-Creator Terms" clause
+     - Platform fee (25%) always deducted first - non-negotiable
+     - Minimum Super Creator commission: 5% (floor)
+     - Requires written agreements with all sub-creators
+     - Must provide copies to Platform upon request
+     - Must comply with local labor/contract laws
+     - Section 7.8: Platform provides template agreement
+   - **When Standard (OFF):**
+     - Section 7.7: "Standard Sub-Creator Terms" clause
+     - Super Creator cannot negotiate individual terms without Platform approval
+
+3. **Revenue Table Updates (COMPLETED)**
+   - When negotiable: Shows "(minimum)" and "(maximum)" labels
+   - Commission labeled as "minimum" not fixed
+   - Sub-Creator share labeled as "maximum" not fixed
+
+**Testing Status:** Manually verified via API
+- ✅ Contract with negotiable=true: KON-202602-AA76B6
+- ✅ HTML includes "Negotiable Sub-Creator Terms" clause
+- ✅ Minimum commission and template clauses present
+
+
 ## Upcoming Features (P1)
 
 1. **PDF Export for Contracts**
