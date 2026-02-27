@@ -984,10 +984,9 @@ REACT_APP_BACKEND_URL=<backend-url>
 
 ## Upcoming Features (P1)
 
-1. **Admin Dashboard Refactoring**
-   - Break down large monolithic AdminDashboard.jsx into smaller components
-   - Implement lazy loading for tab content
-   - Improve initial load performance
+1. **PDF Export for Contracts**
+   - Add direct PDF generation using a library like jsPDF or server-side PDF generation
+   - Currently uses browser print-to-PDF as workaround
 
 
 ## Future/Backlog (P2-P3)
