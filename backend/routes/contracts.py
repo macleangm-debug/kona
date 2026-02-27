@@ -329,7 +329,7 @@ def generate_contract_html(contract: dict) -> str:
         <p><span class="clause-number">7.8</span> <strong>Sub-Creator Agreement Template:</strong> The Platform shall provide a template agreement for sub-creators. Super Creator may modify terms within the parameters specified above.</p>
             """
         else:
-            negotiable_clause = f"""
+            negotiable_clause = """
         <p><span class="clause-number">7.7</span> <strong>Standard Sub-Creator Terms:</strong> All sub-creators recruited by Super Creator shall be subject to the Platform's standard revenue sharing terms. Super Creator is not authorized to negotiate individual terms with sub-creators without prior written approval from the Platform.</p>
             """
         
