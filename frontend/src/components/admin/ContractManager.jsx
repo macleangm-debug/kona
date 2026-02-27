@@ -162,7 +162,12 @@ export const ContractManager = ({ token }) => {
           exclusivity: form.exclusivity,
           exclusivity_scope: form.exclusivity_scope,
           content_ownership: form.content_ownership,
-          termination_notice_days: form.termination_notice
+          termination_notice_days: form.termination_notice,
+          territory: form.territory || null,
+          territory_exclusive: form.territory_exclusive,
+          is_super_creator: form.is_super_creator,
+          can_manage_creators: form.can_manage_creators,
+          sub_creator_commission_percent: form.sub_creator_commission
         },
         tax_terms: {
           vat_handling: form.vat_handling,
