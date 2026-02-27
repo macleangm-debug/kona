@@ -778,7 +778,30 @@ export const ContractManager = ({ token }) => {
                           max={50}
                         />
                         <p className="text-xs text-muted-foreground mt-1">
-                          Super Creator earns this % from sub-creators' net revenue
+                          {form.sub_creator_negotiable_terms 
+                            ? "Minimum % Super Creator earns from sub-creators' net revenue"
+                            : "Fixed % Super Creator earns from sub-creators' net revenue"
+                          }
+                        </p>
+                      </div>
+                    )}
+
+                    {form.can_manage_creators && (
+                      <div className="mt-3 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={form.sub_creator_negotiable_terms}
+                            onChange={(e) => setForm({...form, sub_creator_negotiable_terms: e.target.checked})}
+                            className="w-4 h-4"
+                          />
+                          <span className="font-medium">Allow negotiable sub-creator terms</span>
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-2 ml-6">
+                          {form.sub_creator_negotiable_terms 
+                            ? "Super Creator CAN negotiate individual revenue splits with each sub-creator (subject to minimum commission and platform fee)"
+                            : "Super Creator must use standard platform terms for all sub-creators"
+                          }
                         </p>
                       </div>
                     )}
