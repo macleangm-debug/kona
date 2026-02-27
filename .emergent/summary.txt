@@ -1,76 +1,66 @@
 <analysis>**original_problem_statement:**
-The user's high-level goal is to review, fix, and enhance a video streaming application (). The initial focus was on improving creator workflows and fixing critical bugs. The scope has now expanded to add a comprehensive suite of new features to the Creator Portal and Admin Portal to enhance creator engagement, monetization, and UI/UX.
+The user's core objective is to build out a sophisticated video streaming application named . The initial focus has shifted from bug fixes to implementing advanced creator monetization and management tools. The current work involves creating a highly configurable contract management system within the Super Admin portal. This system needs to handle complex scenarios, including designating Super Creators with exclusive territorial rights, defining specific revenue-sharing models, and accommodating different legal entities and currencies. The latest request is to enable the downloading of these generated contracts in PDF and Word document formats.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Fix Critical Bugs:** Resolve UI lag, data consistency bugs, and improve UI/UX. (Largely completed).
-2.  **Creator Portal Enhancements (Completed):**
-    *   Real-time Earnings Dashboard
-    *   Episode Scheduler
-    *   Creator Milestones & Badges
-    *   Series Trailer Creator
-    *   Merchandise Integration
-    *   Sponsorship Marketplace
-    *   AI Thumbnail Generator (with multi-provider resilience)
-    *   Fan Polls & Q&A
-    *   Tip Jar / Super Coins (Dashboard only)
-3.  **UI/UX Improvements (Completed):**
-    *   Refactor Creator and Admin portal sidebars into collapsible, grouped menus for better navigation.
-4.  **Current & Upcoming Features (User's Next Priority):**
-    *   **Exclusive Early Access:** Allow creators to grant early access to episodes for premium subscribers.
-    *   **Video Player Tip Integration:** Integrate the Tip Jar functionality directly into the video player UI.
-    *   **Tip Goal:** Allow creators to set and display a public goal for tips.
+1.  **Integrated Creator Workflow:** Streamline the content creation process by integrating tools like thumbnail and trailer generation directly into the episode management interface. (Completed)
+2.  **Advanced Contract Management System:**
+    *   Build a UI in the Admin Portal to generate dynamic contracts.
+    *   Support standard creators and Super Creators.
+    *   Allow configuration of exclusive territories (e.g., United Republic of Tanzania).
+    *   Define custom revenue splits (e.g., 60% creator / 40% company) after a platform fee.
+    *   Allow the contracting party to be specified (e.g., Dar24 Media Limited) with Kona as the platform provider.
+    *   Support local currencies (e.g., Tanzanian Shilling - TZS).
+    *   Provide toggles for optional clauses, such as allowing Super Creators to negotiate terms with their sub-creators.
+3.  **Contract Export:** Allow generated contracts to be downloaded in PDF and Word (.docx) formats. (In Progress)
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack video streaming platform (React/FastAPI/MongoDB). In this session, the agent successfully built the frontend for six new creator features (Merchandise, Sponsorships, Trailers, AI Thumbnails, Fan Polls, Tip Jar Dashboard), fully completing the user's previous requests.
-
-A major UI/UX improvement was also implemented by refactoring the lengthy sidebars in both the Creator and Admin portals into a standardized, collapsible, multi-group layout. The agent has just begun implementing the backend for the next set of features: Exclusive Early Access and Tip Goals. The Pydantic models and a new routes file have been created.
+The application is a full-stack video streaming platform (React/FastAPI/MongoDB). A comprehensive and dynamic contract management system has been successfully implemented in the Admin Portal. This system can generate detailed contracts tailored for both regular creators and Super Creators, incorporating specific terms for revenue splits, exclusive territories, and contracting parties as requested by the user. The agent has just begun implementing the final piece of this feature: allowing admins to download the generated contracts as PDF and Word files. The necessary backend libraries ( and ) have been installed.
 
 **Last working item**:
-- **Last item agent was working:** Implementing the backend for Exclusive Early Access and Tip Goals. The agent created the Pydantic models in  and a new, empty router file at .
+- **Last item agent was working:** Implementing PDF and Word document download functionality for the contracts. The agent had just installed the required Python libraries and was in the process of adding the backend endpoints and updating the frontend UI.
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** both. The task requires creating new backend endpoints and significant frontend integration into the video player page.
+- **Which testing method agent to use?** both. Backend API endpoints for file conversion need to be tested for success and correct format generation. The frontend needs to be tested to ensure the download buttons trigger the downloads correctly.
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   There are no known outstanding bugs. The current focus is on new feature development.
+*   There are no known outstanding bugs or issues.
 
 **In progress Task List**:
--   **Task 1: Implement Early Access, Tip Goals, and Video Player Tipping (P0)**
-    -   **Where to resume:** Continue building the backend in . Complete the API endpoints for creating/managing Early Access rules and Tip Goals. Then, register the new router in . After the backend is done, modify the frontend video player page () to integrate the  and add logic to check for early access rules before allowing playback.
-    -   **What will be achieved with this?** Creators will gain new monetization and engagement tools (Early Access, Tip Goals), and viewers will be able to tip directly while watching videos.
+-   **Task 1: Complete PDF and Word Contract Downloads (P0)**
+    -   **Where to resume:** Resume by implementing the file conversion logic in the backend router  for the new PDF and Word download endpoints. Subsequently, update the frontend component  to add the download buttons and the corresponding API calls.
+    -   **What will be achieved with this?** Admins will be able to export the dynamically generated contracts into standard, shareable document formats (PDF and .docx) for legal and record-keeping purposes.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** Both.
     -   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
+*   **Upcoming Tasks:**
+    *   **Super Creator Dashboard (P1):** Based on the creation of the Super Creator role, the next logical step is to build a dedicated dashboard for these users to manage sub-creators within their territory.
 *   **Future Tasks:**
-    *   Refactor  and  main content rendering to be more modular (e.g., lazy loading).
-    *   Implement an Analytics Export feature.
-    *   Add social sharing features for content.
-    *   Deploy the application to production.
+    *   Refactor  and  to lazy-load tab components for better performance.
+    *   Implement a system-wide Analytics Export feature.
+    *   Add social sharing capabilities for video content.
+    *   Prepare and execute the deployment of the application to a production environment.
 
 **Completed work in this session**
-- **Feature: Session 2 Creator Features (Frontend)**:
-  - Created and integrated frontend components (, ) and integrated the existing  into the .
-- **Feature: AI Thumbnail Generator**:
-  - Implemented a resilient backend service in  using  (Gemini primary, OpenAI fallback).
-  - Created  component and tab.
-  - Added a Quick Generate Thumbnail button to .
-- **Feature: Fan Polls & Q&A**:
-  - Implemented backend () and frontend (). Integrated into Creator Portal.
-- **Feature: Tip Jar / Super Coins (Creator Dashboard)**:
-  - Implemented backend () and a  for creators to track tips.
-- **UI/UX Refactor: Collapsible Sidebars**:
-  - Re-architected the navigation in  and  into a standardized, collapsible, grouped sidebar to handle the growing number of menu items.
-- **Bug Fixes**:
-  - Resolved an authorization bug where admins could not create polls.
-  - The testing agent resolved a critical React hooks order bug in .
+- **Feature: Integrated Creator Workflow:**
+  - Added Create Short and Generate Thumbnail quick-action buttons directly to episode cards on the , streamlining the creator process.
+  - Implemented the backend logic and routes () to support the creation of short video clips.
+- **Feature: Comprehensive Contract Management System:**
+  - Created the full stack for contract management, including backend models, routes (), and a frontend UI ().
+  - Implemented a dynamic HTML generator for contracts based on form inputs.
+- **Feature: Super Creator & Custom Contract Terms:**
+  - Enhanced the contract system to support a Super Creator role with clauses for exclusive territories and negotiable sub-creator terms.
+  - Customized the contract template to specify Dar24 Media Limited as the company and Kona as the platform provider, and added support for local currencies like TZS.
+- **Bug Fixes:**
+  - The testing agent found and fixed a critical JavaScript temporal dead zone error that was crashing the .
+  - Resolved several backend bugs in the  router related to async database operations and incorrect dependency injections.
 
 **Earlier issues found/mentioned but not fixed**
-*   None. The previously recurring session fragility issue in the Creator Portal was resolved by the testing agent in this session.
+*   None.
 
 **Known issue recurrence from previous fork**
 *   None.
@@ -79,69 +69,59 @@ A major UI/UX improvement was also implemented by refactoring the lengthy sideba
 
 
 **Key Technical Concepts**
-*   **Multi-provider LLM Integration:** Utilized  library to create a resilient AI service with a primary (Gemini) and fallback (OpenAI) provider for thumbnail generation, managed via the .
-*   **Collapsible UI Pattern:** Implemented a standardized, reusable collapsible sidebar group pattern in React to improve UX and scalability of navigation in both the Creator and Admin portals.
-*   **Component-Driven Architecture:** Continued to build out the application by creating discrete, single-purpose React components for each new feature, which are then composed into the main portal pages.
+*   **Dynamic Document Generation:** Using backend logic to create complex, data-driven HTML documents (contracts) from a base template and user-provided parameters.
+*   **Server-Side File Conversion:** Leveraging Python libraries (, ) to convert HTML into standard document formats like PDF and DOCX on the fly.
+*   **Contextual UI/UX:** Improving workflows by placing actions directly where users need them (e.g., Create Short on an episode card) instead of on separate, disconnected pages.
 
 **key DB schema**
 -   ****: 
 -   ****: 
--   ****: 
--   ****: 
 
 **changes in tech stack**
-*   ****: Added and used for multi-provider LLM image generation.
+*   ****: Added for HTML to PDF conversion.
+*   ****: Added for HTML to Word (.docx) conversion.
 
 **All files of reference**
-*   : Where backend work for the current task will resume.
-*   : The main hub for creator features.
-*   : Defines the creator sidebar structure.
-*   : Defines the admin portal structure.
-*    (or similar): This will be the target for integrating the tip jar button and early access checks.
+*   : Contains the core logic for contract generation and needs to be updated with the file export functionality.
+*   : The frontend component that requires the addition of download buttons.
+*   : The host page for the contract management feature.
 
 **Areas that need refactoring**:
-*   ** & **: While navigation has been improved, the components themselves are large monolithic renderers for all tab content. They could be optimized by lazy-loading the tab components to improve initial load performance.
-*   ****: Will need significant modification to incorporate the new tipping and early access features. This is an opportunity to ensure the component remains clean and maintainable.
+*   The main dashboard components (, ) are large and could benefit from lazy-loading their child tab components to improve initial page load times. This is noted as a future task.
 
 **key api endpoints**
-*   : Generate a thumbnail from a prompt.
-*   : Apply a generated thumbnail to a series.
-*   : Create a new poll.
-*   : Send a tip for a specific episode.
-*   **Upcoming:** Endpoints for managing Tip Goals and Early Access rules in .
+*   : Create a new contract.
+*   : Retrieve all contracts.
+*   : Fetch an HTML preview of a specific contract.
+*   **Upcoming (In Progress):**
+    *   
+    *   
 
 **Critical Info for New Agent**
-*   **Top Priority:** Your main task is to complete the implementation of **Exclusive Early Access**, **Tip Goals**, and **Video Player Tip Integration**. Resume by building the backend API endpoints in .
-*   **UI Pattern:** The standard for side navigation is now the collapsible group pattern implemented in  and . Adhere to this for any future UI additions.
-*   **Frontend Integration:** The most critical frontend work will be on the video player page ( or equivalent) to integrate the  and the early access logic.
+*   **Top Priority:** Your immediate task is to complete the implementation of the contract download feature. This involves writing the file conversion logic in  and connecting it to new download buttons in the  component.
+*   **Dependencies Installed:** The necessary Python libraries ( for PDF,  for Word) are already installed in the environment. You can proceed directly to implementation.
+*   **Contract Complexity:** The contract generation logic is highly conditional. Be mindful of the various boolean flags in the model and UI, as they dictate the final content of the exported documents.
 
 **documents and test reports created in this job**
-*   
-*   
-*   
-*    (updated multiple times)
+*    (updated consistently)
+*    (latest test report)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asks for the web URL. - **Status:** RESOLVED.
-2.  **User:** Reports the side menu is too long and asks for it to be grouped. - **Status:** RESOLVED.
-3.  **User:** Approves implementing the grouped sidebar (Option A) and applying it to the Admin Portal as well. - **Status:** RESOLVED.
-4.  **User:** Receives the update that the sidebar grouping is complete and asks for the next steps. - **Status:** RESOLVED.
-5.  **User:** Approves the plan to implement Fan Polls & Q&A. - **Status:** RESOLVED.
-6.  **User:** Receives the update that Fan Polls are complete and asks for the next steps. - **Status:** RESOLVED.
-7.  **User:** Approves the plan to implement the Tip Jar / Super Coins feature. - **Status:** RESOLVED.
-8.  **User:** Receives the update that the Tip Jar dashboard is complete. - **Status:** RESOLVED.
-9.  **User:** Requests three new features to be implemented next. - **Status:** IN PROGRESS.
-    - Exclusive Early Access
-    - Video Player Tip Integration
-    - Add tip goal as well
+1.  **User:** Asks for contract changes: exclusive contract, super creator role for Tanzania. - **Status:** RESOLVED.
+2.  **User:** Confirms choices for contract implementation. - **Status:** RESOLVED.
+3.  **User:** Asks for advice on handling local taxes (VAT). - **Status:** RESOLVED.
+4.  **User:** Approves the plan to implement the contract system. - **Status:** RESOLVED.
+5.  **User:** Asks for configurable terms for Super Creators to negotiate with sub-creators. - **Status:** RESOLVED.
+6.  **User:** Requests more changes: hide sub-creator distribution, use local currency (TZS), simplify revenue display (60/40 of net), and set Dar24 Media Limited as the contracting party with Kona as the platform provider. - **Status:** RESOLVED.
+7.  **User:** Requests downloadable formats (PDF and Word) for the contracts. - **Status:** IN PROGRESS.
+8.  **User:** Asks for Super Admin credentials and URL. - **Status:** RESOLVED.
+9.  **User:** Provides specific details for contract changes (Dar24 Media, Tanzania, currency, etc.). - **Status:** RESOLVED.
+10. **User:** Approves the implementation plan for downloadable formats. - **Status:** RESOLVED.
 
 **Project Health Check:**
-*   **Needs Attention:**
-    *   The video player page ( or similar) is now a critical integration point for new features (tipping, access control). It must be modified carefully.
-*   **Needs Refactoring:**
-    *    and  are functionally sound but could be performance-optimized by lazy-loading their child tab components.
-*   **Mocked:**
-    *   None.
+*   **Needs Attention:** The new contract download feature must be completed and tested thoroughly.
+*   **Healthy:** The application is stable, and recently added features have passed all automated tests. The codebase is organized and follows consistent patterns.
+*   **Mocked:** None.
 
 **3rd Party Integrations**
 *   **Bunny.net:** Video hosting, streaming (HLS), and CDN.
@@ -149,17 +129,19 @@ A major UI/UX improvement was also implemented by refactoring the lengthy sideba
 *   **hls.js:** Frontend library for HLS playback.
 *   **react-confetti:** Frontend library for celebration animations.
 *   **emergentintegrations:** Used for multi-provider LLM access (, ) via the .
+*   **weasyprint:** (New) Python library for HTML to PDF conversion.
+*   **pypandoc:** (New) Python library for HTML to Word (.docx) conversion.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES (Used successfully multiple times to test new features and fix bugs).
+- **Testing agent used after significant changes:** YES, successfully caught and fixed critical frontend and backend issues.
 - **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** []
-- **Known regressions:** None. A recurring session loading issue was fixed in this session.
+- **Test files created:** None.
+- **Known regressions:** None.
 
 **Credentials to test flow:**
-*   **Creator/Admin:**
+*   **Super Admin:**
     *   **Email:** 
     *   **Password:** 
 
 **What agent forgot to execute**
-*   Nothing was forgotten. The agent was actively working on the user's latest request when the session ended, having correctly started the backend implementation for the new features.</analysis>
+*   Nothing was forgotten. The agent was actively implementing the user's latest request for downloadable contracts when the session concluded.</analysis>

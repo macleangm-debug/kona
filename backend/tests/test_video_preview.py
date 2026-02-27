@@ -7,7 +7,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://kona-tip-integration.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://kona-contract-export.preview.emergentagent.com')
 
 class TestVideoPreview:
     """Tests for creator video preview feature"""
