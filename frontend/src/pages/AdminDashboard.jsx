@@ -29,7 +29,7 @@ import { ABTestingManager } from "@/components/admin/ABTestingManager";
 import SupportTicketsModule from "@/components/admin/SupportTicketsModule";
 import JobApplicationsModule from "@/components/admin/JobApplicationsModule";
 import PressArticlesModule from "@/components/admin/PressArticlesModule";
-import ThumbnailTestingTab from "@/components/admin/NotificationsManagementTab";
+import NotificationsManagementTab from "@/components/admin/NotificationsManagementTab";
 import ThumbnailTestingTab from "@/components/admin/ThumbnailTestingTab";
 import { ContractManager } from "@/components/admin/ContractManager";
 import { API } from "@/config";
