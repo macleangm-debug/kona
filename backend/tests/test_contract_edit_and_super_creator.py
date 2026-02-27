@@ -587,6 +587,7 @@ class TestSuperCreatorInvite:
         """Test that invite endpoint requires authentication"""
         response = requests.post(
             f"{BASE_URL}/api/super-creator/invite",
+            headers={"User-Agent": TEST_USER_AGENT},
             json={"name": "Test", "email": "test@test.com", "commission_percent": 10}
         )
         assert response.status_code == 401
