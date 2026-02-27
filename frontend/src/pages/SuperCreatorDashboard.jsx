@@ -1035,6 +1035,101 @@ export default function SuperCreatorDashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Create Content Dialog */}
+      <Dialog open={showCreateContent} onOpenChange={setShowCreateContent}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Film className="w-5 h-5 text-purple-400" />
+              Create New Series
+            </DialogTitle>
+            <DialogDescription>
+              {contentForm.creator_id 
+                ? `Creating content for ${contentForm.creator_name}. Revenue will be credited to their account.`
+                : "Create a new series for your profile"
+              }
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {contentForm.creator_id && (
+              <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                <p className="text-sm text-blue-400 flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Creating for: <strong>{contentForm.creator_name}</strong>
+                </p>
+              </div>
+            )}
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Series Title *</label>
+              <Input
+                value={contentForm.title}
+                onChange={(e) => setContentForm({...contentForm, title: e.target.value})}
+                placeholder="Enter series title"
+                data-testid="content-title"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Description *</label>
+              <textarea
+                className="w-full px-3 py-2 bg-background border rounded-md text-sm resize-none h-20"
+                value={contentForm.description}
+                onChange={(e) => setContentForm({...contentForm, description: e.target.value})}
+                placeholder="Describe your series..."
+                data-testid="content-description"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Genre</label>
+              <select
+                className="w-full px-3 py-2 bg-background border rounded-md text-sm"
+                value={contentForm.genre}
+                onChange={(e) => setContentForm({...contentForm, genre: e.target.value})}
+                data-testid="content-genre"
+              >
+                {GENRE_OPTIONS.map(genre => (
+                  <option key={genre} value={genre}>{genre}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Thumbnail URL (Optional)</label>
+              <Input
+                value={contentForm.thumbnail_url}
+                onChange={(e) => setContentForm({...contentForm, thumbnail_url: e.target.value})}
+                placeholder="https://example.com/thumbnail.jpg"
+                data-testid="content-thumbnail"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1" onClick={() => setShowCreateContent(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="flex-1" 
+              onClick={handleCreateContent} 
+              disabled={creatingContent}
+              data-testid="confirm-create-content"
+            >
+              {creatingContent ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Series
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
