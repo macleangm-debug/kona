@@ -127,6 +127,18 @@ export default function SuperCreatorDashboard() {
     }
   }, [token, earningsPeriod]);
 
+  // Fetch series (own content)
+  const fetchSeries = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/creator/series`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSeriesList(res.data.series || []);
+    } catch (e) {
+      console.error("Series fetch failed:", e);
+    }
+  }, [token]);
+
   useEffect(() => {
     if (!token) {
       navigate("/creator/login");
@@ -137,10 +149,10 @@ export default function SuperCreatorDashboard() {
 
   useEffect(() => {
     if (status?.is_super_creator) {
-      Promise.all([fetchDashboard(), fetchSubCreators(), fetchEarnings()])
+      Promise.all([fetchDashboard(), fetchSubCreators(), fetchEarnings(), fetchSeries()])
         .finally(() => setLoading(false));
     }
-  }, [status, fetchDashboard, fetchSubCreators, fetchEarnings]);
+  }, [status, fetchDashboard, fetchSubCreators, fetchEarnings, fetchSeries]);
 
   useEffect(() => {
     if (status?.is_super_creator) {
