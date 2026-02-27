@@ -381,6 +381,12 @@ export const ContractManager = ({ token }) => {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h4 className="font-semibold">{contract.creator?.name}</h4>
+                      {contract.contract_terms?.is_super_creator && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-400 flex items-center gap-1">
+                          <Crown className="w-3 h-3" />
+                          Super Creator
+                        </span>
+                      )}
                       <span className={`text-xs px-2 py-0.5 rounded-full ${statusConfig.color} flex items-center gap-1`}>
                         <StatusIcon className="w-3 h-3" />
                         {statusConfig.label}
@@ -389,6 +395,12 @@ export const ContractManager = ({ token }) => {
                         {contract.contract_number}
                       </span>
                     </div>
+                    {contract.contract_terms?.territory && (
+                      <p className="text-sm text-purple-400 mb-2">
+                        Territory: {contract.contract_terms.territory}
+                        {contract.contract_terms.territory_exclusive && " (Exclusive)"}
+                      </p>
+                    )}
                     <div className="grid grid-cols-4 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Creator Share</p>
