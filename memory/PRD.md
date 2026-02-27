@@ -1028,6 +1028,47 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Contract HTML generation complete
 
 
+### Session 16 Part 5 (2026-02-27) - Super Creator & Territory Contracts
+
+1. **Territory Exclusivity (COMPLETED)**
+   - Added territory field for geographic exclusivity
+   - Territory exclusive checkbox grants sole rights
+   - Contract title changes to "Super Creator Territory Partnership Agreement"
+   - Territory displayed prominently in contract header and party section
+
+2. **Super Creator Role (COMPLETED)**
+   - Designate creators as "Super Creator" with enhanced privileges
+   - Can recruit, onboard, and manage other creators in territory
+   - Sub-Creator Commission: Configurable % (default 10%) of sub-creators' net revenue
+   - Detailed Section 7 in contract with:
+     - Sub-Creator Management rights
+     - Commission calculation and revenue split table
+     - Quality Control responsibilities
+     - Monthly reporting requirements
+
+3. **Contract Document Updates (COMPLETED)**
+   - Dynamic section numbering (adjusts for Super Creator section)
+   - Enhanced Recitals for territory partnerships
+   - Territory responsibilities clause
+   - Sub-creator relationships preserved on termination
+   - Confidentiality includes sub-creator data for Super Creators
+
+4. **Frontend Form Updates (COMPLETED)**
+   - New "Territory & Super Creator" section in Terms tab
+   - Territory input field
+   - Territory exclusive checkbox
+   - Super Creator designation toggle
+   - Sub-Creator management toggle
+   - Commission percentage slider (0-50%)
+   - Contract list shows Super Creator badge and territory
+
+**Testing Status:** Manually verified via API
+- ✅ Super Creator contract created: KON-202602-6E6488
+- ✅ Territory: United Republic of Tanzania (Exclusive)
+- ✅ HTML generation includes all Super Creator sections
+- ✅ Sub-Creator commission table in contract
+
+
 ## Upcoming Features (P1)
 
 1. **PDF Export for Contracts**
