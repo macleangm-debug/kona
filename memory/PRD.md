@@ -1139,11 +1139,45 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Sub-creator table hidden when toggle is OFF
 
 
+### Session 16 Part 8 (2026-02-27) - Contract PDF & Word Export
+
+1. **PDF Export for Contracts (COMPLETED)**
+   - Added server-side PDF generation using WeasyPrint
+   - PDF button (red icon) on contract list rows
+   - PDF button in contract preview modal header
+   - Downloads valid PDF with contract number as filename
+   - **Backend:** `backend/routes/contracts.py` - `generate_pdf_from_html()` function
+   - **Endpoint:** `GET /api/contracts/{id}/export?format=pdf`
+
+2. **Word Document Export (COMPLETED)**
+   - Added DOCX generation using python-docx library
+   - Word button (blue icon) on contract list rows
+   - Word button in contract preview modal header
+   - Professional Word document with proper formatting, tables, signatures
+   - **Backend:** `backend/routes/contracts.py` - `generate_docx_from_contract()` function
+   - **Endpoint:** `GET /api/contracts/{id}/export?format=docx`
+
+3. **Frontend Download UI (COMPLETED)**
+   - Updated `frontend/src/components/admin/ContractManager.jsx`
+   - Added `handleExport()` function with PDF and Word support
+   - Uses `responseType: 'blob'` for binary file downloads
+   - Toast notifications for download success
+   - Proper data-testid attributes for automated testing
+
+**Testing Status:** Verified by testing agent
+- ✅ PDF download from contract list: PASS
+- ✅ Word download from contract list: PASS
+- ✅ PDF download from preview modal: PASS
+- ✅ Word download from preview modal: PASS
+- ✅ Backend API `/api/contracts/{id}/export?format=pdf`: PASS (35,816 bytes)
+- ✅ Backend API `/api/contracts/{id}/export?format=docx`: PASS (38,277 bytes)
+
+
 ## Upcoming Features (P1)
 
-1. **PDF Export for Contracts**
-   - Add direct PDF generation using a library like jsPDF or server-side PDF generation
-   - Currently uses browser print-to-PDF as workaround
+1. **Super Creator Dashboard**
+   - Dedicated dashboard for Super Creators to manage sub-creators in their territory
+   - Sub-creator onboarding and performance tracking
 
 
 ## Future/Backlog (P2-P3)
