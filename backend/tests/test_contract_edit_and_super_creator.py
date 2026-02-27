@@ -19,12 +19,25 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://kona-contract-export
 TEST_EMAIL = "superadmin@kona.com"
 TEST_PASSWORD = "SuperAdmin2025!"
 
+# Browser-like User-Agent to bypass bot detection
+TEST_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+
 
 @pytest.fixture(scope="module")
-def auth_token():
+def base_headers():
+    """Get base headers with User-Agent to bypass bot detection"""
+    return {
+        "User-Agent": TEST_USER_AGENT,
+        "Content-Type": "application/json"
+    }
+
+
+@pytest.fixture(scope="module")
+def auth_token(base_headers):
     """Get authentication token for admin user"""
     response = requests.post(
         f"{BASE_URL}/api/auth/login",
+        headers=base_headers,
         json={"email": TEST_EMAIL, "password": TEST_PASSWORD}
     )
     assert response.status_code == 200, f"Login failed: {response.text}"
@@ -33,10 +46,11 @@ def auth_token():
 
 @pytest.fixture(scope="module")
 def headers(auth_token):
-    """Get headers with authorization"""
+    """Get headers with authorization and User-Agent"""
     return {
         "Authorization": f"Bearer {auth_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "User-Agent": TEST_USER_AGENT
     }
 
 
