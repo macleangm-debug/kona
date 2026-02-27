@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="12" failures="3" skipped="0" tests="15" time="0.786" timestamp="2026-02-27T10:02:37.458336+00:00" hostname="agent-env-82cb7a20-56d0-4a85-b80a-62e9d3509c44"><testcase classname="backend.tests.test_contracts_api.TestContractsPlatformDefaults" name="test_get_platform_defaults_success" time="0.241"><failure message="assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code">backend/tests/test_contracts_api.py:44: in test_get_platform_defaults_success
+    assert response.status_code == 200
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsCreate" name="test_create_contract_success" time="0.120"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsCreate" name="test_create_contract_requires_auth" time="0.102"><failure message="assert 403 == 401&#10; +  where 403 = &lt;Response [403]&gt;.status_code">backend/tests/test_contracts_api.py:176: in test_create_contract_requires_auth
+    assert response.status_code == 401
+E   assert 403 == 401
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsList" name="test_list_contracts_success" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsList" name="test_list_contracts_filter_by_status" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsList" name="test_list_contracts_requires_auth" time="0.112"><failure message="assert 403 == 401&#10; +  where 403 = &lt;Response [403]&gt;.status_code">backend/tests/test_contracts_api.py:242: in test_list_contracts_requires_auth
+    assert response.status_code == 401
+E   assert 403 == 401
+E    +  where 403 = &lt;Response [403]&gt;.status_code</failure></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsHtml" name="test_get_contract_html_success" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsHtml" name="test_get_contract_html_contains_contract_data" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsHtml" name="test_get_contract_html_not_found" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsStatusUpdate" name="test_update_status_draft_to_sent" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsStatusUpdate" name="test_update_status_sent_to_signed" time="0.001"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsStatusUpdate" name="test_update_status_invalid_status" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsStatusUpdate" name="test_update_status_not_found" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsDelete" name="test_delete_draft_contract_success" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase><testcase classname="backend.tests.test_contracts_api.TestContractsDelete" name="test_delete_non_draft_contract_fails" time="0.000"><error message="failed on setup with &quot;AssertionError: Login failed: {&quot;detail&quot;:&quot;Automated requests are not allowed&quot;}&#10;assert 403 == 200&#10; +  where 403 = &lt;Response [403]&gt;.status_code&quot;">backend/tests/test_contracts_api.py:23: in auth_token
+    assert response.status_code == 200, f"Login failed: {response.text}"
+E   AssertionError: Login failed: {"detail":"Automated requests are not allowed"}
+E   assert 403 == 200
+E    +  where 403 = &lt;Response [403]&gt;.status_code</error></testcase></testsuite></testsuites>
