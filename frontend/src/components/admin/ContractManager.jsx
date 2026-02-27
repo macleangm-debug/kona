@@ -1201,11 +1201,85 @@ export const ContractManager = ({ token }) => {
           </Tabs>
 
           <div className="flex gap-2 mt-6">
-            <Button variant="outline" className="flex-1" onClick={() => setShowCreate(false)}>
+            <Button variant="outline" className="flex-1" onClick={handleCloseForm}>
               Cancel
             </Button>
-            <Button className="flex-1" onClick={handleCreate} disabled={creating}>
-              {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create Contract"}
+            <Button 
+              className="flex-1" 
+              onClick={editMode ? handleUpdate : handleCreate} 
+              disabled={creating}
+              data-testid={editMode ? "update-contract-btn" : "save-contract-btn"}
+            >
+              {creating ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : editMode ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Update Contract
+                </>
+              ) : (
+                "Create Contract"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Activate Contract Dialog */}
+      <Dialog open={showActivate} onOpenChange={setShowActivate}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Play className="w-5 h-5 text-emerald-400" />
+              Activate Contract
+            </DialogTitle>
+            <DialogDescription>
+              Set the effective start date for contract {activatingContract?.contract_number}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Contract Start Date</label>
+              <Input
+                type="date"
+                value={activateDate}
+                onChange={(e) => setActivateDate(e.target.value)}
+                className="w-full"
+                data-testid="activate-date-input"
+              />
+              <p className="text-xs text-muted-foreground">
+                Contract duration: {activatingContract?.contract_terms?.duration_months || 12} months from this date
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Activation Notes (Optional)</label>
+              <Input
+                value={activateNotes}
+                onChange={(e) => setActivateNotes(e.target.value)}
+                placeholder="e.g., Signed at Dar es Salaam office"
+                data-testid="activate-notes-input"
+              />
+            </div>
+
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+              <p className="text-sm text-emerald-400">
+                <strong>Creator:</strong> {activatingContract?.creator?.name}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                This will set the contract status to <strong>Active</strong> and start the revenue sharing agreement.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1" onClick={() => setShowActivate(false)}>
+              Cancel
+            </Button>
+            <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700" onClick={handleActivate} data-testid="confirm-activate-btn">
+              <Play className="w-4 h-4 mr-2" />
+              Activate Contract
             </Button>
           </div>
         </DialogContent>
