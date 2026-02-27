@@ -383,6 +383,8 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const [horizontalSwipeStart, setHorizontalSwipeStart] = useState(null);
   const [swipeDirection, setSwipeDirection] = useState(null); // 'left' | 'right'
   const [showSwipeFeedback, setShowSwipeFeedback] = useState(false);
+  const [showGestureHint, setShowGestureHint] = useState(false); // One-time hint for immersive controls
+  const gestureHintShown = useRef(false); // Track if hint was shown this session
   const DOUBLE_TAP_DELAY = 300; // ms
   const SWIPE_THRESHOLD = 80; // px
 
