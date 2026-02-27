@@ -33,6 +33,16 @@ export const ContractManager = ({ token }) => {
   const [creating, setCreating] = useState(false);
   const [filterStatus, setFilterStatus] = useState(null);
   const [platformDefaults, setPlatformDefaults] = useState(null);
+  
+  // Edit mode states
+  const [editMode, setEditMode] = useState(false);
+  const [editingContract, setEditingContract] = useState(null);
+  
+  // Activate modal states
+  const [showActivate, setShowActivate] = useState(false);
+  const [activatingContract, setActivatingContract] = useState(null);
+  const [activateDate, setActivateDate] = useState("");
+  const [activateNotes, setActivateNotes] = useState("");
 
   // Form state
   const [form, setForm] = useState({
