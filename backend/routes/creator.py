@@ -1149,18 +1149,24 @@ async def create_series(data: CreatorSeriesCreate, user: dict = Depends(get_curr
 
 @router.get("/series")
 async def get_my_series(user: dict = Depends(get_current_user)):
-    """Get all series by the creator"""
+    """Get all series by the creator (including series created for sub-creators)"""
     creator = await db.creators.find_one({"user_id": user["id"]}, {"_id": 0})
     
     if not creator or creator["status"] != "approved":
         raise HTTPException(status_code=403, detail="Not an approved creator")
     
+    # Get series created by this creator OR attributed series created by this super creator
     series = await db.creator_series.find(
-        {"creator_id": creator["id"]},
+        {
+            "$or": [
+                {"creator_id": creator["id"]},
+                {"super_creator_id": user["id"]}  # Series created for sub-creators
+            ]
+        },
         {"_id": 0}
     ).sort("created_at", -1).to_list(100)
     
-    return series
+    return {"series": series}
 
 
 @router.get("/series/{series_id}")
