@@ -444,6 +444,10 @@ export default function SuperCreatorDashboard() {
               <Users className="w-4 h-4 mr-2" />
               Sub-Creators
             </TabsTrigger>
+            <TabsTrigger value="content" className="data-[state=active]:bg-purple-500/20">
+              <Film className="w-4 h-4 mr-2" />
+              Content
+            </TabsTrigger>
             <TabsTrigger value="earnings" className="data-[state=active]:bg-purple-500/20">
               <DollarSign className="w-4 h-4 mr-2" />
               Earnings
