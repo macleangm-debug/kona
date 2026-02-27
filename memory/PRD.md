@@ -1235,8 +1235,31 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Contract Activate: All UI and API tests passed (100%)
 - ✅ Super Creator APIs: All 19 backend tests passed (100%)
 - ✅ Super Creator Dashboard: Page loads with proper access control
-- Double-tap left → Rewind 10s
-- Double-tap right → Forward 10s
+
+
+### Session 16 Part 11 (2026-02-27) - Super Creator Content Management
+
+1. **Super Creator Content Creation (COMPLETED)**
+   - New Content tab in Super Creator Dashboard with Film icon
+   - "Create My Content" card for creating own series
+   - "Create for Sub-Creator" button (Film icon) on each active sub-creator
+   - Content creation dialog with title, description, genre, thumbnail fields
+   - Attribution system: content created for sub-creator shows "Creating for: {name}"
+   - **Backend:** `backend/routes/creator.py` - updated `POST /api/creator/series` with `attributed_to` field
+   - **Backend Model:** `backend/models/creator.py` - added `attributed_to` and `attributed_name` to CreatorSeriesCreate
+   - **Frontend:** `frontend/src/pages/SuperCreatorDashboard.jsx` - Content tab and creation flow
+
+2. **Carousel Click Issue Investigation (NO BUG FOUND)**
+   - Investigated user-reported carousel click issue
+   - Carousels work correctly - clicking navigates to `/series/{id}` 
+   - Promo popup is a separate engagement feature (shows after scroll/time)
+   - User likely saw popup coincidentally when clicking
+
+**Testing Status:** Verified by testing agent (iteration_62)
+- ✅ Backend: 11/11 API tests passed (100%)
+- ✅ Frontend code review: All components verified present
+- ✅ Carousel navigation: Works correctly
+- ✅ Attribution flow: Properly passes creator_id to backend
 
 
 ## Future/Backlog (P2-P3)
