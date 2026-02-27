@@ -694,16 +694,24 @@ export const ContractManager = ({ token }) => {
         </div>
       )}
 
-      {/* Create Contract Dialog */}
-      <Dialog open={showCreate} onOpenChange={setShowCreate}>
+      {/* Create/Edit Contract Dialog */}
+      <Dialog open={showCreate} onOpenChange={handleCloseForm}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" />
-              Create Creator Partnership Contract
+              {editMode ? `Edit Contract - ${editingContract?.contract_number}` : "Create Creator Partnership Contract"}
+              {editMode && editingContract?.version > 1 && (
+                <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full ml-2">
+                  v{editingContract.version}
+                </span>
+              )}
             </DialogTitle>
             <DialogDescription>
-              Fill in the details to generate a comprehensive partnership agreement
+              {editMode 
+                ? "Modify the contract details. Changes will create a new version for audit tracking."
+                : "Fill in the details to generate a comprehensive partnership agreement"
+              }
             </DialogDescription>
           </DialogHeader>
 
