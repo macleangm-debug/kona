@@ -41,6 +41,25 @@ export default function SuperCreatorDashboard() {
   const [filterStatus, setFilterStatus] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   
+  // Content management states
+  const [showCreateContent, setShowCreateContent] = useState(false);
+  const [contentForm, setContentForm] = useState({
+    title: "",
+    description: "",
+    genre: "Romance",
+    thumbnail_url: "",
+    creator_id: "", // Empty means self, or sub-creator ID
+    creator_name: "My Content"
+  });
+  const [creatingContent, setCreatingContent] = useState(false);
+  const [seriesList, setSeriesList] = useState([]);
+  
+  // Genre options
+  const GENRE_OPTIONS = [
+    "Romance", "Drama", "Thriller", "Fantasy", "Action", "Comedy", 
+    "Horror", "Mystery", "Family", "Documentary", "Historical", "Crime"
+  ];
+  
   // Form state
   const [form, setForm] = useState({
     name: "",
