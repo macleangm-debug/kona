@@ -3125,6 +3125,7 @@ export const AdminDashboard = () => {
                 {activeTab === "revenue" && "Revenue tracking and reports"}
                 {activeTab === "creators" && "Manage creator applications"}
                 {activeTab === "ads" && "Review and approve advertiser ads and campaigns"}
+                {activeTab === "contracts" && "Manage creator partnership contracts"}
                 {activeTab === "hr-applications" && "Review and manage job applications"}
                 {activeTab === "press-articles" && "Manage press releases and news content"}
                 {activeTab === "support" && "Manage customer support tickets"}
