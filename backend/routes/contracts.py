@@ -36,9 +36,16 @@ class ContractTerms(BaseModel):
     duration_months: int = Field(default=12, ge=1, le=60)
     auto_renewal: bool = Field(default=True)
     exclusivity: bool = Field(default=False)
-    exclusivity_scope: Optional[str] = None  # "platform", "category", "none"
+    exclusivity_scope: Optional[str] = None  # "platform", "category", "territory", "none"
     content_ownership: str = Field(default="creator")  # "creator", "platform", "shared"
     termination_notice_days: int = Field(default=30, ge=7, le=90)
+    # Territory exclusivity
+    territory: Optional[str] = None  # e.g., "United Republic of Tanzania"
+    territory_exclusive: bool = Field(default=False)
+    # Super Creator role
+    is_super_creator: bool = Field(default=False)
+    can_manage_creators: bool = Field(default=False)
+    sub_creator_commission_percent: Optional[float] = Field(default=10.0, ge=0, le=50)  # % of sub-creators' earnings
 
 class TaxTerms(BaseModel):
     vat_handling: str = Field(default="creator_responsible")  # "creator_responsible", "platform_withholds", "gross_up"
