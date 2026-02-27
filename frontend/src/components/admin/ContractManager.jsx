@@ -621,6 +621,11 @@ export const ContractManager = ({ token }) => {
                         <StatusIcon className="w-3 h-3" />
                         {statusConfig.label}
                       </span>
+                      {contract.version > 1 && (
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-500/20 text-yellow-400">
+                          v{contract.version}
+                        </span>
+                      )}
                       <span className="text-xs text-muted-foreground">
                         {contract.contract_number}
                       </span>
