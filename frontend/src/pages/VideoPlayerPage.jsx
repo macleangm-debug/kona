@@ -2161,8 +2161,9 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         )}
       </div>
 
-      {/* Right side action buttons - ALWAYS visible (like TikTok style) */}
-      <div className="absolute right-3 bottom-36 flex flex-col items-center gap-5 z-50">
+      {/* Right side action buttons - Hidden during playback for immersive viewing */}
+      {/* Single tap anywhere reveals controls, double-tap center to like */}
+      <div className={`absolute right-3 bottom-36 flex flex-col items-center gap-5 z-50 transition-opacity duration-300 ${showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         {/* Fullscreen toggle - for horizontal videos */}
         {!isVerticalVideo && (
           <button 
