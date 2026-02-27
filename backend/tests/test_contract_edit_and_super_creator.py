@@ -231,10 +231,11 @@ class TestContractEdit:
         assert updated_contract["contract_terms"]["is_super_creator"] == True
         assert updated_contract["contract_terms"]["territory"] == "United Republic of Tanzania"
     
-    def test_edit_contract_requires_auth(self, edit_test_contract_id):
+    def test_edit_contract_requires_auth(self, edit_test_contract_id, base_headers):
         """Test that editing contract requires authentication"""
         response = requests.put(
             f"{BASE_URL}/api/contracts/{edit_test_contract_id}",
+            headers={"User-Agent": TEST_USER_AGENT},
             json={"notes": "Should fail without auth"}
         )
         assert response.status_code == 401
