@@ -660,10 +660,20 @@ export const ContractManager = ({ token }) => {
                     value={form.currency}
                     onChange={(e) => setForm({...form, currency: e.target.value})}
                   >
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                    <option value="GBP">GBP</option>
-                    <option value="INR">INR</option>
+                    <optgroup label="African Currencies">
+                      <option value="TZS">TZS - Tanzanian Shilling</option>
+                      <option value="KES">KES - Kenyan Shilling</option>
+                      <option value="UGX">UGX - Ugandan Shilling</option>
+                      <option value="RWF">RWF - Rwandan Franc</option>
+                      <option value="NGN">NGN - Nigerian Naira</option>
+                      <option value="GHS">GHS - Ghanaian Cedi</option>
+                      <option value="ZAR">ZAR - South African Rand</option>
+                    </optgroup>
+                    <optgroup label="International">
+                      <option value="USD">USD - US Dollar</option>
+                      <option value="EUR">EUR - Euro</option>
+                      <option value="GBP">GBP - British Pound</option>
+                    </optgroup>
                   </select>
                 </div>
               </div>
