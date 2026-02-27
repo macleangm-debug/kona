@@ -262,6 +262,68 @@ export default function SuperCreatorDashboard() {
     });
   };
 
+  // Reset content form
+  const resetContentForm = () => {
+    setContentForm({
+      title: "",
+      description: "",
+      genre: "Romance",
+      thumbnail_url: "",
+      creator_id: "",
+      creator_name: "My Content"
+    });
+  };
+
+  // Create content (for self or sub-creator)
+  const handleCreateContent = async () => {
+    if (!contentForm.title || !contentForm.description) {
+      toast.error("Title and description are required");
+      return;
+    }
+
+    setCreatingContent(true);
+    try {
+      // If creator_id is set, create for sub-creator, otherwise for self
+      const payload = {
+        title: contentForm.title,
+        description: contentForm.description,
+        genre: contentForm.genre,
+        thumbnail_url: contentForm.thumbnail_url || null
+      };
+
+      // If creating for a sub-creator, add attribution
+      if (contentForm.creator_id) {
+        payload.attributed_to = contentForm.creator_id;
+        payload.attributed_name = contentForm.creator_name;
+      }
+
+      await axios.post(`${API}/creator/series`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success(`Series "${contentForm.title}" created${contentForm.creator_id ? ` for ${contentForm.creator_name}` : ''}!`);
+      setShowCreateContent(false);
+      resetContentForm();
+      fetchSeries();
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to create series");
+    }
+    setCreatingContent(false);
+  };
+
+  // Open content creation for specific sub-creator
+  const handleCreateForSubCreator = (creator) => {
+    setContentForm({
+      title: "",
+      description: "",
+      genre: "Romance",
+      thumbnail_url: "",
+      creator_id: creator.id,
+      creator_name: creator.name
+    });
+    setShowCreateContent(true);
+  };
+
   // Filter sub-creators by search
   const filteredCreators = subCreators.filter(sc => 
     sc.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
