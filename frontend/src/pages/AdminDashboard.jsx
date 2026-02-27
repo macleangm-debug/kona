@@ -2908,6 +2908,7 @@ export const AdminDashboard = () => {
       label: "Business",
       icon: Building2,
       items: [
+        { id: "contracts", label: "Contracts", icon: FileCheck },
         { id: "hr-applications", label: "Job Applications", icon: Briefcase },
         { id: "press-articles", label: "Press & News", icon: Newspaper },
         { id: "support", label: "Support Tickets", icon: Ticket }
