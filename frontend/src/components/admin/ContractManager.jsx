@@ -72,6 +72,7 @@ export const ContractManager = ({ token }) => {
     can_manage_creators: false,
     sub_creator_commission: 10,
     sub_creator_negotiable_terms: false,
+    show_sub_creator_distribution: false,
     // Tax terms
     vat_handling: "creator_responsible",
     withholding_percent: 0,
