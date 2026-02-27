@@ -654,6 +654,9 @@ export const ContractManager = ({ token }) => {
                     <Button variant="ghost" size="icon" onClick={() => handlePreview(contract)} title="Preview">
                       <Eye className="w-4 h-4" />
                     </Button>
+                    <Button variant="ghost" size="icon" onClick={() => handleEdit(contract)} title="Edit Contract" data-testid={`edit-contract-${contract.id}`}>
+                      <Edit className="w-4 h-4 text-yellow-400" />
+                    </Button>
                     <Button variant="ghost" size="icon" onClick={() => handleExport(contract, "pdf")} title="Download PDF" data-testid={`download-pdf-${contract.id}`}>
                       <FileText className="w-4 h-4 text-red-400" />
                     </Button>
@@ -679,8 +682,8 @@ export const ContractManager = ({ token }) => {
                       </Button>
                     )}
                     {contract.status === "signed" && (
-                      <Button variant="ghost" size="icon" onClick={() => handleStatusUpdate(contract, "active")} title="Activate">
-                        <Check className="w-4 h-4 text-emerald-400" />
+                      <Button variant="ghost" size="icon" onClick={() => handleOpenActivate(contract)} title="Activate with Start Date" data-testid={`activate-contract-${contract.id}`}>
+                        <Play className="w-4 h-4 text-emerald-400" />
                       </Button>
                     )}
                   </div>
