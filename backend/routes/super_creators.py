@@ -10,7 +10,7 @@ from bson import ObjectId
 import uuid
 
 from services import db
-from auth import get_current_user
+from services.auth import get_current_user
 
 router = APIRouter(prefix="/super-creator", tags=["Super Creator"])
 
