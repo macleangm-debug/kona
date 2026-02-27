@@ -168,7 +168,8 @@ export const ContractManager = ({ token }) => {
           territory_exclusive: form.territory_exclusive,
           is_super_creator: form.is_super_creator,
           can_manage_creators: form.can_manage_creators,
-          sub_creator_commission_percent: form.sub_creator_commission
+          sub_creator_commission_percent: form.sub_creator_commission,
+          sub_creator_negotiable_terms: form.sub_creator_negotiable_terms
         },
         tax_terms: {
           vat_handling: form.vat_handling,
