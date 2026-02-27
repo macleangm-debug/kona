@@ -142,7 +142,7 @@ const AppContent = () => {
   const isFullScreenPage = fullScreenPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Pages that skip splash screen
-  const skipSplashPages = ["/business", "/creator/login", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome"];
+  const skipSplashPages = ["/business", "/creator/login", "/creator/super", "/admin", "/demo", "/forgot-password", "/reset-password", "/help", "/about", "/terms", "/privacy", "/careers", "/press", "/safety", "/guidelines", "/accessibility", "/cookies", "/dmca", "/creator-guidelines", "/revenue", "/contact", "/welcome"];
   const shouldSkipSplash = skipSplashPages.some(page => location.pathname.startsWith(page)) || isWelcomePage;
   
   // Determine if we're in the "app" area
