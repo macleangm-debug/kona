@@ -653,8 +653,9 @@ def generate_contract_html(contract: dict) -> str:
             </div>
             <div class="signature">
                 <div class="signature-line"></div>
-                <label>Creator Signature</label>
+                <label>{'Super Creator' if is_super_creator else 'Creator'} Signature</label>
                 <p style="margin-top: 10px;"><strong>{creator.get('name', '')}</strong></p>
+                {f"<p><em>Super Creator - {territory}</em></p>" if is_super_creator and territory else ''}
                 <p>Date: _____________________</p>
             </div>
         </div>
