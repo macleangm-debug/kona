@@ -77,6 +77,22 @@ class UpdateContractStatusRequest(BaseModel):
     signed_by_creator: Optional[bool] = None
     signed_by_platform: Optional[bool] = None
 
+class UpdateContractRequest(BaseModel):
+    """Request model for editing contract details"""
+    creator: Optional[ContractParty] = None
+    platform: Optional[ContractParty] = None
+    platform_provider: Optional[PlatformProvider] = None
+    revenue_terms: Optional[RevenueTerms] = None
+    contract_terms: Optional[ContractTerms] = None
+    tax_terms: Optional[TaxTerms] = None
+    additional_clauses: Optional[List[str]] = None
+    notes: Optional[str] = None
+
+class ActivateContractRequest(BaseModel):
+    """Request model for activating a signed contract"""
+    start_date: str  # ISO date string
+    notes: Optional[str] = None
+
 @router.post("/create")
 async def create_contract(
     request: CreateContractRequest,
