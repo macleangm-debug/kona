@@ -856,6 +856,23 @@ export const ContractManager = ({ token }) => {
                         </p>
                       </div>
                     )}
+
+                    {form.can_manage_creators && (
+                      <div className="mt-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={form.show_sub_creator_distribution}
+                            onChange={(e) => setForm({...form, show_sub_creator_distribution: e.target.checked})}
+                            className="w-4 h-4"
+                          />
+                          <span>Show sub-creator revenue table in contract</span>
+                        </label>
+                        <p className="text-xs text-muted-foreground mt-1 ml-6">
+                          Uncheck to hide the detailed sub-creator revenue distribution from the contract
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
