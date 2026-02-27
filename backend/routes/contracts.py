@@ -46,6 +46,7 @@ class ContractTerms(BaseModel):
     is_super_creator: bool = Field(default=False)
     can_manage_creators: bool = Field(default=False)
     sub_creator_commission_percent: Optional[float] = Field(default=10.0, ge=0, le=50)  # % of sub-creators' earnings
+    sub_creator_negotiable_terms: bool = Field(default=False)  # Can Super Creator set their own terms with sub-creators
 
 class TaxTerms(BaseModel):
     vat_handling: str = Field(default="creator_responsible")  # "creator_responsible", "platform_withholds", "gross_up"
