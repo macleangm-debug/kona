@@ -502,7 +502,8 @@ def generate_contract_html(contract: dict) -> str:
 </head>
 <body>
     <div class="header">
-        <h1>Creator Partnership Agreement</h1>
+        <h1>{'Super Creator Territory Partnership Agreement' if is_super_creator else 'Creator Partnership Agreement'}</h1>
+        {f'<p style="font-size: 16px; color: #666; margin-top: 5px;">Exclusive Territory: {territory}</p>' if territory else ''}
         <p class="contract-number">Contract No: {contract.get('contract_number', 'DRAFT')}</p>
         <p class="contract-number">Effective Date: {contract.get('effective_date', '')[:10] if contract.get('effective_date') else 'TBD'}</p>
     </div>
@@ -516,19 +517,22 @@ def generate_contract_html(contract: dict) -> str:
             {f"<p>Tax ID: {platform.get('tax_id')}</p>" if platform.get('tax_id') else ''}
         </div>
         <div class="party">
-            <h3>The Creator</h3>
+            <h3>The {'Super Creator' if is_super_creator else 'Creator'}</h3>
             <p class="name">{creator.get('name', '')}</p>
             {f"<p>{creator.get('company_name')}</p>" if creator.get('company_name') else ''}
             <p>{creator.get('address', '')}</p>
             <p>Email: {creator.get('email', '')}</p>
             {f"<p>Tax ID/VAT: {creator.get('tax_id')}</p>" if creator.get('tax_id') else ''}
+            {f"<p><strong>Territory: {territory}</strong></p>" if territory else ''}
         </div>
     </div>
 
     <div class="section">
         <h2>1. Recitals</h2>
         <p>WHEREAS, the Platform operates a digital video streaming service enabling creators to publish, distribute, and monetize their content;</p>
-        <p>WHEREAS, the Creator wishes to publish content on the Platform and participate in the Platform's revenue sharing program;</p>
+        {'<p>WHEREAS, the Platform wishes to expand its presence in ' + territory + ' and requires a trusted local partner to manage operations and creator relations in this territory;</p>' if territory and is_super_creator else ''}
+        <p>WHEREAS, the {'Super ' if is_super_creator else ''}Creator wishes to {'serve as the Platform representative in ' + territory + ' and ' if territory and is_super_creator else ''}publish content on the Platform and participate in the Platform's revenue sharing program;</p>
+        {'<p>WHEREAS, the Super Creator has demonstrated expertise in content creation and management, and is qualified to recruit, mentor, and oversee other creators within the designated territory;</p>' if is_super_creator else ''}
         <p>NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinafter set forth, the parties agree as follows:</p>
     </div>
 
