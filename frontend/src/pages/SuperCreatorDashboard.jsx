@@ -659,6 +659,17 @@ export default function SuperCreatorDashboard() {
                             <Play className="w-4 h-4 text-green-400" />
                           </Button>
                         )}
+                        {creator.status === "active" && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleCreateForSubCreator(creator)}
+                            title="Create Content for this Creator"
+                            data-testid={`create-content-${creator.id}`}
+                          >
+                            <Film className="w-4 h-4 text-purple-400" />
+                          </Button>
+                        )}
                         <Button variant="ghost" size="icon" title="View Details">
                           <Eye className="w-4 h-4" />
                         </Button>
