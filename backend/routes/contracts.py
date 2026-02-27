@@ -601,38 +601,41 @@ def generate_contract_html(contract: dict) -> str:
     </div>
 
     <div class="section">
-        <h2>6. Exclusivity</h2>
-        <p>{exclusivity_text}</p>
+        <h2>6. Exclusivity & Territory</h2>
+        <p><span class="clause-number">6.1</span> {exclusivity_text}</p>
+        {territory_clause}
+    </div>
+
+    {super_creator_clause}
+
+    <div class="section">
+        <h2>{'8' if is_super_creator else '7'}. Term & Termination</h2>
+        <p><span class="clause-number">{'8' if is_super_creator else '7'}.1</span> <strong>Initial Term:</strong> This Agreement shall commence on the Effective Date and continue for a period of {terms.get('duration_months', 12)} months.</p>
+        <p><span class="clause-number">{'8' if is_super_creator else '7'}.2</span> <strong>Renewal:</strong> {'This Agreement shall automatically renew for successive periods of equal length unless either party provides written notice of non-renewal at least ' + str(terms.get('termination_notice_days', 30)) + ' days prior to the end of the current term.' if terms.get('auto_renewal') else 'This Agreement shall not automatically renew. Parties must execute a new agreement to continue the partnership.'}</p>
+        <p><span class="clause-number">{'8' if is_super_creator else '7'}.3</span> <strong>Termination for Convenience:</strong> Either party may terminate this Agreement with {terms.get('termination_notice_days', 30)} days' written notice to the other party.</p>
+        <p><span class="clause-number">{'8' if is_super_creator else '7'}.4</span> <strong>Termination for Cause:</strong> Either party may terminate immediately upon material breach by the other party that remains uncured for 14 days after written notice.</p>
+        <p><span class="clause-number">{'8' if is_super_creator else '7'}.5</span> <strong>Effect of Termination:</strong> Upon termination, {'Super ' if is_super_creator else ''}Creator's Content may remain on the Platform for a wind-down period of 30 days. All accrued but unpaid revenue shall be paid within 45 days of termination.{' Sub-creators recruited by Super Creator shall continue their direct relationship with the Platform.' if is_super_creator else ''}</p>
     </div>
 
     <div class="section">
-        <h2>7. Term & Termination</h2>
-        <p><span class="clause-number">7.1</span> <strong>Initial Term:</strong> This Agreement shall commence on the Effective Date and continue for a period of {terms.get('duration_months', 12)} months.</p>
-        <p><span class="clause-number">7.2</span> <strong>Renewal:</strong> {'This Agreement shall automatically renew for successive periods of equal length unless either party provides written notice of non-renewal at least ' + str(terms.get('termination_notice_days', 30)) + ' days prior to the end of the current term.' if terms.get('auto_renewal') else 'This Agreement shall not automatically renew. Parties must execute a new agreement to continue the partnership.'}</p>
-        <p><span class="clause-number">7.3</span> <strong>Termination for Convenience:</strong> Either party may terminate this Agreement with {terms.get('termination_notice_days', 30)} days' written notice to the other party.</p>
-        <p><span class="clause-number">7.4</span> <strong>Termination for Cause:</strong> Either party may terminate immediately upon material breach by the other party that remains uncured for 14 days after written notice.</p>
-        <p><span class="clause-number">7.5</span> <strong>Effect of Termination:</strong> Upon termination, Creator's Content may remain on the Platform for a wind-down period of 30 days. All accrued but unpaid revenue shall be paid within 45 days of termination.</p>
+        <h2>{'9' if is_super_creator else '8'}. Confidentiality</h2>
+        <p>Both parties agree to keep confidential all non-public information disclosed during the term of this Agreement, including but not limited to revenue figures, business strategies, {'sub-creator information, territory performance data, ' if is_super_creator else ''}and user data. This obligation survives termination for a period of 2 years.</p>
     </div>
 
     <div class="section">
-        <h2>8. Confidentiality</h2>
-        <p>Both parties agree to keep confidential all non-public information disclosed during the term of this Agreement, including but not limited to revenue figures, business strategies, and user data. This obligation survives termination for a period of 2 years.</p>
+        <h2>{'10' if is_super_creator else '9'}. Dispute Resolution</h2>
+        <p><span class="clause-number">{'10' if is_super_creator else '9'}.1</span> <strong>Negotiation:</strong> The parties shall attempt to resolve any dispute arising from this Agreement through good-faith negotiation.</p>
+        <p><span class="clause-number">{'10' if is_super_creator else '9'}.2</span> <strong>Mediation:</strong> If negotiation fails, the parties agree to submit the dispute to mediation before pursuing other remedies.</p>
+        <p><span class="clause-number">{'10' if is_super_creator else '9'}.3</span> <strong>Governing Law:</strong> This Agreement shall be governed by and construed in accordance with the laws of the jurisdiction where the Platform is incorporated.</p>
     </div>
 
     <div class="section">
-        <h2>9. Dispute Resolution</h2>
-        <p><span class="clause-number">9.1</span> <strong>Negotiation:</strong> The parties shall attempt to resolve any dispute arising from this Agreement through good-faith negotiation.</p>
-        <p><span class="clause-number">9.2</span> <strong>Mediation:</strong> If negotiation fails, the parties agree to submit the dispute to mediation before pursuing other remedies.</p>
-        <p><span class="clause-number">9.3</span> <strong>Governing Law:</strong> This Agreement shall be governed by and construed in accordance with the laws of the jurisdiction where the Platform is incorporated.</p>
-    </div>
-
-    <div class="section">
-        <h2>10. General Provisions</h2>
-        <p><span class="clause-number">10.1</span> <strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations and agreements.</p>
-        <p><span class="clause-number">10.2</span> <strong>Amendments:</strong> This Agreement may only be amended in writing signed by both parties.</p>
-        <p><span class="clause-number">10.3</span> <strong>Assignment:</strong> Neither party may assign this Agreement without the prior written consent of the other party.</p>
-        <p><span class="clause-number">10.4</span> <strong>Severability:</strong> If any provision is found invalid, the remaining provisions shall continue in full force and effect.</p>
-        <p><span class="clause-number">10.5</span> <strong>Notices:</strong> All notices shall be in writing and sent to the addresses specified above or updated in writing.</p>
+        <h2>{'11' if is_super_creator else '10'}. General Provisions</h2>
+        <p><span class="clause-number">{'11' if is_super_creator else '10'}.1</span> <strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations and agreements.</p>
+        <p><span class="clause-number">{'11' if is_super_creator else '10'}.2</span> <strong>Amendments:</strong> This Agreement may only be amended in writing signed by both parties.</p>
+        <p><span class="clause-number">{'11' if is_super_creator else '10'}.3</span> <strong>Assignment:</strong> Neither party may assign this Agreement without the prior written consent of the other party.</p>
+        <p><span class="clause-number">{'11' if is_super_creator else '10'}.4</span> <strong>Severability:</strong> If any provision is found invalid, the remaining provisions shall continue in full force and effect.</p>
+        <p><span class="clause-number">{'11' if is_super_creator else '10'}.5</span> <strong>Notices:</strong> All notices shall be in writing and sent to the addresses specified above or updated in writing.</p>
     </div>
 
     {"".join(f'<div class="section"><h2>11. Additional Terms</h2><p>{clause}</p></div>' for clause in (contract.get('additional_clauses') or [])) if contract.get('additional_clauses') else ''}
