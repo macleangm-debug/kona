@@ -100,6 +100,7 @@ async def create_contract(
         "status": "draft",
         "creator": request.creator.dict(),
         "platform": request.platform.dict(),
+        "platform_provider": request.platform_provider.dict() if request.platform_provider else {"name": "Kona Streaming Services", "role": "Technology Platform Provider"},
         "revenue_terms": request.revenue_terms.dict(),
         "contract_terms": request.contract_terms.dict(),
         "tax_terms": request.tax_terms.dict(),
