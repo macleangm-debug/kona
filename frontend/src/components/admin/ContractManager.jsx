@@ -1024,9 +1024,13 @@ export const ContractManager = ({ token }) => {
           <div className="sticky top-0 bg-background border-b p-4 flex justify-between items-center">
             <DialogTitle>Contract Preview - {selectedContract?.contract_number}</DialogTitle>
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => handleExport(selectedContract, "html")}>
-                <Download className="w-4 h-4 mr-2" />
-                Download
+              <Button variant="outline" size="sm" onClick={() => handleExport(selectedContract, "pdf")} data-testid="preview-download-pdf">
+                <FileText className="w-4 h-4 mr-2 text-red-400" />
+                PDF
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => handleExport(selectedContract, "docx")} data-testid="preview-download-docx">
+                <FileType className="w-4 h-4 mr-2 text-blue-400" />
+                Word
               </Button>
               <Button variant="outline" size="sm" onClick={() => handleExport(selectedContract, "print")}>
                 <Printer className="w-4 h-4 mr-2" />
