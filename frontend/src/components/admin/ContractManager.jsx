@@ -280,6 +280,34 @@ export const ContractManager = ({ token }) => {
         a.click();
         URL.revokeObjectURL(url);
         toast.success("HTML exported!");
+      } else if (format === "pdf") {
+        toast.info("Generating PDF...");
+        const res = await axios.get(`${API}/contracts/${contract.id}/export?format=pdf`, {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'blob'
+        });
+        const blob = new Blob([res.data], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${contract.contract_number}.pdf`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("PDF downloaded!");
+      } else if (format === "docx") {
+        toast.info("Generating Word document...");
+        const res = await axios.get(`${API}/contracts/${contract.id}/export?format=docx`, {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'blob'
+        });
+        const blob = new Blob([res.data], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${contract.contract_number}.docx`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Word document downloaded!");
       } else if (format === "print") {
         const res = await axios.get(`${API}/contracts/${contract.id}/html`, {
           headers: { Authorization: `Bearer ${token}` }
