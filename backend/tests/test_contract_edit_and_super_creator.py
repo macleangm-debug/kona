@@ -456,7 +456,10 @@ class TestSuperCreatorStatus:
     
     def test_super_creator_status_requires_auth(self):
         """Test that super creator status requires authentication"""
-        response = requests.get(f"{BASE_URL}/api/super-creator/status")
+        response = requests.get(
+            f"{BASE_URL}/api/super-creator/status",
+            headers={"User-Agent": TEST_USER_AGENT}
+        )
         assert response.status_code == 401
 
 
