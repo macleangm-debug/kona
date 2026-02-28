@@ -133,7 +133,15 @@ const AppContent = () => {
   // Initialize native app features (Capacitor)
   useEffect(() => {
     NativeApp.initializeNativeApp();
+    initializeFirebase();
   }, []);
+
+  // Track user properties when authenticated
+  useEffect(() => {
+    if (user) {
+      setKonaUserProperties(user);
+    }
+  }, [user]);
 
   const handleAuthClick = (signUpMode = false) => {
     setForceSignUp(signUpMode);
