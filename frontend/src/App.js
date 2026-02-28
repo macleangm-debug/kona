@@ -14,6 +14,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { usePromoManager } from "@/hooks/usePromoManager";
 import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 
+// Native App Integration
+import NativeApp from "@/services/NativeApp";
+
 // Components
 import { 
   AuthModal, 
