@@ -17,6 +17,9 @@ import { useMilestoneNotifications } from "@/hooks/useMilestoneNotifications";
 // Native App Integration
 import NativeApp from "@/services/NativeApp";
 
+// Firebase Analytics & Push Notifications
+import { initializeFirebase, KonaAnalytics, setKonaUserProperties } from "@/services/Firebase";
+
 // Components
 import { 
   AuthModal, 
