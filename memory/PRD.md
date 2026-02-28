@@ -1267,7 +1267,7 @@ REACT_APP_BACKEND_URL=<backend-url>
 ### Mobile App (Capacitor) - SETUP COMPLETE
 - iOS and Android project structure ready
 - Native plugins configured:
-  - Push Notifications
+  - Push Notifications (Firebase Cloud Messaging)
   - Biometric Login (Face ID / Touch ID)
   - Haptic Feedback
   - Network Status / Offline Mode
@@ -1276,20 +1276,36 @@ REACT_APP_BACKEND_URL=<backend-url>
 - App Store submission guides created
 - Build script ready: `./build-mobile.sh`
 
+**Codemagic CI/CD Configured:**
+- `codemagic.yaml` - Automatic builds on push/tag
+- iOS builds → TestFlight → App Store
+- Android builds → Play Store (internal → production)
+- Development builds for PRs
+
+**Firebase Integrated:**
+- Analytics with custom Kona events (view series, play episode, tip creator, etc.)
+- Push Notifications (FCM)
+- Crashlytics ready
+- `Firebase.js` service with `KonaAnalytics` helpers
+
 **Files Created:**
 - `/app/frontend/capacitor.config.json` - Capacitor configuration
-- `/app/frontend/src/services/NativeApp.js` - Native app integration service
-- `/app/frontend/src/hooks/useNativeApp.js` - React hooks for native features
-- `/app/frontend/src/components/BiometricLogin.jsx` - Face ID / Touch ID component
+- `/app/frontend/codemagic.yaml` - CI/CD pipeline
+- `/app/frontend/src/services/NativeApp.js` - Native app integration
+- `/app/frontend/src/services/Firebase.js` - Firebase analytics & push
+- `/app/frontend/src/hooks/useNativeApp.js` - React hooks
+- `/app/frontend/src/components/BiometricLogin.jsx` - Face ID / Touch ID
 - `/app/frontend/src/components/NetworkStatus.jsx` - Offline indicator
 - `/app/frontend/app-store/ios/APP_STORE_LISTING.md` - iOS App Store guide
 - `/app/frontend/app-store/android/PLAY_STORE_LISTING.md` - Play Store guide
-- `/app/frontend/build-mobile.sh` - Build script
+- `/app/frontend/MOBILE_SETUP_GUIDE.md` - Complete setup instructions
+- `/app/frontend/build-mobile.sh` - Local build script
 
-**To Build Apps:**
-1. Set up Xcode (iOS) and Android Studio (Android) on your local machine
-2. Run `./build-mobile.sh` from frontend directory
-3. Follow the App Store submission guides
+**To Deploy Mobile Apps:**
+1. Create Firebase project and add iOS/Android apps
+2. Sign up for Codemagic and connect repo
+3. Configure signing credentials (see MOBILE_SETUP_GUIDE.md)
+4. Push to main branch → Automatic build & deploy
 
 ### Other Backlog Items
 
