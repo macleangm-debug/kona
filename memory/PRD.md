@@ -1264,6 +1264,35 @@ REACT_APP_BACKEND_URL=<backend-url>
 
 ## Future/Backlog (P2-P3)
 
+### Mobile App (Capacitor) - SETUP COMPLETE
+- iOS and Android project structure ready
+- Native plugins configured:
+  - Push Notifications
+  - Biometric Login (Face ID / Touch ID)
+  - Haptic Feedback
+  - Network Status / Offline Mode
+  - Deep Linking
+  - Native Share
+- App Store submission guides created
+- Build script ready: `./build-mobile.sh`
+
+**Files Created:**
+- `/app/frontend/capacitor.config.json` - Capacitor configuration
+- `/app/frontend/src/services/NativeApp.js` - Native app integration service
+- `/app/frontend/src/hooks/useNativeApp.js` - React hooks for native features
+- `/app/frontend/src/components/BiometricLogin.jsx` - Face ID / Touch ID component
+- `/app/frontend/src/components/NetworkStatus.jsx` - Offline indicator
+- `/app/frontend/app-store/ios/APP_STORE_LISTING.md` - iOS App Store guide
+- `/app/frontend/app-store/android/PLAY_STORE_LISTING.md` - Play Store guide
+- `/app/frontend/build-mobile.sh` - Build script
+
+**To Build Apps:**
+1. Set up Xcode (iOS) and Android Studio (Android) on your local machine
+2. Run `./build-mobile.sh` from frontend directory
+3. Follow the App Store submission guides
+
+### Other Backlog Items
+
 - Refactor AdminDashboard.jsx (large monolithic component)
 - Analytics Export feature (CSV/PDF) - backend done
 - Social sharing features - backend done, need more frontend polish
