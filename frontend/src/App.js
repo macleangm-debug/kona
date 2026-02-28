@@ -127,6 +127,11 @@ const AppContent = () => {
     }
   }, [searchParams]);
 
+  // Initialize native app features (Capacitor)
+  useEffect(() => {
+    NativeApp.initializeNativeApp();
+  }, []);
+
   const handleAuthClick = (signUpMode = false) => {
     setForceSignUp(signUpMode);
     setShowAuth(true);
