@@ -1,0 +1,8 @@
+{
+  "appId": "com.kona.streaming",
+  "appName": "Kona",
+  "webDir": "build",
+  "server": {
+    "androidScheme": "https"
+  }
+}
