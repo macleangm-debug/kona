@@ -1,0 +1,278 @@
+# Codemagic CI/CD Configuration for Kona
+# https://docs.codemagic.io/yaml/yaml-getting-started/
+#
+# SETUP INSTRUCTIONS:
+# 1. Sign up at https://codemagic.io
+# 2. Connect your GitHub/GitLab repository
+# 3. Add this file to your repo root
+# 4. Configure environment variables in Codemagic dashboard:
+#    - APPLE_ID, APP_STORE_CONNECT_KEY_ID, APP_STORE_CONNECT_ISSUER_ID
+#    - CERTIFICATE_PRIVATE_KEY, PROVISIONING_PROFILE
+#    - KEYSTORE, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+#    - FIREBASE_TOKEN (for distribution)
+# 5. Trigger build or push to main branch
+
+workflows:
+  # ================================================
+  # iOS Production Build
+  # ================================================
+  ios-production:
+    name: iOS Production Build
+    instance_type: mac_mini_m2
+    max_build_duration: 60
+    
+    environment:
+      groups:
+        - app_store_credentials  # Apple credentials
+        - firebase               # Firebase config
+      vars:
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
+        XCODE_SCHEME: "App"
+        APP_STORE_APP_ID: "YOUR_APP_STORE_APP_ID"  # From App Store Connect
+      node: 18
+      xcode: latest
+      cocoapods: default
+    
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+        - pattern: 'release/*'
+          include: true
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    
+    scripts:
+      # Install dependencies
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm install
+      
+      # Build React app
+      - name: Build web app
+        script: |
+          cd frontend
+          npm run build
+      
+      # Sync Capacitor
+      - name: Sync Capacitor iOS
+        script: |
+          cd frontend
+          npx cap sync ios
+      
+      # Install CocoaPods
+      - name: Install CocoaPods dependencies
+        script: |
+          cd frontend/ios/App
+          pod install
+      
+      # Set up code signing
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "com.kona.streaming" --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+      
+      # Increment build number
+      - name: Increment build number
+        script: |
+          cd frontend/ios/App
+          LATEST_BUILD=$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APP_ID")
+          agvtool new-version -all $(($LATEST_BUILD + 1))
+      
+      # Build iOS app
+      - name: Build iOS app
+        script: |
+          cd frontend/ios/App
+          xcode-project build-ipa \
+            --workspace "$XCODE_WORKSPACE" \
+            --scheme "$XCODE_SCHEME" \
+            --archive-flags="-destination 'generic/platform=iOS'"
+    
+    artifacts:
+      - frontend/ios/App/build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - frontend/ios/App/*.dSYM.zip
+    
+    publishing:
+      app_store_connect:
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
+        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        submit_to_testflight: true
+        submit_to_app_store: false  # Manual release
+      
+      email:
+        recipients:
+          - build@kona.com
+        notify:
+          success: true
+          failure: true
+      
+      slack:
+        channel: '#builds'
+        notify_on_build_start: true
+        notify:
+          success: true
+          failure: true
+
+  # ================================================
+  # Android Production Build
+  # ================================================
+  android-production:
+    name: Android Production Build
+    instance_type: linux_x2
+    max_build_duration: 60
+    
+    environment:
+      groups:
+        - google_play_credentials  # Play Store credentials
+        - android_signing          # Keystore
+        - firebase                 # Firebase config
+      vars:
+        PACKAGE_NAME: "com.kona.streaming"
+      node: 18
+      java: 17
+    
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+        - pattern: 'release/*'
+          include: true
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    
+    scripts:
+      # Install dependencies
+      - name: Install npm dependencies
+        script: |
+          cd frontend
+          npm install
+      
+      # Build React app
+      - name: Build web app
+        script: |
+          cd frontend
+          npm run build
+      
+      # Sync Capacitor
+      - name: Sync Capacitor Android
+        script: |
+          cd frontend
+          npx cap sync android
+      
+      # Set up keystore
+      - name: Set up Android keystore
+        script: |
+          echo $KEYSTORE | base64 --decode > frontend/android/app/keystore.jks
+          cat > frontend/android/keystore.properties <<EOF
+          storeFile=keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+      
+      # Build Android app bundle
+      - name: Build Android AAB
+        script: |
+          cd frontend/android
+          ./gradlew bundleRelease
+      
+      # Build APK (for testing)
+      - name: Build Android APK
+        script: |
+          cd frontend/android
+          ./gradlew assembleRelease
+    
+    artifacts:
+      - frontend/android/app/build/outputs/**/*.aab
+      - frontend/android/app/build/outputs/**/*.apk
+      - frontend/android/app/build/outputs/**/mapping.txt
+    
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal  # internal, alpha, beta, production
+        submit_as_draft: true
+      
+      email:
+        recipients:
+          - build@kona.com
+        notify:
+          success: true
+          failure: true
+      
+      slack:
+        channel: '#builds'
+        notify_on_build_start: true
+        notify:
+          success: true
+          failure: true
+
+  # ================================================
+  # Development Build (Both Platforms)
+  # ================================================
+  development:
+    name: Development Build
+    instance_type: mac_mini_m2
+    max_build_duration: 45
+    
+    environment:
+      groups:
+        - development
+      node: 18
+      xcode: latest
+      java: 17
+    
+    triggering:
+      events:
+        - pull_request
+      branch_patterns:
+        - pattern: 'develop'
+          include: true
+        - pattern: 'feature/*'
+          include: true
+    
+    scripts:
+      - name: Install dependencies
+        script: |
+          cd frontend
+          npm install
+      
+      - name: Run tests
+        script: |
+          cd frontend
+          npm test -- --coverage --watchAll=false
+      
+      - name: Build web app
+        script: |
+          cd frontend
+          npm run build
+      
+      - name: Lint check
+        script: |
+          cd frontend
+          npm run lint || true
+    
+    artifacts:
+      - frontend/build/**/*
+      - frontend/coverage/**/*
+    
+    publishing:
+      email:
+        recipients:
+          - dev@kona.com
+        notify:
+          success: false
+          failure: true
