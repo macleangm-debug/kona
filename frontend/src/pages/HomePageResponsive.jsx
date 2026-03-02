@@ -935,17 +935,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
         onClose={() => setShowSearch(false)}
       />
       
-      {/* Floating Free Stories Button - Mobile only */}
-      {!isDesktop && (
-        <button
-          onClick={() => navigate('/stories')}
-          className="fixed bottom-24 right-4 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full shadow-lg shadow-purple-500/30 animate-pulse hover:animate-none hover:scale-105 transition-transform"
-          data-testid="mobile-stories-btn"
-        >
-          <Play className="w-5 h-5 fill-white" />
-          <span className="font-semibold text-sm">Free Episodes</span>
-        </button>
-      )}
+{/* Removed blinking Free Episodes button - integrated into content rows instead */}
     </div>
   );
 };
