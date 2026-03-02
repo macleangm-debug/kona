@@ -28,7 +28,7 @@ class TestLiveStreamingAPI:
     def setup(self):
         """Setup test fixtures"""
         self.session = requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update(HEADERS)
         self.token = None
     
     def login(self):
@@ -108,7 +108,7 @@ class TestAIRecommendationsAPI:
     def setup(self):
         """Setup test fixtures"""
         self.session = requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update(HEADERS)
         self.token = None
     
     def login(self):
@@ -209,7 +209,7 @@ class TestStandardRecommendationsAPI:
     def setup(self):
         """Setup test fixtures"""
         self.session = requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update(HEADERS)
         self.token = None
     
     def login(self):
