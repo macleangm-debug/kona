@@ -244,6 +244,10 @@ const AppContent = () => {
         <Route path="/business/auth" element={<BusinessAuthPage />} />
         <Route path="/business/dashboard" element={<BusinessDashboard />} />
         <Route path="/business/campaigns/new" element={<CampaignCreatePage />} />
+        
+        {/* Live Streaming Routes */}
+        <Route path="/live/:streamId" element={<LivePlayer />} />
+        <Route path="/creator/go-live" element={<GoLive />} />
       </Routes>
 
       {/* Bottom Navigation - Only on mobile and not on full-screen pages */}
