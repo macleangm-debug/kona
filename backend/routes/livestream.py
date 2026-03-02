@@ -129,8 +129,8 @@ async def go_live(stream_id: str, user: dict = Depends(get_current_user)):
     if stream["status"] == "ended":
         raise HTTPException(status_code=400, detail="Stream has ended. Create a new stream.")
     
-    # Generate playback URL (in production, get from streaming service)
-    playback_url = f"https://live.kona.stream/hls/{stream_id}/playlist.m3u8"
+    # Generate playback URL (configure via LIVE_PLAYBACK_BASE env var for production)
+    playback_url = f"{LIVE_PLAYBACK_BASE}/{stream_id}/playlist.m3u8"
     
     await db.live_streams.update_one(
         {"id": stream_id},
