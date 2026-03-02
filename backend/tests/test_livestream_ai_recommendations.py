@@ -12,6 +12,15 @@ BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
 ADMIN_EMAIL = "superadmin@kona.com"
 ADMIN_PASSWORD = "SuperAdmin2025!"
 
+# Common headers to avoid bot detection
+HEADERS = {
+    "Content-Type": "application/json",
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Origin": BASE_URL,
+    "Referer": BASE_URL
+}
+
 class TestLiveStreamingAPI:
     """Test Live Streaming API endpoints"""
     
