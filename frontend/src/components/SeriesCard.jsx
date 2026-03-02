@@ -43,16 +43,17 @@ export const SeriesCard = ({ series, onClick, badge, showViews = true, inMyList 
           </div>
         )}
         
-        {/* Badge - Hot/New/Top (only show if not exclusive) */}
+        {/* Badge - Hot/New/Top/Free (only show if not exclusive) */}
         {badge && !isExclusive && (
           <div className={`absolute top-2 left-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
             badge === "hot" ? "bg-red-500" :
             badge === "new" ? "bg-green-500" :
             badge === "top" ? "bg-yellow-500 text-black" :
             badge === "vip" ? "bg-purple-500" :
+            badge === "free" ? "bg-gradient-to-r from-green-400 to-emerald-500 text-black" :
             "bg-primary"
           }`}>
-            {badge}
+            {badge === "free" ? "FREE" : badge}
           </div>
         )}
         
