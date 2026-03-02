@@ -28,8 +28,7 @@ export const LanguageSelector = ({ variant = "dropdown", showLabel = true }) => 
                 : "bg-white/5 border-white/10 hover:bg-white/10"
             }`}
           >
-            <span className="text-lg">{lang.flag}</span>
-            <span className="text-sm">{lang.nativeName}</span>
+            <span className="text-sm font-medium">{lang.nativeName}</span>
             {currentLanguage === lang.code && <Check className="w-4 h-4" />}
           </button>
         ))}
@@ -46,7 +45,7 @@ export const LanguageSelector = ({ variant = "dropdown", showLabel = true }) => 
           className="flex items-center gap-2 hover:bg-white/10"
           data-testid="language-selector"
         >
-          <span className="text-lg">{currentLang.flag}</span>
+          <Globe className="w-4 h-4" />
           {showLabel && <span className="hidden sm:inline">{currentLang.nativeName}</span>}
           <ChevronDown className="w-4 h-4 text-gray-400" />
         </Button>
@@ -60,9 +59,8 @@ export const LanguageSelector = ({ variant = "dropdown", showLabel = true }) => 
               currentLanguage === lang.code ? "bg-primary/20" : ""
             }`}
           >
-            <span className="text-lg">{lang.flag}</span>
             <div className="flex-1">
-              <p className="text-sm">{lang.nativeName}</p>
+              <p className="text-sm font-medium">{lang.nativeName}</p>
               <p className="text-xs text-gray-400">{lang.name}</p>
             </div>
             {currentLanguage === lang.code && <Check className="w-4 h-4 text-primary" />}
