@@ -40,6 +40,7 @@ import LandingPage from "@/pages/LandingPage";
 import WatchPartyPage from "@/pages/WatchPartyPage";
 import DownloadsPage from "@/pages/DownloadsPage";
 import StoriesPage from "@/pages/StoriesPage";
+import CreatorProfilePage from "@/pages/CreatorProfilePage";
 import {
   SeriesDetailPage,
   VideoPlayerPage,
@@ -204,6 +205,7 @@ const AppContent = () => {
         <Route path="/subscriptions" element={<SubscriptionPage />} />
         <Route path="/category/:category" element={<CategoryPage onAuthClick={() => handleAuthClick()} />} />
         <Route path="/stories" element={<StoriesPage onAuthClick={() => handleAuthClick()} />} />
+        <Route path="/creator/:creatorId" element={<CreatorProfilePage />} />
         <Route path="/creator" element={<CreatorPortal />} />
         <Route path="/creator/series/:id" element={<CreatorSeriesDetailPage />} />
         <Route path="/creator/login" element={<CreatorLoginPage />} />

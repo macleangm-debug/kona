@@ -104,6 +104,62 @@ async def get_series_detail(request: Request, series_id: str):
     await cache.set(cache_key, series, CACHE_TTL["series"])
     return series
 
+
+@router.get("/creators/{creator_id}/profile")
+@limiter.limit("60/minute")
+async def get_creator_public_profile(request: Request, creator_id: str):
+    """
+    Get public creator profile for viewing.
+    Shows creator info, their series, and stats.
+    """
+    # Get creator info
+    creator = await db.creators.find_one(
+        {"id": creator_id, "status": "approved"},
+        {"_id": 0, "user_id": 0, "bank_details": 0, "id_document": 0}
+    )
+    
+    if not creator:
+        raise HTTPException(status_code=404, detail="Creator not found")
+    
+    # Get creator's published series
+    series = await db.series.find(
+        {"creator_id": creator_id, "status": "published"},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    
+    # Get user info for profile picture
+    user = await db.users.find_one(
+        {"id": creator.get("user_id")},
+        {"_id": 0, "avatar_url": 1, "username": 1}
+    )
+    
+    # Calculate total views and followers
+    total_views = sum(s.get("total_views", 0) for s in series)
+    total_episodes = sum(s.get("episode_count", 0) for s in series)
+    
+    # Get follower count
+    follower_count = await db.follows.count_documents({"creator_id": creator_id})
+    
+    return {
+        "id": creator_id,
+        "display_name": creator.get("display_name", "Creator"),
+        "bio": creator.get("bio", ""),
+        "avatar_url": creator.get("avatar_url") or (user.get("avatar_url") if user else None),
+        "username": user.get("username") if user else None,
+        "verified": creator.get("verified", False),
+        "category": creator.get("category", "Entertainment"),
+        "social_links": creator.get("social_links", {}),
+        "stats": {
+            "total_series": len(series),
+            "total_episodes": total_episodes,
+            "total_views": total_views,
+            "followers": follower_count
+        },
+        "series": series,
+        "joined_at": creator.get("created_at")
+    }
+
+
 @router.get("/stories/feed")
 @limiter.limit("60/minute")
 async def get_stories_feed(request: Request, limit: int = 20):
@@ -127,16 +183,29 @@ async def get_stories_feed(request: Request, limit: int = 20):
         {"_id": 0}
     ).sort([("created_at", -1), ("episode_number", 1)]).to_list(100)
     
-    # Enrich with series info
+    # Enrich with series and creator info
     enriched_stories = []
     for story in stories:
         series = await db.series.find_one({"id": story["series_id"]}, {"_id": 0})
         if series:
+            # Get creator info
+            creator = await db.creators.find_one(
+                {"id": series.get("creator_id")},
+                {"_id": 0, "display_name": 1, "avatar_url": 1}
+            )
+            creator_name = creator.get("display_name", "Creator") if creator else "Creator"
+            creator_avatar = creator.get("avatar_url") if creator else None
+            
             enriched_stories.append({
                 **story,
                 "series_title": series.get("title", ""),
                 "series_thumbnail": series.get("thumbnail", ""),
                 "series_genre": series.get("genre", ""),
+                "series_description": series.get("description", ""),
+                "creator_id": series.get("creator_id"),
+                "creator_name": creator_name,
+                "creator_avatar": creator_avatar,
+                "description": story.get("description") or series.get("description", ""),
                 "is_story_content": True  # Ensure this flag is set
             })
     

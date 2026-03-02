@@ -108,7 +108,8 @@ const StoryCard = ({
   isActive, 
   onLike, 
   onShare, 
-  onViewSeries, 
+  onViewSeries,
+  onViewCreator,
   onViewEpisodes,
   isMuted,
   onToggleMute,
@@ -213,7 +214,7 @@ const StoryCard = ({
       {/* Video */}
       <video
         ref={videoRef}
-        src={story.episode?.video_url}
+        src={story.video_url}
         className="w-full h-full object-contain"
         playsInline
         muted={isMuted}
@@ -304,29 +305,29 @@ const StoryCard = ({
       
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-20 p-4 bg-gradient-to-t from-black via-black/60 to-transparent z-20">
-        {/* Creator info - clickable to view series */}
+        {/* Creator info - clickable to view creator profile */}
         <button 
-          onClick={onViewSeries}
+          onClick={onViewCreator}
           className="flex items-center gap-3 mb-2 w-full text-left"
-          data-testid="story-series-info-btn"
+          data-testid="story-creator-btn"
         >
           <img 
-            src={story.series?.thumbnail} 
-            alt={story.series?.title}
+            src={story.creator_avatar || story.series_thumbnail || story.thumbnail}
+            alt={story.creator_name || story.series_title}
             className="w-10 h-10 rounded-full object-cover border-2 border-white"
           />
           <div className="flex-1">
-            <h3 className="font-bold text-white">@{story.series?.creator_name || story.series?.title?.toLowerCase().replace(/\s+/g, '_')}</h3>
-            <p className="text-gray-300 text-xs">Episode {story.episode?.episode_number || 1} • Free</p>
+            <h3 className="font-bold text-white">@{story.creator_name || story.series_title?.toLowerCase().replace(/\s+/g, '_') || 'creator'}</h3>
+            <p className="text-gray-300 text-xs">Episode {story.episode_number || 1} • Free</p>
           </div>
         </button>
         
         {/* Episode title */}
-        <p className="text-white font-semibold mb-1">{story.episode?.title}</p>
+        <p className="text-white font-semibold mb-1">{story.title || story.series_title}</p>
         
         {/* Caption/Description */}
         <p className="text-white/80 text-sm line-clamp-2">
-          {story.episode?.description || story.series?.description}
+          {story.description || story.series_description || "Watch this amazing story!"}
         </p>
       </div>
     </div>
@@ -484,6 +485,13 @@ export const StoriesPage = ({ onAuthClick }) => {
     navigate(`/series/${seriesId}`);
   };
   
+  // View creator profile handler
+  const handleViewCreator = (creatorId) => {
+    if (creatorId) {
+      navigate(`/creator/${creatorId}`);
+    }
+  };
+  
   // View episodes handler (swipe right equivalent)
   const handleViewEpisodes = (seriesId) => {
     navigate(`/series/${seriesId}?tab=episodes`);
@@ -545,8 +553,9 @@ export const StoriesPage = ({ onAuthClick }) => {
           isActive={true}
           onLike={() => handleLike(currentIndex)}
           onShare={() => setShowShareModal(true)}
-          onViewSeries={() => handleViewSeries(currentStory.series?.id)}
-          onViewEpisodes={() => handleViewEpisodes(currentStory.series?.id)}
+          onViewSeries={() => handleViewSeries(currentStory.series_id)}
+          onViewCreator={() => handleViewCreator(currentStory.creator_id)}
+          onViewEpisodes={() => handleViewEpisodes(currentStory.series_id)}
           isMuted={isMuted}
           onToggleMute={() => setIsMuted(!isMuted)}
           onNext={goToNext}
