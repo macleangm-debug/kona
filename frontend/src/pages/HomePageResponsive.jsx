@@ -776,6 +776,9 @@ export const HomePageResponsive = ({ onAuthClick }) => {
           </div>
         )}
 
+        {/* Live Streams Section */}
+        <LiveStreamsRow />
+
         {/* Start Watching Free - Prominent Section */}
         {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
           <div className="mb-8 lg:mb-12" data-testid="free-episodes-section">
