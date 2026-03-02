@@ -1,6 +1,18 @@
 """
 Live Streaming Routes
 Handles live stream sessions, chat, and VOD recording
+
+NOTE: Bunny.net Stream is primarily for VOD (Video on Demand), not live RTMP streaming.
+For production live streaming, consider:
+- Mux Live (https://mux.com/live) - Simple API, great for startups
+- AWS IVS (Interactive Video Service) - Scalable, pay-per-use
+- Cloudflare Stream Live - Good for global distribution
+- Wowza Streaming Cloud - Enterprise-grade
+
+The current implementation uses placeholder RTMP URLs. To enable real live streaming:
+1. Choose a live streaming provider
+2. Update the RTMP_URL and playback URL generation in create_live_stream and go_live functions
+3. Integrate webhook callbacks for stream status updates
 """
 import uuid
 from datetime import datetime, timezone, timedelta
@@ -9,11 +21,16 @@ from fastapi import APIRouter, HTTPException, Depends, WebSocket, WebSocketDisco
 from pydantic import BaseModel
 import asyncio
 import json
+import os
 
 from services import db
 from services.auth import get_current_user
 
 router = APIRouter(prefix="/livestream", tags=["LiveStream"])
+
+# Live streaming configuration - update these for production
+LIVE_RTMP_URL = os.environ.get("LIVE_RTMP_URL", "rtmp://live.kona.stream/app")
+LIVE_PLAYBACK_BASE = os.environ.get("LIVE_PLAYBACK_BASE", "https://live.kona.stream/hls")
 
 # ============ MODELS ============
 
