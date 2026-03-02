@@ -86,7 +86,7 @@ async def create_live_stream(data: CreateLiveStream, user: dict = Depends(get_cu
         "started_at": None,
         "ended_at": None,
         "stream_key": stream_key,
-        "rtmp_url": "rtmp://live.kona.stream/app",  # Placeholder - configure with real service
+        "rtmp_url": LIVE_RTMP_URL,  # Configure via LIVE_RTMP_URL env var for production
         "playback_url": None,  # HLS URL once live
         "is_subscriber_only": data.is_subscriber_only,
         "allow_tips": data.allow_tips,
