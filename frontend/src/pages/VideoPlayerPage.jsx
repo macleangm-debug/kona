@@ -305,6 +305,12 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
   const lastSavedProgress = useRef(0);
   const hasShownMidwayPrompt = useRef(false);
   
+  // Auto-play next episode states
+  const [showAutoPlayOverlay, setShowAutoPlayOverlay] = useState(false);
+  const [autoPlayCountdown, setAutoPlayCountdown] = useState(5);
+  const [autoPlayEnabled, setAutoPlayEnabled] = useState(true);
+  const autoPlayTimerRef = useRef(null);
+  
   // CDN Optimization states
   const [streamingConfig, setStreamingConfig] = useState(null);
   const [autoQuality, setAutoQuality] = useState(true);
