@@ -782,27 +782,47 @@ export const HomePageResponsive = ({ onAuthClick }) => {
         {/* Live Streams Section - Coming Soon, hidden until feature is live */}
         {/* <LiveStreamsRow /> */}
 
-        {/* Start Watching Free - Prominent Section */}
+        {/* Start Watching Free - Animated Eye-catching Section */}
         {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
           <div className="mb-8 lg:mb-12" data-testid="free-episodes-section">
-            <div className="mx-4 lg:mx-12 mb-4 p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-transparent border border-green-500/30">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <Play className="w-5 h-5 text-green-400 fill-green-400" />
-                    <h2 className="font-heading text-lg lg:text-xl font-bold text-green-400">Start Watching Free</h2>
+            <button 
+              onClick={() => navigate('/stories')}
+              className="group mx-4 lg:mx-12 mb-4 w-[calc(100%-2rem)] lg:w-[calc(100%-6rem)] relative overflow-hidden"
+            >
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-600/30 via-emerald-500/20 to-green-600/30 animate-gradient-x rounded-2xl" />
+              
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+              
+              {/* Glowing border */}
+              <div className="absolute inset-0 rounded-2xl border border-green-400/50 group-hover:border-green-400 transition-colors shadow-[0_0_20px_rgba(34,197,94,0.3)] group-hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]" />
+              
+              {/* Content */}
+              <div className="relative flex items-center justify-between p-4 lg:p-5">
+                <div className="flex items-center gap-3">
+                  {/* Animated play icon */}
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-green-400/30 rounded-full animate-ping" />
+                    <div className="relative w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                      <Play className="w-5 h-5 lg:w-6 lg:h-6 text-black fill-black ml-0.5" />
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-400">First episode free on all these series - no coins needed!</p>
+                  
+                  {/* Minimal text */}
+                  <div className="text-left">
+                    <span className="text-lg lg:text-xl font-bold text-white">Watch Free</span>
+                    <span className="hidden sm:inline text-lg lg:text-xl font-bold text-green-400 ml-2 animate-pulse">NOW</span>
+                  </div>
                 </div>
-                <button 
-                  onClick={() => navigate('/stories')}
-                  className="flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors"
-                >
-                  Watch All
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                
+                {/* Animated arrow */}
+                <div className="flex items-center gap-1 text-green-400">
+                  <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="w-6 h-6 -ml-4 opacity-50 group-hover:translate-x-2 transition-transform delay-75" />
+                </div>
               </div>
-            </div>
+            </button>
             <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
               {series
                 .filter(s => !s.is_exclusive && !s.custom_episode_price)

@@ -483,25 +483,45 @@ export const HomePage = ({ onAuthClick }) => {
         </div>
       )}
 
-      {/* Start Watching Free - Prominent Section */}
+      {/* Start Watching Free - Animated Eye-catching Section */}
       {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
         <div className="mb-6" data-testid="free-episodes-section">
-          <div className="mx-4 mb-3 p-3 rounded-xl bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-transparent border border-green-500/30">
-            <div className="flex items-center justify-between">
+          <button 
+            onClick={() => navigate('/stories')}
+            className="group mx-4 mb-3 w-[calc(100%-2rem)] relative overflow-hidden"
+          >
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-green-600/30 via-emerald-500/20 to-green-600/30 animate-gradient-x rounded-xl" />
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+            
+            {/* Glowing border */}
+            <div className="absolute inset-0 rounded-xl border border-green-400/50 group-hover:border-green-400 transition-colors shadow-[0_0_15px_rgba(34,197,94,0.3)] group-hover:shadow-[0_0_25px_rgba(34,197,94,0.5)]" />
+            
+            {/* Content */}
+            <div className="relative flex items-center justify-between p-3">
               <div className="flex items-center gap-2">
-                <Play className="w-4 h-4 text-green-400 fill-green-400" />
-                <h2 className="font-heading text-sm font-bold text-green-400">Start Watching Free</h2>
+                {/* Animated play icon */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-green-400/30 rounded-full animate-ping" />
+                  <div className="relative w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                    <Play className="w-4 h-4 text-black fill-black ml-0.5" />
+                  </div>
+                </div>
+                
+                {/* Minimal text */}
+                <span className="text-sm font-bold text-white">Watch Free</span>
+                <span className="text-sm font-bold text-green-400 animate-pulse">NOW</span>
               </div>
-              <button 
-                onClick={() => navigate('/stories')}
-                className="flex items-center text-xs text-green-400"
-              >
-                Watch All
-                <ChevronRight className="w-3 h-3" />
-              </button>
+              
+              {/* Animated arrow */}
+              <div className="flex items-center text-green-400">
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 -ml-3 opacity-50 group-hover:translate-x-2 transition-transform delay-75" />
+              </div>
             </div>
-            <p className="text-xs text-gray-400 mt-1">First episode free - no coins needed!</p>
-          </div>
+          </button>
           <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
             {series
               .filter(s => !s.is_exclusive && !s.custom_episode_price)
