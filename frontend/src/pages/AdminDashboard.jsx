@@ -10,7 +10,7 @@ import {
   Heart, Sparkles, Trash2, Play, Megaphone, Video, ExternalLink, Target,
   FlaskConical, Ticket, Briefcase, Newspaper, Settings2, Coins, Monitor,
   Bell, Send, Image as ImageIcon, Filter, Search, LayoutDashboard, Rocket, Building2,
-  FileCheck
+  FileCheck, Download
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -3683,6 +3683,92 @@ export const AdminDashboard = () => {
         {/* Docs & System Tab (Super Admin Only) */}
         {activeTab === "docs" && user?.is_super_admin && (
           <div className="space-y-6">
+            {/* Partnership Proposal Download Card */}
+            <Card className="p-6 bg-gradient-to-r from-purple-600/30 via-pink-500/20 to-orange-500/20 border-purple-500/30">
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-purple-500/30">
+                    <FileText className="w-8 h-8 text-purple-300" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold mb-1">KONA Partnership Proposal</h3>
+                    <p className="text-sm text-gray-300 mb-2">
+                      Comprehensive 10-page document covering all platform features for viewers, creators, and administrators.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className="bg-green-500/20 text-green-400 border-green-500/30">100+ Features</Badge>
+                      <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">3 User Types</Badge>
+                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">Revenue Model</Badge>
+                      <Badge className="bg-purple-500/20 text-purple-400 border-purple-500/30">Roadmap</Badge>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <a 
+                    href="/KONA_Partnership_Proposal.pdf" 
+                    download="KONA_Partnership_Proposal.pdf"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download PDF
+                  </a>
+                  <a 
+                    href="/KONA_Partnership_Proposal.html" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-medium transition-colors"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Online
+                  </a>
+                </div>
+              </div>
+            </Card>
+
+            {/* Feature Implementation Status */}
+            <Card className="p-6 bg-white/5 border-white/10">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-400" />
+                Feature Implementation Status
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20">
+                  <p className="text-sm font-medium text-green-400 mb-2">Fully Implemented</p>
+                  <ul className="text-xs text-gray-300 space-y-1">
+                    <li>• Video streaming (HLS + fallbacks)</li>
+                    <li>• Stories/Reels mode</li>
+                    <li>• Creator Portal + Content Management</li>
+                    <li>• Tip Jar + Tip Goals (75% to creator)</li>
+                    <li>• Creator Shop (digital + physical)</li>
+                    <li>• AI Thumbnail Generator</li>
+                    <li>• Analytics dashboards</li>
+                    <li>• Admin Dashboard + Contracts</li>
+                    <li>• Multi-language (EN, SW, FR)</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+                  <p className="text-sm font-medium text-yellow-400 mb-2">Backend Ready (UI Mock)</p>
+                  <ul className="text-xs text-gray-300 space-y-1">
+                    <li>• Subscriptions (simulated payment)</li>
+                    <li>• Payouts (KwikPay pending)</li>
+                    <li>• Email notifications (placeholder)</li>
+                    <li>• Trailer video processing</li>
+                    <li>• Shorts video processing</li>
+                  </ul>
+                </div>
+                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <p className="text-sm font-medium text-red-400 mb-2">Planned (Not Built)</p>
+                  <ul className="text-xs text-gray-300 space-y-1">
+                    <li>• M-Pesa / Stripe integration</li>
+                    <li>• Offline video downloads</li>
+                    <li>• Live streaming (Coming Soon UI)</li>
+                    <li>• Native mobile apps</li>
+                    <li>• Push notifications (Firebase ready)</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
             {docsLoading && !currentDoc ? (
               <div className="flex items-center justify-center py-20">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
