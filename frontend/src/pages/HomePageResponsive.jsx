@@ -21,6 +21,7 @@ import { LazySeriesCardDesktop } from "@/components/LazySeriesCardDesktop";
 import SpinInviteModal from "@/components/SpinInviteModal";
 import SEO from "@/components/SEO";
 import Footer from "@/components/Footer";
+import LiveStreamsRow from "@/components/LiveStreamsRow";
 
 // Content Row Component - Horizontal Scrollable
 const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveFromList, badge }) => {
