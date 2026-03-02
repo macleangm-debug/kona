@@ -258,7 +258,7 @@ class TestSeriesAPI:
     def setup(self):
         """Setup test fixtures"""
         self.session = requests.Session()
-        self.session.headers.update({"Content-Type": "application/json"})
+        self.session.headers.update(HEADERS)
     
     def test_series_list(self):
         """Test GET /api/series returns series list"""
