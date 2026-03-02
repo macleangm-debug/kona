@@ -60,8 +60,9 @@ async def create_indexes():
     
     # Creators collection indexes
     await db.creators.create_index("id", unique=True)
-    await db.creators.create_index("email", unique=True)
+    await db.creators.create_index("email", unique=True, sparse=True)  # sparse allows null values
     await db.creators.create_index("status")
+    await db.creators.create_index("user_id")
     
     # Watch progress indexes (for continue watching)
     await db.users.create_index([("watch_progress", 1)])

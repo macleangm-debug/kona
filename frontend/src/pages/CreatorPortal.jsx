@@ -31,7 +31,8 @@ import {
   FanPollsQA,
   TipDashboard,
   TipGoalsManager,
-  EarlyAccessSettings
+  EarlyAccessSettings,
+  CreatorShopManager
 } from "@/components/creator";
 
 export const CreatorPortal = () => {
@@ -345,6 +346,7 @@ export const CreatorPortal = () => {
               {activeTab === "polls" && "Engage fans with polls and answer their questions"}
               {activeTab === "tips" && "Track tips and see your top supporters"}
               {activeTab === "tip-goals" && "Create funding goals for your fans to support"}
+              {activeTab === "shop" && "Manage your digital and physical shop items"}
               {activeTab === "payouts" && "Manage your earnings and payouts"}
               {activeTab === "early-access" && "Offer premium subscribers early access to content"}
               {activeTab === "notifications" && "Stay updated with your account activity"}
@@ -442,6 +444,12 @@ export const CreatorPortal = () => {
           {activeTab === "tip-goals" && (
             <div className="max-w-7xl">
               <TipGoalsManager token={token} series={series} />
+            </div>
+          )}
+
+          {activeTab === "shop" && (
+            <div className="max-w-7xl">
+              <CreatorShopManager token={token} />
             </div>
           )}
 

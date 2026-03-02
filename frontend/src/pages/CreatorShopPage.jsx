@@ -17,7 +17,7 @@ export const CreatorShopPage = () => {
   const { creatorId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   
   const initialType = searchParams.get("type") || "all";
   
@@ -64,6 +64,12 @@ export const CreatorShopPage = () => {
 
     if (!selectedItem) return;
 
+    // Check if user has enough coins
+    if ((user?.coins || 0) < selectedItem.price_coins) {
+      toast.error("Not enough coins");
+      return;
+    }
+
     // Validate shipping for physical items
     if (selectedItem.type === "physical") {
       if (!shippingAddress.name || !shippingAddress.address || !shippingAddress.city || !shippingAddress.country) {
@@ -86,6 +92,11 @@ export const CreatorShopPage = () => {
       toast.success(response.data.message || "Purchase successful!");
       setShowPurchaseSheet(false);
       setSelectedItem(null);
+
+      // Refresh user balance
+      if (refreshUser) {
+        await refreshUser();
+      }
 
       // If digital item with download, offer download
       if (response.data.download_url) {

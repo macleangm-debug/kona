@@ -21,7 +21,7 @@ const TIP_AMOUNTS = [10, 25, 50, 100, 500];
 export const CreatorProfilePage = () => {
   const { creatorId } = useParams();
   const navigate = useNavigate();
-  const { user, token } = useAuth();
+  const { user, token, refreshUser } = useAuth();
   
   const [creator, setCreator] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -149,6 +149,12 @@ export const CreatorProfilePage = () => {
       return;
     }
 
+    // Check if user has enough coins
+    if ((user?.coins || 0) < tipAmount) {
+      toast.error("Not enough coins");
+      return;
+    }
+
     setIsTipping(true);
     try {
       const response = await axios.post(`${API}/creators/${creatorId}/tip`, {
@@ -161,6 +167,12 @@ export const CreatorProfilePage = () => {
       toast.success(response.data.message || `Sent ${tipAmount} coins!`);
       setShowTipSheet(false);
       setTipMessage("");
+      setTipAmount(50); // Reset to default
+      
+      // Refresh user balance
+      if (refreshUser) {
+        await refreshUser();
+      }
       
       // Refresh recent tips
       const tipsRes = await axios.get(`${API}/creators/${creatorId}/tips/recent?limit=5`);
