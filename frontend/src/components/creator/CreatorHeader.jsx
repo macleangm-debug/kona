@@ -203,7 +203,14 @@ export const CreatorHeader = ({
         </div>
 
         {/* Submit Button */}
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 space-y-2">
+          <Button 
+            className="w-full bg-red-600 hover:bg-red-700" 
+            onClick={() => navigate("/creator/go-live")} 
+            data-testid="go-live-btn"
+          >
+            <Radio className="w-4 h-4 mr-2" /> Go Live
+          </Button>
           <Button className="w-full" onClick={onSubmitSeries} data-testid="submit-series-btn">
             <Plus className="w-4 h-4 mr-2" /> Submit Series
           </Button>
