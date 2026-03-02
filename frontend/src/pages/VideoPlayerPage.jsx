@@ -918,11 +918,90 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
     ? allEpisodes[currentEpisodeIndex + 1] 
     : null;
 
+  // Check if next episode is unlocked or free
+  const isNextEpisodeFree = nextEpisode?.coins_required === 0 || nextEpisode?.is_free;
+  const isNextEpisodeUnlocked = nextEpisode?.is_unlocked;
+  const userCoins = user?.coins || 0;
+  const canAffordNext = userCoins >= (nextEpisode?.coins_required || 0);
+
+  // Auto-play countdown effect
+  useEffect(() => {
+    if (showAutoPlayOverlay && autoPlayCountdown > 0) {
+      autoPlayTimerRef.current = setTimeout(() => {
+        setAutoPlayCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (showAutoPlayOverlay && autoPlayCountdown === 0 && autoPlayEnabled) {
+      // Auto-play triggered
+      handleAutoPlayNext();
+    }
+    
+    return () => {
+      if (autoPlayTimerRef.current) {
+        clearTimeout(autoPlayTimerRef.current);
+      }
+    };
+  }, [showAutoPlayOverlay, autoPlayCountdown, autoPlayEnabled]);
+
+  // Handle auto-play next episode
+  const handleAutoPlayNext = async () => {
+    if (!nextEpisode) return;
+    
+    setShowAutoPlayOverlay(false);
+    setAutoPlayCountdown(5);
+    
+    // If episode is free or already unlocked, just navigate
+    if (isNextEpisodeFree || isNextEpisodeUnlocked) {
+      navigate(`/watch/${nextEpisode.id}`);
+      return;
+    }
+    
+    // If user has enough coins, auto-unlock and play
+    if (user && canAffordNext) {
+      try {
+        await axios.post(`${API}/episodes/unlock`, 
+          { episode_id: nextEpisode.id },
+          { headers: { Authorization: `Bearer ${token}` }}
+        );
+        toast.success(`Episode ${nextEpisode.episode_number} unlocked!`);
+        navigate(`/watch/${nextEpisode.id}`);
+      } catch (e) {
+        toast.error(e.response?.data?.detail || "Failed to unlock");
+        // Show manual unlock prompt on failure
+        setSignUpPromptType("next_episode_preview");
+        setShowSignUpPrompt(true);
+      }
+    } else {
+      // Not enough coins - show unlock prompt
+      setSignUpPromptType("next_episode_preview");
+      setShowSignUpPrompt(true);
+    }
+  };
+
+  // Cancel auto-play
+  const cancelAutoPlay = () => {
+    if (autoPlayTimerRef.current) {
+      clearTimeout(autoPlayTimerRef.current);
+    }
+    setShowAutoPlayOverlay(false);
+    setAutoPlayCountdown(5);
+  };
+
   // Show end prompt when video ends
   const handleVideoEnded = () => {
     if (nextEpisode) {
-      setSignUpPromptType("next_episode_preview");
-      setShowSignUpPrompt(true);
+      // Check if we can auto-play
+      if (isNextEpisodeFree || isNextEpisodeUnlocked || (user && canAffordNext)) {
+        // Show auto-play overlay with countdown
+        setShowAutoPlayOverlay(true);
+        setAutoPlayCountdown(5);
+      } else {
+        // No auto-play possible - show unlock prompt
+        setSignUpPromptType("next_episode_preview");
+        setShowSignUpPrompt(true);
+      }
+    } else {
+      // No more episodes - show series completion
+      toast.success("You've finished the series! 🎉");
     }
   };
 
