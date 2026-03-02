@@ -480,6 +480,42 @@ export const HomePage = ({ onAuthClick }) => {
         </div>
       )}
 
+      {/* Start Watching Free - Prominent Section */}
+      {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
+        <div className="mb-6" data-testid="free-episodes-section">
+          <div className="mx-4 mb-3 p-3 rounded-xl bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-transparent border border-green-500/30">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Play className="w-4 h-4 text-green-400 fill-green-400" />
+                <h2 className="font-heading text-sm font-bold text-green-400">Start Watching Free</h2>
+              </div>
+              <button 
+                onClick={() => navigate('/category/free-first-episode')}
+                className="text-xs text-green-400"
+              >
+                See All
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">First episode free - no coins needed!</p>
+          </div>
+          <div className="flex gap-3 px-4 overflow-x-auto scrollbar-hide pb-2">
+            {series
+              .filter(s => !s.is_exclusive && !s.custom_episode_price)
+              .slice(0, 10)
+              .map((s, index) => (
+                <div key={s.id} className="flex-shrink-0 w-28">
+                  <LazySeriesCard 
+                    series={s}
+                    badge={index < 3 ? "free" : null}
+                    onClick={() => navigate(`/watch/${s.id}-ep1`)}
+                    showViews={false}
+                  />
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Trending Now - Horizontal Scroll */}
       <div className="mb-6">
         <div className="flex items-center justify-between px-4 mb-3">
