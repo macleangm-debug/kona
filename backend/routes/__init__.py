@@ -43,6 +43,7 @@ from .shorts import router as shorts_router
 from .contracts import router as contracts_router
 from .super_creators import router as super_creators_router
 from .subtitles import router as subtitles_router
+from .livestream import router as livestream_router
 
 # Create main API router
 api_router = APIRouter()
