@@ -776,8 +776,8 @@ export const HomePageResponsive = ({ onAuthClick }) => {
           </div>
         )}
 
-        {/* Live Streams Section */}
-        <LiveStreamsRow />
+        {/* Live Streams Section - Coming Soon, hidden until feature is live */}
+        {/* <LiveStreamsRow /> */}
 
         {/* Start Watching Free - Prominent Section */}
         {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
