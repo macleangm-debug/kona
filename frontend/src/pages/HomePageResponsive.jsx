@@ -775,6 +775,46 @@ export const HomePageResponsive = ({ onAuthClick }) => {
           </div>
         )}
 
+        {/* Start Watching Free - Prominent Section */}
+        {series.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
+          <div className="mb-8 lg:mb-12" data-testid="free-episodes-section">
+            <div className="mx-4 lg:mx-12 mb-4 p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-transparent border border-green-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Play className="w-5 h-5 text-green-400 fill-green-400" />
+                    <h2 className="font-heading text-lg lg:text-xl font-bold text-green-400">Start Watching Free</h2>
+                  </div>
+                  <p className="text-sm text-gray-400">First episode free on all these series - no coins needed!</p>
+                </div>
+                <button 
+                  onClick={() => navigate('/category/free-first-episode')}
+                  className="hidden lg:flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors"
+                >
+                  See All
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
+              {series
+                .filter(s => !s.is_exclusive && !s.custom_episode_price)
+                .slice(0, 12)
+                .map((s, index) => (
+                  <LazySeriesCardDesktop
+                    key={s.id}
+                    series={s}
+                    badge={index < 3 ? "free" : null}
+                    onClick={() => navigate(`/watch/${s.id}-ep1`)}
+                    inMyList={myList?.includes(s.id)}
+                    onAddToList={handleAddToList}
+                    onRemoveFromList={handleRemoveFromList}
+                  />
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* Trending Now */}
         <ContentRow
           title={`${t('home.trending')} 🔥`}
