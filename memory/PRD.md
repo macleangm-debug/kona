@@ -1403,6 +1403,77 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Episode description field added to upload form
 
 
+### Session 17 Continued (2026-03-02) - Creator Tips & Shop System
+
+#### Creator Tips & Shop Features - COMPLETE ✅
+
+**Backend (`backend/routes/creator_shop.py`):**
+- **Tip System:**
+  - `POST /api/creators/{creator_id}/tip` - Send coins to creator
+  - `GET /api/creators/{creator_id}/tips/recent` - Get recent tips for display
+  - 90% goes to creator, 10% platform fee
+  - Notifications sent to creator on tip received
+
+- **Shop Items Management:**
+  - `GET /api/creators/{creator_id}/shop` - Get all shop items
+  - `GET /api/creators/{creator_id}/shop/items/{item_id}` - Get item details
+  - `POST /api/creators/{creator_id}/shop/items` - Create item (creator)
+  - `PATCH /api/creators/{creator_id}/shop/items/{item_id}` - Update item
+  - `DELETE /api/creators/{creator_id}/shop/items/{item_id}` - Delete item
+
+- **Purchases:**
+  - `POST /api/creators/{creator_id}/shop/purchase/{item_id}` - Buy item with coins
+  - `GET /api/creators/shop/my-purchases` - User's purchase history
+  - `GET /api/creators/shop/purchases/{purchase_id}` - Purchase details
+  - 85% goes to creator, 15% platform fee
+  - Digital items: instant download/email delivery
+  - Physical items: shipping address required, fulfillment tracking
+
+- **Creator Shop Management:**
+  - `GET /api/creators/shop/my-items` - Creator's own items
+  - `GET /api/creators/shop/my-orders` - Orders for fulfillment
+  - `PATCH /api/creators/shop/orders/{purchase_id}/fulfill` - Mark as shipped
+
+**Frontend Components:**
+
+1. **CreatorProfilePage.jsx** - Updated with:
+   - Support section header "✨ Support {Creator}"
+   - Three action cards: Send Tip (yellow), Digital Shop (purple), Merch (blue)
+   - Shop items preview carousel
+   - Recent supporters display
+   - Tip Sheet with quick amounts (10, 25, 50, 100, 500)
+   - Custom amount input, message field
+   - Balance display with "Get more" link
+
+2. **CreatorShopPage.jsx** - NEW:
+   - Header with creator name
+   - Filter tabs: All, Digital, Physical
+   - Items grid with type badges, stock indicators
+   - Purchase sheet with shipping form for physical items
+   - Price summary with balance check
+   - Delivery method indicators (instant download, shipping)
+
+**Routes Added:**
+- `/creator/:creatorId` - Creator profile with tips & shop
+- `/creator/:creatorId/shop` - Full shop browse page
+- `/creator/:creatorId/shop/:itemId` - Item details (reuses shop page)
+
+**Item Types Supported:**
+- **Digital:** Downloads, exclusive content, shoutouts (instant delivery)
+- **Physical:** Merchandise, signed items (requires shipping)
+
+**Database Collections:**
+- `shop_items` - Creator's digital/physical products
+- `purchases` - User purchase records with delivery status
+- `tips` - Tip transaction records
+
+**Testing Status:** Visual verification complete
+- ✅ Creator profile shows Support section with 3 cards
+- ✅ Tip sheet opens with amount buttons and message field
+- ✅ Shop page shows filter tabs and empty state
+- ✅ All routes navigating correctly
+
+
 ### Session 17 Continued (2026-03-02) - Major Features Implementation
 
 #### 1. Adaptive Bitrate Streaming (ABR) - ALREADY COMPLETE

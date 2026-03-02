@@ -4,14 +4,19 @@ import axios from "axios";
 import {
   ChevronLeft, Play, Users, Eye, Film, Calendar,
   Share2, CheckCircle, Instagram, Twitter, Youtube,
-  ExternalLink, Heart, Plus, Check
+  ExternalLink, Heart, Plus, Check, Gift, ShoppingBag,
+  Package, Coins, X, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { API } from "@/config";
 import { toast } from "sonner";
-import { LazySeriesCard } from "@/components";
+
+// Tip amounts for quick selection
+const TIP_AMOUNTS = [10, 25, 50, 100, 500];
 
 export const CreatorProfilePage = () => {
   const { creatorId } = useParams();
@@ -23,6 +28,16 @@ export const CreatorProfilePage = () => {
   const [error, setError] = useState(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  
+  // Tip state
+  const [showTipSheet, setShowTipSheet] = useState(false);
+  const [tipAmount, setTipAmount] = useState(50);
+  const [tipMessage, setTipMessage] = useState("");
+  const [isTipping, setIsTipping] = useState(false);
+  
+  // Shop state
+  const [shopItems, setShopItems] = useState([]);
+  const [recentTips, setRecentTips] = useState([]);
 
   useEffect(() => {
     const fetchCreator = async () => {
@@ -40,6 +55,22 @@ export const CreatorProfilePage = () => {
           } catch (e) {
             console.error("Failed to check follow status:", e);
           }
+        }
+        
+        // Fetch shop items
+        try {
+          const shopRes = await axios.get(`${API}/creators/${creatorId}/shop?limit=6`);
+          setShopItems(shopRes.data.items || []);
+        } catch (e) {
+          console.error("Failed to fetch shop:", e);
+        }
+        
+        // Fetch recent tips
+        try {
+          const tipsRes = await axios.get(`${API}/creators/${creatorId}/tips/recent?limit=5`);
+          setRecentTips(tipsRes.data || []);
+        } catch (e) {
+          console.error("Failed to fetch tips:", e);
         }
       } catch (err) {
         setError(err.response?.data?.detail || "Creator not found");
@@ -103,6 +134,41 @@ export const CreatorProfilePage = () => {
     } else {
       navigator.clipboard.writeText(shareUrl);
       toast.success("Profile link copied!");
+    }
+  };
+
+  const handleSendTip = async () => {
+    if (!token) {
+      toast.error("Please sign in to send tips");
+      navigate("/login");
+      return;
+    }
+
+    if (tipAmount < 1) {
+      toast.error("Minimum tip is 1 coin");
+      return;
+    }
+
+    setIsTipping(true);
+    try {
+      const response = await axios.post(`${API}/creators/${creatorId}/tip`, {
+        amount: tipAmount,
+        message: tipMessage || null
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success(response.data.message || `Sent ${tipAmount} coins!`);
+      setShowTipSheet(false);
+      setTipMessage("");
+      
+      // Refresh recent tips
+      const tipsRes = await axios.get(`${API}/creators/${creatorId}/tips/recent?limit=5`);
+      setRecentTips(tipsRes.data || []);
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to send tip");
+    } finally {
+      setIsTipping(false);
     }
   };
 
@@ -257,8 +323,112 @@ export const CreatorProfilePage = () => {
         )}
       </div>
 
+      {/* Support Section - Tips & Shop */}
+      <div className="px-4 mt-6">
+        <h3 className="font-bold mb-3 flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-yellow-400" />
+          Support {creator?.display_name?.split(' ')[0]}
+        </h3>
+        
+        {/* Action Cards */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          {/* Tip Card */}
+          <button
+            onClick={() => setShowTipSheet(true)}
+            className="p-4 rounded-xl bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 hover:border-yellow-500/50 transition-all text-center"
+            data-testid="tip-btn"
+          >
+            <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-yellow-500/20 flex items-center justify-center">
+              <Gift className="w-5 h-5 text-yellow-400" />
+            </div>
+            <p className="text-sm font-medium">Send Tip</p>
+            <p className="text-[10px] text-muted-foreground">Support creator</p>
+          </button>
+          
+          {/* Digital Shop Card */}
+          <button
+            onClick={() => navigate(`/creator/${creatorId}/shop?type=digital`)}
+            className="p-4 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 hover:border-purple-500/50 transition-all text-center"
+            data-testid="digital-shop-btn"
+          >
+            <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-purple-500/20 flex items-center justify-center">
+              <ShoppingBag className="w-5 h-5 text-purple-400" />
+            </div>
+            <p className="text-sm font-medium">Digital</p>
+            <p className="text-[10px] text-muted-foreground">Downloads & more</p>
+          </button>
+          
+          {/* Physical Shop Card */}
+          <button
+            onClick={() => navigate(`/creator/${creatorId}/shop?type=physical`)}
+            className="p-4 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 hover:border-blue-500/50 transition-all text-center"
+            data-testid="physical-shop-btn"
+          >
+            <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <Package className="w-5 h-5 text-blue-400" />
+            </div>
+            <p className="text-sm font-medium">Merch</p>
+            <p className="text-[10px] text-muted-foreground">Physical items</p>
+          </button>
+        </div>
+        
+        {/* Shop Items Preview */}
+        {shopItems.length > 0 && (
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-muted-foreground">Shop Items</p>
+              <button 
+                onClick={() => navigate(`/creator/${creatorId}/shop`)}
+                className="text-xs text-primary"
+              >
+                View All
+              </button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+              {shopItems.slice(0, 4).map((item) => (
+                <div 
+                  key={item.id}
+                  onClick={() => navigate(`/creator/${creatorId}/shop/${item.id}`)}
+                  className="flex-shrink-0 w-24 cursor-pointer group"
+                >
+                  <div className="aspect-square rounded-lg overflow-hidden bg-white/5 mb-1">
+                    <img 
+                      src={item.image_url || "/default-product.jpg"} 
+                      alt={item.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
+                  </div>
+                  <p className="text-xs truncate">{item.title}</p>
+                  <p className="text-[10px] text-yellow-400 flex items-center gap-0.5">
+                    <Coins className="w-3 h-3" />
+                    {item.price_coins}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* Recent Tips */}
+        {recentTips.length > 0 && (
+          <div className="p-3 rounded-xl bg-white/5 border border-white/10">
+            <p className="text-xs text-muted-foreground mb-2">Recent Supporters</p>
+            <div className="flex flex-wrap gap-2">
+              {recentTips.map((tip, index) => (
+                <div key={index} className="flex items-center gap-1 px-2 py-1 rounded-full bg-yellow-500/10 text-xs">
+                  <span className="text-yellow-400">{tip.from_username}</span>
+                  <span className="text-muted-foreground">sent</span>
+                  <span className="text-yellow-400 font-medium">{tip.amount}</span>
+                  <Coins className="w-3 h-3 text-yellow-400" />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Series Grid */}
-      <div className="px-4">
+      <div className="px-4 mt-6">
         <h3 className="font-bold mb-3 flex items-center gap-2">
           <Film className="w-4 h-4 text-primary" />
           Series ({creator?.series?.length || 0})
@@ -300,6 +470,84 @@ export const CreatorProfilePage = () => {
           </div>
         )}
       </div>
+
+      {/* Tip Sheet */}
+      <Sheet open={showTipSheet} onOpenChange={setShowTipSheet}>
+        <SheetContent side="bottom" className="bg-gray-900 border-white/10 rounded-t-3xl">
+          <SheetHeader>
+            <SheetTitle className="text-white flex items-center gap-2">
+              <Gift className="w-5 h-5 text-yellow-400" />
+              Send a Tip to {creator?.display_name?.split(' ')[0]}
+            </SheetTitle>
+          </SheetHeader>
+          
+          <div className="py-4 space-y-4">
+            {/* Quick amounts */}
+            <div className="flex flex-wrap gap-2">
+              {TIP_AMOUNTS.map((amount) => (
+                <Button
+                  key={amount}
+                  variant={tipAmount === amount ? "default" : "outline"}
+                  onClick={() => setTipAmount(amount)}
+                  className="flex-1 min-w-[60px]"
+                >
+                  <Coins className="w-4 h-4 mr-1 text-yellow-400" />
+                  {amount}
+                </Button>
+              ))}
+            </div>
+            
+            {/* Custom amount */}
+            <div>
+              <label className="text-xs text-muted-foreground">Custom amount</label>
+              <Input
+                type="number"
+                value={tipAmount}
+                onChange={(e) => setTipAmount(Math.max(1, parseInt(e.target.value) || 0))}
+                className="bg-white/10 border-white/20"
+                min={1}
+                max={10000}
+              />
+            </div>
+            
+            {/* Message */}
+            <div>
+              <label className="text-xs text-muted-foreground">Add a message (optional)</label>
+              <Input
+                value={tipMessage}
+                onChange={(e) => setTipMessage(e.target.value)}
+                placeholder="Say something nice..."
+                className="bg-white/10 border-white/20"
+                maxLength={200}
+              />
+            </div>
+            
+            {/* Balance info */}
+            <div className="flex items-center justify-between text-sm p-3 rounded-lg bg-white/5">
+              <span className="text-muted-foreground">Your balance:</span>
+              <span className="text-white font-bold flex items-center gap-1">
+                <Coins className="w-4 h-4 text-yellow-400" />
+                {user?.coins || 0}
+              </span>
+            </div>
+            
+            {/* Send button */}
+            <Button
+              onClick={handleSendTip}
+              disabled={isTipping || !tipAmount || (user?.coins || 0) < tipAmount}
+              className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold"
+            >
+              {isTipping ? "Sending..." : `Send ${tipAmount} Coins`}
+            </Button>
+            
+            {(user?.coins || 0) < tipAmount && (
+              <p className="text-center text-xs text-red-400">
+                Not enough coins. <button onClick={() => navigate("/store")} className="underline">Get more</button>
+              </p>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };

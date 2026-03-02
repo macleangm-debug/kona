@@ -44,6 +44,7 @@ from .contracts import router as contracts_router
 from .super_creators import router as super_creators_router
 from .subtitles import router as subtitles_router
 from .livestream import router as livestream_router
+from .creator_shop import router as creator_shop_router
 
 # Create main API router
 api_router = APIRouter()
@@ -92,3 +93,4 @@ api_router.include_router(contracts_router)
 api_router.include_router(super_creators_router)
 api_router.include_router(subtitles_router)
 api_router.include_router(livestream_router)
+api_router.include_router(creator_shop_router)
