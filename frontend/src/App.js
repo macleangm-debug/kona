@@ -70,6 +70,8 @@ import SupportTicketPage from "@/pages/SupportTicketPage";
 import ContentPage from "@/pages/ContentPage";
 import SupportChatWidget from "@/components/SupportChatWidget";
 import SuperCreatorDashboard from "@/pages/SuperCreatorDashboard";
+import LivePlayer from "@/pages/LivePlayer";
+import GoLive from "@/pages/GoLive";
 
 // Swiper CSS
 import 'swiper/css';
