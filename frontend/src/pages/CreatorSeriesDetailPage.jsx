@@ -942,6 +942,7 @@ export const CreatorSeriesDetailPage = () => {
   const [selectedEpisode, setSelectedEpisode] = useState(null);
   const [episodeForm, setEpisodeForm] = useState({
     title: "",
+    description: "",  // Caption for free episodes
     intro_duration: 30,
     is_free: false,
     coins_required: 5,
@@ -1338,6 +1339,7 @@ export const CreatorSeriesDetailPage = () => {
     setSelectedEpisode(episode);
     setEpisodeForm({
       title: episode.title || "",
+      description: episode.description || "",  // Caption for free episodes
       intro_duration: episode.intro_duration || 30,
       is_free: episode.is_free || false,
       coins_required: episode.coins_required || 5,
@@ -1386,6 +1388,7 @@ export const CreatorSeriesDetailPage = () => {
     try {
       const params = new URLSearchParams();
       if (episodeForm.title) params.append("title", episodeForm.title);
+      if (episodeForm.description) params.append("description", episodeForm.description);
       params.append("intro_duration", episodeForm.intro_duration);
       params.append("is_free", episodeForm.is_free);
       if (!episodeForm.is_free) params.append("coins_required", episodeForm.coins_required);
@@ -2074,6 +2077,26 @@ export const CreatorSeriesDetailPage = () => {
                 placeholder="Episode title"
                 data-testid="episode-title-input"
               />
+            </div>
+            
+            {/* Caption/Description - Shows on Stories feed for free episodes */}
+            <div>
+              <label className="text-sm text-muted-foreground">Caption</label>
+              <p className="text-xs text-muted-foreground mb-2">
+                This text appears below the video in Stories feed (like Instagram captions)
+              </p>
+              <textarea
+                value={episodeForm.description}
+                onChange={(e) => setEpisodeForm({...episodeForm, description: e.target.value})}
+                placeholder="Write a caption for your episode..."
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white resize-none text-sm"
+                rows={3}
+                maxLength={300}
+                data-testid="episode-description-input"
+              />
+              <p className="text-xs text-muted-foreground text-right mt-1">
+                {episodeForm.description?.length || 0}/300
+              </p>
             </div>
             
             <div>

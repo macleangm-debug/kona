@@ -304,7 +304,7 @@ const StoryCard = ({
       
       {/* Bottom info */}
       <div className="absolute bottom-0 left-0 right-20 p-4 bg-gradient-to-t from-black via-black/60 to-transparent z-20">
-        {/* Series info - clickable to view series */}
+        {/* Creator info - clickable to view series */}
         <button 
           onClick={onViewSeries}
           className="flex items-center gap-3 mb-2 w-full text-left"
@@ -316,14 +316,17 @@ const StoryCard = ({
             className="w-10 h-10 rounded-full object-cover border-2 border-white"
           />
           <div className="flex-1">
-            <h3 className="font-bold text-white">{story.series?.title}</h3>
-            <p className="text-gray-300 text-sm">Episode 1 • Free</p>
+            <h3 className="font-bold text-white">@{story.series?.creator_name || story.series?.title?.toLowerCase().replace(/\s+/g, '_')}</h3>
+            <p className="text-gray-300 text-xs">Episode {story.episode?.episode_number || 1} • Free</p>
           </div>
         </button>
         
         {/* Episode title */}
+        <p className="text-white font-semibold mb-1">{story.episode?.title}</p>
+        
+        {/* Caption/Description */}
         <p className="text-white/80 text-sm line-clamp-2">
-          {story.episode?.title || story.series?.description}
+          {story.episode?.description || story.series?.description}
         </p>
       </div>
     </div>

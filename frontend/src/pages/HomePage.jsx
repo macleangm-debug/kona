@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Search, Gift, Star, Play, Sparkles } from "lucide-react";
+import { Search, Gift, Star, Play, Sparkles, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination } from 'swiper/modules';
@@ -15,6 +15,7 @@ import { API } from "@/config";
 import { toast } from "sonner";
 import { KonaLogo2Full } from "@/components/KonaLogo";
 import { CoinBalance, SeriesCard, LazySeriesCard, ContinueWatchingCard, ComingSoonCard, DailyRewardModal, ReminderSuccessModal, SearchModal } from "@/components";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Tab Button
 const TabButton = ({ active, children, onClick }) => (
@@ -277,7 +278,9 @@ export const HomePage = ({ onAuthClick }) => {
       {/* Header - Fixed at top */}
       <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black via-black/90 to-transparent max-w-md mx-auto" data-testid="app-header">
         <KonaLogo2Full height={28} />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {/* Language Selector - Always visible */}
+          <LanguageSelector showLabel={false} />
           {/* Search Button */}
           <button 
             className="p-2 hover:bg-white/10 rounded-full transition-colors"
@@ -490,10 +493,11 @@ export const HomePage = ({ onAuthClick }) => {
                 <h2 className="font-heading text-sm font-bold text-green-400">Start Watching Free</h2>
               </div>
               <button 
-                onClick={() => navigate('/category/free-first-episode')}
-                className="text-xs text-green-400"
+                onClick={() => navigate('/stories')}
+                className="flex items-center text-xs text-green-400"
               >
-                See All
+                Watch All
+                <ChevronRight className="w-3 h-3" />
               </button>
             </div>
             <p className="text-xs text-gray-400 mt-1">First episode free - no coins needed!</p>
@@ -507,7 +511,7 @@ export const HomePage = ({ onAuthClick }) => {
                   <LazySeriesCard 
                     series={s}
                     badge={index < 3 ? "free" : null}
-                    onClick={() => navigate(`/watch/${s.id}-ep1`)}
+                    onClick={() => navigate(`/stories?series=${s.id}`)}
                     showViews={false}
                   />
                 </div>

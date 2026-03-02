@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { Search, Gift, Star, Play, Info, Plus, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell, Sparkles } from "lucide-react";
+import { Search, Gift, Star, Play, Info, Plus, Check, Volume2, VolumeX, ChevronLeft, ChevronRight, Bell, Sparkles, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { EffectCoverflow, Autoplay, Pagination, Navigation } from 'swiper/modules';
@@ -22,6 +22,7 @@ import SpinInviteModal from "@/components/SpinInviteModal";
 import SEO from "@/components/SEO";
 import Footer from "@/components/Footer";
 import LiveStreamsRow from "@/components/LiveStreamsRow";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 // Content Row Component - Horizontal Scrollable
 const ContentRow = ({ title, series, onCardClick, myList, onAddToList, onRemoveFromList, badge }) => {
@@ -669,7 +670,9 @@ export const HomePageResponsive = ({ onAuthClick }) => {
       {!isDesktop && (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black via-black/90 to-transparent lg:hidden" data-testid="mobile-header">
           <KonaLogo2Full height={28} />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Language Selector - Always visible */}
+            <LanguageSelector showLabel={false} />
             <button 
               className="p-2 hover:bg-white/10 rounded-full"
               onClick={() => setShowSearch(true)}
@@ -792,10 +795,10 @@ export const HomePageResponsive = ({ onAuthClick }) => {
                   <p className="text-sm text-gray-400">First episode free on all these series - no coins needed!</p>
                 </div>
                 <button 
-                  onClick={() => navigate('/category/free-first-episode')}
-                  className="hidden lg:flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors"
+                  onClick={() => navigate('/stories')}
+                  className="flex items-center gap-1 text-sm text-green-400 hover:text-green-300 transition-colors"
                 >
-                  See All
+                  Watch All
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -809,7 +812,7 @@ export const HomePageResponsive = ({ onAuthClick }) => {
                     key={s.id}
                     series={s}
                     badge={index < 3 ? "free" : null}
-                    onClick={() => navigate(`/watch/${s.id}-ep1`)}
+                    onClick={() => navigate(`/stories?series=${s.id}`)}
                     inMyList={myList?.includes(s.id)}
                     onAddToList={handleAddToList}
                     onRemoveFromList={handleRemoveFromList}

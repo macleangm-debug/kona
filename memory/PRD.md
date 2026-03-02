@@ -1363,6 +1363,46 @@ REACT_APP_BACKEND_URL=<backend-url>
 - ✅ Subtitle API endpoint responding correctly
 
 
+### Session 17 Continued (2026-03-02) - Language Picker & Instagram-Style Free Videos
+
+#### 1. Language Picker Without Login - COMPLETE ✅
+- Added `LanguageSelector` component to mobile header (visible without authentication)
+- Users can now change language on landing page before signing in
+- **Files Modified:**
+  - `frontend/src/pages/HomePageResponsive.jsx` - Added LanguageSelector import and component
+  - `frontend/src/pages/HomePage.jsx` - Added LanguageSelector to header
+
+#### 2. Instagram/TikTok Style Free Videos - COMPLETE ✅
+**StoriesPage already has the layout:**
+- Full-screen video with right-side vertical action icons (❤️ Like, Share, Episodes, Volume)
+- Creator avatar + @username at bottom left
+- Episode title and caption displayed
+
+**Episode Caption/Description Feature:**
+- Added `description` field to episode editor form
+- Labeled as "Caption" with hint about Stories feed display
+- 300 character limit with counter
+- Caption appears in StoriesPage below creator info
+- **Files Modified:**
+  - `frontend/src/pages/CreatorSeriesDetailPage.jsx` - Added description field to episodeForm state and editor UI
+  - `frontend/src/pages/StoriesPage.jsx` - Updated to show episode description as caption
+  - Backend already supports `description` field in PATCH /api/creator/episodes/{id}
+
+**Free Videos Section UX Update:**
+- "Watch All" button now links to `/stories` page (Instagram-style viewer)
+- Clicking on free series cards opens Stories page with that series
+- **Files Modified:**
+  - `frontend/src/pages/HomePageResponsive.jsx` - Updated free section links
+  - `frontend/src/pages/HomePage.jsx` - Updated free section links
+
+**Testing Status:** Visual verification complete
+- ✅ Language selector visible in mobile header without login
+- ✅ Stories page has TikTok/Instagram-style layout
+- ✅ Right-side action icons (Like, Share, Episodes, Volume)
+- ✅ Creator info with @username at bottom left
+- ✅ Episode description field added to upload form
+
+
 ### Session 17 Continued (2026-03-02) - Major Features Implementation
 
 #### 1. Adaptive Bitrate Streaming (ABR) - ALREADY COMPLETE
