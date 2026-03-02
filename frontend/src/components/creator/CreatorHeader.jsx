@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   ChevronLeft, ChevronDown, ChevronRight, Plus, LayoutDashboard, LineChart, Bell, History,
   Film, Settings, LogOut, Trophy, Coins, Calendar, TrendingUp,
-  ShoppingBag, Handshake, Wand2, PieChart, Rocket, Briefcase, Vote, Gift, Target, Clock
+  ShoppingBag, Handshake, Wand2, PieChart, Rocket, Briefcase, Vote, Gift, Target, Clock, Radio
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
