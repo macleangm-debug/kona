@@ -1776,6 +1776,120 @@ export const VideoPlayerPage = ({ onAuthClick }) => {
         </div>
       )}
 
+      {/* Auto-Play Next Episode Overlay */}
+      {showAutoPlayOverlay && nextEpisode && (
+        <div className="absolute inset-0 z-60 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col justify-end p-6 animate-fade-in">
+          {/* Background blur effect */}
+          <div className="absolute inset-0 backdrop-blur-sm" />
+          
+          {/* Content */}
+          <div className="relative z-10 max-w-lg mx-auto w-full">
+            {/* Up Next Label */}
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-gray-400 text-sm uppercase tracking-wider">Up Next in</span>
+              <div className="flex items-center gap-2">
+                {/* Countdown Circle */}
+                <div className="relative w-12 h-12">
+                  <svg className="w-12 h-12 -rotate-90">
+                    <circle cx="24" cy="24" r="20" stroke="rgba(255,255,255,0.2)" strokeWidth="3" fill="none" />
+                    <circle 
+                      cx="24" cy="24" r="20" 
+                      stroke="#8b5cf6" 
+                      strokeWidth="3" 
+                      fill="none"
+                      strokeDasharray={125.6}
+                      strokeDashoffset={125.6 - (125.6 * (5 - autoPlayCountdown) / 5)}
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center text-white font-bold text-lg">
+                    {autoPlayCountdown}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Next Episode Card */}
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 mb-4 border border-white/10">
+              <div className="flex gap-4">
+                {/* Thumbnail */}
+                <div className="relative w-32 aspect-video rounded-xl overflow-hidden flex-shrink-0">
+                  <img 
+                    src={nextEpisode.thumbnail || series?.thumbnail} 
+                    alt={nextEpisode.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-2 left-2 bg-black/80 px-2 py-1 rounded-full text-xs text-white font-medium">
+                    EP {nextEpisode.episode_number}
+                  </div>
+                  {/* Play icon overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center">
+                      <Play className="w-5 h-5 text-black ml-0.5" fill="black" />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-white text-lg line-clamp-1">{nextEpisode.title}</h3>
+                  <p className="text-gray-400 text-sm mt-1">{series?.title}</p>
+                  
+                  {/* Cost indicator */}
+                  <div className="flex items-center gap-2 mt-3">
+                    {isNextEpisodeFree || isNextEpisodeUnlocked ? (
+                      <span className="text-green-400 text-sm font-medium flex items-center gap-1">
+                        <Check className="w-4 h-4" />
+                        {isNextEpisodeUnlocked ? "Unlocked" : "Free"}
+                      </span>
+                    ) : (
+                      <span className="text-yellow-400 text-sm font-medium flex items-center gap-1">
+                        <Coins className="w-4 h-4" />
+                        {nextEpisode.coins_required} coins
+                        {canAffordNext && <Check className="w-4 h-4 text-green-400 ml-1" />}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <Button 
+                variant="outline" 
+                className="flex-1 border-white/20 text-white hover:bg-white/10"
+                onClick={cancelAutoPlay}
+              >
+                <X className="w-4 h-4 mr-2" />
+                Cancel
+              </Button>
+              <Button 
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+                onClick={handleAutoPlayNext}
+              >
+                <Play className="w-4 h-4 mr-2" fill="white" />
+                Play Now
+              </Button>
+            </div>
+
+            {/* Auto-play toggle */}
+            <button 
+              className="w-full mt-4 text-center text-gray-400 text-sm hover:text-white transition-colors"
+              onClick={() => {
+                setAutoPlayEnabled(!autoPlayEnabled);
+                if (autoPlayEnabled) {
+                  cancelAutoPlay();
+                }
+              }}
+            >
+              {autoPlayEnabled ? "Disable auto-play" : "Enable auto-play"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Horizontal swipe feedback */}
       {swipeDirection && (
         <div className="absolute inset-0 z-40 pointer-events-none flex items-center justify-center">
