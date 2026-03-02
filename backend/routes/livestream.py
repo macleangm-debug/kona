@@ -450,7 +450,7 @@ async def tip_streamer(
         for ws in chat_connections.get(stream_id, []):
             try:
                 await ws.send_json(tip_message)
-            except:
+            except Exception:
                 pass
     
     return {
@@ -511,7 +511,7 @@ async def send_chat_message(
         for ws in chat_connections.get(stream_id, []):
             try:
                 await ws.send_json({"type": "message", **chat_message})
-            except:
+            except Exception:
                 pass
     
     return chat_message
@@ -561,7 +561,7 @@ async def websocket_chat(websocket: WebSocket, stream_id: str):
                 for ws in chat_connections.get(stream_id, []):
                     try:
                         await ws.send_json(chat_message)
-                    except:
+                    except Exception:
                         pass
             
             elif data.get("type") == "ping":

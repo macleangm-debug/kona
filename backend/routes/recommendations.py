@@ -532,7 +532,7 @@ async def analyze_user_behavior(user_id: str) -> dict:
                     time_counts["night"] += 1
                 
                 day_counts[dt.strftime("%A").lower()] += 1
-            except:
+            except Exception:
                 pass
     
     # Calculate binge score (multiple episodes in same day)
@@ -544,7 +544,7 @@ async def analyze_user_behavior(user_id: str) -> dict:
                 dt = datetime.fromisoformat(watched_at.replace("Z", "+00:00"))
                 day_key = dt.strftime("%Y-%m-%d")
                 episodes_per_day[day_key] += 1
-            except:
+            except Exception:
                 pass
     
     avg_eps_per_day = sum(episodes_per_day.values()) / len(episodes_per_day) if episodes_per_day else 1
@@ -604,7 +604,7 @@ def calculate_recommendation_score(series: dict, prefs: dict, behavior: dict, co
                 score += 10
             elif days_old < 90:
                 score += 5
-        except:
+        except Exception:
             pass
     
     # Episode count for binge watchers (0-10 points)
@@ -656,7 +656,7 @@ def get_recommendation_reason(series: dict, prefs: dict, behavior: dict) -> str:
             days_old = (datetime.now(timezone.utc) - created).days
             if days_old < 14:
                 reasons.append("New release")
-        except:
+        except Exception:
             pass
     
     episode_count = series.get("episode_count", 0)
