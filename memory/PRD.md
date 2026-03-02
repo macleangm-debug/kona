@@ -1433,6 +1433,8 @@ REACT_APP_BACKEND_URL=<backend-url>
 - Frontend: 100% (All UI elements verified)
 - Test report: `/app/test_reports/iteration_63.json`
 
+**Note:** Live Streaming is marked as "COMING SOON" - backend routes exist but frontend shows a placeholder page until a real RTMP streaming service is configured.
+
 **Files Created This Session:**
 - `/app/backend/routes/livestream.py`
 - `/app/frontend/src/pages/LivePlayer.jsx`
