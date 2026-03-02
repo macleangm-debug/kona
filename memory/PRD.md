@@ -1318,3 +1318,48 @@ REACT_APP_BACKEND_URL=<backend-url>
 - Recommendation engine improvements (ML models)
 - Social features (comments, reactions)
 
+
+### Session 17 (2026-03-02) - Subtitle Management & Free First Episode UX
+
+1. **Subtitle Management System (VERIFIED COMPLETE)**
+   - Backend routes fully implemented in `backend/routes/subtitles.py`
+   - Frontend editor component complete in `frontend/src/components/creator/SubtitleEditor.jsx`
+   - Supports multiple formats: .docx, .txt, .srt, .vtt
+   - Auto-converts to VTT format for video player compatibility
+   - In-app subtitle editor with line-by-line editing
+   - Language support: English, Swahili, French, Arabic, Portuguese, Hausa, Amharic, Zulu
+   - **Endpoints:**
+     - `POST /api/subtitles/upload` - Upload subtitle file
+     - `POST /api/subtitles/from-text` - Create from plain text with auto-timing
+     - `POST /api/subtitles/editor` - Save from in-app editor
+     - `GET /api/subtitles/{episode_id}/{language}` - Get subtitles
+     - `GET /api/subtitles/{episode_id}/{language}/vtt` - Get VTT format
+     - `GET /api/subtitles/{episode_id}` - List all subtitles
+     - `DELETE /api/subtitles/{episode_id}/{language}` - Delete subtitles
+
+2. **Free First Episode UX Enhancement (COMPLETED)**
+   - Removed blinking "Free Episodes" floating button from mobile homepage
+   - Added prominent "Start Watching Free" section to all homepage variants:
+     - `frontend/src/pages/HomePageResponsive.jsx` - Desktop responsive
+     - `frontend/src/pages/HomePage.jsx` - Mobile
+     - `frontend/src/pages/DiscoverPage.jsx` - Discovery page
+   - Green gradient banner with clear messaging: "First episode free on all these series - no coins needed!"
+   - "FREE EP1" badge styling added to SeriesCard and SeriesCardDesktop components
+   - Direct navigation to video player (`/watch/{series_id}-ep1`) for instant playback
+
+3. **Badge System Enhancement**
+   - Added "free" badge type to both mobile and desktop series cards
+   - Badge styling: Green gradient background with "FREE" or "FREE EP1" text
+   - **Modified:**
+     - `frontend/src/components/SeriesCard.jsx`
+     - `frontend/src/components/SeriesCardDesktop.jsx`
+
+**Testing Status:** All changes verified working via screenshots
+- ✅ Blinking button removed from mobile view
+- ✅ "Start Watching Free" section visible on desktop homepage
+- ✅ "Start Watching Free" section visible on mobile homepage
+- ✅ "Start Watching Free" section visible on Discover page
+- ✅ FREE EP1 badges displaying correctly on series cards
+- ✅ Subtitle API endpoint responding correctly
+
+
