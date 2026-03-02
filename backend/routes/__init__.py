@@ -42,6 +42,7 @@ from .early_access import router as early_access_router
 from .shorts import router as shorts_router
 from .contracts import router as contracts_router
 from .super_creators import router as super_creators_router
+from .subtitles import router as subtitles_router
 
 # Create main API router
 api_router = APIRouter()
