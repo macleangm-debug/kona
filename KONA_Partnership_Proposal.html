@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KONA - African Mini-Series Streaming Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .page {
+            min-height: 100vh;
+            padding: 60px;
+            page-break-after: always;
+        }
+        
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        
+        /* Cover Page */
+        .cover {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cover::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .cover-logo {
+            font-size: 120px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cover-tagline {
+            font-size: 28px;
+            font-weight: 300;
+            color: #a0aec0;
+            margin-bottom: 40px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cover-subtitle {
+            font-size: 18px;
+            color: #718096;
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cover-badge {
+            margin-top: 60px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cover-date {
+            position: absolute;
+            bottom: 40px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 50px;
+        }
+        
+        .section-number {
+            font-size: 14px;
+            font-weight: 600;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .section-title {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #a0aec0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+        }
+        
+        .section-subtitle {
+            font-size: 18px;
+            color: #718096;
+            max-width: 700px;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin: 50px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(236, 72, 153, 0.05) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #a0aec0;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .feature-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 35px;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        
+        .icon-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .icon-pink { background: linear-gradient(135deg, #ec4899, #db2777); }
+        .icon-blue { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .icon-green { background: linear-gradient(135deg, #10b981, #059669); }
+        .icon-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .icon-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        
+        .feature-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+        
+        .feature-desc {
+            font-size: 15px;
+            color: #a0aec0;
+            line-height: 1.7;
+        }
+        
+        .feature-list {
+            margin-top: 15px;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            font-size: 14px;
+            color: #cbd5e0;
+        }
+        
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        /* User Type Sections */
+        .user-section {
+            margin: 50px 0;
+        }
+        
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        
+        .user-title {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        
+        .user-subtitle {
+            font-size: 16px;
+            color: #718096;
+        }
+        
+        /* Revenue Table */
+        .revenue-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        .revenue-table th {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            padding: 18px 25px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .revenue-table td {
+            padding: 18px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-size: 15px;
+        }
+        
+        .revenue-table tr:nth-child(even) {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .revenue-table .highlight {
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        /* Roadmap */
+        .roadmap {
+            margin: 40px 0;
+        }
+        
+        .roadmap-item {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 15px;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .roadmap-phase {
+            min-width: 100px;
+        }
+        
+        .roadmap-phase-label {
+            font-size: 12px;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .roadmap-phase-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+        
+        .roadmap-content h4 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #e2e8f0;
+        }
+        
+        .roadmap-content p {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        /* Tech Stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .tech-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .tech-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .tech-desc {
+            font-size: 13px;
+            color: #718096;
+        }
+        
+        /* Contact Section */
+        .contact-box {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.1) 100%);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 25px;
+            padding: 50px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        
+        .contact-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .contact-text {
+            font-size: 16px;
+            color: #a0aec0;
+            margin-bottom: 30px;
+        }
+        
+        /* Three Column Features */
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .three-col-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .three-col-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        
+        .three-col-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .three-col-desc {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+        
+        /* Highlight Box */
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            padding: 25px 30px;
+            margin: 30px 0;
+        }
+        
+        .highlight-box-title {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .highlight-box-text {
+            color: #a0aec0;
+            font-size: 15px;
+        }
+        
+        /* Bullet List */
+        .bullet-list {
+            columns: 2;
+            column-gap: 40px;
+            list-style: none;
+            padding: 0;
+        }
+        
+        .bullet-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+            font-size: 15px;
+            color: #cbd5e0;
+            break-inside: avoid;
+        }
+        
+        .bullet-list li::before {
+            content: '●';
+            position: absolute;
+            left: 0;
+            color: #8b5cf6;
+        }
+        
+        /* Page Footer */
+        .page-footer {
+            position: absolute;
+            bottom: 30px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            color: #4a5568;
+            font-size: 12px;
+        }
+        
+        /* Comparison Table */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .comparison-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 35px;
+        }
+        
+        .comparison-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .comparison-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .comparison-list li:last-child {
+            border-bottom: none;
+        }
+        
+        @media print {
+            .page {
+                page-break-after: always;
+            }
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Page 1: Cover -->
+<div class="page cover">
+    <div class="cover-logo">KONA</div>
+    <div class="cover-tagline">African Mini-Series Streaming Platform</div>
+    <div class="cover-subtitle">
+        A comprehensive B2C streaming ecosystem connecting African storytellers with global audiences through innovative content delivery, creator monetization, and viewer engagement.
+    </div>
+    <div class="cover-badge">Partnership Proposal 2026</div>
+    <div class="cover-date">Confidential | March 2026</div>
+</div>
+
+<!-- Page 2: Executive Summary -->
+<div class="page" style="background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0a 100%);">
+    <div class="section-header">
+        <div class="section-number">01 — Overview</div>
+        <div class="section-title">Executive Summary</div>
+        <div class="section-subtitle">Kona is building the Netflix of African short-form content, designed specifically for mobile-first audiences across the continent and diaspora.</div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value">100+</div>
+            <div class="stat-label">Features Built</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">User Types</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">45+</div>
+            <div class="stat-label">API Endpoints</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Languages</div>
+        </div>
+    </div>
+    
+    <div class="three-col">
+        <div class="three-col-item">
+            <div class="three-col-icon">🎬</div>
+            <div class="three-col-title">Content Platform</div>
+            <div class="three-col-desc">Stream African mini-series, dramas, and short-form content with Netflix-quality experience</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">💰</div>
+            <div class="three-col-title">Creator Economy</div>
+            <div class="three-col-desc">Comprehensive monetization tools: tips, shops, early access, sponsorships, and automated payouts</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">🌍</div>
+            <div class="three-col-title">African-First</div>
+            <div class="three-col-desc">Built for African audiences with M-Pesa integration, local languages, and mobile-optimized design</div>
+        </div>
+    </div>
+    
+    <div class="highlight-box">
+        <div class="highlight-box-title">🎯 Our Mission</div>
+        <div class="highlight-box-text">To democratize African storytelling by providing creators with world-class tools to produce, distribute, and monetize their content while delivering an immersive viewing experience to audiences worldwide.</div>
+    </div>
+</div>
+
+<!-- Page 3: Viewer Features -->
+<div class="page" style="background: #0a0a0a;">
+    <div class="section-header">
+        <div class="section-number">02 — For Viewers</div>
+        <div class="section-title">Viewer Experience</div>
+        <div class="section-subtitle">A premium streaming experience designed for mobile-first African audiences with engaging features that keep viewers coming back.</div>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon icon-purple">🎥</div>
+            <div class="feature-title">Netflix-Style Streaming</div>
+            <div class="feature-desc">Premium video playback with adaptive quality streaming. Our multi-tier fallback system ensures smooth playback across all network conditions.</div>
+            <ul class="feature-list">
+                <li>HLS adaptive streaming (auto quality adjustment)</li>
+                <li>MP4 fallback at 720p, 480p, 360p</li>
+                <li>Bunny.net CDN for global delivery</li>
+                <li>Offline download support (coming soon)</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-pink">📱</div>
+            <div class="feature-title">Stories/Reels Mode</div>
+            <div class="feature-desc">TikTok-style vertical video browsing for free content. Swipe through episodes in an immersive full-screen experience.</div>
+            <ul class="feature-list">
+                <li>Full-screen vertical video player</li>
+                <li>Swipe navigation between episodes</li>
+                <li>Creator info overlay with follow button</li>
+                <li>Like, share, and tip actions</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-blue">🎯</div>
+            <div class="feature-title">Smart Recommendations</div>
+            <div class="feature-desc">AI-powered content discovery that learns from viewing habits to serve personalized suggestions.</div>
+            <ul class="feature-list">
+                <li>Personalized "For You" feed</li>
+                <li>"Because You Watched" suggestions</li>
+                <li>Trending content from real-time activity</li>
+                <li>Genre-based discovery</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-green">🪙</div>
+            <div class="feature-title">Coin Economy</div>
+            <div class="feature-desc">Engage with content through our virtual currency system. Earn coins through activities and spend them to support creators.</div>
+            <ul class="feature-list">
+                <li>Daily check-in rewards</li>
+                <li>Achievement-based earnings</li>
+                <li>Referral bonuses</li>
+                <li>Leaderboard rankings</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="three-col" style="margin-top: 40px;">
+        <div class="three-col-item">
+            <div class="three-col-icon">🔍</div>
+            <div class="three-col-title">Smart Search</div>
+            <div class="three-col-desc">Auto-complete, trending searches, filters by genre/rating, and search history</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">🎉</div>
+            <div class="three-col-title">Watch Parties</div>
+            <div class="three-col-desc">Synchronized viewing with friends, real-time chat, and shared reactions</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">🌐</div>
+            <div class="three-col-title">Multi-Language</div>
+            <div class="three-col-desc">English, Swahili, and French with subtitle support for accessibility</div>
+        </div>
+    </div>
+</div>
+
+<!-- Page 4: Creator Features Part 1 -->
+<div class="page" style="background: linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 100%);">
+    <div class="section-header">
+        <div class="section-number">03 — For Creators</div>
+        <div class="section-title">Creator Portal</div>
+        <div class="section-subtitle">Professional-grade tools for content creators to produce, manage, and monetize their work with unprecedented control.</div>
+    </div>
+    
+    <div class="user-section">
+        <div class="user-header">
+            <div class="user-icon icon-purple">🎬</div>
+            <div>
+                <div class="user-title">Content Management</div>
+                <div class="user-subtitle">Upload, organize, and publish your series with ease</div>
+            </div>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon icon-purple">📤</div>
+                <div class="feature-title">Batch Episode Upload</div>
+                <div class="feature-desc">Upload multiple episodes at once with drag-and-drop simplicity. Progress tracking shows upload status with thumbnail previews.</div>
+                <ul class="feature-list">
+                    <li>Drag & drop file selection</li>
+                    <li>Bulk metadata editing</li>
+                    <li>Season organization</li>
+                    <li>Automatic CDN distribution</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-pink">📅</div>
+                <div class="feature-title">Episode Scheduler</div>
+                <div class="feature-desc">Queue episodes for timed release with timezone support. Notify subscribers automatically when new content drops.</div>
+                <ul class="feature-list">
+                    <li>Timezone selection (EAT, WAT, EET, UTC)</li>
+                    <li>Early access hours for premium subscribers</li>
+                    <li>Subscriber notifications</li>
+                    <li>Release countdown timers</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-blue">🤖</div>
+                <div class="feature-title">AI Thumbnail Generator</div>
+                <div class="feature-desc">Generate stunning thumbnails with AI. Multi-provider system uses OpenAI and Gemini for high-quality results.</div>
+                <ul class="feature-list">
+                    <li>Custom prompts with style options</li>
+                    <li>Genre-based auto-generation</li>
+                    <li>A/B testing with multiple variants</li>
+                    <li>One-click apply to series/episodes</li>
+                </ul>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon icon-green">🎞️</div>
+                <div class="feature-title">Trailer Creator</div>
+                <div class="feature-desc">Automatically compile highlights from your episodes into promotional trailers with AI scene detection.</div>
+                <ul class="feature-list">
+                    <li>AI-powered scene detection</li>
+                    <li>Background music library</li>
+                    <li>Multiple export formats</li>
+                    <li>Title and end cards</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page 5: Creator Features Part 2 - Monetization -->
+<div class="page" style="background: #0a0a0a;">
+    <div class="section-header">
+        <div class="section-number">03 — For Creators (Continued)</div>
+        <div class="section-title">Monetization Suite</div>
+        <div class="section-subtitle">Multiple revenue streams to maximize creator earnings with transparent, creator-friendly terms.</div>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon icon-green">💎</div>
+            <div class="feature-title">Tip Jar System</div>
+            <div class="feature-desc">Receive tips from fans with 5 tiers featuring stunning visual effects. Creators receive 75% of all tips.</div>
+            <ul class="feature-list">
+                <li>Small (10), Medium (50), Large (100) coins</li>
+                <li>Super (500), Mega (1000) coins</li>
+                <li>Visual effects: sparkles, hearts, fireworks</li>
+                <li>Anonymous tipping option</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-orange">🎯</div>
+            <div class="feature-title">Tip Goals & Fundraising</div>
+            <div class="feature-desc">Create public fundraising campaigns for special projects. Track progress and celebrate with contributors.</div>
+            <ul class="feature-list">
+                <li>Up to 3 active goals per creator</li>
+                <li>Goals from 100 to 1M coins</li>
+                <li>Progress tracking with contributor list</li>
+                <li>Video player integration</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-purple">🛍️</div>
+            <div class="feature-title">Creator Shop</div>
+            <div class="feature-desc">Sell digital and physical merchandise directly to fans. Full inventory management and order fulfillment system.</div>
+            <ul class="feature-list">
+                <li>Digital items (instant delivery)</li>
+                <li>Physical merchandise with shipping</li>
+                <li>Image upload for products</li>
+                <li>Order fulfillment with tracking</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-pink">⏰</div>
+            <div class="feature-title">Early Access Subscriptions</div>
+            <div class="feature-desc">Offer exclusive early access to dedicated fans. Three tiers with configurable pricing and access windows.</div>
+            <ul class="feature-list">
+                <li>Basic Tier: 24 hours early</li>
+                <li>Premium Tier: 48 hours early</li>
+                <li>VIP Tier: 72 hours early</li>
+                <li>Per-series or per-episode configuration</li>
+            </ul>
+        </div>
+    </div>
+    
+    <table class="revenue-table" style="margin-top: 40px;">
+        <thead>
+            <tr>
+                <th>Revenue Stream</th>
+                <th>Creator Share</th>
+                <th>Platform Share</th>
+                <th>Payout Speed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tips (Tip Jar)</td>
+                <td class="highlight">75%</td>
+                <td>25%</td>
+                <td>Instant to balance</td>
+            </tr>
+            <tr>
+                <td>Shop Sales</td>
+                <td class="highlight">75%</td>
+                <td>25%</td>
+                <td>Instant to balance</td>
+            </tr>
+            <tr>
+                <td>Episode Purchases</td>
+                <td class="highlight">60%</td>
+                <td>40%</td>
+                <td>After 25% platform fee</td>
+            </tr>
+            <tr>
+                <td>Early Access</td>
+                <td class="highlight">70%</td>
+                <td>30%</td>
+                <td>Monthly</td>
+            </tr>
+            <tr>
+                <td>Sponsorships</td>
+                <td class="highlight">85%</td>
+                <td>15%</td>
+                <td>Per campaign</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Page 6: Creator Features Part 3 - Analytics & Engagement -->
+<div class="page" style="background: linear-gradient(180deg, #0a0a0a 0%, #0f0f1a 100%);">
+    <div class="section-header">
+        <div class="section-number">03 — For Creators (Continued)</div>
+        <div class="section-title">Analytics & Engagement</div>
+        <div class="section-subtitle">Deep insights into your audience and powerful tools to build community around your content.</div>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon icon-blue">📊</div>
+            <div class="feature-title">Real-Time Analytics</div>
+            <div class="feature-desc">Live dashboard showing earnings, views, and engagement as they happen. Make data-driven decisions.</div>
+            <ul class="feature-list">
+                <li>Live viewer count</li>
+                <li>Hourly earnings breakdown</li>
+                <li>Geographic distribution</li>
+                <li>Device and platform analytics</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-purple">📈</div>
+            <div class="feature-title">Content Performance</div>
+            <div class="feature-desc">Understand what resonates with your audience. AI-powered insights help optimize your content strategy.</div>
+            <ul class="feature-list">
+                <li>Episode retention analysis</li>
+                <li>Genre performance comparison</li>
+                <li>"Best Time to Post" recommendations</li>
+                <li>Audience segment breakdown</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-pink">📋</div>
+            <div class="feature-title">Fan Polls & Q&A</div>
+            <div class="feature-desc">Engage directly with your audience through polls and question sessions. Build community and gather feedback.</div>
+            <ul class="feature-list">
+                <li>Multiple choice, Yes/No, Rating polls</li>
+                <li>Q&A with upvoting system</li>
+                <li>Pin polls to series pages</li>
+                <li>Real-time results</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-green">🏆</div>
+            <div class="feature-title">Milestones & Achievements</div>
+            <div class="feature-desc">Track your journey with achievement badges. Earn bonus coins for hitting major milestones.</div>
+            <ul class="feature-list">
+                <li>5 categories: Views, Episodes, Earnings, Series, Streak</li>
+                <li>Multiple tiers with escalating rewards</li>
+                <li>Celebration animations</li>
+                <li>Public badges on profile</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="comparison" style="margin-top: 40px;">
+        <div class="comparison-card">
+            <div class="comparison-title">💼 Sponsorship Marketplace</div>
+            <ul class="comparison-list">
+                <li><span>Browse Campaigns</span><span>✓</span></li>
+                <li><span>Apply with Pitch</span><span>✓</span></li>
+                <li><span>Set Asking Price</span><span>✓</span></li>
+                <li><span>Track Applications</span><span>✓</span></li>
+                <li><span>Receive Brand Outreach</span><span>✓</span></li>
+            </ul>
+        </div>
+        
+        <div class="comparison-card">
+            <div class="comparison-title">💸 Automated Payouts</div>
+            <ul class="comparison-list">
+                <li><span>Instant ($100+)</span><span>2% fee</span></li>
+                <li><span>Weekly ($50-99)</span><span>1.5% fee</span></li>
+                <li><span>Bi-weekly ($25-49)</span><span>1% fee</span></li>
+                <li><span>Monthly ($10-24)</span><span>0.5% fee</span></li>
+                <li><span>Auto-payout at threshold</span><span>✓</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Page 7: Admin Features -->
+<div class="page" style="background: #0a0a0a;">
+    <div class="section-header">
+        <div class="section-number">04 — For Administrators</div>
+        <div class="section-title">Admin Dashboard</div>
+        <div class="section-subtitle">Comprehensive platform management tools for content moderation, user management, and business operations.</div>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon icon-red">👥</div>
+            <div class="feature-title">User Management</div>
+            <div class="feature-desc">Full control over user accounts with search, filters, and administrative actions.</div>
+            <ul class="feature-list">
+                <li>Search and filter users</li>
+                <li>Edit user details and coins</li>
+                <li>Manage subscription status</li>
+                <li>Ban/unban functionality</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-orange">📺</div>
+            <div class="feature-title">Content Moderation</div>
+            <div class="feature-desc">Review and moderate all platform content with approval workflows and quality control.</div>
+            <ul class="feature-list">
+                <li>Series approval queue</li>
+                <li>Episode review system</li>
+                <li>Creator applications</li>
+                <li>Content flagging</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-green">💰</div>
+            <div class="feature-title">Revenue & Finance</div>
+            <div class="feature-desc">Track platform revenue, configure commission rates, and manage exchange rates for multi-currency support.</div>
+            <ul class="feature-list">
+                <li>Revenue dashboard with analytics</li>
+                <li>Configurable commission rates (default 75/25)</li>
+                <li>Exchange rate management</li>
+                <li>Per-series pricing override</li>
+            </ul>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon icon-blue">📢</div>
+            <div class="feature-title">Notifications System</div>
+            <div class="feature-desc">Broadcast notifications to user segments with automated triggers for engagement.</div>
+            <ul class="feature-list">
+                <li>Segment targeting (All, VIP, Creators, etc.)</li>
+                <li>Automated triggers (new episode, low coins)</li>
+                <li>Campaign analytics</li>
+                <li>Push notification support</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="three-col" style="margin-top: 40px;">
+        <div class="three-col-item">
+            <div class="three-col-icon">📝</div>
+            <div class="three-col-title">Contract Management</div>
+            <div class="three-col-desc">Creator contracts with revenue splits, tax handling, and Super Creator territories</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">🧪</div>
+            <div class="three-col-title">A/B Testing</div>
+            <div class="three-col-desc">Thumbnail testing with traffic allocation, CTR tracking, and auto-apply winners</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">⚙️</div>
+            <div class="three-col-title">Platform Settings</div>
+            <div class="three-col-desc">Global pricing, video format enforcement, first episode free toggle</div>
+        </div>
+    </div>
+</div>
+
+<!-- Page 8: Technical Architecture -->
+<div class="page" style="background: linear-gradient(180deg, #0f0f1a 0%, #0a0a0a 100%);">
+    <div class="section-header">
+        <div class="section-number">05 — Technology</div>
+        <div class="section-title">Technical Architecture</div>
+        <div class="section-subtitle">Built on modern, scalable technologies designed to handle millions of users across Africa and beyond.</div>
+    </div>
+    
+    <div class="tech-grid">
+        <div class="tech-item">
+            <div class="tech-name">⚛️ React</div>
+            <div class="tech-desc">Modern frontend with lazy loading, memoization, and smooth animations</div>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">⚡ FastAPI</div>
+            <div class="tech-desc">High-performance Python backend with async support</div>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">🍃 MongoDB</div>
+            <div class="tech-desc">Flexible document database with Motor async driver</div>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">🐰 Bunny.net CDN</div>
+            <div class="tech-desc">Global video delivery with adaptive streaming</div>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">🔐 JWT Auth</div>
+            <div class="tech-desc">Secure authentication with session management</div>
+        </div>
+        <div class="tech-item">
+            <div class="tech-name">🌐 i18next</div>
+            <div class="tech-desc">Multi-language support with 3 languages</div>
+        </div>
+    </div>
+    
+    <div class="highlight-box">
+        <div class="highlight-box-title">📱 Mobile-First Design</div>
+        <div class="highlight-box-text">Kona is built for the mobile generation. Every feature is designed to work seamlessly on smartphones with touch-friendly interfaces, optimized data usage, and offline capabilities planned for future releases.</div>
+    </div>
+    
+    <div class="comparison" style="margin-top: 40px;">
+        <div class="comparison-card">
+            <div class="comparison-title">🎥 Video Streaming</div>
+            <ul class="comparison-list">
+                <li><span>HLS Adaptive Streaming</span><span>Primary</span></li>
+                <li><span>MP4 720p Fallback</span><span>Tier 2</span></li>
+                <li><span>MP4 480p Fallback</span><span>Tier 3</span></li>
+                <li><span>MP4 360p Fallback</span><span>Tier 4</span></li>
+                <li><span>Embed Player</span><span>Last Resort</span></li>
+            </ul>
+        </div>
+        
+        <div class="comparison-card">
+            <div class="comparison-title">🔒 Security Features</div>
+            <ul class="comparison-list">
+                <li><span>JWT Authentication</span><span>✓</span></li>
+                <li><span>Token Expiration Checks</span><span>✓</span></li>
+                <li><span>Device Limit Enforcement</span><span>✓</span></li>
+                <li><span>CORS Configuration</span><span>✓</span></li>
+                <li><span>Rate Limiting</span><span>✓</span></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Page 9: Roadmap -->
+<div class="page" style="background: #0a0a0a;">
+    <div class="section-header">
+        <div class="section-number">06 — Future</div>
+        <div class="section-title">Product Roadmap</div>
+        <div class="section-subtitle">Our vision for the future of African content streaming with exciting features on the horizon.</div>
+    </div>
+    
+    <div class="roadmap">
+        <div class="roadmap-item" style="border-color: #10b981;">
+            <div class="roadmap-phase">
+                <div class="roadmap-phase-label">Completed</div>
+                <div class="roadmap-phase-name">Phase 1</div>
+            </div>
+            <div class="roadmap-content">
+                <h4>Core Platform (✓ Complete)</h4>
+                <p>Full streaming platform with viewer experience, creator portal, admin dashboard, monetization suite, analytics, and AI tools. 100+ features implemented and tested.</p>
+            </div>
+        </div>
+        
+        <div class="roadmap-item" style="border-color: #f59e0b;">
+            <div class="roadmap-phase">
+                <div class="roadmap-phase-label">In Progress</div>
+                <div class="roadmap-phase-name">Phase 2</div>
+            </div>
+            <div class="roadmap-content">
+                <h4>Payment Integration</h4>
+                <p>M-Pesa, Airtel Money, and Stripe/Flutterwave integration for real-money transactions. Enable creators to cash out earnings and viewers to purchase coins with local payment methods.</p>
+            </div>
+        </div>
+        
+        <div class="roadmap-item" style="border-color: #8b5cf6;">
+            <div class="roadmap-phase">
+                <div class="roadmap-phase-label">Upcoming</div>
+                <div class="roadmap-phase-name">Phase 3</div>
+            </div>
+            <div class="roadmap-content">
+                <h4>Subscription System</h4>
+                <p>Premium subscription tiers with auto-renewal, exclusive content access, ad-free viewing, and enhanced creator tools for subscribers.</p>
+            </div>
+        </div>
+        
+        <div class="roadmap-item" style="border-color: #ec4899;">
+            <div class="roadmap-phase">
+                <div class="roadmap-phase-label">Planned</div>
+                <div class="roadmap-phase-name">Phase 4</div>
+            </div>
+            <div class="roadmap-content">
+                <h4>Offline Downloads & Live Streaming</h4>
+                <p>Download episodes for offline viewing with encrypted storage. Launch live streaming for creators with real-time chat and live tipping.</p>
+            </div>
+        </div>
+        
+        <div class="roadmap-item" style="border-color: #3b82f6;">
+            <div class="roadmap-phase">
+                <div class="roadmap-phase-label">Vision</div>
+                <div class="roadmap-phase-name">Phase 5</div>
+            </div>
+            <div class="roadmap-content">
+                <h4>Mobile Apps & Global Expansion</h4>
+                <p>Native iOS and Android apps via Capacitor. Expand to new African markets with localized content and regional payment methods.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Page 10: Partnership -->
+<div class="page" style="background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 100%);">
+    <div class="section-header">
+        <div class="section-number">07 — Partnership</div>
+        <div class="section-title">Why Partner With Kona?</div>
+        <div class="section-subtitle">Join us in revolutionizing African content streaming with a platform built for scale, engagement, and creator success.</div>
+    </div>
+    
+    <div class="three-col">
+        <div class="three-col-item">
+            <div class="three-col-icon">🚀</div>
+            <div class="three-col-title">Production Ready</div>
+            <div class="three-col-desc">100+ features built, tested, and ready for launch. Full ecosystem for viewers, creators, and administrators.</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">💎</div>
+            <div class="three-col-title">Creator-First</div>
+            <div class="three-col-desc">Industry-leading 75% revenue share for tips and shop sales. Comprehensive monetization tools.</div>
+        </div>
+        <div class="three-col-item">
+            <div class="three-col-icon">🌍</div>
+            <div class="three-col-title">African Market</div>
+            <div class="three-col-desc">Built specifically for African audiences with local payment methods, languages, and mobile-first design.</div>
+        </div>
+    </div>
+    
+    <div class="stats-grid" style="margin-top: 50px;">
+        <div class="stat-card">
+            <div class="stat-value">22+</div>
+            <div class="stat-label">Viewer Features</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">45+</div>
+            <div class="stat-label">Creator Features</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">35+</div>
+            <div class="stat-label">Admin Features</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">5+</div>
+            <div class="stat-label">Revenue Streams</div>
+        </div>
+    </div>
+    
+    <div class="contact-box">
+        <div class="contact-title">Ready to Transform African Storytelling?</div>
+        <div class="contact-text">Let's discuss how we can work together to bring world-class streaming to African audiences and empower the next generation of African content creators.</div>
+        <div style="margin-top: 30px; color: #a0aec0;">
+            <p style="font-size: 18px; font-weight: 600; color: #ffffff; margin-bottom: 10px;">KONA</p>
+            <p>African Mini-Series Streaming Platform</p>
+            <p style="margin-top: 20px; font-size: 14px;">Confidential Partnership Document | March 2026</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
