@@ -3,9 +3,10 @@ Creator Shop & Tips Routes
 Handles creator monetization: tips, digital items, and physical merchandise
 """
 import uuid
+import base64
 from datetime import datetime, timezone
 from typing import Optional, List
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile, File
 from pydantic import BaseModel
 import os
 
@@ -13,6 +14,28 @@ from services import db
 from services.auth import get_current_user
 
 router = APIRouter(prefix="/creators", tags=["CreatorShop"])
+
+# ============ PLATFORM SETTINGS ============
+
+async def get_platform_settings():
+    """Get platform commission settings"""
+    settings = await db.platform_settings.find_one({"id": "commission_rates"})
+    if not settings:
+        # Default: 75% to creator, 25% platform fee
+        return {
+            "tip_creator_percent": 75,
+            "shop_creator_percent": 75
+        }
+    return settings
+
+async def get_creator_percent(setting_type: str) -> float:
+    """Get the creator percentage for tips or shop purchases"""
+    settings = await get_platform_settings()
+    if setting_type == "tip":
+        return settings.get("tip_creator_percent", 75) / 100.0
+    elif setting_type == "shop":
+        return settings.get("shop_creator_percent", 75) / 100.0
+    return 0.75  # Default 75%
 
 # ============ MODELS ============
 
@@ -73,8 +96,10 @@ async def send_tip_to_creator(
         {"$inc": {"coins": -data.amount}}
     )
     
-    # Add to creator's balance (90% goes to creator, 10% platform fee)
-    creator_amount = int(data.amount * 0.9)
+    # Get configurable creator percentage
+    creator_percent = await get_creator_percent("tip")
+    creator_amount = int(data.amount * creator_percent)
+    
     await db.creators.update_one(
         {"id": creator_id},
         {"$inc": {"coins_balance": creator_amount, "total_tips": data.amount}}
@@ -311,8 +336,10 @@ async def purchase_shop_item(
         {"$inc": {"coins": -price}}
     )
     
-    # Add to creator's balance (85% for shop items, 15% platform fee)
-    creator_amount = int(price * 0.85)
+    # Get configurable creator percentage
+    creator_percent = await get_creator_percent("shop")
+    creator_amount = int(price * creator_percent)
+    
     await db.creators.update_one(
         {"id": creator_id},
         {"$inc": {"coins_balance": creator_amount, "shop_revenue": price}}
@@ -501,3 +528,77 @@ async def fulfill_order(
     })
     
     return {"message": "Order marked as shipped"}
+
+
+
+# ============ IMAGE UPLOAD ============
+
+UPLOAD_DIR = "/app/uploads/shop_images"
+
+@router.post("/shop/upload-image")
+async def upload_shop_image(
+    file: UploadFile = File(...),
+    user: dict = Depends(get_current_user)
+):
+    """Upload an image for shop item (PNG, JPG, WEBP)"""
+    # Verify user is a creator
+    creator = await db.creators.find_one({"user_id": user["id"]})
+    if not creator:
+        raise HTTPException(status_code=403, detail="Not a creator")
+    
+    # Validate file type
+    allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Allowed: PNG, JPG, WEBP")
+    
+    # Read file content
+    content = await file.read()
+    
+    # Check file size (max 5MB)
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+    
+    # Create upload directory if it doesn't exist
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+    
+    # Generate unique filename
+    ext = file.filename.split(".")[-1] if "." in file.filename else "png"
+    image_id = f"shop-img-{uuid.uuid4().hex[:12]}.{ext}"
+    file_path = os.path.join(UPLOAD_DIR, image_id)
+    
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(content)
+    
+    # Return the URL (will be served via API)
+    image_url = f"/api/creators/shop/images/{image_id}"
+    
+    return {
+        "success": True,
+        "image_id": image_id,
+        "image_url": image_url
+    }
+
+@router.get("/shop/images/{image_id}")
+async def get_shop_image(image_id: str):
+    """Serve a shop item image"""
+    from fastapi.responses import FileResponse
+    
+    file_path = os.path.join(UPLOAD_DIR, image_id)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+    
+    # Determine content type
+    ext = image_id.split(".")[-1].lower()
+    content_types = {
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "webp": "image/webp"
+    }
+    
+    return FileResponse(
+        file_path, 
+        media_type=content_types.get(ext, "image/png"),
+        headers={"Cache-Control": "public, max-age=31536000"}
+    )

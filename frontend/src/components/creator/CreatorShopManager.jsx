@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import {
   Plus, Edit2, Trash2, Package, Download, ShoppingBag,
   Coins, Image as ImageIcon, Eye, EyeOff, Truck, Mail,
-  ChevronRight, MoreVertical, Save, X, AlertCircle, Check
+  ChevronRight, MoreVertical, Save, X, AlertCircle, Check, Upload, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -51,6 +51,8 @@ export const CreatorShopManager = ({ token }) => {
     download_url: ""
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Order details
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -217,6 +219,50 @@ export const CreatorShopManager = ({ token }) => {
       fetchData();
     } catch (err) {
       toast.error("Failed to update item");
+    }
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Invalid file type. Allowed: PNG, JPG, WEBP");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large. Maximum size is 5MB");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await axios.post(`${API}/creators/shop/upload-image`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      if (res.data.success) {
+        setItemForm({...itemForm, image_url: res.data.image_url});
+        toast.success("Image uploaded!");
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to upload image");
+    } finally {
+      setUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -629,26 +675,56 @@ export const CreatorShopManager = ({ token }) => {
                 className="mt-1"
               />
               <p className="text-xs text-muted-foreground mt-1">
-                You'll receive 85% ({Math.floor(itemForm.price_coins * 0.85)} coins) per sale
+                You'll receive 75% ({Math.floor(itemForm.price_coins * 0.75)} coins) per sale
               </p>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
-              <label className="text-sm text-muted-foreground">Image URL</label>
-              <Input
-                value={itemForm.image_url}
-                onChange={(e) => setItemForm({...itemForm, image_url: e.target.value})}
-                placeholder="https://example.com/image.jpg"
-                className="mt-1"
+              <label className="text-sm text-muted-foreground">Product Image</label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleImageUpload}
+                className="hidden"
               />
-              {itemForm.image_url && (
-                <img 
-                  src={itemForm.image_url} 
-                  alt="Preview" 
-                  className="mt-2 w-full h-32 object-cover rounded-lg"
-                  onError={(e) => e.target.style.display = 'none'}
-                />
+              
+              {itemForm.image_url ? (
+                <div className="mt-2 relative">
+                  <img 
+                    src={itemForm.image_url.startsWith('/api') ? `${API.replace('/api', '')}${itemForm.image_url}` : itemForm.image_url}
+                    alt="Preview" 
+                    className="w-full h-40 object-cover rounded-lg border border-white/10"
+                    onError={(e) => e.target.src = 'https://via.placeholder.com/400x200?text=Image+Error'}
+                  />
+                  <Button
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-2 right-2 h-8 w-8"
+                    onClick={() => setItemForm({...itemForm, image_url: ""})}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="mt-2 border-2 border-dashed border-white/20 rounded-lg p-8 text-center cursor-pointer hover:border-primary/50 transition-colors"
+                >
+                  {uploading ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                      <p className="text-sm text-muted-foreground">Uploading...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="w-8 h-8 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">Click to upload image</p>
+                      <p className="text-xs text-muted-foreground">PNG, JPG, WEBP (max 5MB)</p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 

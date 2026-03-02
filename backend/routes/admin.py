@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import PlainTextResponse
+from pydantic import BaseModel
 
 from models.schemas import (
     AdminSeriesCreate, AdminEpisodeCreate, AdminUserUpdate,
@@ -1530,3 +1531,63 @@ async def apply_global_pricing_to_all(user: dict = Depends(require_super_admin))
     }
 
     return result
+
+
+# ============ PLATFORM COMMISSION SETTINGS ============
+
+class CommissionSettings(BaseModel):
+    tip_creator_percent: int  # 1-100
+    shop_creator_percent: int  # 1-100
+
+@router.get("/settings/commission")
+async def get_commission_settings(user: dict = Depends(require_super_admin)):
+    """Get platform commission settings"""
+    settings = await db.platform_settings.find_one({"id": "commission_rates"})
+    if not settings:
+        # Default settings
+        return {
+            "tip_creator_percent": 75,
+            "shop_creator_percent": 75,
+            "tip_platform_percent": 25,
+            "shop_platform_percent": 25
+        }
+    
+    return {
+        "tip_creator_percent": settings.get("tip_creator_percent", 75),
+        "shop_creator_percent": settings.get("shop_creator_percent", 75),
+        "tip_platform_percent": 100 - settings.get("tip_creator_percent", 75),
+        "shop_platform_percent": 100 - settings.get("shop_creator_percent", 75)
+    }
+
+@router.put("/settings/commission")
+async def update_commission_settings(
+    data: CommissionSettings,
+    user: dict = Depends(require_super_admin)
+):
+    """Update platform commission settings (Super Admin only)"""
+    # Validate percentages
+    if not (1 <= data.tip_creator_percent <= 99):
+        raise HTTPException(status_code=400, detail="Tip creator percent must be between 1 and 99")
+    if not (1 <= data.shop_creator_percent <= 99):
+        raise HTTPException(status_code=400, detail="Shop creator percent must be between 1 and 99")
+    
+    await db.platform_settings.update_one(
+        {"id": "commission_rates"},
+        {"$set": {
+            "id": "commission_rates",
+            "tip_creator_percent": data.tip_creator_percent,
+            "shop_creator_percent": data.shop_creator_percent,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": user["id"]
+        }},
+        upsert=True
+    )
+    
+    return {
+        "success": True,
+        "message": "Commission settings updated",
+        "tip_creator_percent": data.tip_creator_percent,
+        "shop_creator_percent": data.shop_creator_percent,
+        "tip_platform_percent": 100 - data.tip_creator_percent,
+        "shop_platform_percent": 100 - data.shop_creator_percent
+    }

@@ -862,6 +862,13 @@ const PlatformSettingsTab = ({ token }) => {
   const [series, setSeries] = useState([]);
   const [selectedSeries, setSelectedSeries] = useState(null);
   const [seriesPricing, setSeriesPricing] = useState(null);
+  
+  // Commission settings
+  const [commissionSettings, setCommissionSettings] = useState({
+    tip_creator_percent: 75,
+    shop_creator_percent: 75
+  });
+  const [savingCommission, setSavingCommission] = useState(false);
 
   const fetchSettings = async () => {
     try {
@@ -878,6 +885,33 @@ const PlatformSettingsTab = ({ token }) => {
       });
     }
     setLoading(false);
+  };
+
+  const fetchCommissionSettings = async () => {
+    try {
+      const res = await axios.get(`${API}/admin/settings/commission`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setCommissionSettings({
+        tip_creator_percent: res.data.tip_creator_percent || 75,
+        shop_creator_percent: res.data.shop_creator_percent || 75
+      });
+    } catch (e) {
+      console.error("Commission settings fetch failed:", e);
+    }
+  };
+
+  const saveCommissionSettings = async () => {
+    setSavingCommission(true);
+    try {
+      await axios.put(`${API}/admin/settings/commission`, commissionSettings, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Commission settings saved!");
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Failed to save commission settings");
+    }
+    setSavingCommission(false);
   };
 
   const fetchSeries = async () => {
@@ -906,6 +940,7 @@ const PlatformSettingsTab = ({ token }) => {
     if (token) {
       fetchSettings();
       fetchSeries();
+      fetchCommissionSettings();
     }
   }, [token]);
 
@@ -954,6 +989,81 @@ const PlatformSettingsTab = ({ token }) => {
 
   return (
     <div className="space-y-6">
+      {/* Commission Settings */}
+      <Card className="p-6 bg-gray-900/50 border-white/10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-green-500/20">
+            <Coins className="w-5 h-5 text-green-400" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg">Creator Commission Settings</h3>
+            <p className="text-sm text-muted-foreground">Configure how much creators earn from tips and shop sales</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="text-sm font-medium mb-2 block">Tip Commission (Creator %)</label>
+            <div className="flex items-center gap-4">
+              <Input
+                type="number"
+                min={1}
+                max={99}
+                value={commissionSettings.tip_creator_percent}
+                onChange={(e) => setCommissionSettings({
+                  ...commissionSettings,
+                  tip_creator_percent: Math.min(99, Math.max(1, parseInt(e.target.value) || 75))
+                })}
+                className="w-24"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Creator receives {commissionSettings.tip_creator_percent}%, Platform receives {100 - commissionSettings.tip_creator_percent}%
+            </p>
+          </div>
+
+          <div>
+            <label className="text-sm font-medium mb-2 block">Shop Commission (Creator %)</label>
+            <div className="flex items-center gap-4">
+              <Input
+                type="number"
+                min={1}
+                max={99}
+                value={commissionSettings.shop_creator_percent}
+                onChange={(e) => setCommissionSettings({
+                  ...commissionSettings,
+                  shop_creator_percent: Math.min(99, Math.max(1, parseInt(e.target.value) || 75))
+                })}
+                className="w-24"
+              />
+              <span className="text-sm text-muted-foreground">%</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Creator receives {commissionSettings.shop_creator_percent}%, Platform receives {100 - commissionSettings.shop_creator_percent}%
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              Example: For a 100 coin tip, creator receives <span className="text-green-400 font-medium">{commissionSettings.tip_creator_percent} coins</span>
+            </div>
+            <Button onClick={saveCommissionSettings} disabled={savingCommission}>
+              {savingCommission ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Commission Settings"
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
+
       {/* Global Pricing Settings */}
       <Card className="p-6 bg-gray-900/50 border-white/10">
         <div className="flex items-center gap-3 mb-6">
