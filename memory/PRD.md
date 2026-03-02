@@ -1610,7 +1610,7 @@ Full monetization API:
 - `GET /api/creators/shop/my-orders` - Creator's orders to fulfill
 - `PATCH /api/creators/shop/orders/{id}/fulfill` - Mark as shipped
 
-**Status:** UI-ONLY mock for tips/purchases - backend routes exist but coin transaction logic needs implementation.
+**Status:** FULLY IMPLEMENTED - Tip and Shop transaction logic is complete and tested.
 
 #### Test Data Seeded
 - Creator: "Amara Studios" (ID: test-creator-001)
@@ -1621,25 +1621,52 @@ Full monetization API:
 
 ---
 
+### Session (2026-03-02) - Tip & Shop Transaction Logic Implementation
+
+#### Transaction Logic - COMPLETE ✅
+**Testing:** All 26 API tests passed (see /app/test_reports/iteration_64.json)
+
+Implemented coin transaction logic:
+- **Tips:** Users can tip creators 1-10,000 coins. Creator receives 90% (10% platform fee)
+- **Shop Purchases:** Creator receives 85% of purchase price (15% platform fee)
+- **Digital Items:** Complete immediately, return download_url if set
+- **Physical Items:** Require shipping_address, status=pending for creator fulfillment
+
+**Coin Flow Verified:**
+- User balance decreases on tip/purchase
+- Creator balance increases with commission applied
+- Proper error handling for insufficient funds
+
+#### Creator Shop Manager UI - COMPLETE ✅
+**Location:** `/app/frontend/src/components/creator/CreatorShopManager.jsx`
+
+Added "Shop" tab to Creator Portal (under Revenue section) with:
+- Stats dashboard: Total items, Total sales, Revenue (coins), Pending orders
+- Items management: Create, Edit, Delete, Toggle visibility (active/hidden)
+- Filter tabs: All, Digital, Physical items
+- Item cards with image, type badge, price, sold count, stock indicator
+- Create/Edit dialog with full form (type, title, description, price, image, stock, delivery method)
+- Orders management: View pending orders, Fulfill with tracking number
+
+**Navigation:** Creator Portal > Revenue > Shop
+
+---
+
 ## Prioritized Backlog
 
-### P0 - Critical (Next Steps)
-1. **Implement Tip & Shop Transaction Logic**
-   - Deduct coins from user balance on tip/purchase
-   - Credit coins to creator balance
-   - Handle digital item delivery (grant access/download)
-   - Handle physical item orders (create fulfillment records)
+### P0 - Critical (COMPLETED)
+1. ~~**Implement Tip & Shop Transaction Logic**~~ ✅
+2. ~~**Creator Shop Management UI**~~ ✅
 
 ### P1 - High Priority
-1. **Creator Shop Management UI**
-   - Build UI in Creator Portal for adding/editing shop items
-   - Upload images for items
-   - Manage inventory for physical items
-
-2. **Comments Feature**
+1. **Comments Feature**
    - Bottom-sheet comments for episodes in Stories view
    - New `episode_comments` collection
    - Like/reply functionality
+
+2. **Image Upload for Shop Items**
+   - Currently using URL input
+   - Add direct image upload with Bunny.net CDN
 
 ### P2 - Medium Priority
 1. **Payment Integration**
