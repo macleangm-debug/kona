@@ -1627,8 +1627,8 @@ Full monetization API:
 **Testing:** All 26 API tests passed (see /app/test_reports/iteration_64.json)
 
 Implemented coin transaction logic:
-- **Tips:** Users can tip creators 1-10,000 coins. Creator receives 90% (10% platform fee)
-- **Shop Purchases:** Creator receives 85% of purchase price (15% platform fee)
+- **Tips:** Users can tip creators 1-10,000 coins. Creator receives configurable % (default 75%)
+- **Shop Purchases:** Creator receives configurable % (default 75%)
 - **Digital Items:** Complete immediately, return download_url if set
 - **Physical Items:** Require shipping_address, status=pending for creator fulfillment
 
@@ -1637,12 +1637,41 @@ Implemented coin transaction logic:
 - Creator balance increases with commission applied
 - Proper error handling for insufficient funds
 
+#### Image Upload for Shop Items - COMPLETE ✅
+**Testing:** All 12 API tests passed (see /app/test_reports/iteration_65.json)
+
+New endpoints:
+- `POST /api/creators/shop/upload-image` - Upload PNG/JPG/WEBP images (max 5MB)
+- `GET /api/creators/shop/images/{image_id}` - Serve uploaded images
+
+Features:
+- Files saved to `/app/uploads/shop_images/`
+- Proper content-type headers and caching
+- File type and size validation
+
+#### Configurable Commission Rates - COMPLETE ✅
+**Testing:** Verified in iteration_65.json
+
+Admin can configure:
+- Tip creator percentage (default 75%, platform gets 25%)
+- Shop purchase creator percentage (default 75%, platform gets 25%)
+
+New endpoints (Super Admin only):
+- `GET /api/admin/settings/commission` - Get current rates
+- `PUT /api/admin/settings/commission` - Update rates (1-99% range)
+
+Admin UI:
+- Added to Admin Dashboard > Platform Settings tab
+- Visual display of creator vs platform split
+- Save button with loading state
+
 #### Creator Shop Manager UI - COMPLETE ✅
 **Location:** `/app/frontend/src/components/creator/CreatorShopManager.jsx`
 
 Added "Shop" tab to Creator Portal (under Revenue section) with:
 - Stats dashboard: Total items, Total sales, Revenue (coins), Pending orders
 - Items management: Create, Edit, Delete, Toggle visibility (active/hidden)
+- **Image upload:** Drag-and-drop PNG/JPG/WEBP upload instead of URL input
 - Filter tabs: All, Digital, Physical items
 - Item cards with image, type badge, price, sold count, stock indicator
 - Create/Edit dialog with full form (type, title, description, price, image, stock, delivery method)
@@ -1657,16 +1686,14 @@ Added "Shop" tab to Creator Portal (under Revenue section) with:
 ### P0 - Critical (COMPLETED)
 1. ~~**Implement Tip & Shop Transaction Logic**~~ ✅
 2. ~~**Creator Shop Management UI**~~ ✅
+3. ~~**Image Upload for Shop Items**~~ ✅
+4. ~~**Configurable Commission Rates (Admin)**~~ ✅
 
 ### P1 - High Priority
 1. **Comments Feature**
    - Bottom-sheet comments for episodes in Stories view
    - New `episode_comments` collection
    - Like/reply functionality
-
-2. **Image Upload for Shop Items**
-   - Currently using URL input
-   - Add direct image upload with Bunny.net CDN
 
 ### P2 - Medium Priority
 1. **Payment Integration**
