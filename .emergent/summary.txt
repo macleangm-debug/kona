@@ -1,147 +1,178 @@
 <analysis>**original_problem_statement:**
-The user's core objective is to build out a sophisticated video streaming application named . The initial focus has shifted from bug fixes to implementing advanced creator monetization and management tools. The current work involves creating a highly configurable contract management system within the Super Admin portal. This system needs to handle complex scenarios, including designating Super Creators with exclusive territorial rights, defining specific revenue-sharing models, and accommodating different legal entities and currencies. The latest request is to enable the downloading of these generated contracts in PDF and Word document formats.
+The user's objective is to build a sophisticated video streaming application named , inspired by a provided business plan for HiiPlay. The project has evolved from initial setup to implementing advanced features.
+
+Key requests implemented include:
+- A dynamic contract management system for creators, including Super Creators with special terms, and the ability to edit, version, and download contracts as PDF/Word.
+- An immersive video player with gesture controls (tap to show/hide UI, double-tap to like) and a Netflix-style auto-play feature.
+- A Super Creator dashboard to manage sub-creators and upload content on their behalf.
+- Scaffolding a full mobile app (iOS/Android) from the existing React PWA using Capacitor, and setting up a CI/CD pipeline with Codemagic and Firebase for production builds.
+
+The user's latest request is to build a user-friendly subtitle management system that allows creators to upload Word/text files or use an in-app editor, abstracting away the complexity of the VTT format.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Integrated Creator Workflow:** Streamline the content creation process by integrating tools like thumbnail and trailer generation directly into the episode management interface. (Completed)
-2.  **Advanced Contract Management System:**
-    *   Build a UI in the Admin Portal to generate dynamic contracts.
-    *   Support standard creators and Super Creators.
-    *   Allow configuration of exclusive territories (e.g., United Republic of Tanzania).
-    *   Define custom revenue splits (e.g., 60% creator / 40% company) after a platform fee.
-    *   Allow the contracting party to be specified (e.g., Dar24 Media Limited) with Kona as the platform provider.
-    *   Support local currencies (e.g., Tanzanian Shilling - TZS).
-    *   Provide toggles for optional clauses, such as allowing Super Creators to negotiate terms with their sub-creators.
-3.  **Contract Export:** Allow generated contracts to be downloaded in PDF and Word (.docx) formats. (In Progress)
+Based on an analysis of the user-provided HiiPlay business plan, the following high-level features are required:
+1.  **Core Platform:** A B2C streaming service for web and mobile (iOS/Android) focused on short-form mini-series. (Mostly Complete)
+2.  **Monetization:** A multi-faceted model including a virtual coin system, tipping, subscriptions, and eventually, advertising. (Partially Implemented - Coins/Referrals Done)
+3.  **Payment Integrations:** Support for local African payment methods like M-Pesa and Airtel Money, alongside standard credit card processing. (Not Started)
+4.  **Content & Viewing Experience:** High-quality video streaming (HLS, adaptive bitrate), offline downloads, and an immersive UI. (Partially Implemented)
+5.  **Creator Ecosystem:** A full-featured portal for creators to upload content, manage series, view analytics, and a Super Creator system for territory management. (Mostly Complete)
+6.  **Admin & Moderation:** A comprehensive admin dashboard for user management, content moderation, analytics, and contract oversight. (Mostly Complete)
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack video streaming platform (React/FastAPI/MongoDB). A comprehensive and dynamic contract management system has been successfully implemented in the Admin Portal. This system can generate detailed contracts tailored for both regular creators and Super Creators, incorporating specific terms for revenue splits, exclusive territories, and contracting parties as requested by the user. The agent has just begun implementing the final piece of this feature: allowing admins to download the generated contracts as PDF and Word files. The necessary backend libraries ( and ) have been installed.
+The application is a robust full-stack video streaming platform (React/FastAPI/MongoDB) named 'kona'. It features comprehensive portals for Admins, Creators, and Super Creators. Key functionalities include dynamic contract management (create, edit, version, download), a referral and coin-based monetization system, and an immersive video player with gesture controls and auto-play. The project has been fully configured to be built as native iOS and Android apps using Capacitor, with a CI/CD pipeline set up via Codemagic and integrations with Firebase for push notifications and analytics.
 
 **Last working item**:
-- **Last item agent was working:** Implementing PDF and Word document download functionality for the contracts. The agent had just installed the required Python libraries and was in the process of adding the backend endpoints and updating the frontend UI.
-- **Status:** IN PROGRESS
-- **Agent Testing Done:** N
-- **Which testing method agent to use?** both. Backend API endpoints for file conversion need to be tested for success and correct format generation. The frontend needs to be tested to ensure the download buttons trigger the downloads correctly.
-- **User Testing Done:** N
+-   **Last item agent was working:** Building a comprehensive subtitle management system. This involves creating a new backend router () to handle the conversion of uploaded Word/Text files into the VTT format, and a new frontend component () to provide creators with an in-app tool for creating and editing subtitles.
+-   **Status:** IN PROGRESS
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** both. The backend requires testing the file upload and conversion logic. The frontend requires testing the  component's functionality and UI.
+-   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-*   There are no known outstanding bugs or issues.
+-   There are no outstanding bugs. The primary pending work is the completion of the in-progress subtitle management task.
 
 **In progress Task List**:
--   **Task 1: Complete PDF and Word Contract Downloads (P0)**
-    -   **Where to resume:** Resume by implementing the file conversion logic in the backend router  for the new PDF and Word download endpoints. Subsequently, update the frontend component  to add the download buttons and the corresponding API calls.
-    -   **What will be achieved with this?** Admins will be able to export the dynamically generated contracts into standard, shareable document formats (PDF and .docx) for legal and record-keeping purposes.
+-   **Task 1: Complete Subtitle Management System (P0)**
+    -   **Where to resume:** The foundational files have been created. The next steps are to implement the core logic:
+        1.  In , write the Python code to parse uploaded  and  files and convert their content into the VTT timestamped format.
+        2.  In , build out the React UI, including the file upload interface, the line-by-line editor, and state management to handle subtitle data and API interactions.
+    -   **What will be achieved with this?** Creators will gain a user-friendly way to add subtitles to their videos, either by uploading a simple document or by using an intuitive in-app editor, removing the technical barrier of creating VTT files manually.
     -   **Status:** IN PROGRESS
     -   **Should Test frontend/backend/both after fix?** Both.
     -   **Blocked on something:** No.
 
 **Upcoming and Future Tasks**
-*   **Upcoming Tasks:**
-    *   **Super Creator Dashboard (P1):** Based on the creation of the Super Creator role, the next logical step is to build a dedicated dashboard for these users to manage sub-creators within their territory.
-*   **Future Tasks:**
+*   **Upcoming Tasks (High Priority):**
+    *   **Payment Integration (P0):** Integrate M-Pesa, Airtel Money, and Stripe/Flutterwave to enable real-money transactions for coin purchases and subscriptions. This is critical for monetization in the target market.
+    *   **Subscription System (P1):** Implement subscription tiers (e.g., Weekly, Monthly) with auto-renewal and defined benefits (e.g., ad-free, unlock all content).
+    *   **Offline Video Downloads (P1):** Allow mobile app users to download episodes for offline viewing, a crucial feature for areas with intermittent internet connectivity.
+*   **Future Tasks (Medium/Low Priority):**
+    *   **Adaptive Bitrate Streaming:** Optimize the video player to automatically adjust stream quality based on the user's network speed.
+    *   **Advertising System:** Build a system for inserting video ads to monetize non-subscribed users.
+    *   **Live Streaming:** Add capabilities for creators to host live video sessions with real-time chat and gifting.
+    *   **Advanced AI:** Improve the content recommendation engine and explore AI for script generation or video editing assistance.
     *   Refactor  and  to lazy-load tab components for better performance.
-    *   Implement a system-wide Analytics Export feature.
-    *   Add social sharing capabilities for video content.
-    *   Prepare and execute the deployment of the application to a production environment.
 
 **Completed work in this session**
-- **Feature: Integrated Creator Workflow:**
-  - Added Create Short and Generate Thumbnail quick-action buttons directly to episode cards on the , streamlining the creator process.
-  - Implemented the backend logic and routes () to support the creation of short video clips.
-- **Feature: Comprehensive Contract Management System:**
-  - Created the full stack for contract management, including backend models, routes (), and a frontend UI ().
-  - Implemented a dynamic HTML generator for contracts based on form inputs.
-- **Feature: Super Creator & Custom Contract Terms:**
-  - Enhanced the contract system to support a Super Creator role with clauses for exclusive territories and negotiable sub-creator terms.
-  - Customized the contract template to specify Dar24 Media Limited as the company and Kona as the platform provider, and added support for local currencies like TZS.
-- **Bug Fixes:**
-  - The testing agent found and fixed a critical JavaScript temporal dead zone error that was crashing the .
-  - Resolved several backend bugs in the  router related to async database operations and incorrect dependency injections.
+- **Contract Management Enhancements:**
+  - Implemented PDF and Word document download for contracts in  and .
+  - Added the ability for Admins to edit existing contracts, which creates a new version for audit purposes, and to activate contracts with a specific start date.
+- **Super Creator Features:**
+  - Created a  page.
+  - Implemented functionality for Super Creators to manage and upload content on behalf of their sub-creators by updating  and .
+- **Video Viewing Experience:**
+  - Revamped the  to be more immersive: UI controls fade out and are toggled by a single tap.
+  - Implemented a double-tap to like gesture.
+  - Added a Netflix-style smart auto-play feature that automatically plays the next episode if the user has enough coins, with a cancellable countdown.
+- **PWA to Native Mobile App Conversion:**
+  - Set up Capacitor in the  directory to wrap the React PWA into native iOS and Android projects.
+  - Integrated native features: Biometric Auth, Push Notifications (FCM), and App Status Bar control.
+  - Configured a  file for cloud-based CI/CD builds, eliminating the need for a local Mac.
+  - Integrated Firebase SDK for analytics and crash reporting.
+  - Created documentation () for the user.
+- **Bug Fix & Investigation:**
+  - Investigated a user report of carousel clicks not working. Determined that navigation was functional and the issue was likely a coincidental promotional pop-up obscuring the screen.
 
 **Earlier issues found/mentioned but not fixed**
-*   None.
+-   **Carousel Click Ambiguity:** A user reported that clicking on carousel items did nothing. The agent's investigation showed navigation was working, attributing the user's experience to a promotional popup that appeared at the same time. While the agent concluded there was no bug, this could be a point of user friction and may need re-evaluation if reported again.
 
 **Known issue recurrence from previous fork**
 *   None.
 
 **Code Architecture**
-
+attributed_to
 
 **Key Technical Concepts**
-*   **Dynamic Document Generation:** Using backend logic to create complex, data-driven HTML documents (contracts) from a base template and user-provided parameters.
-*   **Server-Side File Conversion:** Leveraging Python libraries (, ) to convert HTML into standard document formats like PDF and DOCX on the fly.
-*   **Contextual UI/UX:** Improving workflows by placing actions directly where users need them (e.g., Create Short on an episode card) instead of on separate, disconnected pages.
+*   **PWA to Native Conversion:** Using Capacitor to wrap a React web application into native iOS and Android containers, enabling access to native device APIs.
+*   **Mobile CI/CD:** Automating the mobile build and deployment process using cloud services like Codemagic to build  (iOS) and  (Android) files.
+*   **Dynamic Document Generation:** Backend conversion of application data into PDF and Word formats (, ).
+*   **Gesture-Based UI:** Implementing intuitive mobile-first interactions like tap-to-toggle and double-tap-to-like in the video player.
+*   **Stateful Auto-play:** Creating a smart auto-play system that checks for monetization requirements (user coins) before proceeding to the next episode.
 
 **key DB schema**
--   ****: 
--   ****: 
+-   ****:  (Number),  ('draft', 'signed', 'active'),  (DateTime) fields were added to support versioning and activation.
+-   ****:  (String, creator_id) field was added to allow Super Creators to upload content on behalf of sub-creators.
 
 **changes in tech stack**
-*   ****: Added for HTML to PDF conversion.
-*   ****: Added for HTML to Word (.docx) conversion.
+*   **Capacitor:** , , ,  were added to convert the PWA to native apps.
+*   **Capacitor Plugins:** , , ,  and others were installed for native functionality.
+*   **Firebase:** SDK integrated for push notifications, analytics, and crash reporting.
+*   **Codemagic:**  configured for cloud-based mobile builds.
 
 **All files of reference**
-*   : Contains the core logic for contract generation and needs to be updated with the file export functionality.
-*   : The frontend component that requires the addition of download buttons.
-*   : The host page for the contract management feature.
+*   : New file for subtitle processing logic (in progress).
+*   : New frontend component for the subtitle editor UI (in progress).
+*   : Heavily modified for improved UX (immersive mode, gestures, auto-play).
+*   : Modified to include edit, versioning, and activation UI.
+*   : New page for super creator features.
+*   , : Core configuration files for the mobile app conversion and build process.
+*   : A critical document created for the user explaining how to finalize the Firebase/Codemagic setup.
 
 **Areas that need refactoring**:
-*   The main dashboard components (, ) are large and could benefit from lazy-loading their child tab components to improve initial page load times. This is noted as a future task.
+*   The main dashboard components (, ) could still benefit from lazy-loading their child tab components to improve initial page load times.
 
 **key api endpoints**
-*   : Create a new contract.
-*   : Retrieve all contracts.
-*   : Fetch an HTML preview of a specific contract.
-*   **Upcoming (In Progress):**
-    *   
-    *   
+*   : Updates a contract and creates a new version.
+*   : Sets a signed contract to active status with a start date.
+*   : Retrieves data for the Super Creator dashboard.
+*   : Gets a list of sub-creators for the logged-in Super Creator.
+*   : Onboards a new sub-creator.
+*   The  endpoint was modified to accept an optional  field.
 
 **Critical Info for New Agent**
-*   **Top Priority:** Your immediate task is to complete the implementation of the contract download feature. This involves writing the file conversion logic in  and connecting it to new download buttons in the  component.
-*   **Dependencies Installed:** The necessary Python libraries ( for PDF,  for Word) are already installed in the environment. You can proceed directly to implementation.
-*   **Contract Complexity:** The contract generation logic is highly conditional. Be mindful of the various boolean flags in the model and UI, as they dictate the final content of the exported documents.
+*   **Immediate Priority:** Your first task is to complete the subtitle management system as outlined in the In progress Task List. This is the user's most recent request.
+*   **Future Roadmap is Defined:** The agent analyzed a user-provided business plan () and generated a clear, prioritized list of unimplemented features (Payments, Subscriptions, Offline Downloads, etc.). Refer to this list in the Upcoming and Future Tasks section for planning your next steps after the subtitle feature is complete.
+*   **Mobile App Workflow:** The project is now configured for mobile app builds. To generate new app binaries, code must be pushed, and the Codemagic CI/CD pipeline will handle the build. The user needs to supply the  (for iOS) and  (for Android) files from their Firebase project and place them in the  and  directories, respectively. The process is detailed in .
+*   **Testing Credentials:** The platform has distinct roles. Use  for the admin portal. To test Super Creator features, you must first create a user, then use the admin portal to create a Super Creator contract for that user.
 
 **documents and test reports created in this job**
-*    (updated consistently)
-*    (latest test report)
+*    (updated with latest features)
+*   Multiple test reports in 
+*    (NEW: Explains how to set up Firebase and Codemagic)
+*   The user uploaded an artifact which was analyzed: 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User:** Asks for contract changes: exclusive contract, super creator role for Tanzania. - **Status:** RESOLVED.
-2.  **User:** Confirms choices for contract implementation. - **Status:** RESOLVED.
-3.  **User:** Asks for advice on handling local taxes (VAT). - **Status:** RESOLVED.
-4.  **User:** Approves the plan to implement the contract system. - **Status:** RESOLVED.
-5.  **User:** Asks for configurable terms for Super Creators to negotiate with sub-creators. - **Status:** RESOLVED.
-6.  **User:** Requests more changes: hide sub-creator distribution, use local currency (TZS), simplify revenue display (60/40 of net), and set Dar24 Media Limited as the contracting party with Kona as the platform provider. - **Status:** RESOLVED.
-7.  **User:** Requests downloadable formats (PDF and Word) for the contracts. - **Status:** IN PROGRESS.
-8.  **User:** Asks for Super Admin credentials and URL. - **Status:** RESOLVED.
-9.  **User:** Provides specific details for contract changes (Dar24 Media, Tanzania, currency, etc.). - **Status:** RESOLVED.
-10. **User:** Approves the implementation plan for downloadable formats. - **Status:** RESOLVED.
+1.  **User:** Asks how affiliate and referral work. **Status:** COMPLETE. Agent provided a detailed summary.
+2.  **User:** Asks for the URL. **Status:** COMPLETE. Agent provided URLs and guidance on production  setup.
+3.  **User:** Asks to create a mobile app for iOS/Android from the PWA. **Status:** COMPLETE.
+4.  **User:** Confirms choices for mobile app setup (Capacitor, native features, store submission prep). **Status:** COMPLETE.
+5.  **User:** Asks why a local machine is needed for builds. **Status:** COMPLETE. Agent explained cloud build alternatives.
+6.  **User:** Asks for the best build option for 1M+ subscribers. **Status:** COMPLETE. Agent recommended a scalable stack (Codemagic, Firebase).
+7.  **User:** Asks how the mobile app code is packaged on the backend. **Status:** COMPLETE. Agent explained the architecture (backend is decoupled).
+8.  **User:** Asks for a list of implemented vs. unimplemented features from a provided document. **Status:** COMPLETE. Agent provided a detailed breakdown.
+9.  **User:** Asks about the viewing experience (auto-play). **Status:** COMPLETE. Agent implemented a smart auto-play feature.
+10. **User:** Asks for a better way to handle subtitles than the tricky existing format. **Status:** IN PROGRESS. Agent started building a user-friendly subtitle management system.
 
 **Project Health Check:**
-*   **Needs Attention:** The new contract download feature must be completed and tested thoroughly.
-*   **Healthy:** The application is stable, and recently added features have passed all automated tests. The codebase is organized and follows consistent patterns.
+*   **Broken:** The new subtitle management feature is incomplete and not functional.
+*   **Healthy:** The core platform, including contract management, video playback, and user portals, is stable. The mobile app scaffolding is complete and ready for builds.
 *   **Mocked:** None.
 
 **3rd Party Integrations**
 *   **Bunny.net:** Video hosting, streaming (HLS), and CDN.
-*   **dnd-kit:** Frontend library for drag-and-drop functionality.
+*   **dnd-kit:** Frontend library for drag-and-drop.
 *   **hls.js:** Frontend library for HLS playback.
-*   **react-confetti:** Frontend library for celebration animations.
-*   **emergentintegrations:** Used for multi-provider LLM access (, ) via the .
-*   **weasyprint:** (New) Python library for HTML to PDF conversion.
-*   **pypandoc:** (New) Python library for HTML to Word (.docx) conversion.
+*   **weasyprint, python-docx:** Backend libraries for PDF/Word document generation.
+*   **emergentintegrations:** For multi-provider LLM access (used in previous features).
+*   **Capacitor:** Core framework for PWA-to-native conversion.
+*   **Firebase:** For push notifications (FCM), analytics, and crashlytics.
+*   **Codemagic:** CI/CD service for automated iOS/Android builds (configured via ).
 
 **Testing status**
-- **Testing agent used after significant changes:** YES, successfully caught and fixed critical frontend and backend issues.
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** None.
-- **Known regressions:** None.
+-   **Testing agent used after significant changes:** YES. The agent ran the testing agent multiple times after completing major features like contract editing and super creator content management, achieving 100% pass rates.
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
 *   **Super Admin:**
+    *   **URL Path:** 
     *   **Email:** 
     *   **Password:** 
-
-**What agent forgot to execute**
-*   Nothing was forgotten. The agent was actively implementing the user's latest request for downloadable contracts when the session concluded.</analysis>
+*   **Super Creator:**
+    1.  Create/use a regular creator account.
+    2.  As Super Admin, go to  ->  -> .
+    3.  Create a new contract for that creator and ensure the Super Creator toggle is enabled.
+    4.  Log in as that creator and navigate to the  path to access the dashboard.</analysis>
