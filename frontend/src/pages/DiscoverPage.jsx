@@ -332,6 +332,38 @@ export const DiscoverPage = ({ onAuthClick }) => {
         onRemoveFromList={handleRemoveFromList}
       />
 
+      {/* Start Watching Free - Prominent Section */}
+      {allSeries.filter(s => !s.is_exclusive && !s.custom_episode_price).length > 0 && (
+        <div className="mb-8" data-testid="free-episodes-section">
+          <div className="mx-4 lg:mx-12 mb-4 p-4 lg:p-6 rounded-2xl bg-gradient-to-r from-green-500/20 via-emerald-500/10 to-transparent border border-green-500/30">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                <Play className="w-5 h-5 text-white fill-white" />
+              </div>
+              <div>
+                <h2 className="font-heading text-lg lg:text-xl font-bold text-green-400">Start Watching Free</h2>
+                <p className="text-sm text-gray-400">First episode free on all these series - no coins needed!</p>
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-3 lg:gap-4 overflow-x-auto scrollbar-hide px-4 lg:px-12 pb-2">
+            {allSeries
+              .filter(s => !s.is_exclusive && !s.custom_episode_price)
+              .slice(0, 12)
+              .map((s) => (
+                <SeriesCardDesktop
+                  key={s.id}
+                  series={s}
+                  onClick={() => navigate(`/watch/${s.id}-ep1`)}
+                  inMyList={myList?.includes(s.id)}
+                  onAddToList={handleAddToList}
+                  onRemoveFromList={handleRemoveFromList}
+                />
+              ))}
+          </div>
+        </div>
+      )}
+
       {/* Because You Watched */}
       {user && watchedSeries && (
         <BecauseYouWatchedRow
