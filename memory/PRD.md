@@ -1559,5 +1559,105 @@ REACT_APP_BACKEND_URL=<backend-url>
 - `/app/frontend/src/pages/HomePageResponsive.jsx` - Added LiveStreamsRow
 - `/app/frontend/src/components/creator/CreatorHeader.jsx` - Added Go Live button
 
+---
+
+### Session (2026-03-02) - Creator Profile & Shop UI Demonstration
+
+#### Creator Profile Page - COMPLETE ✅
+**Location:** `/app/frontend/src/pages/CreatorProfilePage.jsx`
+
+Public creator profile page accessible at `/creator/{creatorId}` with:
+- Creator avatar with verified badge
+- Display name, category, and bio
+- Stats row: Followers, Series, Episodes, Views
+- Follow/Unfollow button
+- Social media links (Instagram, Twitter, YouTube)
+- **"Support this Creator"** section with 3 action cards:
+  - Send Tip (opens tip sheet modal)
+  - Digital Shop (downloads & more)
+  - Physical Merch
+- Shop items preview (horizontal scrollable)
+- Recent supporters (tips display)
+- Series grid showing all creator's published series
+
+#### Creator Shop Page - COMPLETE ✅
+**Location:** `/app/frontend/src/pages/CreatorShopPage.jsx`
+
+Full shop experience at `/creator/{creatorId}/shop` with:
+- Filter tabs: All, Digital, Physical
+- Item cards with:
+  - Image thumbnails
+  - Type badges (DIGITAL purple, PHYSICAL blue)
+  - Stock indicators for physical items
+  - Coin prices and sold counts
+- Purchase sheet modal with:
+  - Shipping address form for physical items
+  - Price summary with user balance
+  - Purchase confirmation
+
+#### Backend Routes - COMPLETE ✅
+**Location:** `/app/backend/routes/creator_shop.py`
+
+Full monetization API:
+- `POST /api/creators/{id}/tip` - Send coin tips (90% to creator)
+- `GET /api/creators/{id}/tips/recent` - Get recent tips
+- `GET /api/creators/{id}/shop` - List shop items
+- `POST /api/creators/{id}/shop/items` - Create item (creator)
+- `PATCH /api/creators/{id}/shop/items/{item_id}` - Update item
+- `DELETE /api/creators/{id}/shop/items/{item_id}` - Delete item
+- `POST /api/creators/{id}/shop/purchase/{item_id}` - Purchase (85% to creator)
+- `GET /api/creators/shop/my-items` - Creator's own items
+- `GET /api/creators/shop/my-orders` - Creator's orders to fulfill
+- `PATCH /api/creators/shop/orders/{id}/fulfill` - Mark as shipped
+
+**Status:** UI-ONLY mock for tips/purchases - backend routes exist but coin transaction logic needs implementation.
+
+#### Test Data Seeded
+- Creator: "Amara Studios" (ID: test-creator-001)
+- 3 Series: Hearts of Nairobi, The Lagos Heir, Whispers in Accra
+- 6 Shop Items: 3 digital (documentary, soundtrack, Q&A), 3 physical (t-shirt, poster, mug set)
+- 150 followers
+- 3 sample tips
+
+---
+
+## Prioritized Backlog
+
+### P0 - Critical (Next Steps)
+1. **Implement Tip & Shop Transaction Logic**
+   - Deduct coins from user balance on tip/purchase
+   - Credit coins to creator balance
+   - Handle digital item delivery (grant access/download)
+   - Handle physical item orders (create fulfillment records)
+
+### P1 - High Priority
+1. **Creator Shop Management UI**
+   - Build UI in Creator Portal for adding/editing shop items
+   - Upload images for items
+   - Manage inventory for physical items
+
+2. **Comments Feature**
+   - Bottom-sheet comments for episodes in Stories view
+   - New `episode_comments` collection
+   - Like/reply functionality
+
+### P2 - Medium Priority
+1. **Payment Integration**
+   - M-Pesa, Airtel Money
+   - Stripe/Flutterwave for cards
+   
+2. **Subscription System**
+   - Auto-renewal logic
+   - Tier benefits enforcement
+
+3. **Offline Video Downloads**
+   - Download manager
+   - Encrypted storage
+
+### Future/Backlog
+- Live Streaming (currently "Coming Soon" placeholder)
+- Advanced Analytics Dashboard
+- Push Notification Campaigns
+
 
 
