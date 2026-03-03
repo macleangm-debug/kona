@@ -3744,26 +3744,25 @@ export const AdminDashboard = () => {
                     <li>• Analytics dashboards</li>
                     <li>• Admin Dashboard + Contracts</li>
                     <li>• Multi-language (EN, SW, FR)</li>
+                    <li>• Video Processing (FFmpeg installed)</li>
                   </ul>
                 </div>
                 <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-                  <p className="text-sm font-medium text-yellow-400 mb-2">Backend Ready (UI Mock)</p>
+                  <p className="text-sm font-medium text-yellow-400 mb-2">Backend Ready (Awaiting Integration)</p>
                   <ul className="text-xs text-gray-300 space-y-1">
-                    <li>• Subscriptions (simulated payment)</li>
-                    <li>• Payouts (KwikPay pending)</li>
-                    <li>• Email notifications (placeholder)</li>
-                    <li>• Trailer video processing</li>
-                    <li>• Shorts video processing</li>
+                    <li>• Payouts (KwikPay API pending)</li>
+                    <li>• Subscriptions (Stripe/M-Pesa pending)</li>
+                    <li>• Email notifications (SMTP pending)</li>
+                    <li>• Push notifications (Firebase ready)</li>
                   </ul>
                 </div>
                 <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
                   <p className="text-sm font-medium text-red-400 mb-2">Planned (Not Built)</p>
                   <ul className="text-xs text-gray-300 space-y-1">
-                    <li>• M-Pesa / Stripe integration</li>
+                    <li>• M-Pesa / Stripe payment gateway</li>
                     <li>• Offline video downloads</li>
-                    <li>• Live streaming (Coming Soon UI)</li>
-                    <li>• Native mobile apps</li>
-                    <li>• Push notifications (Firebase ready)</li>
+                    <li>• Live streaming</li>
+                    <li>• Native mobile apps (iOS/Android)</li>
                   </ul>
                 </div>
               </div>
